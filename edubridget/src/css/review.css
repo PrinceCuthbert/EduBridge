@@ -1,0 +1,127 @@
+/* Main Review Section */
+.reviewpage {
+  min-height: 60vh;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 2rem;
+}
+
+.review_title {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.review_title h1 {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, serif;
+  font-size: 3rem;
+  margin-top: 2rem;
+}
+
+.review_title p {
+  padding: 0 5rem;
+  font-size: 1.6rem;
+  margin-top: 2rem;
+  color: #666;
+}
+
+/* Card Section for Reviews */
+.cardSection {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 0 2rem;
+}
+
+/* Individual Review Card */
+.review-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease;
+  text-align: center;
+  align-items: center;
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.review-card:hover {
+  transform: translateY(-5px);
+}
+
+.review-icon {
+  font-size: 2rem;
+  color: #0077cc;
+  margin-bottom: 1rem;
+}
+
+.review-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.review-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.review-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.review-description {
+  font-size: 1.2rem;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+/* Blockquote Styling */
+.review-description {
+  font-size: 1.2rem;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  font-style: italic; /* Make the text italic */
+  border-left: 4px solid #0077cc; /* Blue left border */
+  padding-left: 1.2rem; /* Space between border and text */
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+  .review_title h1 {
+    font-size: 2.5rem;
+  }
+
+  .review_title p {
+    font-size: 1.3rem;
+  }
+
+  .review-card {
+    max-width: 100%;
+    padding: 1.5rem;
+  }
+
+  .review-title {
+    font-size: 1.2rem;
+  }
+
+  .review-description {
+    font-size: 1rem;
+  }
+}

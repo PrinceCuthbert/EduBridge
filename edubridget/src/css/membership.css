@@ -1,0 +1,166 @@
+.membershipSection {
+  background-color: #fff;
+}
+
+.member_title {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-top: 4rem;
+}
+
+.member_title > h1 {
+  font-size: 3.5rem;
+  color: black;
+  margin-bottom: 1rem;
+}
+
+.member_title > p {
+  font-size: 1.8rem;
+  color: #555;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.membership-cards-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+  justify-content: center;
+  padding: 0 3rem 5rem;
+}
+
+.membership-card {
+  max-width: 720px; /* enlarged */
+  background-color: #ffffff;
+  border-radius: 20px; /* slightly rounder */
+  padding: 3rem; /* more spacious */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease;
+  font-size: 1.4rem; /* larger base font */
+}
+
+.membership-card:hover {
+  transform: translateY(-7px);
+}
+
+.membership-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.plan-name {
+  font-size: 2.6rem;
+  font-weight: bold;
+  color: #000;
+}
+
+.plan-desc {
+  font-size: 1.6rem;
+  color: #666;
+}
+
+.plan-price {
+  font-size: 2rem;
+  margin-top: 0.5rem;
+}
+
+.price-amount {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #1a73e8;
+}
+
+.features {
+  list-style-type: none;
+  padding: 0;
+  margin: 2rem 0;
+}
+
+.features li {
+  font-size: 1.4rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.features li::before {
+  content: "\2713"; /* checkmark */
+  color: green;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.features li.disabled {
+  color: #bbb;
+  text-decoration: line-through;
+}
+
+.features li.disabled::before {
+  content: "\2717"; /* cross mark */
+  color: red;
+}
+
+.signup-btn {
+  background-color: #1a73e8;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.signup-btn:hover {
+  background-color: #0f5dc2;
+}
+
+@media (max-width: 600px) {
+  .member_title > h1 {
+    font-size: 2.2rem;
+  }
+
+  .member_title > p {
+    font-size: 1.2rem;
+  }
+
+  .membership-card {
+    font-size: 1rem;
+    padding: 2rem;
+  }
+
+  .plan-name {
+    font-size: 1.8rem;
+  }
+
+  .plan-desc {
+    font-size: 1.2rem;
+  }
+
+  .plan-price {
+    font-size: 1.4rem;
+  }
+
+  .price-amount {
+    font-size: 2.2rem;
+  }
+
+  .features li {
+    font-size: 1.1rem;
+  }
+
+  .features li::before {
+    font-size: 1.2rem;
+  }
+
+  .signup-btn {
+    font-size: 1.1rem;
+  }
+}
