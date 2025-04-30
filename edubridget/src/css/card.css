@@ -1,0 +1,49 @@
+.cardSection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 3rem 6rem;
+}
+
+.card {
+  background-color: rgba(234, 233, 233, 0.4);
+  padding: 2rem;
+  border-radius: 1rem;
+  display: flex;
+  height: 20rem;
+  flex-direction: column;
+  align-items: start;
+  gap: 0.8rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card > h2 {
+  font-size: 2rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, serif;
+}
+
+.card > p {
+  font-size: 1.5rem;
+}
+
+.card > .link {
+  font-size: 1.5rem;
+}
+
+.card > .link:hover {
+  cursor: pointer;
+  color: blueviolet;
+  transform: scale(1.01);
+  transition: smooth 0.2s all;
+}
+.card:hover {
+  transform: translateY(-5px);
+  transition: 0.3s ease;
+  box-shadow: #000 2px;
+}
+
+.icons {
+  /* border: solid 50% aqua; */
+  color: aqua;
+  font-size: 2rem;
+}
