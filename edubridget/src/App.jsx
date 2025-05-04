@@ -8,6 +8,9 @@ import {
   faCertificate,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
+import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons"; // Import quote icon
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 import "./css/header.css";
 import "./css/intropage.css";
@@ -17,19 +20,32 @@ import "./css/courses.css";
 import "./css/membership.css";
 import "./css/review.css";
 import "./css/footer.css";
-import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons"; // Import quote icon
+
+import MembershipPage from "./pages/MembershipPage";
+import ContactPage from "./pages/contactpage";
 
 function App() {
   return (
-    <>
+    <Router>
       <Header />
-      <Intro />
-      <About />
-      <Courses />
-      <Membership />
-      <ReviewSection />
-      <Footer />
-    </>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <Intro />
+              <About />
+              <Courses />
+              <Membership />
+              <ReviewSection />
+              <Footer />
+            </>
+          }
+        />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/membership" element={<MembershipPage />} />
+      </Routes>
+    </Router>
   );
 }
 
@@ -51,14 +67,58 @@ function Header() {
 
       <nav className="nav_list">
         <ul className={menuOpen ? "show" : ""}>
-          <li>Home</li>
-          <li>Course</li>
-          <li>Resource</li>
-          <li>Membership</li>
-          <li>About</li>
-          <li>Contact</li>
-          <li className="login">Login</li>
-          <li className="signup">Sign Up</li>
+          <li>
+            <NavLink
+              to="/"
+              className={({ isActive }) => (isActive ? "active" : "")}>
+              Home
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/courses"
+              className={({ isActive }) => (isActive ? "active" : "")}>
+              Courses
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/resources"
+              className={({ isActive }) => (isActive ? "active" : "")}>
+              Resources
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/membership"
+              className={({ isActive }) => (isActive ? "active" : "")}>
+              Membership
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/about"
+              className={({ isActive }) => (isActive ? "active" : "")}>
+              About
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/contact"
+              className={({ isActive }) => (isActive ? "active" : "")}>
+              Contact
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/login" className="login">
+              Login
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/signup" className="signup">
+              Sign Up
+            </NavLink>
+          </li>
         </ul>
       </nav>
     </header>
@@ -72,7 +132,7 @@ function Intro() {
         <div className="partOne">
           <div className="description">
             <h1>
-              Empowering <br /> Africa through <br /> AfricaKnowledge
+              Empowering Africa through <br></br>Knowledge
             </h1>
             <p>
               Access quality education, resources, and expert guidance to
@@ -80,8 +140,8 @@ function Intro() {
             </p>
           </div>
           <div className="buttons">
-            <button className="primary-btn">Explore Courses</button>
-            <button className="secondary-btn">Watch Intro</button>
+            <button className="btn btn--primary">Explore Courses</button>
+            <button className="btn btn--secondary">Watch Intro</button>
           </div>
         </div>
         <div className="partTwo">

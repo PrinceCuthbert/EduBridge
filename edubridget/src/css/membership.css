@@ -1,5 +1,16 @@
+/* General Styles */
+body {
+  font-family: "Roboto", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5; /* Light background for modern look */
+}
+
 .membershipSection {
   background-color: #fff;
+  padding: 3rem 2rem;
 }
 
 .member_title {
@@ -9,16 +20,19 @@
 }
 
 .member_title > h1 {
-  font-size: 3.5rem;
-  color: black;
+  font-size: 3.8rem;
+  font-weight: 700;
+  color: #000; /* Black color for main titles */
+  font-family: "Georgia", serif; /* Serif font for titles */
   margin-bottom: 1rem;
 }
 
 .member_title > p {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   color: #555;
   max-width: 700px;
   margin: 0 auto;
+  line-height: 1.8;
 }
 
 .membership-cards-wrapper {
@@ -30,21 +44,62 @@
 }
 
 .membership-card {
-  max-width: 720px; /* enlarged */
+  max-width: 720px;
   background-color: #ffffff;
-  border-radius: 20px; /* slightly rounder */
-  padding: 3rem; /* more spacious */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.3s ease;
-  font-size: 1.4rem; /* larger base font */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  font-size: 1.4rem;
+}
+membership-card .membership-body {
+  text-align: center;
+  padding: 20px;
+  background-color: #f9f9ff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.membership-card .features {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.membership-card .features li {
+  margin: 10px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.membership-card.features li.disabled {
+  color: #aaa;
+  text-decoration: line-through;
+}
+
+/* Center the button */
+.membership-card.signup-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff; /* bluish color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.membership-card.signup-btn:hover {
+  background-color: #0056b3; /* darker blue on hover */
 }
 
 .membership-card:hover {
   transform: translateY(-7px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 
 .membership-header {
@@ -53,13 +108,13 @@
 }
 
 .plan-name {
-  font-size: 2.6rem;
+  font-size: 2.8rem;
   font-weight: bold;
   color: #000;
 }
 
 .plan-desc {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   color: #666;
 }
 
@@ -69,7 +124,7 @@
 }
 
 .price-amount {
-  font-size: 3rem;
+  font-size: 3.2rem;
   font-weight: bold;
   color: #1a73e8;
 }
@@ -112,19 +167,282 @@
   padding: 1rem 2rem;
   border: none;
   border-radius: 10px;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
+  font-weight: 600;
   cursor: pointer;
   width: 100%;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .signup-btn:hover {
   background-color: #0f5dc2;
+  transform: scale(1.05);
 }
 
-@media (max-width: 600px) {
+.testimonials {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.testimonial-card {
+  --tw-bg-opacity: 1;
+  max-width: 600px;
+  width: 100%;
+  min-height: 200px;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.testimonial-text {
+  font-size: 1.4rem;
+  font-style: italic;
+  color: #555;
+}
+
+.testimonial-author {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  margin-top: 1rem;
+}
+
+.review-stars {
+  font-size: 1.5rem;
+  color: #f4c150; /* Gold color for stars */
+  margin-bottom: 0.5rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 1rem;
+  border: 2px solid #ddd;
+}
+
+.faq-list {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.faq-item {
+  --tw-bg-opacity: 1;
+  padding: 2rem;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.faq-question {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #000; /* Black color for FAQ titles */
+  font-family: "Georgia", serif; /* Serif font for FAQ titles */
+  margin-bottom: 0.5rem;
+}
+
+.faq-answer {
+  font-size: 1.4rem;
+  color: #555;
+  line-height: 1.8;
+}
+
+.end_section {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-top: 4rem;
+}
+
+.end_section h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #000; /* Black color for end section titles */
+  font-family: "Georgia", serif; /* Serif font for end section titles */
+}
+
+.end_section p {
+  margin-top: 1.5rem;
+  font-size: 1.5rem;
+  color: #555;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.buttons > button {
+  padding: 1.2rem 2.5rem;
+  border: none;
+  border-radius: 100px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.buttons > button:first-child {
+  background-color: #4788e3;
+  color: white;
+}
+
+.buttons > button:first-child:hover {
+  background-color: #3a6fb5;
+}
+
+.buttons > button:nth-child(2) {
+  background-color: transparent;
+  color: #4788e3;
+  border: 1px solid #4788e3;
+}
+
+.buttons > button:nth-child(2):hover {
+  background-color: #e8f1fc;
+}
+
+/* End section */
+/* End section */
+/* End section */
+
+.end-section {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.end-section h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.end-section p {
+  font-size: 16px;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+.end-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Styling for the buttons */
+.choose-plan-btn,
+.learn-more-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 16px;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Bluish color for the first button */
+.choose-plan-btn {
+  background-color: #3994f6;
+}
+
+.choose-plan-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Grey or soft blue for the secondary button */
+.learn-more-btn {
+  background-color: #ffffff;
+  color: #3994f6;
+  border: #3994f6 1px solid;
+}
+
+.learn-more-btn:hover {
+  background-color: #0056b3;
+  color: #ffffff;
+}
+
+/* Responsive Styles */
+/* Responsive Styles */
+/* Responsive Styles */
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .membership-card {
+    max-width: 600px;
+    padding: 2rem;
+    font-size: 1.2rem;
+  }
+
   .member_title > h1 {
-    font-size: 2.2rem;
+    font-size: 3rem;
+  }
+
+  .member_title > p {
+    font-size: 1.6rem;
+  }
+
+  .testimonials {
+    gap: 1.5rem;
+  }
+
+  .testimonial-card {
+    max-width: 500px;
+    padding: 1.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .membership-cards-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .membership-card {
+    max-width: 90%;
+    padding: 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .member_title > h1 {
+    font-size: 2.5rem;
+  }
+
+  .member_title > p {
+    font-size: 1.4rem;
+  }
+
+  .testimonial-card {
+    max-width: 90%;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .member_title > h1 {
+    font-size: 2rem;
   }
 
   .member_title > p {
@@ -133,34 +451,28 @@
 
   .membership-card {
     font-size: 1rem;
-    padding: 2rem;
+    padding: 1rem;
   }
 
-  .plan-name {
-    font-size: 1.8rem;
+  .testimonial-card {
+    padding: 0.8rem;
+    font-size: 0.9rem;
   }
 
-  .plan-desc {
+  .review-stars {
     font-size: 1.2rem;
   }
 
-  .plan-price {
-    font-size: 1.4rem;
+  .user-avatar {
+    width: 40px;
+    height: 40px;
   }
 
-  .price-amount {
-    font-size: 2.2rem;
+  .testimonial-author {
+    font-size: 0.9rem;
   }
 
-  .features li {
-    font-size: 1.1rem;
-  }
-
-  .features li::before {
-    font-size: 1.2rem;
-  }
-
-  .signup-btn {
-    font-size: 1.1rem;
+  .user-plan {
+    font-size: 0.8rem;
   }
 }

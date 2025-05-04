@@ -21,7 +21,7 @@
 
 .footer-branding p {
   font-size: 1.2rem;
-  color: #ddd;
+  color: #ffff;
   max-width: 400px;
 }
 
@@ -36,7 +36,7 @@
 .footer-contact h3,
 .footer-newsletter h3 {
   font-size: 1.6rem;
-  color: #fff;
+  color: #ffff;
   margin-bottom: 1rem;
 }
 
@@ -50,13 +50,13 @@
 }
 
 .footer-links ul li a {
-  color: #bbb;
+  color: #ffff;
   text-decoration: none;
   font-size: 1.1rem;
 }
 
 .footer-links ul li a:hover {
-  color: #fff;
+  color: rgb(166, 197, 187);
 }
 
 .footer-contact p {
@@ -71,6 +71,7 @@
 
 .footer-newsletter input {
   background-color: #fff;
+  color: #000;
   outline: none;
   padding: 0.8rem;
   font-size: 1.2rem;
