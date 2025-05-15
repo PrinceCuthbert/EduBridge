@@ -1,6 +1,8 @@
-import { StrictMode } from "react";
+import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { useState } from "react";
+
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGraduationCap,
@@ -11,19 +13,30 @@ import {
 import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons"; // Import quote icon
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
+import {
+  faBook,
+  faEdit,
+  faFileAlt,
+  faChalkboardTeacher,
+  faLaptop,
+  faMoneyCheckAlt,
+} from "@fortawesome/free-solid-svg-icons";
 
 import "./css/header.css";
 import "./css/intropage.css";
-import "./css/aboutpage.css";
+import "./css/aboutSection.css";
 import "./css/card.css";
 import "./css/courses.css";
 import "./css/membership.css";
 import "./css/review.css";
 import "./css/footer.css";
+import "./css/academicService.css";
+import "./css/AboutUsPage/AboutUsPage.css";
 
 import MembershipPage from "./pages/MembershipPage";
 import ContactPage from "./pages/contactpage";
 
+import AboutUsPage from "./pages/AboutUsPage";
 function App() {
   return (
     <Router>
@@ -35,6 +48,7 @@ function App() {
             <>
               <Intro />
               <About />
+              <AcademicSection />
               <Courses />
               <Membership />
               <ReviewSection />
@@ -44,6 +58,7 @@ function App() {
         />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/membership" element={<MembershipPage />} />
+        <Route path="/AboutUsPage" element={<AboutUsPage />}></Route>
       </Routes>
     </Router>
   );
@@ -52,7 +67,12 @@ function App() {
 export default App;
 
 function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const [menuOpen, setMenuOpen] = React.useState(false); // Define state for menu
+
+  useEffect(() => {
+    setMenuOpen(false); // close menu on route change
+  }, [location]);
 
   return (
     <header className="header">
@@ -97,7 +117,7 @@ function Header() {
           </li>
           <li>
             <NavLink
-              to="/about"
+              to="/AboutUsPage"
               className={({ isActive }) => (isActive ? "active" : "")}>
               About
             </NavLink>
@@ -193,7 +213,7 @@ function About() {
   ];
 
   return (
-    <main className="main aboutpage">
+    <main className="main aboutsection">
       <div className="about_title">
         <h1>Why Choose TM EduBridge?</h1>
         <p>
@@ -221,6 +241,90 @@ function Card({ icon, title, description }) {
       <FontAwesomeIcon icon={icon} size="3x" className="icons" />
       <h2>{title}</h2>
       <p>{description}</p>
+    </div>
+  );
+}
+
+// Academic services offered
+// Academic services offered
+
+function AcademicSection() {
+  const cardData = [
+    {
+      icon: faBook,
+      title: "Thesis Writing Support",
+      content: [
+        "Guidance with structure, content, and formatting",
+        "Assistance at any stage: proposal, draft, or final submission",
+      ],
+    },
+    {
+      icon: faEdit,
+      title: "Proofreading & Editing",
+      content: [
+        "Grammar, punctuation, and spelling corrections",
+        "Academic style and clarity improvements",
+        "Consistency in formatting and references (APA, MLA, IEEE, etc.)",
+      ],
+    },
+    {
+      icon: faFileAlt,
+      title: "Research Paper & Journal Publication",
+      content: [
+        "Editing and formatting for journal submission",
+        "Plagiarism check and reduction support",
+        "Assistance with response to reviewers",
+      ],
+    },
+    {
+      icon: faChalkboardTeacher,
+      title: "Academic Advisory & Coaching",
+      content: [
+        "Topic selection and refinement",
+        "Research methodology support",
+        "Data analysis guidance (qualitative & quantitative)",
+      ],
+    },
+    {
+      icon: faLaptop,
+      title: "Presentation & Defense Preparation",
+      content: [
+        "Slide design and content review",
+        "Mock defense sessions with feedback",
+      ],
+    },
+    {
+      icon: faMoneyCheckAlt,
+      title: "Scholarship & Grant Application",
+      content: [
+        "Statement of purpose (SOP) and personal statement editing",
+        "CV and recommendation letter support",
+      ],
+    },
+  ];
+
+  return (
+    <div className="academicServices">
+      <h1>Academic Services Offered</h1>
+      <p>
+        Comprehensive academic support to help you succeed in your educational
+        journey.
+      </p>
+      <div className="cardSection">
+        {cardData.map((card, index) => (
+          <div key={index} className="card academicCard">
+            <div className="card-header">
+              <FontAwesomeIcon icon={card.icon} size="3x" className="icons" />
+              <h2>{card.title}</h2>
+            </div>
+            <ul>
+              {card.content.map((item, idx) => (
+                <li key={idx}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -458,11 +562,34 @@ function Footer() {
       <div className="footer-content">
         {/* TM EduBridge Branding Section */}
         <div className="footer-branding">
-          <h2>TM EduBridge</h2>
-          <p>
-            Empowering Africa through Knowledge. We provide quality education
-            and resources to help students achieve their academic goals.
-          </p>
+          <div className="footer-start">
+            <h2>TM EduBridge</h2>
+            <p>
+              Empowering Africa through Knowledge. We provide quality education
+              and resources to help students achieve their academic goals.
+            </p>
+          </div>
+
+          <div className="social-icons">
+            <a
+              href="https://github.com/PrinceCuthbert/africa-learn-bridge-online?tab=readme-ov-file"
+              target="_blank">
+              <i className="fab fa-facebook-f"></i>
+            </a>
+            <a
+              href="https://github.com/PrinceCuthbert/africa-learn-bridge-online?tab=readme-ov-file"
+              target="_blank">
+              <i className="fab fa-twitter"></i>
+            </a>
+            <a href="https://www.instagram.com/tmedubridge/" target="_blank">
+              <i className="fab fa-instagram"></i>
+            </a>
+            <a
+              href="https://github.com/PrinceCuthbert/africa-learn-bridge-online?tab=readme-ov-file"
+              target="_blank">
+              <i className="fab fa-linkedin-in"></i>
+            </a>
+          </div>
         </div>
 
         {/* Quick Links Section */}
@@ -491,11 +618,18 @@ function Footer() {
         </div>
 
         {/* Contact Information Section */}
-        <div className="footer-contact">
+        <div className="footer-column">
           <h3>Contact Us</h3>
-          <p>123 Education Street, Kigali, Rwanda</p>
-          <p>+250 12 345 6789</p>
-          <p>info@edubridge.com</p>
+          <p>
+            <i className="fas fa-map-marker-alt"></i> 123 Education Street,
+            Kigali, Rwanda
+          </p>
+          <p>
+            <i className="fas fa-phone-alt"></i> +250 12 345 6789
+          </p>
+          <p>
+            <i className="fas fa-envelope"></i> info@edubridge.com
+          </p>
         </div>
 
         {/* Newsletter Subscription Section */}

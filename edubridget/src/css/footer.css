@@ -25,6 +25,10 @@
   max-width: 400px;
 }
 
+.footer-start {
+  margin-bottom: 2rem;
+}
+
 .footer-links,
 .footer-contact,
 .footer-newsletter {
