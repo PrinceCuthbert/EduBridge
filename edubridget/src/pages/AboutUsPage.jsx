@@ -35,7 +35,7 @@ function AboutUsPage() {
         <h2>Founder's Message</h2>
         <p className="subheading">A personal note from our visionary founder</p>
         <div className="founder-content">
-          <div>
+          <div className="founder-profile">
             <img
               src="./public/zino.jpg"
               alt="Founder"

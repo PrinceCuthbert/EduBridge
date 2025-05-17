@@ -73,23 +73,34 @@
 
 .founder-content {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: row; /* Always side-by-side */
+  align-items: flex-start;
+  gap: 2rem;
   padding: 1rem;
 }
+/* Ensure sticky remains active */
+.founder-profile {
+  position: sticky;
+  top: 4rem;
+  flex-shrink: 0;
+}
 
+/* Image size adjustment remains responsive */
 .founder-image {
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   border-radius: 100%;
   border: 3px solid #007bff;
   object-fit: cover;
 }
 
+/* Message content area */
 .message-text {
-  /* max-width: 800px; */
+  overflow: hidden; /* Prevent overflow */
+  padding-right: 1rem;
   text-align: left;
+  flex-grow: 1;
+  max-height: 110vh;
 }
 .core-values {
   padding: 60px 20px;
@@ -388,6 +399,10 @@
   cursor: pointer;
 }
 
+/* responsiveness */
+/* responsiveness */
+/* responsiveness */
+/* 
 @media (min-width: 768px) {
   .vision-mission {
     flex-direction: row;
@@ -411,5 +426,185 @@
 
   .message-text {
     text-align: left;
+  }
+  .founder-message {
+    padding: 2rem 1rem;
+  }
+
+  .founder-message > h2 {
+    font-size: rem;
+  }
+
+  .subheading {
+    font-size: 1rem;
+  }
+
+  .founder-content {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .founder-profile {
+    position: sticky;
+    top: 4rem;
+  }
+
+  .message-text {
+    overflow: hidden;
+    max-height: 110vh;
+    /* padding: 0;
+    text-align: left; */
+
+@media (max-width: 767px) {
+  .about-page {
+    padding: 1.2rem;
+    font-size: 1.3rem;
+  }
+
+  .intro {
+    padding: 2rem 1rem;
+  }
+
+  .intro h1 {
+    font-size: 1.8rem;
+  }
+
+  .intro .tagline {
+    font-size: 1.2rem;
+    line-height: 1.4;
+  }
+
+  .vision-mission {
+    flex-direction: column;
+  }
+
+  .vision,
+  .mission {
+    width: 100%;
+  }
+
+  .founder-message {
+    padding: 1.5rem 1rem;
+  }
+
+  .founder-message > h2 {
+    font-size: 2rem;
+  }
+
+  .subheading {
+    font-size: 1rem;
+  }
+
+  .founder-content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .founder-profile {
+    position: relative; /* Disable sticky for small screens */
+    top: unset;
+    margin-bottom: 1rem;
+  }
+
+  .founder-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .message-text {
+    padding: 0;
+    max-height: none; /* Allow full scroll/display */
+    font-size: 1.3rem;
+  }
+
+  .core-values {
+    padding: 30px 10px;
+  }
+
+  .core-values h2 {
+    font-size: 2rem;
+  }
+
+  .core-values p {
+    font-size: 1.2rem;
+  }
+
+  .value-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card {
+    width: 100%;
+    padding: 20px 15px;
+    min-height: auto;
+  }
+
+  .card h3 {
+    font-size: 1.5rem;
+  }
+
+  .card p {
+    font-size: 1.3rem;
+  }
+
+  .team-title {
+    font-size: 2rem;
+  }
+
+  .team-subtitle {
+    font-size: 1.3rem;
+  }
+
+  .team-card {
+    width: 100%;
+    max-width: 90%;
+  }
+
+  .footer {
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-column {
+    width: 100%;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-size: 1.3rem;
+  }
+
+  .footer-column h3 {
+    font-size: 1.4rem;
+  }
+
+  .footer-column p,
+  .footer-column ul li a {
+    font-size: 1.2rem;
+  }
+
+  .newsletter-form input {
+    font-size: 1.2rem;
+  }
+
+  .subscribe-btn {
+    font-size: 1.2rem;
+  }
+
+  .footer-bottom {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .social-media i,
+  .social-icons i {
+    font-size: 1.3rem;
   }
 }
