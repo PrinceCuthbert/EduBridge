@@ -36,9 +36,9 @@ import "./css/contactPage/contactPage.css";
 
 import MembershipPage from "./pages/MembershipPage";
 import ContactPage from "./pages/contactPage";
-
 import AboutUsPage from "./pages/AboutUsPage";
 import Footer from "./pages/footer";
+import CoursesPage from "./pages/coursesPage";
 
 function App() {
   return (
@@ -62,6 +62,7 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/membership" element={<MembershipPage />} />
         <Route path="/AboutUsPage" element={<AboutUsPage />}></Route>
+        <Route path="/coursesPage" element={<CoursesPage />}></Route>
       </Routes>
     </Router>
   );
@@ -99,7 +100,7 @@ function Header() {
           </li>
           <li>
             <NavLink
-              to="/courses"
+              to="/coursesPage"
               className={({ isActive }) => (isActive ? "active" : "")}>
               Courses
             </NavLink>

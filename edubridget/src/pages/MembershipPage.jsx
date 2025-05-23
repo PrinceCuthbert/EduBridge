@@ -48,7 +48,7 @@ function MembershipPage() {
       text: "EduBridge has transformed my learning experience. The courses are amazing!",
       author: "John Doe",
       stars: 5,
-      avatar: "publicheadshot.png", // Replace with actual avatar URL
+      avatar: "public/headshot.png", // Replace with actual avatar URL
       plan: "Premium Plan",
     },
     {
