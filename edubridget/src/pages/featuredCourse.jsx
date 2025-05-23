@@ -84,7 +84,8 @@ function FeaturedCoursesSection() {
       category: "Korean Language",
       courses: [
         {
-          image: "/alexander.jpg",
+          image:
+            "https://images.pexels.com/photos/5327922/pexels-photo-5327922.jpeg",
           title: "Undergraduate Introduction to Business Management",
           rating: 4.5,
           duration: "15 weeks",
@@ -97,7 +98,8 @@ function FeaturedCoursesSection() {
       category: "Programming",
       courses: [
         {
-          image: "/alexander.jpg",
+          image:
+            "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg",
           title: "Undergraduate Engineering Mechanics",
           rating: 4.7,
           duration: "18 weeks",
@@ -110,7 +112,8 @@ function FeaturedCoursesSection() {
       category: "University Courses",
       courses: [
         {
-          image: "/alexander.jpg",
+          image:
+            "https://images.pexels.com/photos/356040/pexels-photo-356040.jpeg",
           title: "Undergraduate Human Anatomy & Physiology",
           rating: 4.8,
           duration: "20 weeks",
@@ -123,7 +126,17 @@ function FeaturedCoursesSection() {
       category: "Language Courses",
       courses: [
         {
-          image: "/alexander.jpg",
+          image:
+            "https://images.pexels.com/photos/267669/pexels-photo-267669.jpeg",
+          title: "Advanced Language Skills",
+          rating: 4.6,
+          duration: "12 weeks",
+          price: "₵1,100",
+          instructor: "Prof. Emma Kiptoo",
+        },
+        {
+          image:
+            "https://images.pexels.com/photos/267669/pexels-photo-267669.jpeg",
           title: "Advanced Language Skills",
           rating: 4.6,
           duration: "12 weeks",
@@ -158,7 +171,7 @@ function FeaturedCoursesSection() {
       <div className="featuredCoursesGrid">
         {activeFeaturedCourses.map((course, index) => (
           <FeaturedCourseCard
-            key={course.title} // Use a unique identifier if available
+            key={course.title}
             image={course.image}
             title={course.title}
             rating={course.rating}
