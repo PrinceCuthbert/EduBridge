@@ -40,6 +40,8 @@ import AboutUsPage from "./pages/AboutUsPage";
 import Footer from "./pages/footer";
 import CoursesPage from "./pages/coursesPage";
 
+import ResourcesPage from "./pages/resourcesPage";
+
 function App() {
   return (
     <Router>
@@ -59,10 +61,11 @@ function App() {
             </>
           }
         />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/membership" element={<MembershipPage />} />
+        <Route path="/contactPage" element={<ContactPage />} />
+        <Route path="/membershipPage" element={<MembershipPage />} />
         <Route path="/AboutUsPage" element={<AboutUsPage />}></Route>
         <Route path="/coursesPage" element={<CoursesPage />}></Route>
+        <Route path="/resourcesPage" element={<ResourcesPage />}></Route>
       </Routes>
     </Router>
   );
@@ -107,14 +110,14 @@ function Header() {
           </li>
           <li>
             <NavLink
-              to="/resources"
+              to="/resourcesPage"
               className={({ isActive }) => (isActive ? "active" : "")}>
               Resources
             </NavLink>
           </li>
           <li>
             <NavLink
-              to="/membership"
+              to="/membershipPage"
               className={({ isActive }) => (isActive ? "active" : "")}>
               Membership
             </NavLink>
@@ -128,7 +131,7 @@ function Header() {
           </li>
           <li>
             <NavLink
-              to="/contact"
+              to="/contactPage"
               className={({ isActive }) => (isActive ? "active" : "")}>
               Contact
             </NavLink>
@@ -505,7 +508,7 @@ function ReviewSection() {
       title: "Jane M., Kenya",
       description:
         "TM EduBridge transformed my learning experience. I passed my national exams with flying colors!",
-      image: "./headshot.png", // Placeholder for image
+      image: "/headshot.png", // Placeholder for image
     },
     {
       icon: faQuoteLeft,
@@ -513,14 +516,14 @@ function ReviewSection() {
       description:
         "As a working professional, the flexible learning options helped me earn a certification in my own time.",
 
-      image: "./cuthbert.jpg", // Placeholder for image
+      image: "/cuthbert.jpg", // Placeholder for image
     },
     {
       icon: faQuoteLeft,
       title: "Ms. Amina B., Tanzania",
       description:
         "As an educator, I’ve found their resources aligned with our curriculum and easy to implement.",
-      image: "./zino.jpg", // Placeholder for image
+      image: "/zino.jpg", // Placeholder for image
     },
   ];
 

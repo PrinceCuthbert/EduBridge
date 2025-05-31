@@ -36,11 +36,7 @@ function AboutUsPage() {
         <p className="subheading">A personal note from our visionary founder</p>
         <div className="founder-content">
           <div className="founder-profile">
-            <img
-              src="./public/zino.jpg"
-              alt="Founder"
-              className="founder-image"
-            />
+            <img src="/zino.jpg" alt="Founder" className="founder-image" />
             <div className="social-media">
               <i className="fab fa-facebook-f"></i>
               <i className="fab fa-twitter"></i>
@@ -151,7 +147,7 @@ function AboutUsPage() {
 
         <div className="team-members">
           <div className="team-card">
-            <img src="./public/zino.jpg" alt="Adolphe NIYIGENA" />
+            <img src="/zino.jpg" alt="Adolphe NIYIGENA" />
             <h3>Adolphe NIYIGENA</h3>
             <p className="role blue">Founder & CEO</p>
             <p>
@@ -160,7 +156,7 @@ function AboutUsPage() {
             </p>
           </div>
           <div className="team-card">
-            <img src="./public/ehsan-ahmadi.jpg" alt="Grace Mutoni" />
+            <img src="/ehsan-ahmadi.jpg" alt="Grace Mutoni" />
             <h3>Grace Mutoni</h3>
             <p className="role blue">Head of Korean Language</p>
             <p>
@@ -169,7 +165,7 @@ function AboutUsPage() {
             </p>
           </div>
           <div className="team-card">
-            <img src="./public/alexander.jpg" alt="David Kamau" />
+            <img src="/alexander.jpg" alt="David Kamau" />
             <h3>David Kamau</h3>
             <p className="role blue">Lead Programming Instructor</p>
             <p>
@@ -178,7 +174,7 @@ function AboutUsPage() {
             </p>
           </div>
           <div className="team-card">
-            <img src="./public/vinicius.jpg" alt="Sarah Okello" />
+            <img src="/vinicius.jpg" alt="Sarah Okello" />
             <h3>Vinicius Okello</h3>
             <p className="role blue">Academic Director</p>
             <p>

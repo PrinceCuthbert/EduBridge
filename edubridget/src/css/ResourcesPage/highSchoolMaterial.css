@@ -1,0 +1,105 @@
+.introduction {
+  background-color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.introduction > h1 {
+  font-size: 3rem;
+  font-family: "Segoe UI", sans-serif;
+  padding: 1.4rem;
+}
+
+/* Center the country buttons horizontally and style active/non-active states */
+.countriesButton {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.country-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid #c6c6c6;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  outline: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.country-btn.active,
+.country-btn.default {
+  background-color: #0077cc;
+  color: #fff;
+  border-color: white;
+  outline: none;
+  box-shadow: 0 4px 16px rgba(0, 119, 204, 0.1);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transform: scale(1.04);
+  z-index: 1;
+}
+
+/* When active, set text color to white for children */
+.country-btn.active .country-short,
+.country-btn.active .country-name,
+.country-btn.default .country-short,
+.country-btn.default .country-name {
+  color: #fff;
+}
+
+.country-short {
+  font-size: 1.2rem;
+  font-family: "Segoe UI", sans-serif;
+  color: #0077cc;
+  border: none;
+  outline: none;
+}
+
+.country-name {
+  font-size: 1.5rem;
+  font-family: "Segoe UI", sans-serif;
+  color: #0077cc;
+  border: none;
+  outline: none;
+}
+
+/* When active, set text color to white */
+.default .country-short,
+.default .country-name {
+  color: white;
+  outline: none;
+}
+
+.default {
+  background-color: #0077cc;
+  color: white;
+  outline: none;
+  border-color: #c6c6c6; /* Keep the outline border color same as .outline */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* Same as .outline */
+}
+
+.outline {
+  background-color: white;
+  color: #0077cc;
+  border-color: #c6c6c6;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.outline:hover {
+  background-color: #f0faff;
+  color: #0077cc;
+  border-color: #0077cc;
+  outline: none;
+}
