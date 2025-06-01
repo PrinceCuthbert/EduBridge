@@ -1,71 +1,143 @@
+/* --- Main Resource Page Styles --- */
 .resources-page {
   font-family: "Segoe UI", sans-serif;
-  font-size: 1.7rem;
+  font-size: 1.15rem; /* base font size for scaling */
   background-color: #f8f9fc;
+  min-height: 100vh;
 }
+
 .resources-intro {
   background: linear-gradient(to right, #0077cc, #03aa56);
-  color: #ffffff; /* White text for contrast */
+  color: #ffffff;
   text-align: center;
-  padding: 7rem 2rem; /* Spacing for the section */
-  margin-bottom: 3rem;
-  height: 30vh;
-  border-radius: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  padding: 6rem 2rem 4rem 2rem;
+  margin-bottom: 2.5rem;
+  min-height: 200px;
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
+
 .resources-intro-title {
-  color: #ffff;
-  font-size: 4rem;
-  font-family: "Segoe", sans-serif;
+  color: #fff;
+  font-size: 3.5rem;
+  font-family: "Segoe UI", sans-serif;
+  margin-bottom: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .description {
-  color: #ffff;
-  font-size: 1.9rem;
+  color: #fff;
+  font-size: 1.5rem;
   font-weight: 400;
   max-width: 800px;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 /* resources-type section */
-
 .resources-type {
   background-color: #f8f9fc;
-  padding: 12px 0;
+  padding: 18px 0;
 }
 
 .search-nav {
-  /* background-color: #e2f3f7; */
   background-color: #eef9fb;
-
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
+  justify-content: center;
+  gap: 1.5rem;
   max-width: 900px;
-  height: 8px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.5rem 1.2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  flex-wrap: wrap;
 }
+
 .search-nav > a {
   color: #111;
   background: transparent;
-  padding: 0.7rem 1.5rem;
+  padding: 0.85rem 1.7rem;
   border-radius: 8px;
-  font-size: 1.4rem;
-  font-weight: 500;
+  font-size: 1.25rem;
+  font-weight: 600;
   text-decoration: none;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
   cursor: pointer;
   display: flex;
   align-items: center;
+  border: none;
 }
 
-.search-nav > a.active {
+.search-nav > a.active,
+.search-nav > a:hover {
   background: #fff;
-  padding: 0.7rem 1.5rem;
   color: #0077cc;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 900px) {
+  .resources-intro-title {
+    font-size: 2.5rem;
+  }
+  .description {
+    font-size: 1.15rem;
+    max-width: 95vw;
+  }
+  .search-nav {
+    gap: 1rem;
+    padding: 1rem 0.5rem;
+  }
+  .search-nav > a {
+    font-size: 1.05rem;
+    padding: 0.7rem 1.1rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .resources-intro {
+    padding: 3rem 1rem 2rem 1rem;
+    min-height: 120px;
+  }
+  .resources-intro-title {
+    font-size: 1.7rem;
+  }
+  .description {
+    font-size: 1rem;
+  }
+  .search-nav {
+    gap: 0.7rem;
+    padding: 0.7rem 0.5rem;
+  }
+  .search-nav > a {
+    font-size: 0.98rem;
+    padding: 0.5rem 0.8rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .resources-intro {
+    padding: 1.2rem 0.3rem;
+    min-height: 80px;
+  }
+  .resources-intro-title {
+    font-size: 1.1rem;
+  }
+  .description {
+    font-size: 0.95rem;
+  }
+  .search-nav {
+    gap: 0.3rem;
+    padding: 0.3rem 0.1rem;
+  }
+  .search-nav > a {
+    font-size: 0.9rem;
+    padding: 0.3rem 0.5rem;
+  }
 }

@@ -10,13 +10,63 @@ const countries = [
   { id: 4, name: "Tanzania", short: "TZ" },
 ];
 
+const SchoolCountries = [
+  {
+    name: "Rwanda",
+    flag: "🇷🇼",
+    schools: ["FAWE Girls School", "Lycée de Kigali", "Green Hills Academy"],
+  },
+  {
+    name: "Uganda",
+    flag: "🇺🇬",
+    schools: [
+      "Makerere College School",
+      "Kampala High School",
+      "St. Mary's College",
+    ],
+  },
+  {
+    name: "Kenya",
+    flag: "🇰🇪",
+    schools: [
+      "Alliance High School",
+      "Kenya High School",
+      "Starehe Boys Centre",
+    ],
+  },
+  {
+    name: "Tanzania",
+    flag: "🇹🇿",
+    schools: [
+      "Mkwawa High School",
+      "Azania Secondary School",
+      "St. Francis College",
+    ],
+  },
+];
+
+const subjects = [
+  { name: "Mathematics", icon: "📊", materials: 15 },
+  { name: "Physics", icon: "⚡", materials: 12 },
+  { name: "Chemistry", icon: "🧪", materials: 10 },
+  { name: "Biology", icon: "🔬", materials: 14 },
+  { name: "English", icon: "📚", materials: 18 },
+  { name: "History", icon: "🏛️", materials: 8 },
+];
+
 function ResourcesPage() {
   const [activeTab, setActiveTab] = useState("highschool");
 
   const renderTabContent = () => {
     switch (activeTab) {
       case "highschool":
-        return <HighSchoolTab />;
+        return (
+          <HighSchoolTab
+            countries={countries}
+            subjects={subjects}
+            SchoolCountries={SchoolCountries}
+          />
+        );
       case "books":
         return <FamousBooksTab />;
       case "live":
@@ -67,8 +117,12 @@ function ResourcesPage() {
   );
 }
 
-function HighSchoolTab() {
-  const [selectedCountry, setSelectedCountry] = useState(null);
+function HighSchoolTab({ countries, SchoolCountries, subjects }) {
+  const [selectedCountry, setSelectedCountry] = useState("Rwanda");
+  // Find the schools for the selected country
+  const selectedCountryData = SchoolCountries.find(
+    (c) => c.name === selectedCountry
+  );
 
   return (
     <>
@@ -93,6 +147,36 @@ function HighSchoolTab() {
           </button>
         ))}
       </div>
+      <section>
+        <div className="schools">
+          <div className="title">
+            <h2>Schools in {selectedCountry}</h2>
+          </div>
+          {selectedCountryData?.schools.map((school) => (
+            <div className="school" key={school}>
+              <p>{school}</p>
+              <button>View Materials</button>
+            </div>
+          ))}
+        </div>
+
+        <div className="subjects">
+          <div>
+            <h2>Available Subjects</h2>
+          </div>
+          <div className="subjects-grid">
+            {subjects.map((subject) => (
+              <div className="subject-card" key={subject.name}>
+                <div className="subject-icon">{subject.icon}</div>
+                <div className="subject-name">{subject.name}</div>
+                <div className="subject-materials">
+                  {subject.materials} materials
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </>
   );
 }
