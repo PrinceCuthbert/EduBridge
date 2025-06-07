@@ -7,6 +7,7 @@ import {
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import FeaturedCoursesSection from "./featuredCourse";
+
 import "../css/coursesPage/coursesPage.css"; // Adjust path if your CSS is elsewhere
 
 function Course({ icon, title, description, bgColor }) {

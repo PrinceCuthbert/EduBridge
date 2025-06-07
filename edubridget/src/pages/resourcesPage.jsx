@@ -1,7 +1,9 @@
-// import React from "react";
+import React, { useState } from "react";
 import "../css/ResourcesPage/resourcePage.css";
 import "../css/ResourcesPage/highSchoolMaterial.css";
-import React, { useState } from "react";
+
+// In src/pages/resources/HighSchoolTab.jsx
+import HighSchoolTab from "./resources/HighSchoolTab";
 
 const countries = [
   { id: 1, name: "Rwanda", short: "RW" },
@@ -63,8 +65,8 @@ function ResourcesPage() {
         return (
           <HighSchoolTab
             countries={countries}
-            subjects={subjects}
             SchoolCountries={SchoolCountries}
+            subjects={subjects}
           />
         );
       case "books":
@@ -87,7 +89,6 @@ function ResourcesPage() {
           content designed to support your academic journey.
         </p>
       </section>
-
       <section className="resources-type">
         <div className="search-nav">
           <a
@@ -96,9 +97,14 @@ function ResourcesPage() {
             High School Materials
           </a>
           <a
-            className={activeTab === "highschool" ? "active" : ""}
-            onClick={() => setActiveTab("highschool")}>
-            High School Materials
+            className={activeTab === "national-exams" ? "active" : ""}
+            onClick={() => setActiveTab("national-exams")}>
+            National Exams
+          </a>
+          <a
+            className={activeTab === "university" ? "active" : ""}
+            onClick={() => setActiveTab("university")}>
+            Universities
           </a>
           <a
             className={activeTab === "books" ? "active" : ""}
@@ -113,83 +119,19 @@ function ResourcesPage() {
           <a
             className={activeTab === "blog" ? "active" : ""}
             onClick={() => setActiveTab("blog")}>
-            Blog&News
+            Blog & News
           </a>
         </div>
         <div>{renderTabContent()}</div>
       </section>
+      {/* <HighSchoolTab /> */}
     </div>
   );
 }
 
-function HighSchoolTab({ countries, SchoolCountries, subjects }) {
-  const [selectedCountry, setSelectedCountry] = useState("Rwanda");
-  // Find the schools for the selected country
-  const selectedCountryData = SchoolCountries.find(
-    (c) => c.name === selectedCountry
-  );
-
-  return (
-    <>
-      <div className="introduction">
-        <h1>High School Materials</h1>
-        <p>
-          Access comprehensive study materials organized by country, school, and
-          subject.
-        </p>
-      </div>
-
-      <div className="countriesButton">
-        {countries.map((country) => (
-          <button
-            key={country.id}
-            className={`country-btn${
-              selectedCountry === country.name ? " active" : ""
-            }`}
-            onClick={() => setSelectedCountry(country.name)}>
-            <span className="country-short">{country.short}</span>
-            <span className="country-name">{country.name}</span>
-          </button>
-        ))}
-      </div>
-      <section>
-        <div className="schools">
-          <div className="title">
-            <h2>Schools in {selectedCountry}</h2>
-          </div>
-          {selectedCountryData?.schools.map((school) => (
-            <div className="school" key={school}>
-              <p>{school}</p>
-              <button>View Materials</button>
-            </div>
-          ))}
-        </div>
-
-        <div className="subjects">
-          <div>
-            <h2>Available Subjects</h2>
-          </div>
-          <div className="subjects-grid">
-            {subjects.map((subject) => (
-              <div className="subject-card" key={subject.name}>
-                <div className="subject-icon">{subject.icon}</div>
-                <div className="subject-name">{subject.name}</div>
-                <div className="subject-materials">
-                  {subject.materials} materials
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <NationaExams />
-      </section>
-    </>
-  );
-}
-
-function NationaExams() {
-  return <div></div>;
-}
+// function NationaExams() {
+//   return <div></div>;
+// }
 
 function FamousBooksTab() {
   return (

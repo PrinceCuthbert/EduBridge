@@ -1,327 +1,182 @@
-.introduction {
-  background-color: inherit;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* Container */
+.highschool-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: system-ui, sans-serif;
+  color: #1a202c;
 }
 
-.introduction > h1 {
-  font-size: 3rem;
-  font-family: "Segoe UI", sans-serif;
-  padding: 1.4rem;
+/* Header Section */
+.highschool-header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
-/* Center the country buttons horizontally and style active/non-active states */
-.countriesButton {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin: 2rem 0 1.5rem 0;
-  flex-wrap: wrap;
-}
-
-.country-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  font-weight: 500;
-  border-radius: 8px;
-  border: 1px solid #c6c6c6;
-  background-color: white;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  outline: none !important;
-  box-shadow: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.country-btn.active,
-.country-btn.default {
-  background-color: #0077cc;
-  color: #fff;
-  border-color: white;
-  outline: none;
-  box-shadow: 0 4px 16px rgba(0, 119, 204, 0.1);
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  transform: scale(1.04);
-  z-index: 1;
-}
-
-/* When active, set text color to white for children */
-.country-btn.active .country-short,
-.country-btn.active .country-name,
-.country-btn.default .country-short,
-.country-btn.default .country-name {
-  color: #fff;
-}
-
-.country-short {
-  font-size: 1.2rem;
-  font-family: "Segoe UI", sans-serif;
-  color: #0077cc;
-  border: none;
-  outline: none;
-}
-
-.country-name {
-  font-size: 1.5rem;
-  font-family: "Segoe UI", sans-serif;
-  color: #0077cc;
-  border: none;
-  outline: none;
-}
-
-/* When active, set text color to white */
-.default .country-short,
-.default .country-name {
-  color: white;
-  outline: none;
-}
-
-.default {
-  background-color: #0077cc;
-  color: white;
-  outline: none;
-  border-color: #c6c6c6; /* Keep the outline border color same as .outline */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* Same as .outline */
-}
-
-.outline {
-  background-color: white;
-  color: #0077cc;
-  border-color: #c6c6c6;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.outline:hover {
-  background-color: #f0faff;
-  color: #0077cc;
-  border-color: #0077cc;
-  outline: none;
-}
-
-/* Schools Section */
-/* Schools Section */
-
-.schools {
-  background-color: transparent;
-  padding: 2.5rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-}
-
-.schools .title {
-  margin-bottom: 1.2rem;
-  /* background: #fff; */
-}
-.schools .title h2 {
+.highschool-header h1 {
   font-size: 2.2rem;
   font-weight: 700;
-  color: #222;
-  margin: 0;
-  font-family: "Segoe UI", serif;
+  margin-bottom: 0.5rem;
 }
 
-.school {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+.highschool-header p {
+  font-size: 1.7rem;
+  color: #555;
+}
+
+/* Country Tabs */
+.country-tabs {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2rem 2.5rem;
-  min-width: 320px;
-  max-width: 480px;
-  width: 100%;
-  margin: 0 auto;
-  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
 }
-.school > p {
-  font-size: 1.5rem;
-  color: #222;
-  margin: 0;
-  font-weight: 500;
-}
-.school > button {
-  font-size: 1.1rem;
-  background: #0077cc;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 0.7rem 1.5rem;
+
+.country-button {
+  font-size: 1.4rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 9999px;
+  border: 1px solid #cbd5e0;
+  background-color: #fff;
   font-weight: 600;
+  color: #1a202c;
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px rgba(0, 119, 204, 0.08);
-}
-.school > button:hover {
-  background: #005fa3;
+  transition: background-color 0.2s, color 0.2s;
 }
 
-.school {
-  display: flex;
-  justify-content: space-between;
-}
-.school > p {
-  font-size: 1.8rem;
+.country-button:hover {
+  background-color: #e6f0ff;
 }
 
-.school > button {
-  font-size: 1.2rem;
+.country-button.active {
+  background-color: #2563eb;
+  color: #fff;
 }
 
-/* subject part */
-.subjects {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2.5rem 2.5rem 2rem 2.5rem;
-  width: 100%;
-  margin: 2rem auto 0 auto;
-  gap: 1.5rem;
-  max-width: 480px;
-  min-width: unset; /* Remove min-width for better mobile fit */
-}
-
-.subjects-grid {
+/* School Grid */
+.school-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: 1fr;
   gap: 1.5rem;
-  width: 100%;
-  margin-top: 1.5rem;
+  margin-bottom: 3rem;
 }
 
-.subject-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  padding: 1.2rem 1rem 1rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 0;
-  transition: box-shadow 0.2s;
+.school-card {
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
 }
 
-.subject-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+.school-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
-.subject-icon {
-  font-size: 2.4rem;
-  margin-bottom: 0.6rem;
-}
-
-.subject-name {
-  font-size: 1.25rem;
+.school-card h3 {
+  font-size: 1.5rem;
   font-weight: 600;
-  color: #222;
-  margin-bottom: 0.4rem;
+  margin: 0.5rem 0;
+}
+
+.school-card p {
+  font-size: 1.3rem;
+  color: #555;
+  margin: 0.3rem 0;
+}
+
+.school-card button {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.school-card button:hover {
+  background-color: #1d4ed8;
+}
+
+/* Stats Section */
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+  background-color: #f8fafc;
+  border-radius: 1rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.stat-box {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.5rem;
   text-align: center;
+  transition: transform 0.2s ease;
 }
 
-.subject-materials {
-  font-size: 1.1rem;
-  color: #0077cc;
-  font-weight: 500;
-  text-align: center;
+.stat-box:hover {
+  transform: translateY(-4px);
 }
-/* ...existing code... */
 
-/* Responsive adjustments */
-@media (max-width: 700px) {
-  .schools {
-    padding: 1.2rem 0;
-    gap: 1.2rem;
+.stat-number {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.3rem;
+}
+
+.stat-label {
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Color Styles */
+.blue {
+  color: #2563eb;
+}
+
+.green {
+  color: #16a34a;
+}
+
+.orange {
+  color: #ea580c;
+}
+
+.purple {
+  color: #7c3aed;
+}
+
+/* Responsive Layout */
+@media (min-width: 640px) {
+  .school-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  .school {
-    padding: 1.2rem 1rem;
-    min-width: 0;
-    max-width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .school-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
-  .school > p {
+
+  .highschool-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+  }
+
+  .stat-label {
     font-size: 1.1rem;
-  }
-  .school > button {
-    width: 100%;
-    font-size: 1rem;
-    padding: 0.6rem 0;
-  }
-
-  /* .subjects {
-    padding: 1.2rem 0.7rem 1rem 0.7rem;
-    min-width: 0;
-    max-width: 100%;
-    gap: 1rem;
-  }
-  .subjects-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  .subject-card {
-    min-width: 0;
-    padding: 1rem 0.7rem 0.7rem 0.7rem;
-  }
-  .subject-icon {
-    font-size: 2rem;
-  }
-  .subject-name {
-    font-size: 1rem;
-  }
-  .subject-materials {
-    font-size: 0.95rem;
-  } */
-  .subjects {
-    padding: 1.2rem 0.5rem 1rem 0.5rem;
-    max-width: 100%;
-  }
-  .subjects-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  .subject-card {
-    padding: 1rem 0.5rem 0.7rem 0.5rem;
-  }
-  .subject-icon {
-    font-size: 2rem;
-  }
-  .subject-name {
-    font-size: 1.1rem;
-  }
-  .subject-materials {
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 400px) {
-  .introduction > h1 {
-    font-size: 2rem;
-    padding: 0.7rem;
-  }
-  .subjects {
-    padding: 0.7rem 0.1rem 0.7rem 0.1rem;
-  }
-  .subjects-grid {
-    grid-template-columns: 1fr;
-  }
-  .subject-name {
-    font-size: 1rem;
-  }
-  .subject-materials {
-    font-size: 0.98rem;
   }
 }
