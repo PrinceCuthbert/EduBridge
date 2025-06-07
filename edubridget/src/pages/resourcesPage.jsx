@@ -96,6 +96,11 @@ function ResourcesPage() {
             High School Materials
           </a>
           <a
+            className={activeTab === "highschool" ? "active" : ""}
+            onClick={() => setActiveTab("highschool")}>
+            High School Materials
+          </a>
+          <a
             className={activeTab === "books" ? "active" : ""}
             onClick={() => setActiveTab("books")}>
             Famous Books
@@ -176,9 +181,14 @@ function HighSchoolTab({ countries, SchoolCountries, subjects }) {
             ))}
           </div>
         </div>
+        <NationaExams />
       </section>
     </>
   );
+}
+
+function NationaExams() {
+  return <div></div>;
 }
 
 function FamousBooksTab() {
