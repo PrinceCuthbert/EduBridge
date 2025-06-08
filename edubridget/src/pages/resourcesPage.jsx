@@ -58,6 +58,122 @@ const subjects = [
   { name: "History", icon: "🏛️", materials: 8 },
 ];
 
+const examData = [
+  {
+    id: 1,
+    name: "Rwanda",
+    flag: "🇷🇼",
+    levels: [
+      {
+        name: "O-Level",
+        subjects: [
+          {
+            name: "Mathematics",
+            years: [
+              { year: 2022, link: "/rwanda/o-level/math/2022.pdf" },
+              { year: 2023, link: "/rwanda/o-level/math/2023.pdf" },
+              { year: 2025, link: "/rwanda/o-level/math/2023.pdf" },
+            ],
+          },
+          {
+            name: "Biology",
+            years: [{ year: 2022, link: "/rwanda/o-level/biology/2022.pdf" }],
+          },
+        ],
+      },
+      {
+        name: "A-Level",
+        subjects: [
+          {
+            name: "Physics",
+            years: [{ year: 2023, link: "/rwanda/a-level/physics/2023.pdf" }],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: "Kenya",
+    flag: "🇰🇪",
+    levels: [
+      {
+        name: "KCSE",
+        subjects: [
+          {
+            name: "Chemistry",
+            years: [{ year: 2021, link: "/kenya/kcse/chemistry/2021.pdf" }],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: "Tanzania",
+    flag: "🇹🇿",
+    levels: [
+      {
+        name: "CSEE",
+        subjects: [
+          {
+            name: "Mathematics",
+            years: [
+              { year: 2022, link: "/tanzania/csee/math/2022.pdf" },
+              { year: 2023, link: "/tanzania/csee/math/2023.pdf" },
+            ],
+          },
+          {
+            name: "English",
+            years: [{ year: 2022, link: "/tanzania/csee/english/2022.pdf" }],
+          },
+        ],
+      },
+      {
+        name: "ACSEE",
+        subjects: [
+          {
+            name: "Physics",
+            years: [{ year: 2023, link: "/tanzania/acsee/physics/2023.pdf" }],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 4,
+    name: "Uganda",
+    flag: "🇺🇬",
+    levels: [
+      {
+        name: "UCE",
+        subjects: [
+          {
+            name: "Mathematics",
+            years: [
+              { year: 2022, link: "/uganda/uce/math/2022.pdf" },
+              { year: 2023, link: "/uganda/uce/math/2023.pdf" },
+            ],
+          },
+          {
+            name: "Biology",
+            years: [{ year: 2022, link: "/uganda/uce/biology/2022.pdf" }],
+          },
+        ],
+      },
+      {
+        name: "UACE",
+        subjects: [
+          {
+            name: "Physics",
+            years: [{ year: 2023, link: "/uganda/uace/physics/2023.pdf" }],
+          },
+        ],
+      },
+    ],
+  },
+];
+
 function ResourcesPage() {
   const [activeTab, setActiveTab] = useState("highschool");
 
@@ -72,7 +188,13 @@ function ResourcesPage() {
           />
         );
       case "national-exams":
-        return <NationalExams />;
+        return (
+          <NationalExams
+            countries={examData}
+            // SchoolCountries={SchoolCountries}
+            subjects={subjects}
+          />
+        );
       case "books":
         return <FamousBooksTab />;
       case "live":
@@ -136,10 +258,6 @@ function ResourcesPage() {
     </div>
   );
 }
-
-// function NationaExams() {
-//   return <div></div>;
-// }
 
 function FamousBooksTab() {
   return (
