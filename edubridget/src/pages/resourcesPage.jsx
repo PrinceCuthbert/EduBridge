@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import "../css/ResourcesPage/resourcePage.css";
 import "../css/ResourcesPage/highSchoolMaterial.css";
-
+import Footer from "../pages/footer.jsx";
+import "../css/footer.css";
 // In src/pages/resources/HighSchoolTab.jsx
 import HighSchoolTab from "./resources/HighSchoolTab";
+import NationalExams from "./resources/NationalExams.jsx";
 
 const countries = [
   { id: 1, name: "Rwanda", short: "RW" },
@@ -69,6 +71,8 @@ function ResourcesPage() {
             subjects={subjects}
           />
         );
+      case "national-exams":
+        return <NationalExams />;
       case "books":
         return <FamousBooksTab />;
       case "live":
@@ -122,7 +126,11 @@ function ResourcesPage() {
             Blog & News
           </a>
         </div>
+
         <div>{renderTabContent()}</div>
+      </section>
+      <section>
+        <Footer />
       </section>
       {/* <HighSchoolTab /> */}
     </div>
