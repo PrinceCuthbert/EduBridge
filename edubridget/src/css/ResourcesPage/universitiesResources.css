@@ -1,0 +1,22 @@
+.university-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: system-ui, sans-serif;
+  color: #1a202c;
+}
+.university-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.university-header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.university-header p {
+  font-size: 1.7rem;
+  color: #555;
+}
