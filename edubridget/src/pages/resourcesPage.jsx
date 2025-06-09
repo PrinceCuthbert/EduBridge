@@ -6,6 +6,7 @@ import "../css/footer.css";
 // In src/pages/resources/HighSchoolTab.jsx
 import HighSchoolTab from "./resources/HighSchoolTab";
 import NationalExams from "./resources/NationalExams.jsx";
+import UniversitiesTab from "./resources/UniversitiesTab.jsx";
 
 const countries = [
   { id: 1, name: "Rwanda", short: "RW" },
@@ -65,6 +66,22 @@ const examData = [
     flag: "🇷🇼",
     levels: [
       {
+        name: "PLE",
+        subjects: [
+          {
+            name: "Mathematics",
+            years: [
+              { year: 2022, link: "/rwanda/ple/math/2022.pdf" },
+              { year: 2023, link: "/rwanda/ple/math/2023.pdf" },
+            ],
+          },
+          {
+            name: "English",
+            years: [{ year: 2022, link: "/rwanda/ple/english/2022.pdf" }],
+          },
+        ],
+      },
+      {
         name: "O-Level",
         subjects: [
           {
@@ -97,6 +114,19 @@ const examData = [
     name: "Kenya",
     flag: "🇰🇪",
     levels: [
+      {
+        name: "PLE",
+        subjects: [
+          {
+            name: "Mathematics",
+            years: [{ year: 2022, link: "/kenya/ple/math/2022.pdf" }],
+          },
+          {
+            name: "English",
+            years: [{ year: 2022, link: "/kenya/ple/english/2022.pdf" }],
+          },
+        ],
+      },
       {
         name: "KCSE",
         subjects: [
@@ -195,6 +225,8 @@ function ResourcesPage() {
             subjects={subjects}
           />
         );
+      case "university":
+        return <UniversitiesTab />;
       case "books":
         return <FamousBooksTab />;
       case "live":
