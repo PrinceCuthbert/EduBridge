@@ -7,7 +7,7 @@ import {
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
-import "../css/coursesPage/featuredCourse.css";
+import "../../css/coursesPage/featuredCourse.css";
 
 function FeaturedCourseCard({
   image,
@@ -125,15 +125,6 @@ function FeaturedCoursesSection() {
     {
       category: "Language Courses",
       courses: [
-        {
-          image:
-            "https://images.pexels.com/photos/267669/pexels-photo-267669.jpeg",
-          title: "Advanced Language Skills",
-          rating: 4.6,
-          duration: "12 weeks",
-          price: "₵1,100",
-          instructor: "Prof. Emma Kiptoo",
-        },
         {
           image:
             "https://images.pexels.com/photos/267669/pexels-photo-267669.jpeg",

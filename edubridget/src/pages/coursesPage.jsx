@@ -5,10 +5,14 @@ import {
   faClock,
   faCertificate,
   faUsers,
+  faCheck,
 } from "@fortawesome/free-solid-svg-icons";
-import FeaturedCoursesSection from "./featuredCourse";
 
 import "../css/coursesPage/coursesPage.css"; // Adjust path if your CSS is elsewhere
+
+import "../css/coursesPage/courseBenefits.css";
+
+import FeaturedCourses from "./coursesPage/featuredCourse";
 
 function Course({ icon, title, description, bgColor }) {
   return (
@@ -53,6 +57,44 @@ function CoursesPage() {
       description:
         "Improve your language skills in English, French, Swahili, and more",
       bgColor: "#f3e5f5",
+    },
+  ];
+
+  const features = [
+    {
+      id: 1,
+      icon: "✓", // or you can use an icon component like <FontAwesomeIcon icon={faCheck} />
+      title: "Expert Instructors",
+      description:
+        "Learn from qualified educators with real-world experience in their fields.",
+    },
+    {
+      id: 2,
+      icon: "✓",
+      title: "Practical Learning",
+      description:
+        "Hands-on projects and real-world applications that reinforce your learning.",
+    },
+    {
+      id: 3,
+      icon: "✓",
+      title: "Flexible Learning",
+      description:
+        "Study at your own pace with 24/7 access to course materials.",
+    },
+    {
+      id: 4,
+      icon: "✓",
+      title: "Recognized Certificates",
+      description:
+        "Earn certificates that enhance your resume and professional profile.",
+    },
+    {
+      id: 5,
+      icon: "✓",
+      title: "Community Support",
+      description:
+        "Join a community of learners and receive guidance from peers and instructors.",
     },
   ];
 
@@ -106,9 +148,59 @@ function CoursesPage() {
           ))}
         </div>
         <button className="coursebtn">View all courses</button>
-        <FeaturedCoursesSection />
+        <FeaturedCourses />
+        <FeaturesList features={features} />
       </main>
     </>
+  );
+}
+function FeaturesList({ features }) {
+  return (
+    <section className="features-section">
+      <div className="features-header">
+        <h2>Benefits of Our Courses</h2>
+        <p>
+          Our courses provide a comprehensive learning experience that goes
+          beyond traditional education. Here is what sets us apart:
+        </p>
+        <div className="features-content-row">
+          <div className="features-list">
+            {features.map((feature) => (
+              <div key={feature.id} className="feature-item">
+                <span className="feature-icon">{feature.icon}</span>
+                <div className="feature-content">
+                  <h3>{feature.title}</h3>
+                  <p>{feature.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="testimonial-images">
+        <div className="first-image">
+          <img
+            src="./public/alexander.jpg"
+            alt="Smiling student in a classroom setting, appearing confident and engaged. Bright, welcoming environment with other students in the background. Positive and inspiring mood."
+            className="testimonial-img"
+          />
+        </div>
+
+        <div className="student-image">
+          <img
+            src="./public/alexander.jpg"
+            alt="Smiling student in a classroom setting, appearing confident and engaged. Bright, welcoming environment with other students in the background. Positive and inspiring mood."
+            className="testimonial-img"
+          />
+          <img
+            src="./public/alexander.jpg"
+            alt="Smiling student in a classroom setting, appearing confident and engaged. Bright, welcoming environment with other students in the background. Positive and inspiring mood."
+            className="testimonial-img"
+          />
+        </div>
+      </div>
+    </section>
   );
 }
 
