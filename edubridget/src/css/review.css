@@ -125,7 +125,8 @@
 }
 
 .startJourneyDiv > h1 {
-  font-size: 2.5rem;
+  font-size: 3.4rem;
+  font-family: serif;
 }
 
 .journey-buttons {
@@ -143,33 +144,136 @@
   color: #0077cc;
 }
 
+.journey-buttons > button:first-child:hover {
+  background-color: #e5e2e2;
+  color: #0077cc;
+}
+
 .journey-buttons > button:last-child {
   background-color: #2086c1;
   color: #f5f5f5;
-  border: 0.5px #d5d3d3 solid;
+  /* border: 0.5px #d5d3d3 solid; */
+  outline: none;
   /* Remove justify-content and gap here, as parent handles spacing */
 }
 
+.journey-buttons > button:last-child:hover {
+  background-color: #2086c1;
+  color: #000;
+}
 /* Responsive Styling */
+@media (max-width: 1024px) {
+  .reviewpage {
+    padding: 1.5rem;
+  }
+  .review_title p {
+    padding: 0 2rem;
+    font-size: 1.3rem;
+  }
+  .startJourneyDiv {
+    padding: 3rem 2rem 3rem 2rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .cardSection {
+    gap: 1.2rem;
+    padding: 0 1rem;
+  }
+  .review-card {
+    max-width: 90vw;
+    padding: 1.2rem;
+  }
+  .startJourneyDiv {
+    padding: 2.5rem 1rem 2.5rem 1rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .reviewpage {
+    padding: 1rem;
+  }
   .review_title h1 {
     font-size: 2.5rem;
   }
-
   .review_title p {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
+    padding: 0 1rem;
   }
-
   .review-card {
     max-width: 100%;
-    padding: 1.5rem;
+    padding: 1.1rem;
   }
+  .review-title {
+    font-size: 1.1rem;
+  }
+  .review-description {
+    font-size: 0.98rem;
+    padding-left: 0.7rem;
+  }
+  .startJourneyDiv {
+    padding: 2rem 0.5rem 2rem 0.5rem;
+  }
+  .startJourneyDiv > h1 {
+    font-size: 2.1rem;
+  }
+  .startJourneyDiv > p {
+    font-size: 1.1rem;
+  }
+  .journey-buttons {
+    flex-direction: column;
+    gap: 1rem;
+    font-size: 1.1rem;
+  }
+}
 
+@media (max-width: 500px) {
+  .reviewpage {
+    padding: 0.5rem;
+  }
+  .review_title h1 {
+    font-size: 1.7rem;
+    margin-top: 3rem;
+  }
+  .review_title p {
+    font-size: 1.3rem;
+    padding: 0 0.5rem;
+    margin-top: 1rem;
+  }
+  .cardSection {
+    gap: 0.5rem;
+    padding: 0;
+  }
+  .review-card {
+    padding: 0.7rem;
+    border-radius: 8px;
+  }
   .review-title {
     font-size: 1.2rem;
   }
-
   .review-description {
     font-size: 1rem;
+    padding-left: 0.4rem;
+  }
+  .review-image {
+    width: 56px;
+    height: 56px;
+  }
+  .startJourneyDiv {
+    padding: 1.9rem 0.2rem 1.4rem 0.2rem;
+  }
+  .startJourneyDiv > h1 {
+    font-size: 1.7rem;
+  }
+  .startJourneyDiv > p {
+    font-size: 1.2rem;
+  }
+  .journey-buttons {
+    font-size: 1rem;
+    gap: 1rem;
+  }
+  .journey-buttons:focus-within {
+    outline: none;
+    box-shadow: none;
   }
 }
