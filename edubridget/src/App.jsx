@@ -57,6 +57,7 @@ function App() {
               <Courses />
               <Membership />
               <ReviewSection />
+              <StartJourney />
               <Footer />
             </>
           }
@@ -559,7 +560,24 @@ function ReviewSection() {
           </div>
         ))}
       </div>
+      {/* <StartJourney /> */}
     </main>
+  );
+}
+
+function StartJourney() {
+  return (
+    <div className="startJourneyDiv">
+      <h1>Ready to Begin Your Learning Journey?</h1>
+      <p>
+        Join thousands of students across Africa who are transforming their
+        education with TM EduBridge Online Academy.
+      </p>
+      <div className="journey-buttons">
+        <button>Get Started Today</button>
+        <button>Contact Us</button>
+      </div>
+    </div>
   );
 }
 
