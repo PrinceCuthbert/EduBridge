@@ -1,11 +1,15 @@
 import React from "react"; // Required for JSX (especially if using hooks or older React versions)
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faGraduationCap,
+  faTag,
   faClock,
   faCertificate,
+  faGraduationCap,
   faUsers,
-  faCheck,
+  faTrophy, // achievement
+  faPlay, // start
+  // faCheck,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 
 import "../css/coursesPage/coursesPage.css"; // Adjust path if your CSS is elsewhere
@@ -13,6 +17,9 @@ import "../css/coursesPage/coursesPage.css"; // Adjust path if your CSS is elsew
 import "../css/coursesPage/courseBenefits.css";
 
 import FeaturedCourses from "./coursesPage/featuredCourse";
+
+import Footer from "../pages/footer.jsx";
+import "../css/footer.css";
 
 function Course({ icon, title, description, bgColor }) {
   return (
@@ -150,6 +157,8 @@ function CoursesPage() {
         <button className="coursebtn">View all courses</button>
         <FeaturedCourses />
         <FeaturesList features={features} />
+        <BecomeInstructor />
+        <Footer />
       </main>
     </>
   );
@@ -201,6 +210,58 @@ function FeaturesList({ features }) {
         </div>
       </div>
     </section>
+  );
+}
+
+const BecomeInstructorArray = [
+  {
+    icon: faTag,
+    title: "Make an Impact",
+    description:
+      "Help shape the future of education in Africa by sharing your expertise with eager students.",
+  },
+  {
+    icon: faUsers,
+    title: "Join Our Community",
+    description:
+      "Become part of a growing network of dedicated educators committed to quality education.",
+  },
+  {
+    icon: faStar,
+    title: "Earn While Teaching",
+    description: "Receive competitive compensation while doing what you love.",
+  },
+];
+
+function BecomeInstructor() {
+  return (
+    <>
+      <div className="becomeInstructorSection">
+        <div className="partOne">
+          <h2>Share Your Knowledge</h2>
+          <p>
+            Are you an expert in your field? Join our team of instructors and
+            help empower the next generation of African students.
+          </p>
+          <button>
+            <a>Become an instructor</a>
+          </button>
+        </div>
+        <div className="partTwo">
+          {BecomeInstructorArray.map((item, idx) => (
+            <div key={idx} className="elements">
+              <i>
+                <FontAwesomeIcon icon={item.icon} size="2x" />
+              </i>
+              <div className="text">
+                <h2>{item.title}</h2>
+                <p>{item.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
 
