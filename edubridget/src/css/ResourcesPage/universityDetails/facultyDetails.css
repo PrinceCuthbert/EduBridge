@@ -1,0 +1,88 @@
+.university-details-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.back-button {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 0.25rem;
+}
+
+.university-info-card {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 1rem;
+  background-color: #f8fafc;
+  margin: 1.5rem 0;
+  gap: 1rem;
+}
+
+.uni-icon img {
+  width: 40px;
+  height: 40px;
+}
+
+.uni-meta {
+  font-size: 14px;
+  color: #475569;
+  margin-top: 4px;
+}
+
+.faculties-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.faculty-card {
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.faculty-icon img {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 10px;
+}
+
+.faculty-card h4 {
+  margin: 10px 0 6px;
+  font-size: 16px;
+}
+
+.faculty-card p {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 1rem;
+}
+
+.view-courses-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 14px;
+  font-size: 14px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.view-courses-btn:hover {
+  background-color: #0056b3;
+}

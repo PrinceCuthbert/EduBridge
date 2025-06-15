@@ -11,7 +11,7 @@ import {
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons"; // Import quote icon
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import {
   faBook,
@@ -34,13 +34,14 @@ import "./css/academicService.css";
 import "./css/AboutUsPage/AboutUsPage.css";
 import "./css/contactPage/contactPage.css";
 
-import MembershipPage from "./pages/MembershipPage";
-import ContactPage from "./pages/contactPage";
-import AboutUsPage from "./pages/AboutUsPage";
 import Footer from "./pages/footer";
-import CoursesPage from "./pages/coursesPage";
-
-import ResourcesPage from "./pages/resourcesPage";
+import ContactPage from "./ContactPage";
+import MembershipPage from "./MembershipPage";
+import AboutUsPage from "./AboutUsPage";
+import CoursesPage from "./CoursesPage";
+import ResourcesPage from "./ResourcesPage";
+import FacultiesDetails from "./FacultiesDetails";
+import UniversitiesTab from "./UniversitiesTab";
 
 function App() {
   return (
@@ -67,6 +68,8 @@ function App() {
         <Route path="/AboutUsPage" element={<AboutUsPage />}></Route>
         <Route path="/coursesPage" element={<CoursesPage />}></Route>
         <Route path="/resourcesPage" element={<ResourcesPage />}></Route>
+        <Route path="/FacultiesDetails" element={<FacultiesDetails />} />
+        <Route path="/UniversitiesTab" element={<UniversitiesTab />} />
       </Routes>
     </Router>
   );

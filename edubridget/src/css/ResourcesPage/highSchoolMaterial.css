@@ -14,7 +14,8 @@
 }
 
 .highschool-header h1 {
-  font-size: 2.2rem;
+  font-family: serif;
+  font-size: 3rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
 }
@@ -77,13 +78,13 @@
 }
 
 .school-card h3 {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 600;
   margin: 0.5rem 0;
 }
 
 .school-card p {
-  font-size: 1.3rem;
+  font-size: 1.6rem;
   color: #555;
   margin: 0.3rem 0;
 }
@@ -94,7 +95,7 @@
   background-color: #2563eb;
   color: white;
   border: none;
-  border-radius: 9999px;
+  border-radius: 100px;
   font-size: 1.2rem;
   cursor: pointer;
   transition: background-color 0.2s;

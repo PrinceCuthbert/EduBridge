@@ -1,6 +1,6 @@
 /* --- Main Resource Page Styles --- */
 .resources-page {
-  font-family: "Segoe UI", sans-serif;
+  font-family: "Segoe UI";
   font-size: 1.15rem; /* base font size for scaling */
   background-color: #f8f9fc;
   min-height: 100vh;
@@ -23,8 +23,8 @@
 
 .resources-intro-title {
   color: #fff;
-  font-size: 3.5rem;
-  font-family: "Segoe UI", sans-serif;
+  font-size: 4.3rem;
+  font-family: serif;
   margin-bottom: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -32,7 +32,7 @@
 
 .description {
   color: #fff;
-  font-size: 1.5rem;
+  font-size: 1.9rem;
   font-weight: 400;
   max-width: 800px;
   margin: 0 auto;
@@ -64,7 +64,7 @@
   background: transparent;
   padding: 0.85rem 1.7rem;
   border-radius: 8px;
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-weight: 600;
   text-decoration: none;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
@@ -137,31 +137,10 @@
     padding: 0.5rem 0.3rem;
   }
   .search-nav > a {
-    font-size: 1.19rem;
+    font-size: 1.4rem;
     padding: 0.45rem 0.75rem;
   }
 }
-
-/* @media (max-width: 400px) {
-  .resources-intro {
-    padding: 1.2rem 0.3rem;
-    min-height: 80px;
-  }
-  .resources-intro-title {
-    font-size: 1.1rem;
-  }
-  .description {
-    font-size: 0.95rem;
-  }
-  .search-nav {
-    gap: 0.3rem;
-    padding: 0.3rem 0.1rem;
-  }
-  .search-nav > a {
-    font-size: 0.9rem;
-    padding: 0.3rem 0.5rem;
-  }
-} */
 
 @media (max-width: 350px) {
   .resources-intro {
@@ -179,7 +158,7 @@
     padding: 0.3rem 0.2rem;
   }
   .search-nav > a {
-    font-size: 0.85rem;
+    font-size: 1.4rem;
     padding: 0.3rem 0.5rem;
   }
 }

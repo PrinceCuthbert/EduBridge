@@ -198,12 +198,12 @@ function FeaturesList({ features }) {
 
         <div className="student-image">
           <img
-            src="./public/alexander.jpg"
+            src="./public/vinicius.jpg"
             alt="Smiling student in a classroom setting, appearing confident and engaged. Bright, welcoming environment with other students in the background. Positive and inspiring mood."
             className="testimonial-img"
           />
           <img
-            src="./public/alexander.jpg"
+            src="./public/headshot.png"
             alt="Smiling student in a classroom setting, appearing confident and engaged. Bright, welcoming environment with other students in the background. Positive and inspiring mood."
             className="testimonial-img"
           />
