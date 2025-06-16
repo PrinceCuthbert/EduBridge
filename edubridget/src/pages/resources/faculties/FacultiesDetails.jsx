@@ -1,6 +1,7 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-import "../../css/ResourcesPage/facultyDetails.css";
+import "../../../css/ResourcesPage/universityDetails/facultyDetails.css";
 
 const faculties = [
   {
@@ -31,9 +32,12 @@ const faculties = [
 ];
 
 function FacultiesDetails() {
+  const navigate = useNavigate();
   return (
     <div className="university-details-page">
-      <button className="back-button">← Back to Universities</button>
+      <button className="back-button" onClick={() => navigate(-1)}>
+        ← Back to Universities
+      </button>
 
       <h2>University of Rwanda - Faculties</h2>
       <p>Select a faculty to browse courses and materials</p>
@@ -41,7 +45,7 @@ function FacultiesDetails() {
       {/* University Info Card */}
       <div className="university-info-card">
         <div className="uni-icon">
-          <img src="/your-path/university-icon.png" alt="University Icon" />
+          <img src="./public/alexander.jpg" alt="University Icon" />
         </div>
         <div>
           <h3>University of Rwanda</h3>
@@ -56,7 +60,7 @@ function FacultiesDetails() {
         {faculties.map((faculty, index) => (
           <div className="faculty-card" key={index}>
             <div className="faculty-icon">
-              <img src="/your-path/book-icon.png" alt="Book Icon" />
+              {/* <img src="/your-path/book-icon.png" alt="Book Icon" /> */}
             </div>
             <h4>{faculty.name}</h4>
             <p>

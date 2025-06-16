@@ -7,6 +7,7 @@ import "../css/footer.css";
 import HighSchoolTab from "./resources/HighSchoolTab";
 import NationalExams from "./resources/NationalExams.jsx";
 import UniversitiesTab from "./resources/UniversitiesTab.jsx";
+import FamousBooksTab from "./resources/FamousBook.jsx";
 
 const countries = [
   { id: 1, name: "Rwanda", short: "RW" },
@@ -291,17 +292,17 @@ function ResourcesPage() {
   );
 }
 
-function FamousBooksTab() {
-  return (
-    <div>
-      <h1>Famous Books</h1>
-      <p>
-        Explore a curated list of famous books to enhance your knowledge and
-        understanding.
-      </p>
-    </div>
-  );
-}
+// function FamousBooksTab() {
+//   return (
+//     <div>
+//       <h1>Famous Books</h1>
+//       <p>
+//         Explore a curated list of famous books to enhance your knowledge and
+//         understanding.
+//       </p>
+//     </div>
+//   );
+// }
 
 function LiveClassesTab() {
   return (

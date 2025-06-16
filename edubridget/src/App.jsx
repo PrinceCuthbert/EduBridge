@@ -35,13 +35,13 @@ import "./css/AboutUsPage/AboutUsPage.css";
 import "./css/contactPage/contactPage.css";
 
 import Footer from "./pages/footer";
-import ContactPage from "./ContactPage";
-import MembershipPage from "./MembershipPage";
-import AboutUsPage from "./AboutUsPage";
-import CoursesPage from "./CoursesPage";
-import ResourcesPage from "./ResourcesPage";
-import FacultiesDetails from "./FacultiesDetails";
-import UniversitiesTab from "./UniversitiesTab";
+import ContactPage from "./pages/contactpage.jsx";
+import MembershipPage from "./pages/MembershipPage";
+import AboutUsPage from "./pages/AboutUsPage";
+import CoursesPage from "./pages/CoursesPage";
+import ResourcesPage from "./pages/resourcesPage.jsx";
+import FacultiesDetails from "./pages/resources/faculties/FacultiesDetails.jsx";
+import UniversitiesTab from "./pages/resources/UniversitiesTab.jsx";
 
 function App() {
   return (

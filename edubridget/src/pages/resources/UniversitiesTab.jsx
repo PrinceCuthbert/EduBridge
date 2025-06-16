@@ -5,7 +5,7 @@ import { FaUniversity, FaMapMarkerAlt } from "react-icons/fa";
 import "../../css/ResourcesPage/universitiesResources.css";
 
 import { Route, Routes } from "react-router-dom";
-import FacultiesDetails from "./pages/resources/faculties/FacultiesDetails.jsx";
+// import FacultiesDetails from "../resources/faculties/FacultiesDetails.jsx";
 
 const regions = [
   { name: "East Africa", flag: "🌍", universities: 15 },
