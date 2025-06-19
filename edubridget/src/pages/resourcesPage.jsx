@@ -8,6 +8,8 @@ import HighSchoolTab from "./resources/HighSchoolTab";
 import NationalExams from "./resources/NationalExams.jsx";
 import UniversitiesTab from "./resources/UniversitiesTab.jsx";
 import FamousBooksTab from "./resources/FamousBook.jsx";
+import LiveClassesTab from "./resources/LiveClasses.jsx";
+import BlogNewsTab from "./resources/Blog&News.jsx";
 
 const countries = [
   { id: 1, name: "Rwanda", short: "RW" },
@@ -288,38 +290,6 @@ function ResourcesPage() {
         <Footer />
       </section>
       {/* <HighSchoolTab /> */}
-    </div>
-  );
-}
-
-// function FamousBooksTab() {
-//   return (
-//     <div>
-//       <h1>Famous Books</h1>
-//       <p>
-//         Explore a curated list of famous books to enhance your knowledge and
-//         understanding.
-//       </p>
-//     </div>
-//   );
-// }
-
-function LiveClassesTab() {
-  return (
-    <div>
-      <h1>Live Classes</h1>
-      <p>Join interactive live classes conducted by expert educators.</p>
-    </div>
-  );
-}
-
-function BlogNewsTab() {
-  return (
-    <div>
-      <h1>Blog & News</h1>
-      <p>
-        Stay updated with the latest blogs and news in the education sector.
-      </p>
     </div>
   );
 }

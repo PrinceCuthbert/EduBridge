@@ -1,0 +1,625 @@
+/* Container + headings */
+.blog-news {
+  padding: 2.2rem 1rem;
+  background-color: #f7f7f7;
+}
+
+.blog-news h1 {
+  text-align: center;
+  margin-bottom: 0.8rem;
+  font-family: serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.blog-news .subtext {
+  text-align: center;
+  margin-bottom: 2.2rem;
+  color: #444;
+  font-size: 1.9rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Search + Filters */
+.blog-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  align-items: center;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.search-bar {
+  flex: 1;
+  color: #444;
+  min-width: 280px;
+  padding: 0.8rem 1.2rem;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  background-color: #fff;
+  background-image: url("https://cdn-icons-png.flaticon.com/512/622/622669.png");
+  background-repeat: no-repeat;
+  background-position: 12px center;
+  background-size: 20px;
+  padding-left: 2.5rem;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #0077cc;
+  box-shadow: 0 4px 12px rgba(0, 119, 204, 0.15);
+}
+
+.filters {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.filter {
+  padding: 0.8rem 1.5rem;
+  background: white;
+  color: #333;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.filter:hover {
+  background: #f8f9fa;
+  border-color: #0077cc;
+  transform: translateY(-1px);
+}
+
+.filter.active {
+  background: #0077cc;
+  color: #fff;
+  border-color: #0077cc;
+  box-shadow: 0 4px 12px rgba(0, 119, 204, 0.25);
+}
+
+/* Cards */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.featured-article {
+  border: 3px solid #0077cc;
+  margin-bottom: 2.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.featured-article .badge {
+  display: inline-block;
+  margin: 1.5rem;
+  padding: 0.6rem 1.2rem;
+  background: #e3f2fd;
+  color: #0077cc;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.featured-article .card-content {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.featured-article .text {
+  flex: 1 1 400px;
+  padding: 1.5rem 2.5rem 2.5rem 2.5rem;
+}
+
+.featured-article .text h2 {
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-family: serif;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.featured-article .image {
+  flex: 0 0 400px;
+  display: flex;
+  align-items: center;
+}
+
+.featured-article .image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.featured-article .excerpt {
+  font-size: 1.3rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.featured-article .meta {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 1.2rem;
+}
+
+.featured-article .engagement {
+  margin: 1.5rem 0;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.featured-article .actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+/* Article Grid */
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.article-card .card-image {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.article-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.article-card:hover img {
+  transform: scale(1.05);
+}
+
+.tags-overlay {
+  position: absolute;
+  top: 0.8rem;
+  left: 0.8rem;
+  right: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Tags */
+.tag {
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tag.study-tips {
+  background: #0077cc;
+}
+
+.tag.resources {
+  background: #4caf50;
+}
+
+.tag.guest {
+  background: #ff9800;
+}
+
+.tag.level {
+  background: #666;
+}
+
+.tag.level.beginner {
+  background: #4caf50;
+}
+
+.tag.level.intermediate {
+  background: #f4c20d;
+  color: #222;
+}
+
+.tag.level.advanced {
+  background: #f44336;
+}
+
+.tag.downloadable {
+  background: #9c27b0;
+}
+
+.tag-small {
+  display: inline-block;
+  padding: 0.4rem 0.7rem;
+  background: #f0f2f5;
+  color: #555;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+/* Card Content */
+.card-content {
+  padding: 1.8rem;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.card-content h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  line-height: 1.4;
+  flex: 1;
+  font-family: serif;
+  font-weight: 600;
+  color: #333;
+}
+
+.bookmark-btn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.bookmark-btn:hover {
+  background: #f0f2f5;
+  transform: scale(1.1);
+}
+
+.card-content .excerpt {
+  font-size: 1.1rem;
+  color: #555;
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+
+.card-content .meta {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1.2rem;
+  line-height: 1.5;
+}
+
+.card-content .author-title {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.card-content .engagement {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1.2rem;
+}
+
+.tags {
+  margin-bottom: 1.5rem;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+/* Buttons */
+.btn {
+  font-size: 1.1rem;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn.primary {
+  background: #0077cc;
+  color: #fff;
+}
+
+.btn.primary:hover {
+  background: #005fa3;
+}
+
+.btn.outline {
+  background: transparent;
+  color: #0077cc;
+  border: 2px solid #0077cc;
+  box-shadow: none;
+}
+
+.btn.outline:hover {
+  background: #0077cc;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 119, 204, 0.25);
+}
+
+.btn.small {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+}
+
+/* Stats Row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 3.5rem;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.stat-box {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-box strong {
+  display: block;
+  font-size: 2.5rem;
+  margin-bottom: 0.8rem;
+  color: #333;
+  font-weight: 700;
+}
+
+.stat-box p {
+  margin: 0;
+  color: #555;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* No Results */
+.no-results {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #666;
+}
+
+.no-results-icon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.no-results h3 {
+  font-size: 1.8rem;
+  margin-bottom: 0.8rem;
+  color: #555;
+  font-weight: 600;
+}
+
+.no-results p {
+  font-size: 1.2rem;
+  color: #777;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .blog-news {
+    padding: 1.8rem 1rem;
+  }
+
+  .blog-news h1 {
+    font-size: 2.4rem;
+  }
+
+  .blog-news .subtext {
+    font-size: 1.6rem;
+  }
+
+  .blog-controls {
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+
+  .search-bar {
+    min-width: 250px;
+    font-size: 1rem;
+    padding: 0.7rem 1rem 0.7rem 2.2rem;
+  }
+
+  .filter {
+    padding: 0.7rem 1.2rem;
+    font-size: 1rem;
+  }
+
+  .featured-article .text h2 {
+    font-size: 1.9rem;
+  }
+
+  .featured-article .excerpt {
+    font-size: 1.2rem;
+  }
+
+  .articles-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .card-content h3 {
+    font-size: 1.3rem;
+  }
+
+  .card-content .excerpt {
+    font-size: 1rem;
+  }
+
+  .stat-box strong {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .blog-news {
+    padding: 1.2rem 0.8rem;
+  }
+
+  .blog-news h1 {
+    font-size: 1.9rem;
+  }
+
+  .blog-news .subtext {
+    font-size: 1.3rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .blog-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .search-bar {
+    min-width: auto;
+    margin-bottom: 0.5rem;
+  }
+
+  .filters {
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .filter {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .featured-article .card-content {
+    flex-direction: column;
+  }
+
+  .featured-article .text {
+    padding: 1.2rem 1.5rem 1.5rem 1.5rem;
+  }
+
+  .featured-article .text h2 {
+    font-size: 1.6rem;
+  }
+
+  .featured-article .excerpt {
+    font-size: 1.1rem;
+  }
+
+  .featured-article .image {
+    flex: none;
+    height: 220px;
+  }
+
+  .articles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-content {
+    padding: 1.4rem;
+  }
+
+  .card-content h3 {
+    font-size: 1.2rem;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-box {
+    padding: 1.5rem 1rem;
+  }
+
+  .stat-box strong {
+    font-size: 2rem;
+  }
+
+  .stat-box p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .filters {
+    gap: 0.3rem;
+  }
+
+  .filter {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .featured-article .actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}

@@ -285,7 +285,7 @@ function UniversitiesTab() {
       </div>
 
       {/* Faculties List */}
-      {selectedUniversity && faculties && (
+      {/* {selectedUniversity && faculties && (
         <div className="faculties-list">
           <h3>Faculties at {selectedUniversity}</h3>
           <div className="faculty-buttons">
@@ -301,7 +301,7 @@ function UniversitiesTab() {
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Courses List */}
       {/* {selectedFaculty && (

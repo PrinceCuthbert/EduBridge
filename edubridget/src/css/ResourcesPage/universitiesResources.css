@@ -55,10 +55,10 @@
   color: #fff;
 }
 .region-flag {
-  font-size: 1.5rem;
+  font-size: 1.7rem;
 }
 .region-count {
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: #555;
 }
 
@@ -92,7 +92,7 @@
 
 .university-name {
   font-family: serif;
-  font-size: 1.7rem;
+  font-size: 1.8rem;
 }
 .uniIcon {
   color: #0077cc;
@@ -150,7 +150,7 @@
 
 /* Faculties List */
 /* Faculties List */
-.faculties-list {
+/* .faculties-list {
   margin-bottom: 1.5rem;
   text-align: center;
 }
@@ -189,10 +189,10 @@
   color: #fff;
   outline: none;
   box-shadow: none;
-}
+} */
 
 /* Courses List */
-.courses-list {
+/* .courses-list {
   margin-bottom: 2rem;
   text-align: center;
 }
@@ -215,7 +215,7 @@
   padding: 0.35rem 1rem;
   margin: 0.2rem 0;
   display: block;
-}
+} */
 
 /* Materials Section */
 .materials-section {
@@ -223,7 +223,7 @@
   text-align: center;
 }
 .materials-section h3 {
-  font-size: 1.15rem;
+  font-size: 1.8rem;
   color: #0077cc;
   margin-bottom: 1rem;
 }
@@ -249,12 +249,12 @@
   margin-bottom: 0.4rem;
 }
 .material-type {
-  font-size: 1.02rem;
+  font-size: 1.3rem;
   color: #0077cc;
   font-weight: 500;
 }
 .material-count {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: #555;
 }
 
