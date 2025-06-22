@@ -107,11 +107,10 @@
 }
 
 .featured-article {
-  border: 3px solid #0077cc;
-  margin-bottom: 2.5rem;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+  position: relative;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0 auto;
 }
 
 .featured-article .badge {
@@ -186,9 +185,11 @@
 .articles-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 2rem;
+  gap: 0.3rem;
+  margin-top: 2rem;
   margin-bottom: 2.5rem;
-  max-width: 1400px;
+  width: 100%;
+  max-width: 100vw;
   margin-left: auto;
   margin-right: auto;
 }
