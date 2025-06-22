@@ -123,7 +123,6 @@ function BlogNewsTab() {
           Stay updated with the latest education trends, study tips, and expert
           insights.
         </p>
-
         {/* Search + Filters */}
         <div className="blog-controls">
           <input
@@ -162,38 +161,51 @@ function BlogNewsTab() {
             </button>
           </div>
         </div>
-
         {/* Featured Article */}
         {filteredPosts.some((post) => post.featured) && (
           <div className="featured-article card">
-            <span className="badge">⭐ Featured Article</span>
-
             {filteredPosts
               .filter((post) => post.featured)
               .map((post) => (
                 <div key={post.id} className="card-content">
                   <div className="text">
+                    <span className="badge">⭐ Featured Article</span>
                     <h2>{post.title}</h2>
-                    <p className="excerpt">{post.excerpt}</p>
-                    <p className="meta">
-                      {post.author}
-                      {"authorTitle" in post && ` • ${post.authorTitle}`} •{" "}
-                      {post.date} • {post.readTime}
+                    <p
+                      className="excerpt"
+                      style={{ fontSize: "1.6rem", marginRight: "1rem" }}>
+                      {post.excerpt}
                     </p>
+                    <div className="details">
+                      <div className="meta">
+                        <span>{post.author}</span>
+                        {"authorTitle" in post && (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              minWidth: "200px",
+                            }}>
+                            {post.authorTitle}
+                          </span>
+                        )}
+                        <span>{post.date}</span>
+                        <span
+                          style={{
+                            marginLeft: "12px",
+                          }}>
+                          {post.readTime}
+                        </span>
+                      </div>
+                    </div>
+
                     <div className="engagement">
-                      👁️ {post.views} &nbsp; ❤️ {post.likes} &nbsp; 💬{" "}
-                      {post.comments}
+                      <p>👁️ {post.views} &nbsp;</p>
+                      <p>❤️ {post.likes} &nbsp;</p>
+                      <p>💬 {post.comments}</p>
                     </div>
                     <div className="actions">
                       <button className="btn primary">Read Full Article</button>
                       <button className="btn outline">🔗 Share</button>
-                      <button
-                        className="btn outline"
-                        onClick={() => toggleBookmark(post.id)}>
-                        {bookmarkedPosts.includes(post.id)
-                          ? "🔖 Bookmarked"
-                          : "📌 Bookmark"}
-                      </button>
                     </div>
                   </div>
 
@@ -205,7 +217,6 @@ function BlogNewsTab() {
           </div>
         )}
 
-        {/* Article Grid */}
         <div className="articles-grid">
           {filteredPosts
             .filter((post) => !post.featured)
@@ -277,7 +288,6 @@ function BlogNewsTab() {
               </div>
             ))}
         </div>
-
         {/* Stats Row */}
         <div className="stats-row">
           <div className="stat-box">
@@ -301,7 +311,6 @@ function BlogNewsTab() {
             <p>Bookmarked</p>
           </div>
         </div>
-
         {/* No results message */}
         {filteredPosts.length === 0 && (
           <div className="no-results">
@@ -310,11 +319,6 @@ function BlogNewsTab() {
             <p>Try adjusting your search terms or filters</p>
           </div>
         )}
-
-        {/* <div className="featured-article card">
-          <div></div>
-          <div></div>
-        </div> */}
       </div>
     </>
   );
