@@ -288,6 +288,7 @@ function BlogNewsTab() {
               </div>
             ))}
         </div>
+
         {/* Stats Row */}
         <div className="stats-row">
           <div className="stat-box">
