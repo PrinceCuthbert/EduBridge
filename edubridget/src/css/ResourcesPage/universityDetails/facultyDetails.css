@@ -85,3 +85,71 @@ h2 {
   text-align: center;
   color: #6b7280;
 }
+
+/* Responsiveness */
+/* Responsiveness */
+/* Responsiveness */
+
+@media (max-width: 900px) {
+  .university-details-page {
+    padding: 1rem;
+    max-width: 100vw;
+  }
+  .header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+  .university-info-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.8rem 1rem;
+    gap: 0.7rem;
+  }
+  .faculties-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+  .faculty-card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .university-details-page {
+    padding: 0.5rem;
+  }
+  .header-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  h2 {
+    font-size: 1.2rem;
+  }
+  .university-info-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.6rem 0.5rem;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .uni-icon {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  .faculties-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+  .faculty-card {
+    padding: 0.7rem;
+  }
+  .view-courses-btn,
+  .back-button {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.95rem;
+  }
+}
