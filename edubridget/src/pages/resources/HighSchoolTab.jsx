@@ -93,14 +93,6 @@ function HighSchoolTab({ countries, SchoolCountries, subjects }) {
           <AnimatedCounter target={gradeLevels} color="green" />
           <p className="stat-label">Grade Levels</p>
         </div>
-        {/* <div className="stat-box">
-          <AnimatedCounter target={totalMaterials} color="orange" />
-          <p className="stat-label">Materials</p>
-        </div> */}
-        {/* <div className="stat-box">
-          <AnimatedCounter target={totalSubjects} color="purple" />
-          <p className="stat-label">Subjects</p>
-        </div> */}
       </div>
     </div>
   );

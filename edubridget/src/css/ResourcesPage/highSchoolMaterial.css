@@ -130,31 +130,32 @@
 }
 
 .stat-number {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 800;
   margin-bottom: 0.3rem;
 }
 
 .stat-label {
-  font-size: 1rem;
+  font-size: 2rem;
   color: #555;
 }
 
 /* Color Styles */
+/* Color Utility Classes for AnimatedCounter */
 .blue {
-  color: #2563eb;
+  color: #2563eb !important;
 }
 
 .green {
-  color: #16a34a;
+  color: #16a34a !important;
 }
 
 .orange {
-  color: #ea580c;
+  color: #ea580c !important;
 }
 
 .purple {
-  color: #7c3aed;
+  color: #7c3aed !important;
 }
 
 /* Responsive Layout */

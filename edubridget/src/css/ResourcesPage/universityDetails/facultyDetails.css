@@ -1,147 +1,87 @@
 .university-details-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2.5rem 1rem 3rem 1rem;
-  font-family: system-ui, sans-serif;
-  background: #f6f9fc;
-  min-height: 100vh;
+  padding: 2rem;
+  max-width: 1000px;
+  margin: auto;
+  font-family: "Segoe UI", sans-serif;
 }
 
-.back-button {
-  background: #007bff;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 18px;
-  margin-bottom: 24px;
-  cursor: pointer;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: background 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-.back-button:hover {
-  background: #0056b3;
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
 h2 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-  color: #1a237e;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  color: #1f2937;
 }
 
 .university-info-card {
   display: flex;
   align-items: center;
-  border: 1px solid #cbd5e1;
-  border-radius: 12px;
-  padding: 1.2rem 1.5rem;
-  background-color: #f8fafc;
-  margin: 1.5rem 0 2.5rem 0;
-  gap: 1.5rem;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  background-color: #f9fafb;
+  padding: 1rem 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 2rem;
 }
 
-.uni-icon img {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #e3eaf6;
-  border: 2px solid #e3eaf6;
+.uni-icon {
+  margin-right: 1rem;
+  color: #3b82f6;
 }
 
 .uni-meta {
-  font-size: 1rem;
-  color: #475569;
-  margin-top: 6px;
-  font-weight: 500;
+  color: #6b7280;
+  font-size: 0.95rem;
 }
 
 .faculties-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 2rem;
-  margin-top: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
 }
 
 .faculty-card {
-  background-color: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 1.5rem 1rem 1.2rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   text-align: center;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
-  transition: box-shadow 0.2s, transform 0.2s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease;
 }
+
 .faculty-card:hover {
-  box-shadow: 0 6px 24px rgba(0, 123, 255, 0.10);
-  transform: translateY(-2px) scale(1.02);
+  transform: translateY(-3px);
 }
 
-.faculty-icon img {
-  width: 44px;
-  height: 44px;
-  margin-bottom: 12px;
+.faculty-icon {
+  margin-bottom: 0.8rem;
+  color: #10b981;
 }
 
-.faculty-card h4 {
-  margin: 12px 0 8px 0;
-  font-size: 1.18rem;
-  color: #0d47a1;
-  font-weight: 600;
+.faculty-meta {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
 }
 
-.faculty-card p {
-  font-size: 1rem;
-  color: #475569;
-  margin-bottom: 1.2rem;
-}
-
-.view-courses-btn {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 22px;
-  font-size: 1rem;
+.view-courses-btn,
+.back-button {
+  background-color: #3b82f6;
+  color: #fff;
   border: none;
-  border-radius: 24px;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  transition: background 0.2s, transform 0.2s;
-  box-shadow: 0 2px 8px rgba(0,123,255,0.07);
-}
-.view-courses-btn:hover {
-  background-color: #0056b3;
-  transform: scale(1.04);
 }
 
-/* Responsive Design */
-@media (max-width: 800px) {
-  .university-details-page {
-    padding: 1.2rem 0.5rem 2rem 0.5rem;
-  }
-  .university-info-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1rem;
-  }
-  .faculties-grid {
-    gap: 1.2rem;
-  }
-  .faculty-card {
-    padding: 1.1rem 0.7rem 1rem 0.7rem;
-  }
+.course-placeholder {
+  margin-top: 2rem;
+  text-align: center;
+  color: #6b7280;
 }
-
-@media (max-width: 500px) {
-  .university-details-page {
-    padding: 0.5rem 0.1rem 1rem 0.1rem;
-  }
-  .university-info-
