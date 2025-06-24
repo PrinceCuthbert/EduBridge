@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { FiFileText, FiBookOpen, FiStar } from "react-icons/fi";
 import { FaUniversity, FaMapMarkerAlt } from "react-icons/fa";
 import "../../css/ResourcesPage/universitiesResources.css";
@@ -198,6 +199,9 @@ const materialTypes = [
 ];
 
 function UniversitiesTab() {
+  const location = useLocation();
+  const university = location.state?.university;
+
   const [selectedRegion, setSelectedRegion] = useState(regions[0].name);
   const [selectedUniversity, setSelectedUniversity] = useState(null);
   const [selectedFaculty, setSelectedFaculty] = useState(null);

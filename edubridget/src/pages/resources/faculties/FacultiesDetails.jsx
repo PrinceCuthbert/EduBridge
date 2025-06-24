@@ -55,12 +55,7 @@ function FacultiesDetails() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get university name from location.state or fallback to default
-  const universityName =
-    location.state?.university?.name || "University of Rwanda";
-  // Find the university object
-  const university =
-    universities.find((u) => u.name === universityName) || universities[0];
+  const university = location.state?.university;
 
   return (
     <div className="university-details-page">
@@ -68,21 +63,40 @@ function FacultiesDetails() {
         ← Back to Universities
       </button>
 
+      {/* <button
+        className="back-button"
+        onClick={() => navigate("/resources/universities")}>
+        ← Back to Universities
+      </button> */}
+
       <h2>{university.name} - Faculties</h2>
       <p>Select a faculty to browse courses and materials</p>
 
       {/* University Info Card */}
-      <div className="university-info-card">
-        <div className="uni-icon">
-          <img src={university.image} alt="University Icon" />
+      {university && (
+        <div className="university-info-card">
+          <div className="uni-icon">
+            {/* You can add an icon or image here if available */}
+          </div>
+          <div>
+            <h3>{university.name}</h3>
+            <p className="uni-meta">
+              {university.location}, {university.country} •{" "}
+              {university.totalStudents} students • Est.{" "}
+              {university.established}
+            </p>
+          </div>
         </div>
-        <div>
-          <h3>{university.name}</h3>
-          <p className="uni-meta">
-            {university.city}, {university.country} • {university.students}{" "}
-            students • Est. {university.established}
-          </p>
-        </div>
+      )}
+
+      <div className="faculties-grid">
+        {university.faculties.map((faculty, index) => (
+          <div className="faculty-card" key={index}>
+            <h4>{faculty}</h4>
+            {/* Add more faculty info if available */}
+            <button className="view-courses-btn">View Courses →</button>
+          </div>
+        ))}
       </div>
 
       {/* Faculties Grid */}
