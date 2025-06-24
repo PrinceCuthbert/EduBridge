@@ -24,8 +24,8 @@ function FacultiesDetails() {
           </div>
           <button
             className="back-button"
-            onClick={() => setSelectedFaculty(null)}>
-            ← Back to Faculties
+            onClick={() => navigate("/resources/universities")}>
+            ← Back to Universities
           </button>
         </div>
 
@@ -58,8 +58,13 @@ function FacultiesDetails() {
           <h2>{university.name} - Faculties</h2>
           <p>Select a faculty to browse courses and materials</p>
         </div>
-        <button className="back-button" onClick={() => navigate(-1)}>
+        {/* <button
+          className="back-button"
+          onClick={() => navigate("/resources/universities")}>
           ← Back to Universities
+        </button> */}
+        <button className="back-button" onClick={() => navigate(-1)}>
+          ← Back to University
         </button>
       </div>
 

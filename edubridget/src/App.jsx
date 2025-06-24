@@ -70,6 +70,9 @@ function App() {
         <Route path="/resourcesPage" element={<ResourcesPage />}></Route>
         <Route path="/FacultiesDetails" element={<FacultiesDetails />} />
         <Route path="/UniversitiesTab" element={<UniversitiesTab />} />
+        {/* Navigation from facult details back */}
+
+        <Route path="/resources/universities" element={<UniversitiesTab />} />
       </Routes>
     </Router>
   );

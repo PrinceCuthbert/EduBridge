@@ -281,7 +281,9 @@ function UniversitiesTab() {
                 </span>
               )}
             </div>
-            <Link to="/FacultiesDetails" state={{ university: uni }}>
+            <Link
+              to="/FacultiesDetails"
+              state={{ university: uni, fromUniversity: true }}>
               <button className="view-faculties-btn">View Faculties</button>
             </Link>
           </div>
