@@ -143,7 +143,7 @@
 }
 
 .featured-article .text h2 {
-  font-size: 2.2rem;
+  font-size: 2rem;
   color: #333;
   font-family: serif;
   font-weight: 700;
@@ -216,7 +216,6 @@
 
 .article-card .card-image {
   position: relative;
-  /* height: 200px; */
   min-height: 180px;
   background: #f3f3f3;
 }
@@ -299,9 +298,8 @@
 }
 
 /* Card Content */
-/* .card-content {
-  padding: 1.8rem;
-} */
+/* Card Content */
+/* Card Content */
 
 .card-content {
   padding: 1.5rem 1.5rem 1.8rem 1.5rem;
@@ -485,172 +483,321 @@
 }
 
 /* Responsive Design */
+/* Responsive Design */
+/* Responsive Design */
+/* Responsive Design */
+/* ...existing code... */
+
+/* --- Responsive Design --- */
+@media (max-width: 1100px) {
+  .blog-news {
+    padding: 2rem 2vw;
+  }
+  .blog-controls {
+    max-width: 100vw;
+    padding-left: 2vw;
+    padding-right: 2vw;
+  }
+  .articles-grid {
+    padding: 0 2vw;
+    gap: 1.5rem;
+    justify-content: center;
+    grid-template-columns: repeat(2, 1fr); /* Ensure 2 columns */
+  }
+  .article-card {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1.2rem;
+    max-width: 420px;
+  }
+  .featured-article {
+    flex-direction: column;
+    margin: 0 auto 2rem auto;
+    padding: 1.2rem 2vw;
+    /* Make featured-article width similar to two article-cards */
+    width: 100%;
+    max-width: calc(
+      2 * 420px + 1.5rem
+    ); /* Match two article-card widths + gap */
+    box-sizing: border-box;
+    /* Center the card */
+  }
+  .featured-article .card-content {
+    flex-direction: column;
+    padding: 1.2rem 0;
+  }
+  .featured-article .image {
+    width: 100%;
+    min-height: 220px;
+    flex: none;
+    max-width: 100%;
+  }
+  .blog-news h1 {
+    font-size: 2.2rem;
+  }
+  .blog-news .subtext {
+    font-size: 1.3rem;
+  }
+}
+
 @media (max-width: 900px) {
   .blog-news {
-    padding: 1.8rem 1rem;
+    padding: 1.5rem 3vw;
   }
-
-  .blog-news h1 {
-    font-size: 2.4rem;
-  }
-
-  .blog-news .subtext {
-    font-size: 1.6rem;
-  }
-
   .blog-controls {
     gap: 1.2rem;
     margin-bottom: 2rem;
+    padding-left: 3vw;
+    padding-right: 3vw;
   }
-
-  .search-bar {
-    min-width: 250px;
-    font-size: 1rem;
-    padding: 0.7rem 1rem 0.7rem 2.2rem;
-  }
-
-  .filter {
-    padding: 0.7rem 1.2rem;
-    font-size: 1rem;
-  }
-
-  .featured-article .text h2 {
-    font-size: 1.9rem;
-  }
-
-  .featured-article .excerpt {
-    font-size: 1.2rem;
-  }
-
   .articles-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+    padding: 0 3vw;
+    gap: 1.2rem;
+    justify-content: center;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns with gap */
   }
-
-  .card-content h3 {
-    font-size: 1.3rem;
+  .article-card {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1rem;
+    max-width: 380px;
   }
+  .featured-article {
+    padding: 1rem 3vw;
+    max-width: 780px;
+    margin: 0 auto 1.5rem auto;
+    max-width: calc(2 * 380px + 1.2rem);
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .featured-article .card-content {
+    padding: 1rem 0;
+  }
+  .blog-news h1 {
+    font-size: 2rem;
+  }
+  .blog-news .subtext {
+    font-size: 1.1rem;
+  }
+}
 
-  .card-content .excerpt {
+@media (max-width: 764px) {
+  .articles-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 4vw;
+    justify-content: center;
+  }
+  .article-card {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0.8rem;
+    max-width: 98vw;
+  }
+  .featured-article {
+    margin-bottom: 1.2rem;
+    border-width: 2px;
+    padding: 0.8rem 4vw;
+    max-width: 98vw;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .featured-article .card-content {
+    padding: 0.8rem 0;
+  }
+  .featured-article .image {
+    min-height: 140px;
+    height: 180px;
+  }
+}
+
+@media (max-width: 700px) {
+  .blog-news {
+    padding: 1.2rem 4vw;
+  }
+  .blog-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.7rem;
+    padding-left: 4vw;
+    padding-right: 4vw;
+  }
+  /* .articles-grid and .article-card handled above for <=764px */
+  .blog-news h1 {
+    font-size: 1.6rem;
+  }
+  .blog-news .subtext {
     font-size: 1rem;
-  }
-
-  .stat-box strong {
-    font-size: 2.2rem;
   }
 }
 
 @media (max-width: 600px) {
+  .blog-controls {
+    font-size: 1.08rem; /* Slightly larger and relative */
+  }
+  .search-bar {
+    font-size: 1.08rem;
+    padding: 1rem 1.5rem 1rem 2.5rem;
+  }
+  .filters {
+    font-size: 1.08rem;
+  }
+  .filter {
+    font-size: 1.08rem;
+    padding: 0.9rem 1.5rem;
+  }
   .blog-news {
-    padding: 1.2rem 0.8rem;
+    padding: 1.2rem 6vw;
   }
-
-  .blog-news h1 {
-    font-size: 1.9rem;
-  }
-
-  .blog-news .subtext {
-    font-size: 1.3rem;
-    margin-bottom: 1.8rem;
-  }
-
   .blog-controls {
     flex-direction: column;
     align-items: stretch;
-    gap: 1rem;
+    gap: 1.2rem;
+    padding-left: 6vw;
+    padding-right: 6vw;
   }
-
-  .search-bar {
-    min-width: auto;
-    margin-bottom: 0.5rem;
-  }
-
-  .filters {
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .filter {
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  .featured-article .card-content {
-    flex-direction: column;
-  }
-
-  .featured-article .text {
-    padding: 1.2rem 1.5rem 1.5rem 1.5rem;
-  }
-
-  .featured-article .text h2 {
-    font-size: 1.6rem;
-  }
-
-  .featured-article .excerpt {
-    font-size: 1.1rem;
-  }
-
-  .featured-article .image {
-    flex: none;
-    height: 220px;
-  }
-
   .articles-grid {
     grid-template-columns: 1fr;
-  }
-
-  .card-content {
-    padding: 1.4rem;
-  }
-
-  .card-content h3 {
-    font-size: 1.2rem;
-  }
-
-  .stats-row {
-    grid-template-columns: repeat(2, 1fr);
+    padding: 0 6vw;
     gap: 1rem;
+    justify-content: center;
+  }
+  .article-card {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0.8rem 6vw; /* Match featured-article horizontal padding */
+    max-width: 99vw;
+    box-sizing: border-box;
+  }
+  .card-content {
+    padding: 1.2rem 0.7rem 1.4rem 0.7rem; /* Match featured-article .text padding */
+  }
+  .card-content h3 {
+    font-size: 1.25rem;
+  }
+  .card-content .excerpt {
+    font-size: 1.08rem;
+  }
+  .card-content .meta {
+    font-size: 1.05rem;
+  }
+  .featured-article {
+    padding: 0.8rem 6vw;
+    max-width: 99vw;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .featured-article .card-content {
+    padding: 0.8rem 0;
+  }
+  .featured-article .text {
+    padding: 1.2rem 0.7rem 1.4rem 0.7rem;
+  }
+  .blog-news h1 {
+    font-size: 1.6rem;
+  }
+  .blog-news .subtext {
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .blog-controls {
+    font-size: 1.12rem; /* Even larger for very small screens */
+  }
+  .search-bar {
+    font-size: 1.12rem;
+    padding: 1.1rem 1.5rem 1.1rem 2.5rem;
+  }
+  .filters {
+    font-size: 1.12rem;
+  }
+  .filter {
+    font-size: 1.12rem;
+    padding: 1rem 1.7rem;
+  }
+  .blog-news {
+    padding: 0.7rem 4vw;
   }
 
-  .stat-box {
-    padding: 1.5rem 1rem;
-  }
-
-  .stat-box strong {
+  .blog-news h1 {
+    margin-top: 1rem;
     font-size: 2rem;
   }
+  .blog-news .subtext {
+    font-size: 1.3rem;
+    padding: 0 3rem;
+  }
+  .articles-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+    padding: 0 4vw;
+    justify-content: center;
+  }
+  .article-card {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0.4rem 4vw; /* Match featured-article horizontal padding */
+    min-width: 0;
+    max-width: 100vw;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+  .card-content {
+    padding: 0.8rem 0.5rem 1rem 0.5rem;
+  }
+  .card-content h3 {
+    font-size: 1.5rem;
+  }
 
-  .stat-box p {
+  .card-content .excerpt {
+    font-size: 1.02rem;
+  }
+  .card-content .meta {
     font-size: 1rem;
+  }
+  .featured-article {
+    border-width: 1.5px;
+    margin-bottom: 1rem;
+    padding: 0.4rem 4vw;
+    max-width: 100vw;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .featured-article .image {
+    min-height: 100px;
+    height: 120px;
+  }
+  .featured-article .text {
+    padding: 0.8rem 0.4rem 1rem 0.4rem;
   }
 }
 
 @media (max-width: 480px) {
   .filters {
-    gap: 0.3rem;
+    gap: 0.2rem;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
   }
-
   .filter {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 1.2rem;
   }
-
   .featured-article .actions {
     flex-direction: column;
+    padding: 0.2rem;
   }
-
   .btn {
     width: 100%;
     margin-bottom: 0.5rem;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
   }
-
   .card-content h3 {
-    font-size: 1.1rem;
+    font-size: 1.8rem;
   }
-
   .card-content .excerpt,
   .card-content .meta {
-    font-size: 0.95rem;
+    font-size: 1.5rem;
   }
 }
