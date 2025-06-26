@@ -11,45 +11,49 @@ function FacultiesDetails() {
 
   if (!university) return <p>University not found.</p>;
 
-  // Handle courses view (optional extension)
-  if (selectedFaculty) {
-    return (
-      <div className="university-details-page">
-        <div className="header-row">
-          <div>
-            <h2>
-              {selectedFaculty.name} - {university.name}
-            </h2>
-            <p>Available courses and materials</p>
-          </div>
-          <button
-            className="back-button"
-            onClick={() => navigate("/resources/universities")}>
-            ← Back to Universities
-          </button>
-        </div>
-
-        {/* University Info Card */}
-        <div className="university-info-card">
-          <div className="uni-icon">
-            <FaUniversity size={28} />
-          </div>
-          <div className="uni-details">
-            <h3>{university.name}</h3>
-            <p className="uni-meta">
-              {university.city}, {university.country} • {university.students}{" "}
-              students • Est. {university.established}
-            </p>
-          </div>
-        </div>
-
-        <div className="course-placeholder">
-          {/* Replace with actual course data */}
-          <p>Courses for {selectedFaculty.name} will appear here.</p>
-        </div>
-      </div>
-    );
-  }
+  // Handle courses view (optional extension
+  // if (selectedFaculty) {
+  //   return (
+  //     <div className="university-details-page">
+  //       <div className="header-row">
+  //         <div>
+  //           <h2>
+  //             {selectedFaculty.name} - {university.name}
+  //           </h2>
+  //           <p>Available courses and materials</p>
+  //         </div>
+  //         <button
+  //           className="back-button"
+  //           onClick={() => navigate("/resources/universities")}>
+  //           ← Back to Universities
+  //         </button>
+  //       </div>
+  //
+  //       {/* University Info Card */}
+  //       <div className="university-info-card">
+  //         <div className="uni-icon">
+  //             <div>
+  //                 <FaUniversity size={28} />
+  //             </div>
+  //
+  //             <div className="uni-details">
+  //                 <h3>{university.name}</h3>
+  //                 <p className="uni-meta">
+  //                     {university.city}, {university.country} • {university.students}{" "}
+  //                     students • Est. {university.established}
+  //                 </p>
+  //             </div>
+  //         </div>
+  //
+  //       </div>
+  //
+  //       <div className="course-placeholder">
+  //         {/* Replace with actual course data */}
+  //         <p>Courses for {selectedFaculty.name} will appear here.</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="university-details-page">
