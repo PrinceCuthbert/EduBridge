@@ -57,11 +57,25 @@
   transition: background-color 0.3s, color 0.3s;
 }
 
+.buttons > button:nth-child(2){
+  /*background-color: white;*/
+  color: white;
+  background-color: #0077cc;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
 .primary-btn:hover,
 .secondary-btn:hover {
   background-color: #0077cc; /* Change background to blue on hover */
   color: white; /* Change text color to white on hover */
 }
+
+
 
 .partTwo {
   flex: 1;
@@ -93,7 +107,7 @@
   }
 
   .description h1 {
-    font-size: 4rem;
+    font-size: 3.5rem;
   }
 
   .description p {

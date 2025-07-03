@@ -70,7 +70,7 @@ function App() {
         <Route path="/resourcesPage" element={<ResourcesPage />}></Route>
         <Route path="/FacultiesDetails" element={<FacultiesDetails />} />
         <Route path="/UniversitiesTab" element={<UniversitiesTab />} />
-        {/* Navigation from facult details back */}
+        {/* Navigation from faculty details back */}
 
         <Route path="/resources/universities" element={<UniversitiesTab />} />
       </Routes>
@@ -175,7 +175,7 @@ function Intro() {
           </div>
           <div className="buttons">
             <button className="btn btn--primary">Explore Courses</button>
-            <button className="btn btn--secondary">Watch Intro</button>
+            <button className="btn btn--secondary" style={{backgroundColor:"white",color:"#0077cc"}}>Watch Intro</button>
           </div>
         </div>
         <div className="partTwo">
@@ -587,11 +587,11 @@ function StartJourney() {
   );
 }
 
-const rootElement = document.getElementById("root");
-const root = createRoot(rootElement);
-
-root.render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+// const rootElement = document.getElementById("root");
+// const root = createRoot(rootElement);
+//
+// root.render(
+//   <StrictMode>
+//     <App />
+//   </StrictMode>
+// );

@@ -17,6 +17,10 @@
   margin: 0 auto 2.5rem auto;
 }
 
+.cardSection {
+  padding: 2rem;
+}
+
 .academicServices .academicCard {
   background: #ffffff;
   border: 1px solid #ccc;
@@ -122,5 +126,11 @@
 
   .academicServices .academicCard ul li {
     font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .cardSection {
+    padding: 0.5rem;
   }
 }
