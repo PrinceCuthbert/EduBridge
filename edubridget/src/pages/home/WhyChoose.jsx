@@ -61,9 +61,9 @@ const WhyChoose = () => {
 
   return (
     <section className="py-24 bg-white">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-6 lg:px-12 xl:px-16 max-w-7xl">
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-6 font-serif">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
             Why Choose TM EduBridge?
           </h2>
           <p className="text-lg text-slate-600 leading-relaxed">
@@ -76,7 +76,7 @@ const WhyChoose = () => {
           {cardData.map((card, index) => (
             <div 
               key={index} 
-              className="group bg-slate-50/50 p-10 rounded-3xl transition-all duration-300 border border-transparent hover:bg-white hover:shadow-xl hover:border-slate-100 hover:-translate-y-2"
+              className="group bg-white p-10 rounded-3xl transition-all duration-300 border border-slate-200 hover:bg-white shadow-md hover:shadow-2xl hover:border-primary/30 hover:-translate-y-2"
             >
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-8 transition-all duration-300 ${getColorClasses(card.color)} shadow-sm group-hover:shadow-md`}>
                 <FontAwesomeIcon icon={card.icon} className="text-2xl" />

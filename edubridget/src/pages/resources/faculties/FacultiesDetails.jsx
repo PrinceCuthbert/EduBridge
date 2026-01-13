@@ -99,7 +99,7 @@ function FacultiesDetails() {
         <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl opacity-60 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl md:text-5xl font-extrabold text-white font-serif">
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-white font-serif">
               {university.name} - Faculties
             </h1>
             <Link

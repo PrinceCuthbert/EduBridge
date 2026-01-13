@@ -31,7 +31,7 @@ function ContactPage() {
       <section className="relative pt-32 pb-20 overflow-hidden bg-primary-gradient">
         <div className="absolute top-0 left-0 -translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl opacity-60 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10 text-center text-white">
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 font-serif">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6 font-serif">
             Contact Us
           </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
@@ -87,7 +87,7 @@ function ContactPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
             {/* Message Form */}
             <div>
-              <h2 className="text-3xl font-extrabold text-slate-900 mb-4 font-serif">Send Us a Message</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Send Us a Message</h2>
               <p className="text-slate-600 mb-8">
                 Fill out the form below and our team will get back to you as soon as possible.
               </p>
@@ -208,7 +208,7 @@ function ContactPage() {
 
             {/* Support Options */}
             <div>
-              <h2 className="text-3xl font-extrabold text-slate-900 mb-4 font-serif">Support Options</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Support Options</h2>
               <p className="text-slate-600 mb-8">
                 We offer multiple ways to get the support you need for a smooth learning experience.
               </p>

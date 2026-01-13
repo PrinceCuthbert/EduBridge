@@ -70,7 +70,7 @@ function BlogAndNewsTab() {
     <div className="container mx-auto px-6">
       {/* Header */}
       <div className="max-w-3xl mx-auto text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 font-serif">
+        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
           Blog & Educational News
         </h2>
         <p className="text-lg text-slate-600 leading-relaxed">

@@ -43,7 +43,7 @@ function SignInPage() {
             </div>
             <span className="ml-2 text-2xl font-bold text-slate-900">EduBridge</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900 mb-2 font-serif">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
             Sign in to your account
           </h1>
           <p className="text-slate-600">

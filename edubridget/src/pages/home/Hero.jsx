@@ -17,7 +17,7 @@ const Hero = () => {
               Empowering Africa's Future
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight mb-6 font-serif">
               Empowering Africa through 
               <span className="block mt-2">Knowledge</span>
             </h1>

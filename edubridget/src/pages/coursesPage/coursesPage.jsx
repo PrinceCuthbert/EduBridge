@@ -18,7 +18,7 @@ import Footer from "../footer/footer.jsx";
 
 function CourseCategory({ icon, title, description, colorClass }) {
   return (
-    <div className={`p-8 rounded-[2rem] transition-all duration-300 border border-transparent hover:shadow-xl hover:bg-white hover:border-slate-100 group flex flex-col items-start h-full bg-white/50`}>
+    <div className={`p-8 rounded-[2rem] transition-all duration-300 border border-slate-200 hover:shadow-2xl hover:bg-white hover:border-primary/30 group flex flex-col items-start h-full bg-white shadow-md`}>
       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-sm transition-all duration-300 ${colorClass} group-hover:scale-110`}>
         <FontAwesomeIcon icon={icon} className="text-xl" />
       </div>
@@ -114,7 +114,7 @@ function CoursesPage() {
         <div className="container mx-auto px-6 relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="flex-1 text-center lg:text-left text-white">
-              <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-8 font-serif">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-8 font-serif">
                 Explore Our Courses
               </h1>
               <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">

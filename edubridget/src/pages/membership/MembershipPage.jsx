@@ -117,7 +117,7 @@ function MembershipPage() {
       <section className="relative pt-32 pb-20 overflow-hidden bg-primary-gradient">
         <div className="absolute top-0 left-0 -translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl opacity-60 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10 text-center text-white">
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 font-serif">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6 font-serif">
             Membership Plans
           </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed mb-8">
@@ -239,7 +239,7 @@ function MembershipPage() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 font-serif">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
               What Our Members Say
             </h2>
             <p className="text-lg text-slate-600">
