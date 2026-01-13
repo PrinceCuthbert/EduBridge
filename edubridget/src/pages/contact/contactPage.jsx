@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useForm, ValidationError } from "@formspree/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPhone,
@@ -12,6 +13,18 @@ import FAQSection from "../../components/FAQSection";
 import { faqs } from "../../data/faqData";
 
 function ContactPage() {
+  const [state, handleSubmit] = useForm("mwvvkzkj");
+
+  // Auto-hide success message after 5 seconds and reset form
+  useEffect(() => {
+    if (state.succeeded) {
+      const timer = setTimeout(() => {
+        window.location.reload(); // Reload to reset form and hide message
+      }, 2000); // 5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [state.succeeded]);
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero Section */}
@@ -79,41 +92,118 @@ function ContactPage() {
                 Fill out the form below and our team will get back to you as soon as possible.
               </p>
 
-              <form className="space-y-6">
+              <form 
+                onSubmit={handleSubmit}
+                className="space-y-6"
+              >
+                {state.succeeded && (
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                    <p className="text-green-700 font-medium text-center">
+                      ✓ Thank you for your message! We'll get back to you soon.
+                    </p>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <input
+                      id="firstName"
+                      name="firstName"
+                      type="text"
+                      placeholder="First Name"
+                      required
+                      disabled={state.submitting}
+                      className="px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent w-full disabled:bg-slate-100"
+                    />
+                    <ValidationError 
+                      prefix="First Name" 
+                      field="firstName"
+                      errors={state.errors}
+                      className="text-red-500 text-sm mt-1"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      placeholder="Last Name"
+                      required
+                      disabled={state.submitting}
+                      className="px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent w-full disabled:bg-slate-100"
+                    />
+                    <ValidationError 
+                      prefix="Last Name" 
+                      field="lastName"
+                      errors={state.errors}
+                      className="text-red-500 text-sm mt-1"
+                    />
+                  </div>
+                </div>
+
+                <div>
                   <input
-                    type="text"
-                    placeholder="First Name"
-                    className="px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Your email address"
+                    required
+                    disabled={state.submitting}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:bg-slate-100"
                   />
-                  <input
-                    type="text"
-                    placeholder="Last Name"
-                    className="px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  <ValidationError 
+                    prefix="Email" 
+                    field="email"
+                    errors={state.errors}
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-                <input
-                  type="text"
-                  placeholder="Subject"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-                <textarea
-                  placeholder="Your message..."
-                  rows={5}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-                ></textarea>
+
+                <div>
+                  <input
+                    id="subject"
+                    name="subject"
+                    type="text"
+                    placeholder="Subject"
+                    required
+                    disabled={state.submitting}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:bg-slate-100"
+                  />
+                  <ValidationError 
+                    prefix="Subject" 
+                    field="subject"
+                    errors={state.errors}
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+
+                <div>
+                  <textarea
+                    id="message"
+                    name="message"
+                    placeholder="Your message..."
+                    rows={5}
+                    required
+                    disabled={state.submitting}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none disabled:bg-slate-100"
+                  ></textarea>
+                  <ValidationError 
+                    prefix="Message" 
+                    field="message"
+                    errors={state.errors}
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+
                 <button
                   type="submit"
-                  className="w-full px-8 py-3.5 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all shadow-lg"
+                  disabled={state.submitting}
+                  className="w-full px-8 py-3.5 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all shadow-lg disabled:bg-slate-400 disabled:cursor-not-allowed"
                 >
-                  Send Message
+                  {state.submitting ? "Sending..." : "Send Message"}
                 </button>
               </form>
+              
             </div>
 
             {/* Support Options */}

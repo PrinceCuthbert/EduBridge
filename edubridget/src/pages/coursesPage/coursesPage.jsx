@@ -104,6 +104,8 @@ function CoursesPage() {
     },
   ];
 
+
+
   return (
     <div className="min-h-screen bg-white">
       {/* Intro Section */}
@@ -171,7 +173,7 @@ function FeaturesList({ features }) {
       <div className="container mx-auto px-6">
         <div className="flex flex-col lg:flex-row gap-16 items-center">
           <div className="flex-1">
-            <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-6 font-serif leading-tight">
+            <h2 className="text-2xl md:text-4xl font-extrabold text-slate-900 mb-6 font-serif leading-tight">
               Benefits of Our Courses
             </h2>
             <p className="text-lg text-slate-600 leading-relaxed mb-10">

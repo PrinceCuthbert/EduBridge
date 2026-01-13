@@ -109,46 +109,76 @@ const Header = () => {
       </div>
 
       {/* Mobile Nav Overlay */}
-      {/* <div 
-        className={`lg:hidden fixed inset-0 z-40 bg-white transform transition-transform duration-300 ease-in-out ${
+      <div 
+        className={`lg:hidden fixed inset-0 z-40 bg-gradient-to-br from-primary via-primary-dark to-secondary transform transition-transform duration-500 ease-out ${
           menuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex flex-col h-full pt-24 px-8">
-          <ul className="flex flex-col gap-6 text-xl font-semibold">
-            {navLinks.map((link) => (
-              <li key={link.path}>
-                <NavLink
-                  to={link.path}
-                  className={({ isActive }) =>
-                    isActive ? 'text-blue-600' : 'text-gray-800'
-                  }
-                  onClick={() => setMenuOpen(false)}
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+        
+        <div className="relative flex flex-col h-full pt-24 px-8 overflow-y-auto">
+          {/* Navigation Links */}
+          <nav className="flex-1">
+            <ul className="flex flex-col gap-2">
+              {navLinks.map((link, index) => (
+                <li 
+                  key={link.path}
+                  className={`transform transition-all duration-500 ${
+                    menuOpen ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
+                  }`}
+                  style={{ transitionDelay: `${index * 50}ms` }}
                 >
-                  {link.name}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
+                  <NavLink
+                    to={link.path}
+                    className={({ isActive }) =>
+                      `flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-lg transition-all ${
+                        isActive 
+                          ? 'bg-white text-primary shadow-lg' 
+                          : 'text-white/90 hover:bg-white/10 hover:text-white'
+                      }`
+                    }
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <span className={`w-2 h-2 rounded-full transition-all ${
+                          isActive ? 'bg-primary scale-100' : 'bg-white/40 scale-0'
+                        }`} />
+                        {link.name}
+                      </>
+                    )}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
           
-          <div className="mt-12 flex flex-col gap-4">
+          {/* Auth Buttons */}
+          <div 
+            className={`mt-8 mb-8 flex flex-col gap-4 transform transition-all duration-500 ${
+              menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            }`}
+            style={{ transitionDelay: '300ms' }}
+          >
             <NavLink 
-              to="/login" 
-              className="w-full py-4 text-center text-gray-800 font-bold border-2 border-gray-100 rounded-2xl"
+              to="/signin" 
+              className="w-full py-4 text-center text-white font-bold border-2 border-white/30 rounded-2xl backdrop-blur-sm hover:bg-white/10 hover:border-white/50 transition-all active:scale-95"
               onClick={() => setMenuOpen(false)}
             >
               Login
             </NavLink>
             <NavLink 
               to="/signup" 
-              className="w-full py-4 text-center bg-blue-600 text-white font-bold rounded-2xl shadow-xl shadow-blue-100"
+              className="w-full py-4 text-center bg-white text-primary font-bold rounded-2xl shadow-2xl shadow-black/20 hover:shadow-3xl hover:scale-105 transition-all active:scale-95"
               onClick={() => setMenuOpen(false)}
             >
               Sign Up
             </NavLink>
           </div>
         </div>
-      </div> */}
+      </div>
     </header>
   );
 };

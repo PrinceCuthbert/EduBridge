@@ -54,11 +54,17 @@ function App() {
             <Route path="/aboutUsPage" element={<AboutUsPage />} />
             <Route path="/coursesPage" element={<CoursesPage />} />
             <Route path="/resourcesPage" element={<ResourcesPage />} />
-            <Route path="/faculties/:facultyId" element={<FacultiesDetails />} />
+            <Route
+              path="/faculties/:facultyId"
+              element={<FacultiesDetails />}
+            />
             <Route path="/signin" element={<SignInPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/UniversitiesTab" element={<UniversitiesTab />} />
-            <Route path="/resources/universities" element={<UniversitiesTab />} />
+            <Route
+              path="/resources/universities"
+              element={<UniversitiesTab />}
+            />
           </Routes>
         </main>
         <Footer />
