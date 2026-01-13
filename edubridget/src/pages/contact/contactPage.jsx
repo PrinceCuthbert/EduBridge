@@ -1,6 +1,5 @@
 import React from "react";
-import Footer from "./footer";
-import "../css/footer.css";
+import Footer from "../footer/footer.jsx";
 
 function ContactPage() {
   const question = [

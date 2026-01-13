@@ -1,343 +1,175 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-import { FiFileText, FiBookOpen, FiStar } from "react-icons/fi";
-import { FaUniversity, FaMapMarkerAlt } from "react-icons/fa";
-import "../../css/ResourcesPage/universitiesResources.css";
-
-import { Route, Routes } from "react-router-dom";
-// import FacultiesDetails from "../resources/faculties/FacultiesDetails.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUniversity, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
+import { universities } from "../../data/universities.js";
 
 const regions = [
-  { name: "East Africa", flag: "🌍", universities: 15 },
-  { name: "Korea", flag: "🇰🇷", universities: 12 },
-  { name: "Europe", flag: "🇪🇺", universities: 20 },
-  { name: "North America", flag: "🇺🇸", universities: 18 },
-  { name: "Asia Pacific", flag: "🌏", universities: 22 },
-];
-
-const universities = [
-  // East Africa
-  {
-    name: "University of Rwanda",
-    location: "Kigali",
-    country: "Rwanda",
-    region: "East Africa",
-    faculties: ["Engineering", "Medicine", "Business", "Sciences", "Arts"],
-    totalStudents: "32,000+",
-    established: "2013",
-  },
-  {
-    name: "Makerere University",
-    location: "Kampala",
-    country: "Uganda",
-    region: "East Africa",
-    faculties: ["Medicine", "Engineering", "Law", "Arts", "Sciences"],
-    totalStudents: "40,000+",
-    established: "1922",
-  },
-  {
-    name: "University of Nairobi",
-    location: "Nairobi",
-    country: "Kenya",
-    region: "East Africa",
-    faculties: ["Medicine", "Engineering", "Business", "Law", "Agriculture"],
-    totalStudents: "68,000+",
-    established: "1970",
-  },
-  {
-    name: "University of Dar es Salaam",
-    location: "Dar es Salaam",
-    country: "Tanzania",
-    region: "East Africa",
-    faculties: ["Medicine", "Engineering", "Law", "Arts", "Sciences"],
-    totalStudents: "40,000+",
-    established: "1961",
-  },
-
-  // Korea
-  {
-    name: "Seoul National University",
-    location: "Seoul",
-    country: "South Korea",
-    region: "Korea",
-    faculties: [
-      "Engineering",
-      "Medicine",
-      "Liberal Arts",
-      "Natural Sciences",
-      "Business",
-    ],
-    totalStudents: "28,000+",
-    established: "1946",
-  },
-  {
-    name: "KAIST",
-    location: "Daejeon",
-    country: "South Korea",
-    region: "Korea",
-    faculties: [
-      "Engineering",
-      "Natural Sciences",
-      "Business",
-      "Information Technology",
-    ],
-    totalStudents: "10,000+",
-    established: "1971",
-  },
-  {
-    name: "Yonsei University",
-    location: "Seoul",
-    country: "South Korea",
-    region: "Korea",
-    faculties: [
-      "Medicine",
-      "Engineering",
-      "Business",
-      "Liberal Arts",
-      "Dentistry",
-    ],
-    totalStudents: "38,000+",
-    established: "1885",
-  },
-  {
-    name: "Korea University",
-    location: "Seoul",
-    country: "South Korea",
-    region: "Korea",
-    faculties: ["Law", "Business", "Engineering", "Liberal Arts", "Medicine"],
-    totalStudents: "37,000+",
-    established: "1905",
-  },
-
-  // Europe
-  {
-    name: "University of Oxford",
-    location: "Oxford",
-    country: "United Kingdom",
-    region: "Europe",
-    faculties: ["Medicine", "Engineering", "Law", "Philosophy", "Mathematics"],
-    totalStudents: "24,000+",
-    established: "1096",
-  },
-  {
-    name: "ETH Zurich",
-    location: "Zurich",
-    country: "Switzerland",
-    region: "Europe",
-    faculties: [
-      "Engineering",
-      "Natural Sciences",
-      "Mathematics",
-      "Computer Science",
-    ],
-    totalStudents: "22,000+",
-    established: "1855",
-  },
-
-  // North America
-  {
-    name: "Harvard University",
-    location: "Cambridge",
-    country: "United States",
-    region: "North America",
-    faculties: ["Medicine", "Law", "Business", "Engineering", "Liberal Arts"],
-    totalStudents: "23,000+",
-    established: "1636",
-  },
-  {
-    name: "MIT",
-    location: "Cambridge",
-    country: "United States",
-    region: "North America",
-    faculties: [
-      "Engineering",
-      "Computer Science",
-      "Economics",
-      "Physics",
-      "Mathematics",
-    ],
-    totalStudents: "11,000+",
-    established: "1861",
-  },
-
-  // Asia Pacific
-  {
-    name: "University of Tokyo",
-    location: "Tokyo",
-    country: "Japan",
-    region: "Asia Pacific",
-    faculties: ["Engineering", "Medicine", "Law", "Economics", "Sciences"],
-    totalStudents: "28,000+",
-    established: "1877",
-  },
-  {
-    name: "National University of Singapore",
-    location: "Singapore",
-    country: "Singapore",
-    region: "Asia Pacific",
-    faculties: ["Engineering", "Medicine", "Business", "Law", "Computing"],
-    totalStudents: "38,000+",
-    established: "1905",
-  },
-];
-
-const materialTypes = [
-  {
-    type: "Lecture Notes",
-    icon: FiFileText,
-    color: "text-eduBlue",
-    count: 120,
-  },
-  {
-    type: "Research Papers",
-    icon: FiBookOpen,
-    color: "text-eduGreen",
-    count: 85,
-  },
-  { type: "Past Exams", icon: FiStar, color: "text-orange-500", count: 45 },
+  { id: 1, name: "East Africa", flag: "🌍", count: 4 },
+  { id: 2, name: "Korea", flag: "🇰🇷", count: 4 },
+  { id: 3, name: "Europe", flag: "🇪🇺", count: 2 },
+  { id: 4, name: "North America", flag: "🇺🇸", count: 2 },
+  { id: 5, name: "Asia Pacific", flag: "🌏", count: 2 },
 ];
 
 function UniversitiesTab() {
-  const location = useLocation();
-  const university = location.state?.university;
+  const [selectedRegion, setSelectedRegion] = useState("East Africa");
+  const [loading, setLoading] = useState(true);
+  const [filteredUniversities, setFilteredUniversities] = useState([]);
 
-  const [selectedRegion, setSelectedRegion] = useState(regions[0].name);
-  const [selectedUniversity, setSelectedUniversity] = useState(null);
-  const [selectedFaculty, setSelectedFaculty] = useState(null);
+  // Simulate async data loading
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      const filtered = universities.filter((uni) => uni.region === selectedRegion);
+      setFilteredUniversities(filtered);
+      setLoading(false);
+    }, 700);
 
-  // Filter universities by selected region
-  const filteredUniversities = universities.filter(
-    (uni) => uni.region === selectedRegion
-  );
+    return () => clearTimeout(timer);
+  }, [selectedRegion]);
 
-  // Get faculties for selected university
-  const faculties =
-    selectedUniversity &&
-    universities.find((u) => u.name === selectedUniversity)?.faculties;
+  // Calculate stats
+  const totalUniversities = filteredUniversities.length;
+  const totalFaculties = filteredUniversities.reduce((sum, uni) => sum + uni.faculties.length, 0);
+  const totalCourses = totalFaculties * 3; // Estimate
+  const totalResources = totalCourses * 5; // Estimate
 
-  // Get courses for selected faculty
-  // const courses = selectedFaculty ? facultyCourses[selectedFaculty] : [];
   return (
-    <div className="university-container">
-      <div className="university-header">
-        <h1>University Resources</h1>
-        <p>
-          Access comprehensive university materials from top institutions across
-          East Africa, Korea, and worldwide.
+    <div className="container mx-auto px-6">
+      {/* Header */}
+      <div className="max-w-3xl mx-auto text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 font-serif">
+          University Resources
+        </h2>
+        <p className="text-lg text-slate-600 leading-relaxed">
+          Access comprehensive university materials from top institutions across East Africa, Korea, and worldwide.
         </p>
       </div>
 
-      {/* Region Tabs */}
-      <div className="regions-tabs">
-        {regions.map((region) => (
-          <button
-            key={region.name}
-            className={`region-tab${
-              selectedRegion === region.name ? " active" : ""
-            }`}
-            onClick={() => {
-              setSelectedRegion(region.name);
-              setSelectedUniversity(null);
-              setSelectedFaculty(null);
-            }}>
-            <span className="region-flag">{region.flag}</span>
-            {region.name}{" "}
-            <span className="region-count">({region.universities})</span>
-          </button>
-        ))}
-      </div>
-
-      {/* Universities List */}
-      <div className="universities-list">
-        {filteredUniversities.map((uni) => (
-          <div
-            className="university-card-box"
-            onClick={() => {
-              setSelectedUniversity(uni.name);
-              setSelectedFaculty(null);
-            }}>
-            <div className="university-icon">
-              <FaUniversity className="uniIcon" aria-label="University Icon" />
-            </div>
-            <h3 className="university-name">{uni.name}</h3>
-            <p className="university-location">
-              <FaMapMarkerAlt /> {uni.location}, {uni.country}
-            </p>
-            <div className="university-meta">
-              <span>{uni.faculties.length} Faculties</span>
-              <span>• {uni.totalStudents}</span>
-              <span>• Est. {uni.established}</span>
-            </div>
-            <div className="faculty-tags">
-              {uni.faculties.slice(0, 3).map((f, index) => (
-                <span key={index} className="faculty-tag">
-                  {f}
-                </span>
-              ))}
-              {uni.faculties.length > 3 && (
-                <span className="faculty-tag">
-                  +{uni.faculties.length - 3} more
-                </span>
-              )}
-            </div>
-            <Link
-              to="/FacultiesDetails"
-              state={{ university: uni, fromUniversity: true }}>
-              <button className="view-faculties-btn">View Faculties</button>
-            </Link>
-          </div>
-        ))}
-      </div>
-
-      {/* Faculties List */}
-      {/* {selectedUniversity && faculties && (
-        <div className="faculties-list">
-          <h3>Faculties at {selectedUniversity}</h3>
-          <div className="faculty-buttons">
-            {faculties.map((faculty) => (
-              <button
-                key={faculty}
-                className={`faculty-btn${
-                  selectedFaculty === faculty ? " active" : ""
-                }`}
-                onClick={() => setSelectedFaculty(faculty)}>
-                {faculty}
-              </button>
-            ))}
-          </div>
-        </div>
-      )} */}
-
-      {/* Courses List */}
-      {/* {selectedFaculty && (
-        <div className="courses-list">
-          <h4>Courses in {selectedFaculty}</h4>
-          <ul>
-            {courses.map((course) => (
-              <li key={course}>{course}</li>
-            ))}
-          </ul>
-        </div>
-      )} */}
-
-      {/* Material Types */}
-      <div className="materials-section">
-        <h3>Available Materials</h3>
-        <div className="materials-list">
-          {materialTypes.map((material) => (
-            <div
-              key={material.type}
-              className={`material-card ${material.color}`}>
-              <span className="material-icon">
-                {material.icon && React.createElement(material.icon)}
+      {/* Region Filter Pills */}
+      <div className="flex flex-wrap justify-center gap-3 mb-12">
+        {regions.map((region) => {
+          const isActive = selectedRegion === region.name;
+          return (
+            <button
+              key={region.id}
+              onClick={() => setSelectedRegion(region.name)}
+              className={`px-6 py-3 rounded-2xl font-bold transition-all duration-300 border text-sm flex items-center gap-2 ${
+                isActive
+                  ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 -translate-y-1"
+                  : "bg-white border-slate-200 text-slate-600 hover:border-primary/30 hover:bg-slate-50"
+              }`}
+            >
+              <span className="text-lg">{region.flag}</span>
+              {region.name}
+              <span className={`text-xs px-2 py-0.5 rounded-full ${isActive ? "bg-white/20" : "bg-slate-100"}`}>
+                {region.count}
               </span>
-              <span className="material-type">{material.type}</span>
-              <span className="material-count">{material.count}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Loading State */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-white rounded-[2rem] p-8 border border-slate-100 animate-pulse">
+              <div className="w-16 h-16 bg-slate-200 rounded-2xl mb-6"></div>
+              <div className="h-6 bg-slate-200 rounded-lg mb-3 w-3/4"></div>
+              <div className="h-4 bg-slate-200 rounded-lg mb-2 w-1/2"></div>
+              <div className="h-4 bg-slate-200 rounded-lg mb-6 w-full"></div>
+              <div className="flex gap-2 mb-6">
+                <div className="h-6 w-20 bg-slate-200 rounded-full"></div>
+                <div className="h-6 w-20 bg-slate-200 rounded-full"></div>
+                <div className="h-6 w-20 bg-slate-200 rounded-full"></div>
+              </div>
+              <div className="h-10 bg-slate-200 rounded-xl w-full"></div>
             </div>
           ))}
         </div>
-      </div>
+      ) : (
+        <>
+          {/* University Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            {filteredUniversities.map((uni) => (
+              <div
+                key={uni.id}
+                className="bg-white rounded-[2rem] p-8 border border-slate-100 hover:shadow-xl hover:border-primary/20 transition-all duration-300 group flex flex-col"
+              >
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:scale-110 transition-all duration-300">
+                  <FontAwesomeIcon icon={faUniversity} className="text-2xl text-primary group-hover:text-white" />
+                </div>
+                
+                <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary transition-colors">
+                  {uni.name}
+                </h3>
+                
+                <p className="text-sm text-slate-500 mb-1 flex items-center gap-2">
+                  <FontAwesomeIcon icon={faMapMarkerAlt} className="text-xs" />
+                  {uni.location}, {uni.country}
+                </p>
+
+                <p className="text-xs text-slate-400 mb-6 flex items-center gap-2 flex-wrap">
+                  <span>{uni.faculties.length} Faculties</span>
+                  <span className="text-slate-300">•</span>
+                  <span>{uni.totalStudents}</span>
+                  <span className="text-slate-300">•</span>
+                  <span>Est. {uni.established}</span>
+                </p>
+
+                <div className="flex flex-wrap gap-2 mb-6 flex-grow">
+                  {uni.faculties.slice(0, 3).map((faculty, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-medium rounded-full"
+                    >
+                      {faculty}
+                    </span>
+                  ))}
+                  {uni.faculties.length > 3 && (
+                    <span className="px-3 py-1 bg-slate-100 text-slate-500 text-xs font-medium rounded-full">
+                      +{uni.faculties.length - 3} more
+                    </span>
+                  )}
+                </div>
+
+                <Link
+                  to={`/resources/${encodeURIComponent(uni.name.replace(/\s+/g, '-'))}/faculties`}
+                  state={{ university: uni, fromUniversity: true }}
+                  className="w-full"
+                >
+                  <button className="w-full px-6 py-3 bg-primary/5 text-primary hover:bg-primary hover:text-white font-bold rounded-xl transition-all border border-primary/20 hover:shadow-lg hover:shadow-primary/20 flex items-center justify-center gap-2">
+                    View Faculties
+                    <span>→</span>
+                  </button>
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          {/* Summary Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm">
+              <p className="text-4xl font-extrabold text-primary mb-2">{totalUniversities}</p>
+              <p className="text-sm font-medium text-slate-600">Universities</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm">
+              <p className="text-4xl font-extrabold text-secondary mb-2">{totalFaculties}</p>
+              <p className="text-sm font-medium text-slate-600">Faculties</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm">
+              <p className="text-4xl font-extrabold text-orange-500 mb-2">{totalCourses.toLocaleString()}+</p>
+              <p className="text-sm font-medium text-slate-600">Courses</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-sm">
+              <p className="text-4xl font-extrabold text-purple-500 mb-2">{totalResources.toLocaleString()}+</p>
+              <p className="text-sm font-medium text-slate-600">Resources</p>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
