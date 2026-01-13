@@ -4,24 +4,35 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 
 function SignUpPage() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     firstName: "",
     lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
-  });
+  };
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [formData, setFormData] = useState(initialFormState);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle sign up logic here
+    
+    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
+    
     console.log("Sign up:", formData);
+    
+    // Reset the form
+    setFormData(initialFormState);
+    
+    // Reset password visibility
+    setShowPassword(false);
+    setShowConfirmPassword(false);
   };
 
   const handleChange = (e) => {

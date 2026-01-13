@@ -4,16 +4,25 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 
 function SignInPage() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
 
-  const handleSubmit = (e) => {
+  const initialFormState = {
+  email: "",
+  password: "",
+  };
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [formData, setFormData] = useState(initialFormState);
+
+ const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle sign in logic here
     console.log("Sign in:", formData);
+    
+    // 2. Reset the data
+    setFormData(initialFormState);
+    
+    // 3. Optional: Reset password visibility too?
+    setShowPassword(false); 
   };
 
   const handleChange = (e) => {
