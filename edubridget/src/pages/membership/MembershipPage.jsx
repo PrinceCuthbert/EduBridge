@@ -179,11 +179,11 @@ function MembershipPage() {
                   <p className="text-slate-600 text-sm mb-6">{plan.description}</p>
                   
                   <div className="mb-2">
-                    <span className="text-5xl font-extrabold text-slate-900">
+                    <span className="text-3xl font-extrabold text-slate-900">
                       {getPrice(plan)}
                     </span>
                     {plan.monthlyPrice > 0 && (
-                      <span className="text-slate-500 text-lg ml-1">{getPeriod()}</span>
+                      <span className="text-slate-900 text-lg ml-1">{getPeriod()}</span>
                     )}
                   </div>
                   
