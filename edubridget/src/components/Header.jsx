@@ -79,7 +79,7 @@ const Header = () => {
           
           <div className="flex items-center gap-4 ml-4">
             <NavLink 
-              to="/login" 
+              to="/signin" 
               className={`px-5 py-2 font-medium transition-colors ${
                 scrolled ? 'text-gray-700 hover:text-primary' : 'text-white hover:text-white/80'
               }`}

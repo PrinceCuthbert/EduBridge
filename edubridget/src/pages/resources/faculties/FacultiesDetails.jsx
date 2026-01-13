@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUniversity, faBookOpen, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faUniversity, faBookOpen, faArrowLeft, faMapMarkerAlt, faUsers, faCalendar } from "@fortawesome/free-solid-svg-icons";
 import { findUniversityByName } from "../../../data/universities.js";
 
 function FacultiesDetails() {
@@ -104,7 +104,7 @@ function FacultiesDetails() {
             </h1>
             <Link
               to="/resourcesPage"
-              className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-medium transition-all border border-white/20 backdrop-blur-sm flex items-center gap-2"
+              className="px-2 py-1 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-medium transition-all border border-white/20 backdrop-blur-sm flex items-center gap-4"
             >
               <FontAwesomeIcon icon={faArrowLeft} />
               Back to Universities
@@ -119,7 +119,7 @@ function FacultiesDetails() {
       {/* Main Content */}
       <section className="py-12">
         <div className="container mx-auto px-6">
-          {/* University Info Card */}
+          {/* University Information Card */}
           <div className="bg-white rounded-[2rem] p-6 md:p-8 border border-slate-100 shadow-sm mb-12 hover:shadow-lg transition-shadow">
             <div className="flex items-center gap-6">
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center flex-shrink-0">
@@ -127,12 +127,19 @@ function FacultiesDetails() {
               </div>
               <div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-2">{university.name}</h3>
-                <p className="text-slate-600 flex items-center gap-2 flex-wrap">
-                  <span>📍 {university.location}</span>
-                  <span className="text-slate-300">•</span>
-                  <span>👥 {university.totalStudents} students</span>
-                  <span className="text-slate-300">•</span>
-                  <span>📅 Est. {university.established}</span>
+                <p className="text-slate-600 flex items-center gap-4 flex-wrap text-sm">
+                  <span className="flex items-center gap-2">
+                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-primary" />
+                    {university.location}
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <FontAwesomeIcon icon={faUsers} className="text-primary" />
+                    {university.totalStudents}+ students
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <FontAwesomeIcon icon={faCalendar} className="text-primary" />
+                    Est. {university.established}
+                  </span>
                 </p>
               </div>
             </div>
