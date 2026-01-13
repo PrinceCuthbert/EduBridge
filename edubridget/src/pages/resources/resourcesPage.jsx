@@ -269,13 +269,13 @@ function ResourcesPage() {
             <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 hidden md:block" />
             
             {/* Scrollable tabs container */}
-            <div className="flex items-center gap-2 py-4 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory">
-              <div className="flex items-center justify-start md:justify-center gap-2 min-w-full md:min-w-0 px-2">
+            <div className="flex items-center gap-2 py-4 overflow-x-auto scrollbar-hide scroll-smooth">
+              <div className="flex items-center gap-2 px-2">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`px-6 py-2.5 rounded-full font-medium text-sm whitespace-nowrap transition-all duration-300 snap-center ${
+                    className={`px-6 py-2.5 rounded-full font-medium text-sm whitespace-nowrap transition-all duration-300 flex-shrink-0 ${
                       activeTab === tab.id
                         ? "bg-primary text-white shadow-lg shadow-primary/20 scale-105"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:scale-105"
