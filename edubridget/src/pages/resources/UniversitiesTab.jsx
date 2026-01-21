@@ -136,7 +136,7 @@ function UniversitiesTab() {
                 </div>
 
                 <Link
-                  to={`/resources/${encodeURIComponent(uni.name.replace(/\s+/g, '-'))}/faculties`}
+                  to={`/faculties/${encodeURIComponent(uni.name.replace(/\s+/g, '-'))}`}
                   state={{ university: uni, fromUniversity: true }}
                   className="w-full"
                 >

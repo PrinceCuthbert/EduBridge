@@ -16,7 +16,7 @@ function SignInPage() {
 
  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Sign in:", formData);
+    // console.log("Sign in:", formData);
     
     // 2. Reset the data
     setFormData(initialFormState);

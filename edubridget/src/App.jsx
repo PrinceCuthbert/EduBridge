@@ -4,15 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 // Global Components
 import Header from "./components/Header";
 import Footer from "./pages/footer/footer.jsx";
-
-// Page Sections (Home)
-import Hero from "./pages/home/Hero";
-import WhyChoose from "./pages/home/WhyChoose";
-import AcademicServices from "./pages/home/AcademicServices";
-import CoursesPreview from "./pages/home/CoursesPreview";
-import MembershipPlans from "./pages/home/MembershipPlans";
-import Testimonials from "./pages/home/Testimonials";
-import CallToAction from "./pages/home/CallToAction";
+import LandingPage from "./pages/home/LandingPage.jsx";
 
 // Pages
 import ContactPage from "./pages/contact/contactPage.jsx";
@@ -31,44 +23,22 @@ import "./index.css";
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900">
-        <Header />
-        <main>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <div className="flex flex-col">
-                  <Hero />
-                  <WhyChoose />
-                  <AcademicServices />
-                  <CoursesPreview />
-                  <MembershipPlans />
-                  <Testimonials />
-                  <CallToAction />
-                </div>
-              }
-            />
-            <Route path="/contactPage" element={<ContactPage />} />
-            <Route path="/membershipPage" element={<MembershipPage />} />
-            <Route path="/aboutUsPage" element={<AboutUsPage />} />
-            <Route path="/coursesPage" element={<CoursesPage />} />
-            <Route path="/resourcesPage" element={<ResourcesPage />} />
-            <Route
-              path="/faculties/:facultyId"
-              element={<FacultiesDetails />}
-            />
-            <Route path="/signin" element={<SignInPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/UniversitiesTab" element={<UniversitiesTab />} />
-            <Route
-              path="/resources/universities"
-              element={<UniversitiesTab />}
-            />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+      <Header />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/contactPage" element={<ContactPage />} />
+        <Route path="/membershipPage" element={<MembershipPage />} />
+        <Route path="/aboutUsPage" element={<AboutUsPage />} />
+        <Route path="/coursesPage" element={<CoursesPage />} />
+        <Route path="/resourcesPage" element={<ResourcesPage />} />
+        <Route path="/faculties/:facultyId" element={<FacultiesDetails />} />
+        <Route path="/signin" element={<SignInPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/UniversitiesTab" element={<UniversitiesTab />} />
+        <Route path="/resources/universities" element={<UniversitiesTab />} />
+      </Routes>
+
+      <Footer />
     </Router>
   );
 }
