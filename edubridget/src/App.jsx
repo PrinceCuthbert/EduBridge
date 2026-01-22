@@ -1,73 +1,109 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import 'aos/dist/aos.css';
+import AOS from 'aos';
 
-// Global Components
-import Header from "./components/Header";
-import Footer from "./pages/footer/footer.jsx";
-
-// Page Sections (Home)
-import Hero from "./pages/home/Hero";
-import WhyChoose from "./pages/home/WhyChoose";
-import AcademicServices from "./pages/home/AcademicServices";
-import CoursesPreview from "./pages/home/CoursesPreview";
-import MembershipPlans from "./pages/home/MembershipPlans";
-import Testimonials from "./pages/home/Testimonials";
-import CallToAction from "./pages/home/CallToAction";
+// Components
+import Header from './components/Header';
+import Footer from './pages/footer/footer'; // Corrected path
+import WhatsAppButton from './components/WhatsAppButton';
+import LoadingSpinner from './components/LoadingSpinner';
 
 // Pages
-import ContactPage from "./pages/contact/contactPage.jsx";
-import MembershipPage from "./pages/membership/MembershipPage.jsx";
-import AboutUsPage from "./pages/aboutUs/AboutUsPage.jsx";
-import CoursesPage from "./pages/coursesPage/coursesPage.jsx";
-import ResourcesPage from "./pages/resources/resourcesPage.jsx";
-import FacultiesDetails from "./pages/resources/faculties/FacultiesDetails.jsx";
-import UniversitiesTab from "./pages/resources/UniversitiesTab.jsx";
-import SignInPage from "./pages/auth/SignInPage.jsx";
-import SignUpPage from "./pages/auth/SignUpPage.jsx";
+import Hero from './pages/home/Hero';
+import WhyChoose from './pages/home/WhyChoose';
+import AcademicServices from './pages/home/AcademicServices';
+import CallToAction from './pages/home/CallToAction';
 
-// Global Styles
-import "./index.css";
+// Legacy Pages (Maintained)
+import AboutUsPage from './pages/aboutUs/AboutUsPage'; // Corrected path
+import ContactPage from './pages/contact/contactPage'; // Corrected path
+import Signin from './pages/auth/SignInPage'; // Corrected path
+import Signup from './pages/auth/SignUpPage'; // Corrected path
+
+// New Pages
+import DigitalLibraryPage from './pages/library/DigitalLibraryPage';
+import BranchesPage from './pages/branches/BranchesPage';
+import StudyAbroadPage from './pages/study-abroad/StudyAbroadPage';
+import VisaConsultationPage from './pages/visa/VisaConsultationPage';
+import ScholarshipsPage from './pages/scholarships/ScholarshipsPage';
+import GalleryPage from './pages/gallery/GalleryPage';
+import PartnersPage from './pages/partners/PartnersPage';
+import BlogPage from './pages/blog/BlogPage';
+
+// Placeholder Pages (To be implemented or reused if existing)
+import CoursesPage from './pages/coursesPage/coursesPage'; // Corrected path
+import MembershipPage from './pages/membership/MembershipPage'; // Corrected path
+import Dashboard from './pages/dashboard/Dashboard'; // Created path
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    });
+    // Simulate loading time
+    setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+  }, []);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <Router>
-      <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900">
+      <ScrollToTop />
+      <div className="flex flex-col min-h-screen">
         <Header />
-        <main>
+        <main className="flex-grow">
           <Routes>
-            <Route
-              path="/"
-              element={
-                <div className="flex flex-col">
-                  <Hero />
-                  <WhyChoose />
-                  <AcademicServices />
-                  <CoursesPreview />
-                  <MembershipPlans />
-                  <Testimonials />
-                  <CallToAction />
-                </div>
-              }
-            />
-            <Route path="/contactPage" element={<ContactPage />} />
-            <Route path="/membershipPage" element={<MembershipPage />} />
+            <Route path="/" element={
+              <>
+                <Hero />
+                <WhyChoose />
+                <AcademicServices />
+                <CallToAction />
+              </>
+            } />
             <Route path="/aboutUsPage" element={<AboutUsPage />} />
+            <Route path="/contactPage" element={<ContactPage />} />
+            
+            {/* New Routes */}
+            <Route path="/library" element={<DigitalLibraryPage />} />
+            <Route path="/branches" element={<BranchesPage />} />
+            <Route path="/study-abroad" element={<StudyAbroadPage />} />
+            <Route path="/visa-consultation" element={<VisaConsultationPage />} />
+            <Route path="/scholarships" element={<ScholarshipsPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/partners" element={<PartnersPage />} />
+            <Route path="/blogs" element={<BlogPage />} />
+            
+            {/* Existing/Placeholder Routes */}
             <Route path="/coursesPage" element={<CoursesPage />} />
-            <Route path="/resourcesPage" element={<ResourcesPage />} />
-            <Route
-              path="/faculties/:facultyId"
-              element={<FacultiesDetails />}
-            />
-            <Route path="/signin" element={<SignInPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/UniversitiesTab" element={<UniversitiesTab />} />
-            <Route
-              path="/resources/universities"
-              element={<UniversitiesTab />}
-            />
+            <Route path="/membershipPage" element={<MembershipPage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            
+            {/* Auth Routes */}
+            <Route path="/signin" element={<Signin />} />
+            <Route path="/signup" element={<Signup />} />
           </Routes>
         </main>
         <Footer />
+        <WhatsAppButton />
       </div>
     </Router>
   );

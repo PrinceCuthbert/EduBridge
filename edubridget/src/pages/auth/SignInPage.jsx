@@ -16,7 +16,7 @@ function SignInPage() {
 
  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Sign in:", formData);
+    // console.log("Sign in:", formData);
     
     // 2. Reset the data
     setFormData(initialFormState);
@@ -118,6 +118,14 @@ function SignInPage() {
               <FontAwesomeIcon icon={faRightToBracket} />
               Sign in
             </button>
+            <div className="mt-4 text-center">
+              <p className="text-sm text-slate-600">
+                Don't have an account?{" "}
+                <Link to="/signup" className="text-primary hover:text-primary-dark font-bold">
+                  Sign up
+                </Link>
+              </p>
+            </div>
           </form>
 
           {/* Demo Accounts */}

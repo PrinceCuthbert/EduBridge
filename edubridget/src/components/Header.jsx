@@ -1,186 +1,179 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { Menu, X } from 'react-feather';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Menu, X, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-const Header = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const location = useLocation();
+export default function Navigation() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [location]);
-
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Courses', path: '/coursesPage' },
-    { name: 'Resources', path: '/resourcesPage' },
-    { name: 'Membership', path: '/membershipPage' },
-    { name: 'About', path: '/AboutUsPage' },
-    { name: 'Contact', path: '/contactPage' },
-  ];
+  const toggleDropdown = (menu) => {
+    setOpenDropdown(openDropdown === menu ? null : menu);
+  };
 
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white/80 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'
-      }`}
-    >
-      <div className="container mx-auto px-6 flex justify-between items-center">
-        {/* Logo */}
-        <NavLink to="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300">
-            <img src="/vite.svg" alt="Logo" className="w-6 h-6 invert brightness-0" />
+    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center">
+              <div className="text-2xl font-bold bg-primary-gradient bg-clip-text text-transparent">
+                EDUBRIDGE
+              </div>
+            </Link>
           </div>
-          <h1 className={`text-2xl font-extrabold bg-clip-text text-transparent ${
-            scrolled ? 'bg-primary-gradient' : 'bg-white'
-          }`}>
-            EduBridge
-          </h1>
-        </NavLink>
 
-        {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-8">
-          <ul className="flex items-center gap-8 font-medium">
-            {navLinks.map((link) => (
-              <li key={link.path}>
-                <NavLink
-                  to={link.path}
-                   className={({ isActive }) =>
-                    `relative transition-colors duration-300 ${
-                      scrolled 
-                        ? (isActive ? 'text-primary' : 'text-gray-600 hover:text-primary') 
-                        : (isActive ? 'text-white' : 'text-white/80 hover:text-white')
-                    }`
-                  }
-                >
-                  {({ isActive }) => (
-                    <>
-                      {link.name}
-                      {isActive && (
-                        <span className={`absolute -bottom-1 left-0 w-full h-0.5 rounded-full ${
-                          scrolled ? 'bg-primary' : 'bg-white'
-                        }`} />
-                      )}
-                    </>
-                  )}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-          
-          <div className="flex items-center gap-4 ml-4">
-            <NavLink 
-              to="/signin" 
-              className={`px-5 py-2 font-medium transition-colors ${
-                scrolled ? 'text-gray-700 hover:text-primary' : 'text-white hover:text-white/80'
-              }`}
-            >
-              Login
-            </NavLink>
-            <NavLink 
-              to="/signup" 
-              className={`px-6 py-2 rounded-full font-medium transition-all active:scale-95 shadow-md ${
-                scrolled 
-                  ? 'bg-primary text-white shadow-primary/20 hover:bg-primary-dark hover:shadow-lg' 
-                  : 'bg-white text-primary shadow-black/10 hover:bg-slate-50 hover:shadow-xl'
-              }`}
-            >
-              Sign Up
-            </NavLink>
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-6">
+            <Link to="/" className="text-gray-700 hover:text-primary transition-colors font-medium">
+              Home
+            </Link>
+
+            {/* About Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center text-gray-700 hover:text-primary transition-colors font-medium">
+                About <ChevronDown className="ml-1 h-4 w-4" />
+              </button>
+              <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
+                <Link to="/aboutUsPage" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">About Edu Bridge</Link>
+                <Link to="/branches" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Branches</Link>
+                <Link to="/partners" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Partners</Link>
+              </div>
+            </div>
+
+            {/* Academics Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center text-gray-700 hover:text-primary transition-colors font-medium">
+                Academics <ChevronDown className="ml-1 h-4 w-4" />
+              </button>
+              <div className="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
+                <Link to="/coursesPage" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">High School Curriculum</Link>
+                <Link to="/coursesPage?filter=university" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Master's Programs</Link>
+                <Link to="/coursesPage" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Online Learning</Link>
+              </div>
+            </div>
+
+            {/* Global Services Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center text-gray-700 hover:text-primary transition-colors font-medium">
+                Global Opportunities <ChevronDown className="ml-1 h-4 w-4" />
+              </button>
+              <div className="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
+                <Link to="/study-abroad" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Study Abroad</Link>
+                <Link to="/visa-consultation" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Visa & Consultation</Link>
+              </div>
+            </div>
+
+            {/* Resources Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center text-gray-700 hover:text-primary transition-colors font-medium">
+                Resources <ChevronDown className="ml-1 h-4 w-4" />
+              </button>
+              <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
+                <Link to="/library" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Digital Library</Link>
+                <Link to="/scholarships" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Scholarships</Link>
+              </div>
+            </div>
+
+            {/* Media Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center text-gray-700 hover:text-primary transition-colors font-medium">
+                Media <ChevronDown className="ml-1 h-4 w-4" />
+              </button>
+              <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
+                 <Link to="/blogs" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Blogs & News</Link>
+                 <Link to="/gallery" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Gallery</Link>
+              </div>
+            </div>
+
+            <Link to="/contactPage" className="text-gray-700 hover:text-primary transition-colors font-medium">
+              Contact
+            </Link>
+
+            <Link to="/signin">
+              <Button className="bg-primary hover:bg-primary-dark text-white font-medium">
+                Sign In
+              </Button>
+            </Link>
           </div>
-        </nav>
 
-        {/* Mobile Toggle */}
-        <button 
-          className="lg:hidden p-2 text-gray-600 hover:text-blue-600 transition-colors focus:outline-none"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-      </div>
-
-      {/* Mobile Nav Overlay */}
-      <div 
-        className={`lg:hidden fixed inset-0 z-40 bg-gradient-to-br from-primary via-primary-dark to-secondary transform transition-transform duration-500 ease-out ${
-          menuOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
-        {/* Decorative Elements */}
-        <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-        
-        <div className="relative flex flex-col h-full pt-24 px-8 overflow-y-auto">
-          {/* Navigation Links */}
-          <nav className="flex-1">
-            <ul className="flex flex-col gap-2">
-              {navLinks.map((link, index) => (
-                <li 
-                  key={link.path}
-                  className={`transform transition-all duration-500 ${
-                    menuOpen ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
-                  }`}
-                  style={{ transitionDelay: `${index * 50}ms` }}
-                >
-                  <NavLink
-                    to={link.path}
-                    className={({ isActive }) =>
-                      `flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-lg transition-all ${
-                        isActive 
-                          ? 'bg-white text-primary shadow-lg' 
-                          : 'text-white/90 hover:bg-white/10 hover:text-white'
-                      }`
-                    }
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {({ isActive }) => (
-                      <>
-                        <span className={`w-2 h-2 rounded-full transition-all ${
-                          isActive ? 'bg-primary scale-100' : 'bg-white/40 scale-0'
-                        }`} />
-                        {link.name}
-                      </>
-                    )}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          
-          {/* Auth Buttons */}
-          <div 
-            className={`mt-8 mb-8 flex flex-col gap-4 transform transition-all duration-500 ${
-              menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-            }`}
-            style={{ transitionDelay: '300ms' }}
-          >
-            <NavLink 
-              to="/signin" 
-              className="w-full py-4 text-center text-white font-bold border-2 border-white/30 rounded-2xl backdrop-blur-sm hover:bg-white/10 hover:border-white/50 transition-all active:scale-95"
-              onClick={() => setMenuOpen(false)}
+          {/* Mobile menu button */}
+          <div className="lg:hidden flex items-center">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-gray-700 hover:text-primary"
             >
-              Login
-            </NavLink>
-            <NavLink 
-              to="/signup" 
-              className="w-full py-4 text-center bg-white text-primary font-bold rounded-2xl shadow-2xl shadow-black/20 hover:shadow-3xl hover:scale-105 transition-all active:scale-95"
-              onClick={() => setMenuOpen(false)}
-            >
-              Sign Up
-            </NavLink>
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
           </div>
         </div>
       </div>
-    </header>
-  );
-};
 
-export default Header;
+      {/* Mobile Navigation */}
+      {isOpen && (
+        <div className="lg:hidden border-t border-gray-200 bg-white max-h-[80vh] overflow-y-auto">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            <Link to="/" className="block px-3 py-2 rounded-md text-base text-gray-700 hover:text-primary hover:bg-slate-50" onClick={() => setIsOpen(false)}>Home</Link>
+            
+            {/* Mobile Dropdowns */}
+            {['About', 'Academics', 'Global Opportunities', 'Resources', 'Media'].map((section) => (
+              <div key={section}>
+                <button
+                  onClick={() => toggleDropdown(section)}
+                  className="w-full flex justify-between items-center px-3 py-2 rounded-md text-base text-gray-700 hover:text-primary hover:bg-slate-50"
+                >
+                  {section}
+                  <ChevronDown className={`h-4 w-4 transition-transform ${openDropdown === section ? 'rotate-180' : ''}`} />
+                </button>
+                {openDropdown === section && (
+                  <div className="pl-4 space-y-1 bg-slate-50 rounded-md">
+                    {section === 'About' && (
+                      <>
+                        <Link to="/aboutUsPage" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>About Edu Bridge</Link>
+                        <Link to="/branches" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Branches</Link>
+                        <Link to="/partners" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Partners</Link>
+                      </>
+                    )}
+                    {section === 'Academics' && (
+                      <>
+                        <Link to="/coursesPage" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>High School Curriculum</Link>
+                        <Link to="/coursesPage?filter=university" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Master's Programs</Link>
+                         <Link to="/coursesPage" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Online Learning</Link>
+                      </>
+                    )}
+                     {section === 'Global Opportunities' && (
+                      <>
+                        <Link to="/study-abroad" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Study Abroad</Link>
+                        <Link to="/visa-consultation" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Visa & Consultation</Link>
+                      </>
+                    )}
+                    {section === 'Resources' && (
+                      <>
+                        <Link to="/library" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Digital Library</Link>
+                        <Link to="/scholarships" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Scholarships</Link>
+                      </>
+                    )}
+                     {section === 'Media' && (
+                      <>
+                        <Link to="/blogs" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Blogs & News</Link>
+                        <Link to="/gallery" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Gallery</Link>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+
+            <Link to="/contactPage" className="block px-3 py-2 rounded-md text-base text-gray-700 hover:text-primary hover:bg-slate-50" onClick={() => setIsOpen(false)}>Contact</Link>
+            
+            <div className="pt-4 pb-2">
+              <Link to="/signin" className="block w-full text-center px-3 py-2 rounded-md text-base bg-primary text-white hover:bg-primary-dark" onClick={() => setIsOpen(false)}>
+                Sign In
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+}

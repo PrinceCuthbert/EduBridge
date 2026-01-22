@@ -25,7 +25,7 @@ function SignUpPage() {
       return;
     }
     
-    console.log("Sign up:", formData);
+    // console.log("Sign up:", formData);
     
     // Reset the form
     setFormData(initialFormState);
