@@ -84,6 +84,13 @@ function AboutUsPage() {
       description: "Education specialist with expertise in curriculum development and educational policy.",
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
     },
+    {
+      id: 5,
+      name: "Kofi Mensah",
+      role: "Head of Digital Learning",
+      description: "Specialist in educational technology with over 10 years of experience designing interactive online platforms for diverse learning environments.",
+      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop",
+    },
   ];
 
   const getIconColor = (color) => {
@@ -222,41 +229,133 @@ function AboutUsPage() {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="py-16 bg-white">
+      {/* Team Slider Section */}
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 font-serif">
               Meet Our Team
             </h2>
             <p className="text-slate-600">Dedicated educators and professionals committed to our mission</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-            {teamMembers.map((member) => (
-              <div
-                key={member.id}
-                className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 hover:shadow-xl hover:border-primary/20 transition-all group"
-              >
-                <div className="h-56 sm:h-64 overflow-hidden bg-slate-200">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">{member.name}</h3>
-                  <p className="text-sm text-primary font-medium mb-3">{member.role}</p>
-                  <p className="text-sm text-slate-600 leading-relaxed">{member.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <TeamSlider members={teamMembers} />
         </div>
       </section>
     </div>
   );
 }
+
+// Custom Team Slider Component
+
+
+const TeamSlider = ({ members }) => {
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [isPaused, setIsPaused] = React.useState(false);
+
+  // Match the visual layout: 1 item on mobile, 2 on tablet, 4 on desktop
+  const [itemsPerPage, setItemsPerPage] = React.useState(4);
+
+  // Update itemsPerPage based on window width
+  React.useEffect(() => {
+    const updateSize = () => {
+      if (window.innerWidth < 640) setItemsPerPage(1);
+      else if (window.innerWidth < 1024) setItemsPerPage(2);
+      else setItemsPerPage(3);
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  const totalPages = members.length;
+
+  const handleNext = () => {
+    // Loop back to 0 if we exceed the length, otherwise increment by 1
+    setCurrentIndex((prev) => (prev + 1) % totalPages);
+  };
+
+  const handlePrev = () => {
+    // Loop to the end if we go below 0
+    setCurrentIndex((prev) => (prev - 1 < 0 ? totalPages - 1 : prev - 1));
+  };
+
+  React.useEffect(() => {
+    if (!isPaused) {
+      const interval = setInterval(handleNext, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [isPaused, totalPages]);
+
+  return (
+    <div 
+      className="relative max-w-7xl mx-auto px-8"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* Prev Button */}
+      <button 
+        onClick={handlePrev}
+        className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-xl border border-slate-100 flex items-center justify-center text-slate-600 hover:text-primary transition-all hover:scale-110"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+
+      {/* Slider Window */}
+      <div className="overflow-hidden py-4">
+        <div 
+          className="flex transition-transform duration-500 ease-in-out"
+          style={{ 
+            transform: `translateX(-${currentIndex * (100 / itemsPerPage)}%)`,
+          }}
+        >
+          {members.map((member) => (
+            <div 
+              key={member.id} 
+              className="flex-shrink-0 px-4"
+              style={{ width: `${100 / itemsPerPage}%` }}
+            >
+              <div className="flex flex-col items-center text-center group">
+                <div className="w-48 h-48 rounded-full overflow-hidden mb-6 border-4 border-slate-100 shadow-lg group-hover:border-primary/20 transition-all duration-500">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-110"
+                  />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-1">{member.name}</h3>
+                <p className="text-sm font-bold text-primary mb-2 uppercase tracking-wide">{member.role}</p>
+                <p className="text-xs text-slate-500 leading-relaxed max-w-[200px] mx-auto line-clamp-3">
+                  {member.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Next Button */}
+      <button 
+        onClick={handleNext}
+        className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-xl border border-slate-100 flex items-center justify-center text-slate-600 hover:text-primary transition-all hover:scale-110"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+      {/* Pagination Dots */}
+      <div className="flex justify-center gap-2 mt-8">
+        {members.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrentIndex(idx)}
+            className={`h-2 rounded-full transition-all duration-300 ${
+              idx === currentIndex ? "bg-primary w-8" : "bg-slate-300 w-2 hover:bg-slate-400"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default AboutUsPage;
