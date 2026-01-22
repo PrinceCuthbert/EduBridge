@@ -141,7 +141,7 @@ export default function Navigation() {
                          <Link to="/coursesPage" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Online Learning</Link>
                       </>
                     )}
-                     {section === 'Global Opportunities' && (
+                    {section === 'Global Opportunities' && (
                       <>
                         <Link to="/study-abroad" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Study Abroad</Link>
                         <Link to="/visa-consultation" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>Visa & Consultation</Link>
