@@ -11,9 +11,9 @@ import LoadingSpinner from './components/LoadingSpinner';
 
 // Pages
 import Hero from './pages/home/Hero';
-import WhyChoose from './pages/home/WhyChoose';
-import AcademicServices from './pages/home/AcademicServices';
-import CallToAction from './pages/home/CallToAction';
+import WhyChoose from './pages/home/pages/WhyChoose';
+import AcademicServices from './pages/home/pages/AcademicServices';
+import CallToAction from './pages/home/pages/CallToAction';
 
 // Legacy Pages (Maintained)
 import AboutUsPage from './pages/aboutUs/AboutUsPage'; // Corrected path
