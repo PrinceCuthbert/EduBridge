@@ -121,14 +121,26 @@ const BranchesPage = () => {
         </section>
 
         {/* Map Placeholder */}
-        <section className="py-8 bg-white border-b border-slate-200">
-          <div className="container mx-auto px-4 md:px-8">
-            <div className="bg-slate-100 rounded-xl h-64 flex items-center justify-center border border-slate-200">
-              <div className="text-center">
-                <MapPin className="h-12 w-12 text-primary mx-auto mb-4" />
-                <p className="text-slate-500 font-medium">Interactive map coming soon</p>
-                <p className="text-sm text-slate-400">7 branches across East Africa</p>
-              </div>
+        {/* Find Us Map */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 font-serif">
+                Find Us
+              </h2>
+              <p className="text-slate-600">Visit our headquarters in Kigali, Rwanda</p>
+            </div>
+
+            <div className="max-w-5xl mx-auto rounded-2xl overflow-hidden border border-slate-200 shadow-lg">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.5160815956!2d30.058480315!3d-1.9440726!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca4258ed8e797%3A0xe9b1d4d3b1d4d3b1!2sKigali%2C%20Rwanda!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus"
+                width="100%"
+                height="450"
+                style={{ border: 0 }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
             </div>
           </div>
         </section>
