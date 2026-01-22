@@ -26,11 +26,11 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/contactPage" element={<ContactPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/membershipPage" element={<MembershipPage />} />
-        <Route path="/aboutUsPage" element={<AboutUsPage />} />
+        <Route path="/about" element={<AboutUsPage />} />
         <Route path="/coursesPage" element={<CoursesPage />} />
-        <Route path="/resourcesPage" element={<ResourcesPage />} />
+        <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/faculties/:facultyId" element={<FacultiesDetails />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/signup" element={<SignUpPage />} />
