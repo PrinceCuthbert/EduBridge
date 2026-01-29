@@ -18,7 +18,7 @@ function LiveClassesTab() {
     {
       id: 1,
       title: "Advanced Mathematics",
-      instructor: "Prof. Sarah Johnson",
+      instructor: "Prof. Sarah Johnson Kelly",
       date: "Today",
       time: "2:00 PM - 3:30 PM",
       students: 45,
