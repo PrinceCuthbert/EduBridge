@@ -140,10 +140,10 @@ function ContactPage() {
             <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 p-6 border border-slate-100">
               <h3 className="font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Get in Touch</h3>
               
-              <div className="space-y-5">
+              <div className="space-y-6">
                 <div className="flex gap-4">
-                  <div className="mt-1 w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <MapPin size={18} />
+                  <div className="w-10 h-10 bg-sky-50 text-sky-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <MapPin size={20} />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-700">Head Office</p>
@@ -152,8 +152,8 @@ function ContactPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="mt-1 w-8 h-8 bg-green-50 text-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Phone size={18} />
+                  <div className="w-10 h-10 bg-sky-50 text-sky-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Phone size={20} />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-700">Phone</p>
@@ -162,8 +162,8 @@ function ContactPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="mt-1 w-8 h-8 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Mail size={18} />
+                  <div className="w-10 h-10 bg-sky-50 text-sky-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Mail size={20} />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-700">Email</p>
@@ -172,8 +172,8 @@ function ContactPage() {
                 </div>
 
                  <div className="flex gap-4">
-                  <div className="mt-1 w-8 h-8 bg-orange-50 text-orange-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Clock size={18} />
+                  <div className="w-10 h-10 bg-sky-50 text-sky-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Clock size={20} />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-700">Working Hours</p>
@@ -187,15 +187,15 @@ function ContactPage() {
             <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 p-6 border border-slate-100">
                <h3 className="font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Regional Offices</h3>
                <div className="space-y-4">
-                 <div>
+                 <div className="pb-4 border-b border-slate-100 last:border-0 last:pb-0">
                    <p className="text-sm font-bold text-slate-700">Rwanda (HQ)</p>
                    <p className="text-xs text-slate-500">+250 788 123 456</p>
                  </div>
-                 <div>
+                 <div className="pb-4 border-b border-slate-100 last:border-0 last:pb-0">
                    <p className="text-sm font-bold text-slate-700">Uganda</p>
                    <p className="text-xs text-slate-500">+256 772 123 456</p>
                  </div>
-                 <div>
+                 <div className="pb-4 border-b border-slate-100 last:border-0 last:pb-0">
                    <p className="text-sm font-bold text-slate-700">Kenya</p>
                    <p className="text-xs text-slate-500">+254 722 123 456</p>
                  </div>
@@ -207,20 +207,20 @@ function ContactPage() {
               <h3 className="font-bold text-slate-900 mb-4">Follow Us</h3>
               <div className="flex gap-3">
                 {[
-                  { icon: Facebook, color: "text-blue-600 bg-blue-50" },
-                  { icon: Twitter, color: "text-sky-500 bg-sky-50" },
-                  { icon: Instagram, color: "text-pink-600 bg-pink-50" },
-                  { icon: Linkedin, color: "text-blue-700 bg-blue-100" }
+                  { icon: Facebook, color: "text-slate-600 bg-slate-100 hover:bg-blue-50 hover:text-blue-600" },
+                  { icon: Twitter, color: "text-slate-600 bg-slate-100 hover:bg-sky-50 hover:text-sky-500" },
+                  { icon: Instagram, color: "text-slate-600 bg-slate-100 hover:bg-pink-50 hover:text-pink-600" },
+                  { icon: Linkedin, color: "text-slate-600 bg-slate-100 hover:bg-blue-100 hover:text-blue-700" }
                 ].map((social, i) => (
-                  <a key={i} href="#" className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform hover:-translate-y-1 ${social.color}`}>
-                    <social.icon size={20} />
+                  <a key={i} href="#" className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${social.color}`}>
+                    <social.icon size={18} />
                   </a>
                 ))}
               </div>
             </div>
 
-            {/* Live Chat Card */}
-            <div className="bg-primary text-white rounded-2xl shadow-lg shadow-primary/30 p-8 text-center relative overflow-hidden group">
+            
+           <div className="bg-primary text-white rounded-2xl shadow-lg shadow-primary/30 p-8 text-center relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-white/20 transition-all" />
               
               <div className="relative z-10">
@@ -231,13 +231,17 @@ function ContactPage() {
                 <p className="text-white/80 text-sm mb-6">
                   Chat with our support team in real-time.
                 </p>
-                <button className="px-6 py-2 bg-secondary text-white font-bold rounded-lg text-sm hover:bg-secondary-dark transition-colors shadow-md w-full">
+                <button 
+                  onClick={() => window.open('https://wa.me/250798697809', '_blank')}
+                  className="px-6 py-2 bg-secondary text-white font-bold rounded-lg text-sm hover:bg-secondary-dark transition-colors shadow-md w-full"
+                >
                   Start Chat
                 </button>
               </div>
             </div>
 
           </div>
+
         </div>
       </div>
       

@@ -33,39 +33,31 @@ function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
-        {/* Logo and Title */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xl">TM</span>
-            </div>
-            <span className="ml-2 text-2xl font-bold text-slate-900">EduBridge</span>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-            Sign in to your account
-          </h1>
-          <p className="text-slate-600">
-            Or{" "}
-            <Link to="/signup" className="text-primary hover:text-primary-dark font-medium">
-              create a new account
+    <div className="min-h-screen bg-white flex">
+      {/* Left Side - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-16 overflow-y-auto">
+        <div className="w-full max-w-md space-y-8">
+          {/* Logo and Title */}
+          <div className="text-center mb-6">
+            <Link to="/" className="inline-flex items-center justify-center mb-4">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-base">EB</span>
+              </div>
+              <span className="ml-2 text-lg font-bold text-slate-900">EduBridge</span>
             </Link>
-          </p>
-        </div>
-
-        {/* Sign In Form */}
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Welcome back</h2>
-            <p className="text-sm text-slate-600">Enter your credentials to access your account</p>
+            <h1 className="text-2xl font-bold text-slate-900 mb-1">
+              Welcome Back
+            </h1>
+            <p className="text-slate-600 text-sm">
+              Sign in to continue your educational journey
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-bold text-slate-900 mb-2">
-                Email address
+              <label htmlFor="email" className="block text-xs font-semibold text-slate-700 mb-1">
+                Email Address
               </label>
               <input
                 id="email"
@@ -74,16 +66,21 @@ function SignInPage() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Enter your email"
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                placeholder="you@example.com"
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-bold text-slate-900 mb-2">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label htmlFor="password" className="block text-xs font-semibold text-slate-700">
+                  Password
+                </label>
+                <Link to="/forgot-password" className="text-xs font-bold text-primary hover:text-primary-dark">
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <input
                   id="password"
@@ -92,57 +89,81 @@ function SignInPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Enter your password"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-12"
+                  placeholder="••••••••"
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-10 transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                 >
-                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="text-xs" />
                 </button>
               </div>
-              <div className="mt-2 text-right">
-                <Link to="/forgot-password" className="text-sm text-primary hover:text-primary-dark">
-                  Forgot your password?
-                </Link>
-              </div>
+            </div>
+            
+            <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-3.5 w-3.5 text-primary focus:ring-primary border-gray-300 rounded"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-xs text-slate-700">
+                  Remember me for 30 days
+                </label>
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full px-8 py-3.5 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-primary hover:bg-primary-dark text-white font-bold text-sm rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
             >
-              <FontAwesomeIcon icon={faRightToBracket} />
-              Sign in
+              Sign In
+              <FontAwesomeIcon icon={faRightToBracket} className="ml-1" />
             </button>
-            <div className="mt-4 text-center">
-              <p className="text-sm text-slate-600">
-                Don't have an account?{" "}
-                <Link to="/signup" className="text-primary hover:text-primary-dark font-bold">
-                  Sign up
-                </Link>
-              </p>
-            </div>
           </form>
+          
+          <div className="mt-6 text-center text-xs text-slate-600">
+             Don't have an account?{" "}
+            <Link to="/signup" className="text-primary hover:text-primary-dark font-bold">
+              Sign up for free
+            </Link>
+          </div>
 
-          {/* Demo Accounts */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
-            <p className="text-sm font-bold text-slate-900 mb-2">Demo Accounts:</p>
-            <div className="text-xs space-y-1">
-              <p>
-                <span className="font-bold text-blue-700">Admin:</span>{" "}
-                <span className="text-slate-600">admin@edubridge.com / admin123</span>
-              </p>
-              <p>
-                <span className="font-bold text-blue-700">Student:</span>{" "}
-                <span className="text-slate-600">student@edubridge.com / student123</span>
-              </p>
+          {/* Demo Accounts - Optional, kept for utility */}
+          <div className="mt-6 pt-4 border-t border-slate-100">
+            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Demo Credentials</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="p-2 bg-slate-50 rounded-lg text-[10px]">
+                 <span className="font-bold block text-slate-800 mb-0.5">Admin</span>
+                 <span className="text-slate-500">admin@edubridge.com</span>
+                 <span className="block text-slate-500">admin123</span>
+              </div>
+              <div className="p-2 bg-slate-50 rounded-lg text-[10px]">
+                 <span className="font-bold block text-slate-800 mb-0.5">Student</span>
+                 <span className="text-slate-500">student@edubridge.com</span>
+                 <span className="block text-slate-500">student123</span>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Right Side - Image */}
+      <div className="hidden lg:block lg:w-1/2 relative">
+        <img
+          src="/Students.png"
+          alt="Students studying nicely"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Overlay for text readability if needed, or colored tint */}
+         <div className="absolute inset-0 bg-gradient-to-t from-primary/90 to-primary/40 mix-blend-multiply"></div>
+         
+         <div className="absolute bottom-0 left-0 right-0 p-12 text-white z-10">
+            <h2 className="text-4xl font-bold mb-4">Bridge Your Future</h2>
+            <p className="text-lg text-white/90 max-w-md">Join thousands of East African students achieving their educational dreams worldwide.</p>
+         </div>
       </div>
     </div>
   );

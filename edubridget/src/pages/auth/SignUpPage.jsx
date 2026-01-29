@@ -43,40 +43,32 @@ function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
-        {/* Logo and Title */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xl">TM</span>
-            </div>
-            <span className="ml-2 text-2xl font-bold text-slate-900">EduBridge</span>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-            Create your account
-          </h1>
-          <p className="text-slate-600">
-            Already have an account?{" "}
-            <Link to="/signin" className="text-primary hover:text-primary-dark font-medium">
-              Sign in here
+    <div className="min-h-screen bg-white flex">
+      {/* Left Side - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-16 overflow-y-auto">
+        <div className="w-full max-w-md space-y-8">
+          {/* Logo and Title */}
+          <div className="text-center mb-6">
+            <Link to="/" className="inline-flex items-center justify-center mb-4">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-base">EB</span>
+              </div>
+              <span className="ml-2 text-lg font-bold text-slate-900">EduBridge</span>
             </Link>
-          </p>
-        </div>
-
-        {/* Sign Up Form */}
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Join EduBridge</h2>
-            <p className="text-sm text-slate-600">Start your learning journey with us today</p>
+            <h1 className="text-2xl font-bold text-slate-900 mb-1">
+              Create Your Account
+            </h1>
+            <p className="text-slate-600 text-sm">
+              Join EduBridge and start your educational journey
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name Fields */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor="firstName" className="block text-sm font-bold text-slate-900 mb-2">
-                  First name
+                <label htmlFor="firstName" className="block text-xs font-semibold text-slate-700 mb-1">
+                  First Name
                 </label>
                 <input
                   id="firstName"
@@ -86,12 +78,12 @@ function SignUpPage() {
                   value={formData.firstName}
                   onChange={handleChange}
                   placeholder="John"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-sm font-bold text-slate-900 mb-2">
-                  Last name
+                <label htmlFor="lastName" className="block text-xs font-semibold text-slate-700 mb-1">
+                  Last Name
                 </label>
                 <input
                   id="lastName"
@@ -101,15 +93,15 @@ function SignUpPage() {
                   value={formData.lastName}
                   onChange={handleChange}
                   placeholder="Doe"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
               </div>
             </div>
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-bold text-slate-900 mb-2">
-                Email address
+              <label htmlFor="email" className="block text-xs font-semibold text-slate-700 mb-1">
+                Email Address
               </label>
               <input
                 id="email"
@@ -118,14 +110,60 @@ function SignUpPage() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="john@example.com"
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                placeholder="you@example.com"
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
 
+             {/* Phone Number Field - New */}
+             <div>
+              <label htmlFor="phoneNumber" className="block text-xs font-semibold text-slate-700 mb-1">
+                Phone Number
+              </label>
+              <div className="flex bg-white border border-slate-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all">
+                  <div className="flex items-center px-3 border-r border-slate-300 bg-slate-50 text-slate-500">
+                     <FontAwesomeIcon icon={["fas", "phone"]} /> 
+                  </div>
+                  <input
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    type="tel"
+                    placeholder="+250 788 123 456"
+                    className="w-full px-3 py-2 text-sm border-none focus:ring-0"
+                    // Add state handling if we add this field to initialFormState
+                  />
+               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+                {/* Country dummy dropdown */}
+                <div>
+                   <label className="block text-xs font-semibold text-slate-700 mb-1">Country</label>
+                   <select className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white">
+                      <option>Select</option>
+                      <option>Rwanda</option>
+                      <option>Uganda</option>
+                      <option>Kenya</option>
+                      <option>Tanzania</option>
+                      <option>Burundi</option>
+                   </select>
+                </div>
+                 {/* Role dummy dropdown */}
+                 <div>
+                   <label className="block text-xs font-semibold text-slate-700 mb-1">I am a</label>
+                   <select className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white">
+                      <option>Select</option>
+                      <option>Student</option>
+                      <option>Teacher</option>
+                      <option>Parent</option>
+                   </select>
+                </div>
+            </div>
+
+
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-bold text-slate-900 mb-2">
+              <label htmlFor="password" className="block text-xs font-semibold text-slate-700 mb-1">
                 Password
               </label>
               <div className="relative">
@@ -136,54 +174,81 @@ function SignUpPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Create a strong password"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-12"
+                  placeholder="••••••••"
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-10 transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                 >
-                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="text-xs" />
                 </button>
               </div>
+              <p className="mt-1 text-[10px] text-slate-500">Must be at least 8 characters with a number and symbol</p>
             </div>
 
-            {/* Confirm Password Field */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-bold text-slate-900 mb-2">
-                Confirm password
-              </label>
-              <div className="relative">
+            {/* Terms */}
+             <div className="flex items-start">
                 <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm your password"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-12"
+                  id="terms"
+                  name="terms"
+                  type="checkbox"
+                  className="mt-0.5 h-3.5 w-3.5 text-primary focus:ring-primary border-gray-300 rounded"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                >
-                  <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
-                </button>
-              </div>
+                <label htmlFor="terms" className="ml-2 block text-xs text-slate-700">
+                  I agree to EduBridge's <Link to="/terms" className="text-primary hover:text-primary-dark">Terms of Service</Link> and <Link to="/privacy" className="text-primary hover:text-primary-dark">Privacy Policy</Link>
+                </label>
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full px-8 py-3.5 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all shadow-lg flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-primary hover:bg-primary-dark text-white font-bold text-sm rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
             >
-              <FontAwesomeIcon icon={faUserPlus} />
-              Create account
+              Create Account
+              <FontAwesomeIcon icon={faUserPlus} className="ml-1" />
             </button>
           </form>
+          
+          <div className="mt-6 text-center text-xs text-slate-600">
+            Already have an account?{" "}
+            <Link to="/signin" className="text-primary hover:text-primary-dark font-bold">
+              Sign in
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Image */}
+      <div className="hidden lg:block lg:w-1/2 relative bg-primary">
+         <img
+          src="/Students.png"
+          alt="Students celebrating"
+          className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-30"
+        />
+        {/* Gradient Overlay */}
+         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-green-600 opacity-90"></div>
+         
+         <img
+          src="/Students.png"
+          alt="Students celebrating"
+          className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-40"
+        />
+
+        <div className="absolute inset-0 flex flex-col justify-center px-16 text-white text-center">
+            <h2 className="text-4xl font-bold mb-6 drop-shadow-md">Start Your Journey Today</h2>
+            <p className="text-lg text-white/90 mb-12 max-w-xl mx-auto font-light leading-relaxed">
+                Create your free account and unlock access to scholarships, online courses, and study abroad opportunities.
+            </p>
+            
+            <div className="flex justify-center gap-4 font-bold text-2xl text-white/50">
+                <span className="hover:text-white transition-colors cursor-default">RW</span>
+                <span className="hover:text-white transition-colors cursor-default">UG</span>
+                <span className="hover:text-white transition-colors cursor-default">KE</span>
+                <span className="hover:text-white transition-colors cursor-default">TZ</span>
+                <span className="hover:text-white transition-colors cursor-default">BI</span>
+            </div>
         </div>
       </div>
     </div>

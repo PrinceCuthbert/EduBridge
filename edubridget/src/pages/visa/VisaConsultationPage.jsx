@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileCheck, MapPin, CheckCircle, Phone, Mail } from "lucide-react";
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 const services = [
   {
@@ -35,6 +37,13 @@ const countries = [
 ];
 
 const VisaConsultationPage = () => {
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      once: true,
+    });
+  }, []);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -49,8 +58,26 @@ const VisaConsultationPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    alert("Thank you! We'll contact you within 24 hours to confirm your appointment.");
+    const button = e.target.querySelector('button[type="submit"]');
+    if (button) button.disabled = true;
+
+    // Simulate network delay
+    setTimeout(() => {
+      console.log("Form submitted:", formData);
+      toast.success("Thank you! We'll contact you within 24 hours to confirm your appointment.");
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        country: "",
+        destination: "",
+        service: "",
+        message: "",
+        preferredDate: "",
+        consultationType: "",
+      });
+      if (button) button.disabled = false;
+    }, 1000);
   };
 
   return (
@@ -59,9 +86,8 @@ const VisaConsultationPage = () => {
         {/* Hero */}
         <section className="bg-primary-gradient py-16 md:py-20">
           <div className="container mx-auto px-4 md:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
+            <div
+              data-aos="fade-up"
               className="text-center text-white"
             >
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -70,7 +96,7 @@ const VisaConsultationPage = () => {
               <p className="text-xl text-white/90 max-w-2xl mx-auto">
                 Expert guidance for student visas, work permits, and migration. 95% visa success rate.
               </p>
-            </motion.div>
+            </div>
           </div>
         </section>
 
@@ -101,25 +127,21 @@ const VisaConsultationPage = () => {
         {/* Services */}
         <section className="py-16 bg-slate-50">
           <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+            <div
+              data-aos="fade-up"
               className="text-center mb-12"
             >
               <h2 className="text-3xl font-bold text-slate-900 mb-4">
                 Our Services
               </h2>
-            </motion.div>
+            </div>
 
             <div className="grid md:grid-cols-3 gap-6">
               {services.map((service, index) => (
-                <motion.div
+                <div
                   key={service.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
+                  data-aos="fade-up"
+                  data-aos-delay={index * 100}
                 >
                   <Card className={`h-full border-slate-200 shadow-sm transition-all hover:shadow-md bg-white ${index === 1 ? "border-primary ring-1 ring-primary/20" : ""}`}>
                     {index === 1 && (
@@ -151,7 +173,7 @@ const VisaConsultationPage = () => {
                       </Button>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -162,10 +184,8 @@ const VisaConsultationPage = () => {
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-12">
               {/* Form */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
+              <div
+               data-aos="fade-right"
               >
                 <h2 className="text-3xl font-bold text-slate-900 mb-6">
                   Book a Consultation
@@ -276,13 +296,11 @@ const VisaConsultationPage = () => {
                     Book Appointment
                   </Button>
                 </form>
-              </motion.div>
+              </div>
 
               {/* Contact Info */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
+              <div
+                data-aos="fade-left"
                 className="space-y-6"
               >
                 <Card className="border-slate-200">
@@ -342,7 +360,7 @@ const VisaConsultationPage = () => {
                     </ul>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             </div>
           </div>
         </section>

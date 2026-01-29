@@ -1,5 +1,6 @@
 import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import 'aos/dist/aos.css';
 import AOS from 'aos';
 
@@ -57,6 +58,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
+      <Toaster position="top-center" richColors toastOptions={{ style: { zIndex: 9999 } }} />
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow">

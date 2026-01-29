@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function Navigation() {
+const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
 
@@ -24,74 +24,74 @@ export default function Navigation() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-6">
-            <Link to="/" className="text-gray-700 hover:text-primary transition-colors font-medium">
+          <div className="hidden lg:flex items-center space-x-4">
+            <Link to="/" className="text-sm text-gray-700 hover:text-primary transition-colors font-medium">
               Home
             </Link>
 
             {/* About Dropdown */}
             <div className="relative group">
-              <button className="flex items-center text-gray-700 hover:text-primary transition-colors font-medium">
-                About <ChevronDown className="ml-1 h-4 w-4" />
+              <button className="flex items-center text-sm text-gray-700 hover:text-primary transition-colors font-medium">
+                About <ChevronDown className="ml-1 h-3 w-3" />
               </button>
               <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
-                <Link to="/aboutUsPage" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">About Edu Bridge</Link>
-                <Link to="/branches" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Branches</Link>
-                <Link to="/partners" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Partners</Link>
+                <Link to="/aboutUsPage" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">About Edu Bridge</Link>
+                <Link to="/branches" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">Branches</Link>
+                <Link to="/partners" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">Partners</Link>
               </div>
             </div>
 
             {/* Academics Dropdown */}
             <div className="relative group">
-              <button className="flex items-center text-gray-700 hover:text-primary transition-colors font-medium">
-                Academics <ChevronDown className="ml-1 h-4 w-4" />
+              <button className="flex items-center text-sm text-gray-700 hover:text-primary transition-colors font-medium">
+                Academics <ChevronDown className="ml-1 h-3 w-3" />
               </button>
               <div className="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
-                <Link to="/coursesPage" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">High School Curriculum</Link>
-                <Link to="/coursesPage?filter=university" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Master's Programs</Link>
-                <Link to="/coursesPage" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Online Learning</Link>
+                <Link to="/coursesPage" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">High School Curriculum</Link>
+                <Link to="/coursesPage?filter=university" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">Master's Programs</Link>
+                <Link to="/coursesPage" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">Online Learning</Link>
               </div>
             </div>
 
             {/* Global Services Dropdown */}
             <div className="relative group">
-              <button className="flex items-center text-gray-700 hover:text-primary transition-colors font-medium">
-                Global Opportunities <ChevronDown className="ml-1 h-4 w-4" />
+              <button className="flex items-center text-sm text-gray-700 hover:text-primary transition-colors font-medium">
+                Global Opportunities <ChevronDown className="ml-1 h-3 w-3" />
               </button>
               <div className="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
-                <Link to="/study-abroad" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Study Abroad</Link>
-                <Link to="/visa-consultation" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Visa & Consultation</Link>
+                <Link to="/study-abroad" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">Study Abroad</Link>
+                <Link to="/visa-consultation" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">Visa & Consultation</Link>
               </div>
             </div>
 
             {/* Resources Dropdown */}
             <div className="relative group">
-              <button className="flex items-center text-gray-700 hover:text-primary transition-colors font-medium">
-                Resources <ChevronDown className="ml-1 h-4 w-4" />
+              <button className="flex items-center text-sm text-gray-700 hover:text-primary transition-colors font-medium">
+                Resources <ChevronDown className="ml-1 h-3 w-3" />
               </button>
               <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
-                <Link to="/library" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Digital Library</Link>
-                <Link to="/scholarships" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Scholarships</Link>
+                <Link to="/library" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">Digital Library</Link>
+                <Link to="/scholarships" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">Scholarships</Link>
               </div>
             </div>
 
             {/* Media Dropdown */}
             <div className="relative group">
-              <button className="flex items-center text-gray-700 hover:text-primary transition-colors font-medium">
-                Media <ChevronDown className="ml-1 h-4 w-4" />
+              <button className="flex items-center text-sm text-gray-700 hover:text-primary transition-colors font-medium">
+                Media <ChevronDown className="ml-1 h-3 w-3" />
               </button>
               <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
-                 <Link to="/blogs" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Blogs & News</Link>
-                 <Link to="/gallery" className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-50 hover:text-primary">Gallery</Link>
+                 <Link to="/blogs" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">Blogs & News</Link>
+                 <Link to="/gallery" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">Gallery</Link>
               </div>
             </div>
 
-            <Link to="/contactPage" className="text-gray-700 hover:text-primary transition-colors font-medium">
+            <Link to="/contactPage" className="text-sm text-gray-700 hover:text-primary transition-colors font-medium">
               Contact
             </Link>
 
             <Link to="/signin">
-              <Button className="bg-primary hover:bg-primary-dark text-white font-medium">
+              <Button size="sm" className="bg-primary hover:bg-primary-dark text-white font-medium text-xs px-4">
                 Sign In
               </Button>
             </Link>
@@ -177,3 +177,5 @@ export default function Navigation() {
     </nav>
   );
 }
+
+export default React.memo(Navigation);

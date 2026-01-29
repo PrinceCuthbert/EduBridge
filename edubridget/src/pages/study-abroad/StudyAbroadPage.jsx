@@ -1,86 +1,178 @@
-import { useState } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapPin, DollarSign, Plane, ChevronLeft, ChevronRight } from 'lucide-react';
 
+// Move static data outside component to prevent re-creation
+const UNIVERSITIES_D2 = [
+  { name: 'DAEGU ARTS UNIVERSITY', code: 'D-2', tags: ['ON SALE'], country: 'South Korea' },
+  { name: 'TRUONG DAI HOC YEWON ( D2, D2-3)', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: 'Tongmyong University', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: '서울여자대학교 (Seoul Women\'s Univ)', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: '충북보건과학대학교', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: '예술예술대학교', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: 'KYUNGSANG UNIVERSITY', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: 'GEOJE UNIVERSITY', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: 'CATHOLIC UNIVERSITY', code: 'D-2', tags: ['NEW'], country: 'South Korea' },
+];
+
+const UNIVERSITIES_D4 = [
+  { name: 'Daegu Arts University', code: 'D-4', tags: ['ON SALE'], country: 'South Korea' },
+  { name: 'Tongmyong University', code: 'D-4', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: 'STU - VIET NAM', code: 'D-4-1', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: 'Songguk University', code: 'D-4-1', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: 'Seoul Theological Univ', code: 'D-4-1', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: 'Seoul Women\'s University', code: 'D-4-1', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: 'Kwang Woon University', code: 'D-4-1', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+  { name: 'Daejin University', code: 'D-4-1', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
+];
+
+const DESTINATIONS = [
+  {
+    name: 'Australia',
+    description: 'World-class education with work opportunities',
+    tuition: '$20,000 - $45,000/year',
+    living: '$18,000 - $24,000/year',
+    features: ['Post-study work visa', 'High quality of life', 'Multicultural environment'],
+    image: 'https://images.unsplash.com/photo-1540448051910-09cfadd5df61?auto=format&fit=crop&w=600&q=80' // Sydney Opera House
+  },
+  {
+    name: 'United States',
+    description: 'Top-ranked universities and research opportunities',
+    tuition: '$25,000 - $55,000/year',
+    living: '$15,000 - $25,000/year',
+    features: ['Flexible education system', 'Diverse programs', 'Innovation hub'],
+    image: 'https://images.unsplash.com/photo-1543783207-c13fad267277?q=80&w=1470&auto=format&fit=crop' // Statue of Liberty
+  },
+  {
+    name: 'Canada',
+    description: 'Affordable education with immigration pathways',
+    tuition: '$15,000 - $35,000/year',
+    living: '$12,000 - $18,000/year',
+    features: ['Post-graduation work permit', 'Safe and welcoming', 'Quality education'],
+    image: 'https://images.unsplash.com/photo-1517935706615-2717063c2225?auto=format&fit=crop&w=600&q=80' // CN Tower
+  },
+  {
+    name: 'Europe',
+    description: 'Affordable/free education with cultural diversity',
+    tuition: '€0 - €20,000/year',
+    living: '€8,000 - €15,000/year',
+    features: ['Many programs in English', 'Cultural experience', 'Travel opportunities'],
+    image: 'https://images.unsplash.com/photo-1511739001486-9608275626ba?auto=format&fit=crop&w=600&q=80' // Eiffel Tower
+  },
+  {
+    name: 'South Korea',
+    description: 'Advanced technology with scholarship opportunities',
+    tuition: '$3,000 - $10,000/year',
+    living: '$8,000 - $12,000/year',
+    features: ['KGSP scholarships', 'Tech industry', 'Dynamic culture'],
+    image: 'https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=600&q=80' // Gyeongbokgung Palace
+  },
+  {
+    name: 'Japan',
+    description: 'Cutting-edge technology and traditional culture',
+    tuition: '$5,000 - $12,000/year',
+    living: '$10,000 - $15,000/year',
+    features: ['MEXT scholarships', 'Advanced technology', 'Safe environment'],
+    image: 'https://images.unsplash.com/photo-1490806843928-2666d632c318?auto=format&fit=crop&w=600&q=80' // Mt Fuji
+  },
+];
+
+const LOADING_PROP = "lazy";
+
+const UniversityCard = React.memo(({ university }) => (
+  <div className="flex-shrink-0 w-48 flex flex-col items-center group cursor-pointer p-2">
+    <div className="w-24 h-24 rounded-full bg-white border border-slate-100 flex items-center justify-center mb-4 overflow-hidden relative shadow-sm group-hover:shadow-md transition-all">
+       <img 
+        src={`https://ui-avatars.com/api/?name=${university.code}&background=random&color=fff&size=128&font-size=0.33`} 
+        alt={university.name} 
+        loading={LOADING_PROP}
+        className="w-full h-full object-cover"
+      />
+    </div>
+    <div className="text-center w-full">
+      <div className="text-[10px] text-slate-500 font-semibold mb-1 uppercase tracking-wider">{university.code}</div>
+      <h3 className="font-bold text-xs text-slate-900 mb-2 line-clamp-2 min-h-[32px] px-1 leading-tight">
+        {university.name}
+      </h3>
+      
+      <div className="flex flex-col gap-1 items-center mt-1">
+         {university.tags?.map((tag, i) => (
+            <Badge 
+              key={i} 
+              variant="secondary" 
+              className={`
+                text-[10px] px-2 py-0.5 h-5
+                ${tag === 'BEST' ? 'bg-emerald-500 text-white hover:bg-emerald-600' : ''}
+                ${tag === 'NEW' ? 'bg-emerald-500 text-white hover:bg-emerald-600' : ''}
+                ${tag === 'ON SALE' ? 'bg-rose-500 text-white hover:bg-rose-600' : ''}
+              `}
+            >
+              {tag}
+            </Badge>
+         ))}
+      </div>
+    </div>
+  </div>
+));
+
+const UniversitySection = React.memo(({ title, visaType, universities, subtitle }) => {
+  const scrollContainerRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 300;
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  return (
+    <div className="mb-12">
+       <div className="flex items-center gap-3 mb-2">
+          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            {title} 
+            <span className="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-600 border border-slate-200 font-semibold">{visaType}</span>
+          </h2>
+       </div>
+       <p className="text-sm text-slate-500 mb-6">{subtitle}</p>
+
+       <div className="relative group/section">
+          {/* Scroll Buttons */}
+          <button 
+            onClick={() => scroll('left')}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-lg border border-slate-100 text-slate-400 hover:text-primary hover:border-primary transition-all opacity-0 group-hover/section:opacity-100 disabled:opacity-0"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <button 
+            onClick={() => scroll('right')}
+            className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-lg border border-slate-100 text-slate-400 hover:text-primary hover:border-primary transition-all opacity-0 group-hover/section:opacity-100"
+            aria-label="Scroll right"
+          >
+            <ChevronRight size={16} />
+          </button>
+
+          {/* List */}
+          <div 
+            ref={scrollContainerRef}
+            className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x snap-mandatory -mx-4 px-4"
+            style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+          >
+            {universities.map((uni, i) => (
+              <UniversityCard key={i} university={uni} />
+            ))}
+          </div>
+       </div>
+    </div>
+  );
+});
+
 export default function StudyAbroadPage() {
-  const [currentPage, setCurrentPage] = useState(0);
-
-  const universities_d2 = [
-    { name: 'TRƯỜNG ĐẠI HỌC YEWON ( D2 - D2-3)', code: 'D2', category: 'BEST', logo: '🏛️', country: 'South Korea' },
-    { name: '동명대학교 (Tongmyong University)', code: 'D-2', category: 'NEW', logo: '🎓', country: 'South Korea' },
-    { name: '서울여자대학교', code: 'D-2', category: 'NEW', logo: '🏫', country: 'South Korea' },
-    { name: '충북보건과학대학교', code: 'D-2', category: 'NEW', logo: '🏥', country: 'South Korea' },
-    { name: '경일대학교', code: 'D-2', category: 'NEW', logo: '🎯', country: 'South Korea' },
-    { name: '경성대학교 KYUNGSANG UNIVERSITY', code: 'D-2', category: 'NEW', logo: '📚', country: 'South Korea' },
-    { name: '가톨릭대대학교 CATHOLIC UNIVERSITY', code: 'D-2', category: 'NEW', logo: '⛪', country: 'South Korea' },
-    { name: '서울신학대학교 Seoul Theological University', code: 'D-2', category: 'NEW', logo: '✝️', country: 'South Korea' },
-  ];
-
-  const universities_d4 = [
-    { name: '동명대학교 (Tongmyong University)', code: 'D4-1', category: 'NEW', logo: '🎓', country: 'South Korea' },
-    { name: '서울여자대학교 (Tongmyong University)', code: 'D4-1', category: 'NEW', logo: '🏫', country: 'South Korea' },
-    { name: '충북보건과학대학교', code: 'D4-1', category: 'NEW', logo: '🏥', country: 'South Korea' },
-    { name: '서울기독신학대학교 (STU)', code: 'D4-1', category: 'NEW', logo: '⛪', country: 'South Korea' },
-    { name: '서울여자대학교', code: 'D4-1', category: 'NEW', logo: '🎯', country: 'South Korea' },
-    { name: 'Truong dai hoc Paewon (D2)', code: 'D4-1', category: 'NEW', logo: '🏛️', country: 'South Korea' },
-    { name: '대전대학교', code: 'D4-1', category: 'NEW', logo: '📚', country: 'South Korea' },
-    { name: 'Korean Language Institute', code: 'D4-1', category: 'NEW', logo: '🗣️', country: 'South Korea' },
-  ];
-
-  const destinations = [
-    {
-      name: 'Australia',
-      description: 'World-class education with work opportunities',
-      tuition: '$20,000 - $45,000/year',
-      living: '$18,000 - $24,000/year',
-      features: ['Post-study work visa', 'High quality of life', 'Multicultural environment'],
-      image: '🦘'
-    },
-    {
-      name: 'United States',
-      description: 'Top-ranked universities and research opportunities',
-      tuition: '$25,000 - $55,000/year',
-      living: '$15,000 - $25,000/year',
-      features: ['Flexible education system', 'Diverse programs', 'Innovation hub'],
-      image: '🗽'
-    },
-    {
-      name: 'Canada',
-      description: 'Affordable education with immigration pathways',
-      tuition: '$15,000 - $35,000/year',
-      living: '$12,000 - $18,000/year',
-      features: ['Post-graduation work permit', 'Safe and welcoming', 'Quality education'],
-      image: '🍁'
-    },
-    {
-      name: 'Europe',
-      description: 'Affordable/free education with cultural diversity',
-      tuition: '€0 - €20,000/year',
-      living: '€8,000 - €15,000/year',
-      features: ['Many programs in English', 'Cultural experience', 'Travel opportunities'],
-      image: '🏰'
-    },
-    {
-      name: 'South Korea',
-      description: 'Advanced technology with scholarship opportunities',
-      tuition: '$3,000 - $10,000/year',
-      living: '$8,000 - $12,000/year',
-      features: ['KGSP scholarships', 'Tech industry', 'Dynamic culture'],
-      image: '🇰🇷'
-    },
-    {
-      name: 'Japan',
-      description: 'Cutting-edge technology and traditional culture',
-      tuition: '$5,000 - $12,000/year',
-      living: '$10,000 - $15,000/year',
-      features: ['MEXT scholarships', 'Advanced technology', 'Safe environment'],
-      image: '🗾'
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -96,69 +188,23 @@ export default function StudyAbroadPage() {
       {/* Available Universities Section */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Tabs defaultValue="d2" className="w-full">
-            <div className="flex items-center justify-between mb-8">
-              <TabsList className="bg-slate-100 p-1 rounded-lg">
-                <TabsTrigger value="d2" className="data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
-                  Available Universities (D-2)
-                </TabsTrigger>
-                <TabsTrigger value="d4" className="data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
-                  Available Universities (D-4-1)
-                </TabsTrigger>
-              </TabsList>
-              
-              <div className="flex items-center space-x-2">
-                <Button variant="outline" size="icon" onClick={() => setCurrentPage(Math.max(0, currentPage - 1))} disabled={currentPage === 0}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" onClick={() => setCurrentPage(currentPage + 1)}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+          
+          <UniversitySection 
+            title="D-2" 
+            visaType="VISA" 
+            subtitle="Available Universities (Degree Program)" 
+            universities={UNIVERSITIES_D2} 
+          />
+          
+          <div className="w-full h-px bg-slate-100 my-8"></div>
 
-            <TabsContent value="d2">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                {universities_d2.map((university, index) => (
-                  <div key={index} className="flex flex-col items-center group cursor-pointer">
-                    <div className="w-24 h-24 rounded-full bg-white border-4 border-blue-100 flex items-center justify-center mb-3 text-4xl group-hover:border-primary transition-all shadow-sm group-hover:shadow-md">
-                      {university.logo}
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xs text-primary font-semibold mb-1">{university.code}</div>
-                      <h3 className="font-medium text-xs text-slate-900 mb-2 line-clamp-3 px-2">
-                        {university.name}
-                      </h3>
-                      <Badge variant="secondary" className="bg-secondary text-white hover:bg-secondary-dark text-xs">
-                        {university.category}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
+          <UniversitySection 
+            title="D-4" 
+            visaType="VISA" 
+            subtitle="List of Universities Offering Korean & English Programs" 
+            universities={UNIVERSITIES_D4} 
+          />
 
-            <TabsContent value="d4">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                {universities_d4.map((university, index) => (
-                  <div key={index} className="flex flex-col items-center group cursor-pointer">
-                    <div className="w-24 h-24 rounded-full bg-white border-4 border-blue-100 flex items-center justify-center mb-3 text-4xl group-hover:border-primary transition-all shadow-sm group-hover:shadow-md">
-                      {university.logo}
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xs text-primary font-semibold mb-1">{university.code}</div>
-                      <h3 className="font-medium text-xs text-slate-900 mb-2 line-clamp-3 px-2">
-                        {university.name}
-                      </h3>
-                      <Badge variant="secondary" className="bg-secondary text-white hover:bg-secondary-dark text-xs">
-                        {university.category}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
         </div>
       </section>
 
@@ -173,12 +219,20 @@ export default function StudyAbroadPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {destinations.map((destination, index) => (
-              <Card key={index} className="hover:shadow-xl transition-shadow border-slate-200 bg-white">
+            {DESTINATIONS.map((destination, index) => (
+              <Card key={index} className="hover:shadow-xl transition-shadow border-slate-200 bg-white overflow-hidden group">
+                <div className="h-48 overflow-hidden relative">
+                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors z-10" />
+                   <img 
+                      src={destination.image} 
+                      alt={destination.name} 
+                      loading={LOADING_PROP}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                   />
+                </div>
                 <CardContent className="p-6">
-                  <div className="text-6xl text-center mb-4">{destination.image}</div>
-                  <h3 className="text-2xl font-bold text-center mb-2 text-slate-900">{destination.name}</h3>
-                  <p className="text-slate-600 text-center text-sm mb-4">{destination.description}</p>
+                  <h3 className="text-2xl font-bold mb-2 text-slate-900">{destination.name}</h3>
+                  <p className="text-slate-600 text-sm mb-4">{destination.description}</p>
                   
                   <div className="space-y-3 mb-6">
                     <div className="flex items-start">
