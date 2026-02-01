@@ -250,7 +250,7 @@ function ResourcesPage() {
       <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-20 overflow-hidden bg-primary-gradient">
         <div className="absolute top-0 left-0 -translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl opacity-60 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10 text-center text-white">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6 font-serif">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6 font-serif text-white">
             Educational Resources
           </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">

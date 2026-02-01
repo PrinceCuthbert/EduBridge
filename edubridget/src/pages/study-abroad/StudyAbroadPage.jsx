@@ -178,7 +178,7 @@ export default function StudyAbroadPage() {
       {/* Header */}
       <div className="bg-primary-gradient text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl lg:text-5xl font-bold mb-4">Study Abroad Programs</h1>
+          <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-white">Study Abroad Programs</h1>
           <p className="text-xl text-white/90">
             Your gateway to international education - self-sponsored and scholarship opportunities
           </p>

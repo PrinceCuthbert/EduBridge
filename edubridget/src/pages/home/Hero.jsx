@@ -12,38 +12,42 @@ const Hero = () => {
         <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-3xl opacity-60 pointer-events-none" />
 
         <div className="container mx-auto px-6 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
-            {/* Content side */}
-            <div className="flex-1 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white backdrop-blur-sm rounded-full text-sm font-semibold mb-6 animate-fade-in border border-white/20">
-                <span className="flex h-2 w-2 rounded-full bg-secondary-light animate-pulse" />
-                Empowering Africa's Future
-              </div>
-              
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight mb-6 font-serif">
-                Empowering Africa through 
-                <span className="block mt-2">Knowledge</span>
-              </h1>
-              
-              <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                Access quality education, resources, and expert guidance to achieve your academic goals with TM EduBridge Online Academy.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start">
-                <button className="w-full sm:w-auto px-8 py-4 bg-white text-primary rounded-2xl font-bold shadow-xl shadow-black/10 hover:bg-slate-50 hover:shadow-2xl transition-all active:scale-95 text-lg">
-                  Explore Courses
-                </button>
-                
-                <button 
-                  onClick={() => setIsVideoOpen(true)}
-                  className="w-full sm:w-auto px-8 py-4 flex items-center justify-center gap-2 text-white font-bold hover:bg-white/10 border border-white/30 rounded-2xl transition-all group text-lg"
-                >
-                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                    <Play size={20} className="fill-white ml-1" />
-                  </div>
-                  Watch Intro
-                </button>
-              </div>
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
+        <div className="max-w-3xl pt-20" data-aos="fade-up">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            </span>
+            {t('hero.badge')}
+          </div>
+          
+          <h1 className="text-display-1 md:text-5xl lg:text-7xl font-bold leading-tight mb-6 font-serif text-white">
+            {t('hero.title_prefix')} <span className="text-secondary-light">{t('hero.title_suffix')}</span>
+          </h1>
+          
+          <p className="text-body-lg text-text-muted mb-8 max-w-xl leading-relaxed">
+            {t('hero.description')}
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 mb-12">
+            <Link to="/coursesPage">
+              <Button size="lg" className="bg-primary hover:bg-primary-dark text-white rounded-full px-8 h-12 text-base font-semibold shadow-lg shadow-primary/25 transition-all hover:scale-105">
+                {t('hero.cta_explore')} <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+            <div className="flex items-center gap-4 sm:ml-4">
+              <button 
+                className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary shadow-lg hover:scale-110 transition-transform cursor-pointer"
+                onClick={() => setIsVideoOpen(true)}
+              >
+                <Play className="h-5 w-5 ml-1" />
+              </button>
+              <span className="text-text-main font-medium cursor-pointer hover:text-primary transition-colors" onClick={() => setIsVideoOpen(true)}>
+                {t('hero.cta_watch')}
+              </span>
+            </div>
+          </div>
               
               <div className="mt-12 flex items-center gap-6 justify-center lg:justify-start">
                 <div className="flex -space-x-3">

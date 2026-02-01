@@ -1,0 +1,387 @@
+{
+  "welcome": "Welcome",
+  "switch_lang": "Switch Language",
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "academics": "Academics",
+    "global": "Global Opportunities",
+    "resources": "Resources",
+    "media": "Media",
+    "contact": "Contact",
+    "sign_in": "Sign In"
+  },
+  "about": {
+    "hero_title": "About TM EduBridge",
+    "hero_subtitle": "Empowering Africa through knowledge, innovation, and accessible education",
+    
+    "founder_title": "Founder's Message",
+    "founder_subtitle": "A personal note from our visionary founder",
+    "founder_name": "Adolphe NIYIGENA",
+    "founder_role": "Founder & CEO",
+    "founder_greeting": "Dear Students, Parents, and Educators,",
+    "founder_signoff_warm": "Warm regards,",
+    "founder_closing": "Together, let's build a brighter future through education.",
+    
+    "founder_message_paragraphs": [
+      "Welcome to TM EduBridge Online Academy. My journey to establishing this platform began with a simple observation: across Africa, quality educational resources remain inaccessible to many talented students eager to learn and grow. After having personally benefited from the transformative power of education in my own life, I became passionate about creating a solution that could bridge this educational gap. I envisioned a platform where a student in a remote village in Rwanda could have the same quality educational experience as one in an urban center.",
+      "TM EduBridge was born from this vision — a comprehensive online academy that brings together courses, materials, and resources tailored to the educational needs of African students. From high school materials organized by country and curriculum to specialized courses in Korean language, programming, and university subjects, our platform aims to be a one-stop educational solution. What began as a small initiative has grown into a vibrant learning community with students from across the continent. Our team of dedicated educators shares my passion for accessible education and works tirelessly to create engaging, relevant content that helps students excel.",
+      "As we continue to grow, our commitment remains unchanged: to empower Africa through knowledge. We believe that education is the most powerful tool for individual and societal transformation, and we are dedicated to making quality education accessible to all. I invite you to join us on this educational journey. Whether you're a student seeking resources, a parent supporting your child's education, or an educator looking to contribute your expertise, there's a place for you in our community."
+    ],
+
+    "values_title": "Our Core Values",
+    "values_subtitle": "These principles guide everything we do at TM EduBridge",
+    "core_values": [
+      {
+        "iconKey": "graduation",
+        "title": "Quality Education",
+        "description": "We are committed to providing the highest quality educational resources and experiences.",
+        "color": "blue"
+      },
+      {
+        "iconKey": "star",
+        "title": "Excellence",
+        "description": "We strive for excellence in everything we do — from course content to student support.",
+        "color": "yellow"
+      },
+      {
+        "iconKey": "access",
+        "title": "Accessibility",
+        "description": "We believe education should be accessible to all, regardless of location or income.",
+        "color": "green"
+      },
+      {
+        "iconKey": "lightbulb",
+        "title": "Innovation",
+        "description": "We embrace innovative teaching methods and technologies to enhance the learning experience.",
+        "color": "purple"
+      },
+      {
+        "iconKey": "users",
+        "title": "Community",
+        "description": "We foster a supportive learning community where students can connect and grow together.",
+        "color": "orange"
+      },
+      {
+        "iconKey": "heart",
+        "title": "Empathy",
+        "description": "We understand the challenges students face and provide compassionate support every step of the way.",
+        "color": "pink"
+      }
+    ],
+
+    "team_title": "Meet Our Team",
+    "team_subtitle": "Dedicated educators and professionals committed to our mission",
+    "team_members": [
+      {
+        "name": "Adolphe NIYIGENA",
+        "role": "Founder & CEO",
+        "description": "Educational visionary with a passion for making quality education accessible to all African students.",
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "Grace Mutoni",
+        "role": "Head of Korean Language",
+        "description": "Korean language expert with years of teaching experience both in Korea and across Africa.",
+        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "David Kamau",
+        "role": "Lead Programming Instructor",
+        "description": "Software engineer with a passion for teaching coding to the next generation of African developers.",
+        "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "Sarah Okello",
+        "role": "Academic Director",
+        "description": "Education specialist with expertise in curriculum development and educational policy.",
+        "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "Kofi Mensah",
+        "role": "Head of Digital Learning",
+        "description": "Specialist in educational technology with over 10 years of experience designing interactive online platforms for diverse learning environments.",
+        "image": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop"
+      }
+    ],
+    "about_us": "About Edu Bridge",
+    "branches": "Branches",
+    "partners": "Partners"
+  },
+  "footer": {
+    "brand": {
+      "description": "Empowering Africa through Knowledge. We provide quality education and resources to help students achieve their academic goals."
+    },
+    "explore_title": "Explore",
+    "explore": [
+      { "name": "Company", "path": "/" },
+      { "name": "About Us", "path": "/aboutUsPage" },
+      { "name": "Our Branches", "path": "/branches" },
+      { "name": "Partners", "path": "/partners" },
+      { "name": "Gallery", "path": "/gallery" },
+      { "name": "Blogs & News", "path": "/blogs" }
+    ],
+    "academics_title": "Academics & Services",
+    "academics": [
+      { "name": "High School & Online", "path": "/coursesPage" },
+      { "name": "Master's Programs", "path": "/coursesPage?filter=university" },
+      { "name": "Study Abroad", "path": "/study-abroad" },
+      { "name": "Visa Consultation", "path": "/visa-consultation" },
+      { "name": "Digital Library", "path": "/library" },
+      { "name": "Scholarships", "path": "/scholarships" }
+    ],
+    "social_links": [
+      { "iconKey": "facebook", "href": "#", "label": "Facebook" },
+      { "iconKey": "twitter", "href": "#", "label": "Twitter" },
+      { "iconKey": "instagram", "href": "https://www.instagram.com/tmedubridge/", "label": "Instagram" },
+      { "iconKey": "linkedin", "href": "#", "label": "LinkedIn" }
+    ],
+    "contact_title": "Contact Us",
+    "contact_info": {
+      "address": "123 Education Street, Kigali, Rwanda",
+      "phone": "+250 12 345 6789",
+      "email": "info@edubridge.com"
+    },
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Subscribe to our newsletter for updates on new courses and resources.",
+      "placeholder": "Enter your email"
+    },
+    "copyright": "TM EduBridge. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "contact": {
+    "hero_title": "Contact Us",
+    "hero_subtitle": "Have questions? We're here to help. Reach out to us and we'll respond as soon as possible.",
+    "form_title": "Send Us a Message",
+    "form_success": "✓ Thank you! We'll be in touch shortly.",
+    "labels": {
+      "full_name": "Full Name",
+      "email": "Email",
+      "phone": "Phone Number",
+      "subject": "Subject",
+      "message": "Message"
+    },
+    "placeholders": {
+      "full_name": "Your full name",
+      "email": "your@email.com",
+      "phone": "+250 7XX XXX XXX",
+      "subject": "Select a subject",
+      "message": "Tell us how we can help you..."
+    },
+    "submit_button": "Send Message",
+    "sending": "Sending...",
+    "sidebar": {
+      "get_in_touch": "Get in Touch",
+      "head_office": "Head Office",
+      "phone": "Phone",
+      "email": "Email",
+      "working_hours": "Working Hours",
+      "working_hours_details": "Mon - Fri: 8:00 AM - 6:00 PM"
+    },
+    "regional_offices_title": "Regional Offices",
+    "regional_offices": [
+      { "country": "Rwanda (HQ)", "phone": "+250 788 123 456" },
+      { "country": "Uganda", "phone": "+256 772 123 456" },
+      { "country": "Kenya", "phone": "+254 722 123 456" }
+    ],
+    "follow_us": "Follow Us",
+    "social_links": [
+       { "iconKey": "facebook", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-blue-50 hover:text-blue-600" },
+       { "iconKey": "twitter", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-sky-50 hover:text-sky-500" },
+       { "iconKey": "instagram", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-pink-50 hover:text-pink-600" },
+       { "iconKey": "linkedin", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-blue-100 hover:text-blue-700" }
+    ],
+    "live_chat": {
+      "title": "Live Chat",
+      "subtitle": "Chat with our support team in real-time.",
+      "button": "Start Chat"
+    },
+    "faq": {
+      "title": "Looking for Quick Answers?",
+      "subtitle": "Check our frequently asked questions for immediate help.",
+      "button": "View FAQs"
+    }
+  },
+  "courses": {
+    "hero_title": "Explore Our Courses",
+    "hero_subtitle": "Discover a wide range of courses designed to help you achieve your educational and career goals.",
+    "hero_button": "Browse by Category",
+    "categories_title": "Course Categories",
+    "categories_subtitle": "Explore our diverse course offerings designed to meet a wide range of educational needs",
+    "categories": [
+      {
+        "iconKey": "graduation",
+        "title": "Korean Language",
+        "description": "Learn Korean from beginner to advanced levels with native speakers.",
+        "colorClass": "bg-purple-50 text-purple-600"
+      },
+      {
+        "iconKey": "users",
+        "title": "Programming",
+        "description": "Master programming languages like Python, Java, and web development.",
+        "colorClass": "bg-blue-50 text-blue-600"
+      },
+      {
+        "iconKey": "certificate",
+        "title": "University Courses",
+        "description": "Access university-level courses across various disciplines.",
+        "colorClass": "bg-green-50 text-green-600"
+      },
+      {
+        "iconKey": "users",
+        "title": "Language Courses",
+        "description": "Improve your language skills in English, French, Swahili, and more",
+        "colorClass": "bg-orange-50 text-orange-600"
+      }
+    ],
+    "features_title": "Benefits of Our Courses",
+    "features_subtitle": "Our courses provide a comprehensive learning experience that goes beyond traditional education. Here is what sets us apart:",
+    "features": [
+      {
+        "title": "Expert Instructors",
+        "description": "Learn from qualified educators with real-world experience in their fields."
+      },
+      {
+        "title": "Practical Learning",
+        "description": "Hands-on projects and real-world applications that reinforce your learning."
+      },
+      {
+        "title": "Flexible Learning",
+        "description": "Study at your own pace with 24/7 access to course materials."
+      },
+      {
+        "title": "Recognized Certificates",
+        "description": "Earn certificates that enhance your resume and professional profile."
+      },
+      {
+        "title": "Community Support",
+        "description": "Join a community of learners and receive guidance from peers and instructors."
+      }
+    ],
+    "testimonial_quote": "The most flexible learning platform I've ever used. Highly recommended!",
+    "instructor_title": "Share Your Knowledge",
+    "instructor_subtitle": "Are you an expert in your field? Join our team of instructors and help empower the next generation of African students.",
+    "instructor_button": "Become an Instructor",
+    "instructor_benefits": [
+      {
+        "iconKey": "tag",
+        "title": "Make an Impact",
+        "description": "Help shape the future of education in Africa by sharing your expertise with eager students."
+      },
+      {
+        "iconKey": "users",
+        "title": "Join Our Community",
+        "description": "Become part of a growing network of dedicated educators committed to quality education."
+      },
+      {
+        "iconKey": "star",
+        "title": "Earn While Teaching",
+        "description": "Receive competitive compensation while doing what you love."
+      }
+    ]
+  },
+  "auth": {
+    "signin": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to continue your educational journey",
+      "email_label": "Email Address",
+      "password_label": "Password",
+      "email_placeholder": "Enter your email",
+      "password_placeholder": "Enter your password",
+      "remember_me": "Remember me",
+      "forgot_password": "Forgot Password?",
+      "sign_in_button": "Sign In",
+      "no_account": "Don't have an account?",
+      "sign_up_link": "Sign up for free",
+      "demo_user": "Demo User:",
+      "demo_pass": "Pass:",
+      "back_home": "Back to Home"
+    },
+    "signup": {
+      "title": "Create Your Account",
+      "subtitle": "Join EduBridge and start your educational journey",
+      "first_name": "First Name",
+      "last_name": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "country": "Country",
+      "role": "I am a...",
+      "password": "Password",
+      "confirm_password": "Confirm Password",
+      "placeholders": {
+        "first_name": "First Name",
+        "last_name": "Last Name",
+        "email": "Enter your email",
+        "phone": "+250...",
+        "password": "Create a password"
+      },
+      "options": {
+        "select": "Select",
+        "student": "Student",
+        "instructor": "Instructor",
+        "parent": "Parent"
+      },
+      "terms_agree": "I agree to the",
+      "terms_link": "Terms of Service",
+      "sign_up_button": "Create Account",
+      "already_have_account": "Already have an account?",
+      "sign_in_link": "Sign in"
+    }
+  },
+  "academics": {
+    "high_school": "High School Curriculum",
+    "masters": "Master's Programs",
+    "online": "Online Learning"
+  },
+  "global": {
+    "study_abroad": "Study Abroad",
+    "visa": "Visa & Consultation"
+  },
+  "resources": {
+    "library": "Digital Library",
+    "scholarships": "Scholarships"
+  },
+  "media": {
+    "blogs": "Blogs & News",
+    "gallery": "Gallery"
+  },
+  "hero": {
+    "badge": "Empowering Africa's Future",
+    "title_prefix": "Empowering Africa through",
+    "title_suffix": "Knowledge",
+    "description": "Access quality education, resources, and expert guidance to achieve your academic goals with TM EduBridge Online Academy.",
+    "cta_explore": "Explore Courses",
+    "cta_watch": "Watch Intro",
+    "stat_students": "Students joined this month",
+    "float_certified": "Certified",
+    "float_expert": "Expert Courses",
+    "float_success": "Success Rate"
+  },
+  "why_choose": {
+    "title": "Why Choose TM EduBridge?",
+    "subtitle": "We provide comprehensive education services tailored for East African students pursuing local and international opportunities.",
+    "features": {
+      "expert": { "title": "Expert Instruction", "desc": "Learn from qualified instructors with years of teaching experience across East African curricula." },
+      "resources": { "title": "Comprehensive Resources", "desc": "Access our extensive digital library with ebooks, journals, and past papers." },
+      "live": { "title": "Live Classes", "desc": "Interactive online classes with real-time support and collaborative learning." },
+      "certs": { "title": "Certificates", "desc": "Earn recognized certificates upon course completion." },
+      "community": { "title": "Community Support", "desc": "Join a vibrant community of learners and professionals." },
+      "regional": { "title": "Regional Presence", "desc": "With offices across East Africa, we're close to you." }
+    }
+  },
+  "services": {
+    "title": "Academic Services",
+    "subtitle": "Discover our wide range of educational programs designed to help you succeed at every stage of your academic journey.",
+    "items": {
+      "thesis": { "title": "Thesis Writing & Consulting", "desc": "Expert guidance for your academic research and thesis preparation." },
+      "proofreading": { "title": "Proofreading & Formatting", "desc": "Professional editing services to perfect your academic documents." },
+      "research": { "title": "Research Papers & Journals", "desc": "Access to academic journals and assistance with research papers." },
+      "scholarships": { "title": "Scholarships & Travel Support", "desc": "Complete application support for scholarships and international programs." },
+      "advisory": { "title": "Academic Advisory & Consulting", "desc": "One-on-one consultations for academic and career planning." },
+      "study_abroad": { "title": "Scholarship to Study Abroad", "desc": "Fully funded and partial scholarship opportunities worldwide." }
+    },
+    "cta": "Learn More"
+  }
+}

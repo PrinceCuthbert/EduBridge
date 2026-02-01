@@ -69,7 +69,7 @@ export default function GalleryPage() {
     <div className="min-h-screen bg-slate-50">
       <div className="bg-primary-gradient text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl lg:text-5xl font-bold mb-4">Success Stories</h1>
+          <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-white">Success Stories</h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto">
             See where our students are studying and hear about their journey with EduBridge.
           </p>

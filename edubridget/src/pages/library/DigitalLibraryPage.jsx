@@ -55,7 +55,7 @@ export default function DigitalLibraryPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-primary-gradient text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl lg:text-5xl font-bold mb-4">Digital Library</h1>
+          <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-white">Digital Library</h1>
           <p className="text-xl text-white/90 mb-8">
             Access thousands of academic resources at your fingertips
           </p>

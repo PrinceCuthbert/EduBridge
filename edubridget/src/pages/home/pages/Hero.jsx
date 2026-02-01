@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play, X } from 'lucide-react';
 const Hero = () => {
+  const { t } = useTranslation();
   const [isVideoOpen, setIsVideoOpen] = useState(false);
 
   return (
@@ -16,21 +18,21 @@ const Hero = () => {
             <div className="flex-1 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white backdrop-blur-sm rounded-full text-sm font-semibold mb-6 animate-fade-in border border-white/20">
                 <span className="flex h-2 w-2 rounded-full bg-secondary-light animate-pulse" />
-                Empowering Africa's Future
+                {t('hero.badge')}
               </div>
               
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight mb-6 font-serif">
-                Empowering Africa through 
-                <span className="block mt-2">Knowledge</span>
+                {t('hero.title_prefix')} 
+                <span className="block mt-2">{t('hero.title_suffix')}</span>
               </h1>
               
               <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                Access quality education, resources, and expert guidance to achieve your academic goals with TM EduBridge Online Academy.
+                {t('hero.description')}
               </p>
               
               <div className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start">
                 <button className="w-full sm:w-auto px-8 py-4 bg-white text-primary rounded-2xl font-bold shadow-xl shadow-black/10 hover:bg-slate-50 hover:shadow-2xl transition-all active:scale-95 text-lg">
-                  Explore Courses
+                  {t('hero.cta_explore')}
                 </button>
                 
                 <button 
@@ -40,7 +42,7 @@ const Hero = () => {
                   <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
                     <Play size={20} className="fill-white ml-1" />
                   </div>
-                  Watch Intro
+                  {t('hero.cta_watch')}
                 </button>
               </div>
               
@@ -53,7 +55,7 @@ const Hero = () => {
                   ))}
                 </div>
                 <p className="text-sm text-white/80 font-medium">
-                  <strong className="text-white">10k+</strong> Students joined this month
+                  <strong className="text-white">10k+</strong> {t('hero.stat_students')}
                 </p>
               </div>
             </div>
@@ -79,15 +81,15 @@ const Hero = () => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Certified</p>
-                      <p className="text-sm font-bold text-slate-900">Expert Courses</p>
+                      <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">{t('hero.float_certified')}</p>
+                      <p className="text-sm font-bold text-slate-900">{t('hero.float_expert')}</p>
                     </div>
                   </div>
                 </div>
                 
                 <div className="absolute -bottom-8 -left-8 bg-white p-5 rounded-2xl shadow-xl animate-pulse">
                   <p className="text-2xl font-bold text-slate-900 mb-1">98%</p>
-                  <p className="text-xs text-slate-500 font-medium">Success Rate</p>
+                  <p className="text-xs text-slate-500 font-medium">{t('hero.float_success')}</p>
                 </div>
               </div>
             </div>

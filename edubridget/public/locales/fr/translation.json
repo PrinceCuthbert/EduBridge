@@ -1,0 +1,387 @@
+{
+  "welcome": "Bienvenue",
+  "switch_lang": "Changer la langue",
+  "nav": {
+    "home": "Accueil",
+    "about": "À propos",
+    "academics": "Académique",
+    "global": "Opportunités Mondiales",
+    "resources": "Ressources",
+    "media": "Médias",
+    "contact": "Contact",
+    "sign_in": "Se connecter"
+  },
+  "about": {
+    "hero_title": "À propos de TM EduBridge",
+    "hero_subtitle": "Autonomiser l'Afrique par la connaissance, l'innovation et une éducation accessible",
+    
+    "founder_title": "Message du Fondateur",
+    "founder_subtitle": "Une note personnelle de notre fondateur visionnaire",
+    "founder_name": "Adolphe NIYIGENA",
+    "founder_role": "Fondateur & PDG",
+    "founder_greeting": "Chers étudiants, parents et éducateurs,",
+    "founder_signoff_warm": "Cordialement,",
+    "founder_closing": "Ensemble, construisons un avenir meilleur grâce à l'éducation.",
+    
+    "founder_message_paragraphs": [
+      "Bienvenue à TM EduBridge Online Academy. Mon parcours vers la création de cette plateforme a commencé par une simple observation : à travers l'Afrique, des ressources éducatives de qualité restent inaccessibles à de nombreux étudiants talentueux désireux d'apprendre et de grandir. Après avoir personnellement bénéficié du pouvoir transformateur de l'éducation dans ma propre vie, je me suis passionné pour la création d'une solution capable de combler ce fossé éducatif. J'ai imaginé une plateforme où un étudiant dans un village reculé du Rwanda pourrait avoir la même qualité d'expérience éducative qu'un étudiant dans un centre urbain.",
+      "TM EduBridge est né de cette vision — une académie en ligne complète qui rassemble des cours, du matériel et des ressources adaptés aux besoins éducatifs des étudiants africains. Des supports de lycée organisés par pays et par programme aux cours spécialisés en langue coréenne, en programmation et en matières universitaires, notre plateforme vise à être une solution éducative unique. Ce qui a commencé comme une petite initiative est devenu une communauté d'apprentissage dynamique avec des étudiants de tout le continent. Notre équipe d'éducateurs dévoués partage ma passion pour l'éducation accessible et travaille sans relâche pour créer un contenu engageant et pertinent qui aide les étudiants à exceller.",
+      "Alors que nous continuons de croître, notre engagement reste inchangé : autonomiser l'Afrique par la connaissance. Nous croyons que l'éducation est l'outil le plus puissant pour la transformation individuelle et sociétale, et nous nous engageons à rendre une éducation de qualité accessible à tous. Je vous invite à nous rejoindre dans ce voyage éducatif. Que vous soyez un étudiant à la recherche de ressources, un parent soutenant l'éducation de son enfant ou un éducateur cherchant à apporter son expertise, il y a une place pour vous dans notre communauté."
+    ],
+
+    "values_title": "Nos Valeurs Fondamentales",
+    "values_subtitle": "Ces principes guident tout ce que nous faisons chez TM EduBridge",
+    "core_values": [
+      {
+        "iconKey": "graduation",
+        "title": "Éducation de Qualité",
+        "description": "Nous nous engageons à fournir des ressources et des expériences éducatives de la plus haute qualité.",
+        "color": "blue"
+      },
+      {
+        "iconKey": "star",
+        "title": "Excellence",
+        "description": "Nous visons l'excellence dans tout ce que nous faisons — du contenu des cours au soutien aux étudiants.",
+        "color": "yellow"
+      },
+      {
+        "iconKey": "access",
+        "title": "Accessibilité",
+        "description": "Nous croyons que l'éducation doit être accessible à tous, quel que soit le lieu ou le revenu.",
+        "color": "green"
+      },
+      {
+        "iconKey": "lightbulb",
+        "title": "Innovation",
+        "description": "Nous adoptons des méthodes d'enseignement et des technologies innovantes pour améliorer l'expérience d'apprentissage.",
+        "color": "purple"
+      },
+      {
+        "iconKey": "users",
+        "title": "Communauté",
+        "description": "Nous favorisons une communauté d'apprentissage solidaire où les étudiants peuvent se connecter et grandir ensemble.",
+        "color": "orange"
+      },
+      {
+        "iconKey": "heart",
+        "title": "Empathie",
+        "description": "Nous comprenons les défis auxquels les étudiants sont confrontés et fournissons un soutien compatissant à chaque étape.",
+        "color": "pink"
+      }
+    ],
+
+    "team_title": "Rencontrez Notre Équipe",
+    "team_subtitle": "Des éducateurs et professionnels dévoués engagés dans notre mission",
+    "team_members": [
+      {
+        "name": "Adolphe NIYIGENA",
+        "role": "Fondateur & PDG",
+        "description": "Visionnaire éducatif passionné par l'accès à une éducation de qualité pour tous les étudiants africains.",
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "Grace Mutoni",
+        "role": "Responsable de la Langue Coréenne",
+        "description": "Experte en langue coréenne avec des années d'expérience dans l'enseignement en Corée et en Afrique.",
+        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "David Kamau",
+        "role": "Instructeur Principal de Programmation",
+        "description": "Ingénieur logiciel passionné par l'enseignement du codage à la prochaine génération de développeurs africains.",
+        "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "Sarah Okello",
+        "role": "Directrice Académique",
+        "description": "Spécialiste de l'éducation avec une expertise dans le développement de programmes et la politique éducative.",
+        "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "Kofi Mensah",
+        "role": "Responsable de l'Apprentissage Numérique",
+        "description": "Spécialiste en technologie éducative avec plus de 10 ans d'expérience dans la conception de plateformes en ligne interactives.",
+        "image": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop"
+      }
+    ],
+    "about_us": "À propos de Edu Bridge",
+    "branches": "Succursales",
+    "partners": "Partenaires"
+  },
+  "footer": {
+    "brand": {
+      "description": "Autonomiser l'Afrique par la connaissance. Nous fournissons une éducation de qualité et des ressources pour aider les étudiants à atteindre leurs objectifs académiques."
+    },
+    "explore_title": "Explorer",
+    "explore": [
+      { "name": "Entreprise", "path": "/" },
+      { "name": "À Propos", "path": "/aboutUsPage" },
+      { "name": "Nos Succursales", "path": "/branches" },
+      { "name": "Partenaires", "path": "/partners" },
+      { "name": "Galerie", "path": "/gallery" },
+      { "name": "Blogs & Actualités", "path": "/blogs" }
+    ],
+    "academics_title": "Académique & Services",
+    "academics": [
+      { "name": "Lycée & En Ligne", "path": "/coursesPage" },
+      { "name": "Programmes de Master", "path": "/coursesPage?filter=university" },
+      { "name": "Étudier à l'Étranger", "path": "/study-abroad" },
+      { "name": "Consultation Visa", "path": "/visa-consultation" },
+      { "name": "Bibliothèque Numérique", "path": "/library" },
+      { "name": "Bourses", "path": "/scholarships" }
+    ],
+    "social_links": [
+      { "iconKey": "facebook", "href": "#", "label": "Facebook" },
+      { "iconKey": "twitter", "href": "#", "label": "Twitter" },
+      { "iconKey": "instagram", "href": "https://www.instagram.com/tmedubridge/", "label": "Instagram" },
+      { "iconKey": "linkedin", "href": "#", "label": "LinkedIn" }
+    ],
+    "contact_title": "Contactez-nous",
+    "contact_info": {
+      "address": "123 Rue de l'Éducation, Kigali, Rwanda",
+      "phone": "+250 12 345 6789",
+      "email": "info@edubridge.com"
+    },
+    "newsletter": {
+      "title": "Bulletin d'information",
+      "description": "Abonnez-vous à notre newsletter pour les mises à jour sur les nouveaux cours et ressources.",
+      "placeholder": "Entrez votre email"
+    },
+    "copyright": "TM EduBridge. Tous droits réservés.",
+    "privacy": "Politique de Confidentialité",
+    "terms": "Conditions d'Utilisation"
+  },
+  "contact": {
+    "hero_title": "Contactez-nous",
+    "hero_subtitle": "Vous avez des questions ? Nous sommes là pour vous aider. Contactez-nous et nous vous répondrons dès que possible.",
+    "form_title": "Envoyez-nous un Message",
+    "form_success": "✓ Merci ! Nous vous contacterons sous peu.",
+    "labels": {
+      "full_name": "Nom Complet",
+      "email": "Email",
+      "phone": "Numéro de Téléphone",
+      "subject": "Sujet",
+      "message": "Message"
+    },
+    "placeholders": {
+      "full_name": "Votre nom complet",
+      "email": "votre@email.com",
+      "phone": "+250 7XX XXX XXX",
+      "subject": "Sélectionnez un sujet",
+      "message": "Dites-nous comment nous pouvons vous aider..."
+    },
+    "submit_button": "Envoyer le Message",
+    "sending": "Envoi en cours...",
+    "sidebar": {
+      "get_in_touch": "Entrer en Contact",
+      "head_office": "Siège Social",
+      "phone": "Téléphone",
+      "email": "Email",
+      "working_hours": "Heures d'Ouverture",
+      "working_hours_details": "Lun - Ven : 8h00 - 18h00"
+    },
+    "regional_offices_title": "Bureaux Régionaux",
+    "regional_offices": [
+      { "country": "Rwanda (Siège)", "phone": "+250 788 123 456" },
+      { "country": "Ouganda", "phone": "+256 772 123 456" },
+      { "country": "Kenya", "phone": "+254 722 123 456" }
+    ],
+    "follow_us": "Suivez-nous",
+    "social_links": [
+       { "iconKey": "facebook", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-blue-50 hover:text-blue-600" },
+       { "iconKey": "twitter", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-sky-50 hover:text-sky-500" },
+       { "iconKey": "instagram", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-pink-50 hover:text-pink-600" },
+       { "iconKey": "linkedin", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-blue-100 hover:text-blue-700" }
+    ],
+    "live_chat": {
+      "title": "Chat en Direct",
+      "subtitle": "Discutez avec notre équipe de support en temps réel.",
+      "button": "Démarrer le Chat"
+    },
+    "faq": {
+      "title": "Vous Cherchez des Réponses Rapides ?",
+      "subtitle": "Consultez nos questions fréquemment posées pour une aide immédiate.",
+      "button": "Voir la FAQ"
+    }
+  },
+  "courses": {
+    "hero_title": "Découvrez Nos Cours",
+    "hero_subtitle": "Découvrez une large gamme de cours conçus pour vous aider à atteindre vos objectifs éducatifs et professionnels.",
+    "hero_button": "Parcourir par Catégorie",
+    "categories_title": "Catégories de Cours",
+    "categories_subtitle": "Explorez nos diverses offres de cours conçues pour répondre à un large éventail de besoins éducatifs",
+    "categories": [
+      {
+        "iconKey": "graduation",
+        "title": "Langue Coréenne",
+        "description": "Apprenez le coréen du niveau débutant au niveau avancé avec des locuteurs natifs.",
+        "colorClass": "bg-purple-50 text-purple-600"
+      },
+      {
+        "iconKey": "users",
+        "title": "Programmation",
+        "description": "Maîtrisez les langages de programmation comme Python, Java et le développement web.",
+        "colorClass": "bg-blue-50 text-blue-600"
+      },
+      {
+        "iconKey": "certificate",
+        "title": "Cours Universitaires",
+        "description": "Accédez à des cours de niveau universitaire dans diverses disciplines.",
+        "colorClass": "bg-green-50 text-green-600"
+      },
+      {
+        "iconKey": "users",
+        "title": "Cours de Langues",
+        "description": "Améliorez vos compétences linguistiques en anglais, français, swahili, et plus",
+        "colorClass": "bg-orange-50 text-orange-600"
+      }
+    ],
+    "features_title": "Avantages de Nos Cours",
+    "features_subtitle": "Nos cours offrent une expérience d'apprentissage complète qui va au-delà de l'éducation traditionnelle. Voici ce qui nous distingue :",
+    "features": [
+      {
+        "title": "Instructeurs Experts",
+        "description": "Apprenez auprès d'éducateurs qualifiés ayant une expérience réelle dans leurs domaines."
+      },
+      {
+        "title": "Apprentissage Pratique",
+        "description": "Des projets pratiques et des applications concrètes qui renforcent votre apprentissage."
+      },
+      {
+        "title": "Apprentissage Flexible",
+        "description": "Étudiez à votre propre rythme avec un accès 24/7 aux supports de cours."
+      },
+      {
+        "title": "Certificats Reconnus",
+        "description": "Obtenez des certificats qui améliorent votre CV et votre profil professionnel."
+      },
+      {
+        "title": "Soutien Communautaire",
+        "description": "Rejoignez une communauté d'apprenants et recevez des conseils de vos pairs et instructeurs."
+      }
+    ],
+    "testimonial_quote": "La plateforme d'apprentissage la plus flexible que j'ai jamais utilisée. Hautement recommandée !",
+    "instructor_title": "Partagez Vos Connaissances",
+    "instructor_subtitle": "Êtes-vous un expert dans votre domaine ? Rejoignez notre équipe d'instructeurs et aidez à autonomiser la prochaine génération d'étudiants africains.",
+    "instructor_button": "Devenir Instructeur",
+    "instructor_benefits": [
+      {
+        "iconKey": "tag",
+        "title": "Avoir un Impact",
+        "description": "Aidez à façonner l'avenir de l'éducation en Afrique en partageant votre expertise avec des étudiants motivés."
+      },
+      {
+        "iconKey": "users",
+        "title": "Rejoindre Notre Communauté",
+        "description": "Faites partie d'un réseau croissant d'éducateurs dévoués engagés pour une éducation de qualité."
+      },
+      {
+        "iconKey": "star",
+        "title": "Gagner en Enseignant",
+        "description": "Recevez une rémunération compétitive tout en faisant ce que vous aimez."
+      }
+    ]
+  },
+  "auth": {
+    "signin": {
+      "title": "Bon retour",
+      "subtitle": "Connectez-vous pour poursuivre votre parcours éducatif",
+      "email_label": "Adresse Email",
+      "password_label": "Mot de passe",
+      "email_placeholder": "Entrez votre email",
+      "password_placeholder": "Entrez votre mot de passe",
+      "remember_me": "Se souvenir de moi",
+      "forgot_password": "Mot de passe oublié ?",
+      "sign_in_button": "Se Connecter",
+      "no_account": "Vous n'avez pas de compte ?",
+      "sign_up_link": "Inscrivez-vous gratuitement",
+      "demo_user": "Utilisateur Démo :",
+      "demo_pass": "Passe :",
+      "back_home": "Retour à l'Accueil"
+    },
+    "signup": {
+      "title": "Créez Votre Compte",
+      "subtitle": "Rejoignez EduBridge et commencez votre parcours éducatif",
+      "first_name": "Prénom",
+      "last_name": "Nom",
+      "email": "Adresse Email",
+      "phone": "Numéro de Téléphone",
+      "country": "Pays",
+      "role": "Je suis un...",
+      "password": "Mot de passe",
+      "confirm_password": "Confirmez le Mot de passe",
+      "placeholders": {
+        "first_name": "Prénom",
+        "last_name": "Nom",
+        "email": "Entrez votre email",
+        "phone": "+250...",
+        "password": "Créez un mot de passe"
+      },
+      "options": {
+        "select": "Sélectionner",
+        "student": "Étudiant",
+        "instructor": "Instructeur",
+        "parent": "Parent"
+      },
+      "terms_agree": "J'accepte les",
+      "terms_link": "Conditions d'Utilisation",
+      "sign_up_button": "Créer un Compte",
+      "already_have_account": "Vous avez déjà un compte ?",
+      "sign_in_link": "Se Connecter"
+    }
+  },
+  "academics": {
+    "high_school": "Curriculum Lycée",
+    "masters": "Programmes de Master",
+    "online": "Apprentissage en ligne"
+  },
+  "global": {
+    "study_abroad": "Étudier à l'étranger",
+    "visa": "Visa et Consultation"
+  },
+  "resources": {
+    "library": "Bibliothèque Numérique",
+    "scholarships": "Bourses"
+  },
+  "media": {
+    "blogs": "Blogs et Actualités",
+    "gallery": "Galerie"
+  },
+  "hero": {
+    "badge": "Autonomiser l'avenir de l'Afrique",
+    "title_prefix": "Autonomiser l'Afrique par",
+    "title_suffix": "la Connaissance",
+    "description": "Accédez à une éducation de qualité, des ressources et des conseils d'experts pour atteindre vos objectifs académiques avec TM EduBridge Online Academy.",
+    "cta_explore": "Explorer les Cours",
+    "cta_watch": "Voir l'Intro",
+    "stat_students": "Étudiants inscrits ce mois-ci",
+    "float_certified": "Certifié",
+    "float_expert": "Cours Experts",
+    "float_success": "Taux de Réussite"
+  },
+  "why_choose": {
+    "title": "Pourquoi choisir TM EduBridge ?",
+    "subtitle": "Nous fournissons des services éducatifs complets adaptés aux étudiants d'Afrique de l'Est poursuivant des opportunités locales et internationales.",
+    "features": {
+      "expert": { "title": "Instruction Experte", "desc": "Apprenez auprès d'instructeurs qualifiés ayant des années d'expérience dans l'enseignement." },
+      "resources": { "title": "Ressources Complètes", "desc": "Accédez à notre vaste bibliothèque numérique avec des ebooks, journaux et examens passés." },
+      "live": { "title": "Classes en Direct", "desc": "Cours en ligne interactifs avec un soutien en temps réel." },
+      "certs": { "title": "Certificats", "desc": "Obtenez des certificats reconnus à la fin du cours." },
+      "community": { "title": "Soutien Communautaire", "desc": "Rejoignez une communauté dynamique d'apprenants et de professionnels." },
+      "regional": { "title": "Présence Régionale", "desc": "Avec des bureaux partout en Afrique de l'Est, nous sommes proches de vous." }
+    }
+  },
+  "services": {
+    "title": "Services Académiques",
+    "subtitle": "Découvrez notre large gamme de programmes éducatifs conçus pour vous aider à réussir à chaque étape de votre parcours académique.",
+    "items": {
+      "thesis": { "title": "Rédaction de Thèse et Conseil", "desc": "Conseils d'experts pour vos recherches académiques et la préparation de votre thèse." },
+      "proofreading": { "title": "Relecture et Mise en Forme", "desc": "Services d'édition professionnels pour perfectionner vos documents académiques." },
+      "research": { "title": "Papiers de Recherche et Journaux", "desc": "Accès aux revues académiques et assistance pour les papiers de recherche." },
+      "scholarships": { "title": "Bourses et Soutien au Voyage", "desc": "Support complet pour les demandes de bourses et les programmes internationaux." },
+      "advisory": { "title": "Conseil Académique", "desc": "Consultations individuelles pour la planification académique et professionnelle." },
+      "study_abroad": { "title": "Bourse pour Étudier à l'Étranger", "desc": "Opportunités de bourses entièrement financées et partielles dans le monde entier." }
+    },
+    "cta": "En Savoir Plus"
+  }
+}

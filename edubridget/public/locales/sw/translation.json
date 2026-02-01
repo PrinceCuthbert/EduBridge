@@ -1,0 +1,387 @@
+{
+  "welcome": "Karibu",
+  "switch_lang": "Badilisha Lugha",
+  "nav": {
+    "home": "Nyumbani",
+    "about": "Kuhusu",
+    "academics": "Masomo",
+    "global": "Fursa za Kimataifa",
+    "resources": "Nyenzo",
+    "media": "Habari",
+    "contact": "Wasiliana",
+    "sign_in": "Ingia"
+  },
+  "about": {
+    "hero_title": "Kuhusu TM EduBridge",
+    "hero_subtitle": "Kuwezesha Afrika kupitia maarifa, ubunifu, na elimu inayopatikana",
+    
+    "founder_title": "Ujumbe wa Mwanzilishi",
+    "founder_subtitle": "Ujumbe binafsi kutoka kwa mwanzilishi wetu mwenye maono",
+    "founder_name": "Adolphe NIYIGENA",
+    "founder_role": "Mwanzilishi & Mkurugenzi Mtendaji",
+    "founder_greeting": "Wapendwa Wanafunzi, Wazazi, na Walimu,",
+    "founder_signoff_warm": "Salamu dhati,",
+    "founder_closing": "Pamoja, tujenge mustakabali mwema kupitia elimu.",
+    
+    "founder_message_paragraphs": [
+      "Karibu TM EduBridge Online Academy. Safari yangu kuanzisha jukwaa hili ilianza na mtazamo rahisi: kote Afrika, rasilimali bora za elimu hazipatikani kwa wanafunzi wengi wenye vipaji na shauku ya kujifunza na kukua. Baada ya kufaidika binafsi na nguvu ya mabadiliko ya elimu katika maisha yangu mwenyewe, nilihamasika kuunda suluhisho ambalo lingeweza kuziba pengo hili la elimu. Nilitarajia jukwaa ambapo mwanafunzi katika kijiji cha mbali nchini Rwanda angeweza kupata uzoefu bora wa elimu kama yule wa mjini.",
+      "TM EduBridge ilizaliwa kutokana na maono haya — chuo kikuu cha mtandaoni kinacholeta pamoja kozi, nyenzo, na rasilimali zilizoundwa kulingana na mahitaji ya elimu ya wanafunzi wa Afrika. Kuanzia nyenzo za sekondari zilizopangwa kwa nchi na mtaala hadi kozi maalum za lugha ya Kikorea, programu, na masomo ya chuo kikuu, jukwaa letu linalenga kuwa suluhisho moja la elimu. Kilichoanza kama mpango mdogo kimekua jumuiya changamfu ya kujifunza na wanafunzi kutoka barani kote. Timu yetu ya waelimishaji waliojitolea inashiriki shauku yangu kwa elimu inayopatikana na inafanya kazi bila kuchoka kuunda maudhui yanayohusisha na muhimu yanayosaidia wanafunzi kufaulu.",
+      "Tunapoendelea kukua, dhamira yetu inabaki ile ile: kuwezesha Afrika kupitia maarifa. Tunaamini kuwa elimu ni zana yenye nguvu zaidi kwa mabadiliko ya mtu binafsi na jamii, na tumejitolea kufanya elimu bora ipatikane kwa wote. Ninakukaribisha kujiunga nasi katika safari hii ya elimu. Iwe wewe ni mwanafunzi anayetafuta rasilimali, mzazi anayemuunga mkono mtoto wake katika elimu, au mwalimu anayetafuta kuchangia utaalamu wake, kuna nafasi kwa ajili yako katika jamii yetu."
+    ],
+
+    "values_title": "Maadili Yetu ya Msingi",
+    "values_subtitle": "Kanuni hizi zinaongoza kila tunachofanya TM EduBridge",
+    "core_values": [
+      {
+        "iconKey": "graduation",
+        "title": "Elimu Bora",
+        "description": "Tumejitolea kutoa rasilimali na uzoefu wa elimu wa hali ya juu zaidi.",
+        "color": "blue"
+      },
+      {
+        "iconKey": "star",
+        "title": "Ubora",
+        "description": "Tunajitahidi kwa ubora katika kila tunachofanya — kutoka maudhui ya kozi hadi usaidizi wa wanafunzi.",
+        "color": "yellow"
+      },
+      {
+        "iconKey": "access",
+        "title": "Upatikanaji",
+        "description": "Tunaamini elimu inapaswa kupatikana kwa wote, bila kujali eneo au kipato.",
+        "color": "green"
+      },
+      {
+        "iconKey": "lightbulb",
+        "title": "Ubunifu",
+        "description": "Tunakumbatia mbinu za kufundisha za kibunifu na teknolojia ili kuboresha uzoefu wa kujifunza.",
+        "color": "purple"
+      },
+      {
+        "iconKey": "users",
+        "title": "Jamii",
+        "description": "Tunakuza jamii ya kujifunza yenye usaidizi ambapo wanafunzi wanaweza kuungana na kukua pamoja.",
+        "color": "orange"
+      },
+      {
+        "iconKey": "heart",
+        "title": "Huruma",
+        "description": "Tunatambua changamoto wanazokumbana nazo wanafunzi na kutoa usaidizi wenye huruma kila hatua.",
+        "color": "pink"
+      }
+    ],
+
+    "team_title": "Kutana na Timu Yetu",
+    "team_subtitle": "Waelimishaji waliojitolea na wataalamu waliojitolea kwa dhamira yetu",
+    "team_members": [
+      {
+        "name": "Adolphe NIYIGENA",
+        "role": "Mwanzilishi & Mkurugenzi Mtendaji",
+        "description": "Mwenye maono ya elimu na shauku ya kufanya elimu bora ipatikane kwa wanafunzi wote wa Afrika.",
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "Grace Mutoni",
+        "role": "Mkuu wa Lugha ya Kikorea",
+        "description": "Mtaalamu wa lugha ya Kikorea mwenye uzoefu wa miaka mingi wa kufundisha Korea na Afrika.",
+        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "David Kamau",
+        "role": "Mwalimu Mkuu wa Kupanga Programu",
+        "description": "Mhandisi wa programu mwenye shauku ya kufundisha uandishi wa kodi kwa kizazi kijacho cha waendelezaji wa Afrika.",
+        "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "Sarah Okello",
+        "role": "Mkurugenzi wa Masomo",
+        "description": "Mtaalamu wa elimu mwenye utaalamu katika ukuzaji wa mtaala na sera ya elimu.",
+        "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop"
+      },
+      {
+        "name": "Kofi Mensah",
+        "role": "Mkuu wa Mafunzo ya Dijitali",
+        "description": "Mtaalamu wa teknolojia ya elimu mwenye uzoefu wa zaidi ya miaka 10 wa kubuni majukwaa ya mtandaoni yanayohusisha.",
+        "image": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop"
+      }
+    ],
+    "about_us": "Kuhusu Edu Bridge",
+    "branches": "Matawi",
+    "partners": "Washirika"
+  },
+  "footer": {
+    "brand": {
+      "description": "Kuwezesha Afrika kupitia Maarifa. Tunatoa elimu bora na rasilimali kusaidia wanafunzi kufikia malengo yao ya kitaaluma."
+    },
+    "explore_title": "Gundua",
+    "explore": [
+      { "name": "Kampuni", "path": "/" },
+      { "name": "Kutuhusu", "path": "/aboutUsPage" },
+      { "name": "Matawi Yetu", "path": "/branches" },
+      { "name": "Wadau", "path": "/partners" },
+      { "name": "Matunzio", "path": "/gallery" },
+      { "name": "Blogu na Habari", "path": "/blogs" }
+    ],
+    "academics_title": "Taaluma na Huduma",
+    "academics": [
+      { "name": "Sekondari na Mtandaoni", "path": "/coursesPage" },
+      { "name": "Programu za Uzamili", "path": "/coursesPage?filter=university" },
+      { "name": "Kusoma Nje ya Nchi", "path": "/study-abroad" },
+      { "name": "Ushauri wa Visa", "path": "/visa-consultation" },
+      { "name": "Maktaba ya Dijiti", "path": "/library" },
+      { "name": "Scholarships", "path": "/scholarships" }
+    ],
+    "social_links": [
+      { "iconKey": "facebook", "href": "#", "label": "Facebook" },
+      { "iconKey": "twitter", "href": "#", "label": "Twitter" },
+      { "iconKey": "instagram", "href": "https://www.instagram.com/tmedubridge/", "label": "Instagram" },
+      { "iconKey": "linkedin", "href": "#", "label": "LinkedIn" }
+    ],
+    "contact_title": "Wasiliana Nasi",
+    "contact_info": {
+      "address": "123 Education Street, Kigali, Rwanda",
+      "phone": "+250 12 345 6789",
+      "email": "info@edubridge.com"
+    },
+    "newsletter": {
+      "title": "Jarida",
+      "description": "Jiandikishe kwenye jarida letu kwa sasisho kuhusu kozi mpya na rasilimali.",
+      "placeholder": "Ingiza barua pepe yako"
+    },
+    "copyright": "TM EduBridge. Haki zote zimehifadhiwa.",
+    "privacy": "Sera ya Faragha",
+    "terms": "Masharti ya Huduma"
+  },
+  "contact": {
+    "hero_title": "Wasiliana Nasi",
+    "hero_subtitle": "Una maswali? Tuko hapa kusaidia. Wasiliana nasi na tutakujibu haraka iwezekanavyo.",
+    "form_title": "Tutumie Ujumbe",
+    "form_success": "✓ Asante! Tutawasiliana nawe hivi karibuni.",
+    "labels": {
+      "full_name": "Jina Kamili",
+      "email": "Barua Pepe",
+      "phone": "Nambari ya Simu",
+      "subject": "Mada",
+      "message": "Ujumbe"
+    },
+    "placeholders": {
+      "full_name": "Jina lako kamili",
+      "email": "yako@email.com",
+      "phone": "+250 7XX XXX XXX",
+      "subject": "Chagua mada",
+      "message": "Tuambie jinsi tunavyoweza kukusaidia..."
+    },
+    "submit_button": "Tuma Ujumbe",
+    "sending": "Inatuma...",
+    "sidebar": {
+      "get_in_touch": "Wasiliana",
+      "head_office": "Makao Makuu",
+      "phone": "Simu",
+      "email": "Barua Pepe",
+      "working_hours": "Saa za Kazi",
+      "working_hours_details": "Jumatatu - Ijumaa: 2:00 Asubuhi - 12:00 Jioni"
+    },
+    "regional_offices_title": "Ofisi za Kikanda",
+    "regional_offices": [
+      { "country": "Rwanda (Makao Makuu)", "phone": "+250 788 123 456" },
+      { "country": "Uganda", "phone": "+256 772 123 456" },
+      { "country": "Kenya", "phone": "+254 722 123 456" }
+    ],
+    "follow_us": "Tufuate",
+    "social_links": [
+       { "iconKey": "facebook", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-blue-50 hover:text-blue-600" },
+       { "iconKey": "twitter", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-sky-50 hover:text-sky-500" },
+       { "iconKey": "instagram", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-pink-50 hover:text-pink-600" },
+       { "iconKey": "linkedin", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-blue-100 hover:text-blue-700" }
+    ],
+    "live_chat": {
+      "title": "Mazungumzo ya Moja kwa Moja",
+      "subtitle": "Zungumza na timu yetu ya usaidizi kwa wakati halisi.",
+      "button": "Anza Mazungumzo"
+    },
+    "faq": {
+      "title": "Unatafuta Majibu ya Haraka?",
+      "subtitle": "Angalia maswali yanayoulizwa mara kwa mara kwa msaada wa haraka.",
+      "button": "Tazama Maswali"
+    }
+  },
+  "courses": {
+    "hero_title": "Chunguza Kozi Zetu",
+    "hero_subtitle": "Gundua anuwai ya kozi zilizoundwa kukusaidia kufikia malengo yako ya elimu na kazi.",
+    "hero_button": "Vinjari kwa Aina",
+    "categories_title": "Aina za Kozi",
+    "categories_subtitle": "Chunguza matoleo yetu mbalimbali ya kozi yaliyoundwa kukidhi mahitaji mbalimbali ya elimu",
+    "categories": [
+      {
+        "iconKey": "graduation",
+        "title": "Lugha ya Kikorea",
+        "description": "Jifunze Kikorea kutoka ngazi ya awali hadi ya juu na wasemaji wazawa.",
+        "colorClass": "bg-purple-50 text-purple-600"
+      },
+      {
+        "iconKey": "users",
+        "title": "Kupanga Programu",
+        "description": "Miliki lugha za programu kama Python, Java, na maendeleo ya wavuti.",
+        "colorClass": "bg-blue-50 text-blue-600"
+      },
+      {
+        "iconKey": "certificate",
+        "title": "Kozi za Chuo Kikuu",
+        "description": "Pata kozi za kiwango cha chuo kikuu katika taaluma mbalimbali.",
+        "colorClass": "bg-green-50 text-green-600"
+      },
+      {
+        "iconKey": "users",
+        "title": "Kozi za Lugha",
+        "description": "Boresha ujuzi wako wa lugha katika Kiingereza, Kifaransa, Kiswahili, na zaidi",
+        "colorClass": "bg-orange-50 text-orange-600"
+      }
+    ],
+    "features_title": "Faida za Kozi Zetu",
+    "features_subtitle": "Kozi zetu zinatoa uzoefu kamili wa kujifunza ambao unazidi elimu ya jadi. Hapa ndipo tunapojitofautisha:",
+    "features": [
+      {
+        "title": "Waelimishaji Mabingwa",
+        "description": "Jifunze kutoka kwa waelimishaji waliohitimu wenye uzoefu wa ulimwengu halisi katika nyanja zao."
+      },
+      {
+        "title": "Kujifunza kwa Vitendo",
+        "description": "Miradi ya vitendo na matumizi ya ulimwengu halisi yanayoimarisha kujifunza kwako."
+      },
+      {
+        "title": "Kujifunza kwa Kubadilika",
+        "description": "Soma kwa kasi yako mwenyewe na ufikiaji wa saa 24/7 wa nyenzo za kozi."
+      },
+      {
+        "title": "Vyeti Vinavyotambulika",
+        "description": "Pata vyeti vinavyoboresha wasifu wako na wasifu wa kitaaluma."
+      },
+      {
+        "title": "Usaidizi wa Jamii",
+        "description": "Jiunge na jamii ya wanafunzi na upate mwongozo kutoka kwa wenzako na waelimishaji."
+      }
+    ],
+    "testimonial_quote": "Jukwaa rahisi zaidi la kujifunza ambalo nimewahi kutumia. Inapendekezwa sana!",
+    "instructor_title": "Shiriki Maarifa Yako",
+    "instructor_subtitle": "Je, wewe ni mtaalamu katika uwanja wako? Jiunge na timu yetu ya waelimishaji na usaidie kuwezesha kizazi kijacho cha wanafunzi wa Afrika.",
+    "instructor_button": "Kuwa Mwalimu",
+    "instructor_benefits": [
+      {
+        "iconKey": "tag",
+        "title": "Fanya Mabadiliko",
+        "description": "Saidia kuunda mustakabali wa elimu barani Afrika kwa kushiriki utaalamu wako na wanafunzi wenye shauku."
+      },
+      {
+        "iconKey": "users",
+        "title": "Jiunge na Jamii Yetu",
+        "description": "Kuwa sehemu ya mtandao unaokua wa waelimishaji waliojitolea kwa elimu bora."
+      },
+      {
+        "iconKey": "star",
+        "title": "Pata Kipato Ukifundisha",
+        "description": "Pokea fidia ya ushindani wakati unafanya kile unachopenda."
+      }
+    ]
+  },
+  "auth": {
+    "signin": {
+      "title": "Karibu Tena",
+      "subtitle": "Ingia ili kuendelea na safari yako ya elimu",
+      "email_label": "Barua Pepe",
+      "password_label": "Nenosiri",
+      "email_placeholder": "Ingiza barua pepe yako",
+      "password_placeholder": "Ingiza nenosiri lako",
+      "remember_me": "Nikumbuke",
+      "forgot_password": "Umesahau Nenosiri?",
+      "sign_in_button": "Ingia",
+      "no_account": "Huna akaunti?",
+      "sign_up_link": "Jisajili bure",
+      "demo_user": "Mtumiaji wa Mfano:",
+      "demo_pass": "Nenosiri:",
+      "back_home": "Rudi Nyumbani"
+    },
+    "signup": {
+      "title": "Unda Akaunti Yako",
+      "subtitle": "Jiunge na EduBridge na anza safari yako ya elimu",
+      "first_name": "Jina la Kwanza",
+      "last_name": "Jina la Ukoo",
+      "email": "Barua Pepe",
+      "phone": "Nambari ya Simu",
+      "country": "Nchi",
+      "role": "Mimi ni...",
+      "password": "Nenosiri",
+      "confirm_password": "Thibitisha Nenosiri",
+      "placeholders": {
+        "first_name": "Jina la Kwanza",
+        "last_name": "Jina la Ukoo",
+        "email": "Ingiza barua pepe yako",
+        "phone": "+250...",
+        "password": "Unda nenosiri"
+      },
+      "options": {
+        "select": "Chagua",
+        "student": "Mwanafunzi",
+        "instructor": "Mwalimu",
+        "parent": "Mzazi"
+      },
+      "terms_agree": "Nakubaliana na",
+      "terms_link": "Masharti ya Huduma",
+      "sign_up_button": "Unda Akaunti",
+      "already_have_account": "Una akaunti tayari?",
+      "sign_in_link": "Ingia"
+    }
+  },
+  "academics": {
+    "high_school": "Mtaala wa Sekondari",
+    "masters": "Programu za Uzamili",
+    "online": "Masomo ya Mtandaoni"
+  },
+  "global": {
+    "study_abroad": "Kusoma Nje ya Nchi",
+    "visa": "Visa na Ushauri"
+  },
+  "resources": {
+    "library": "Maktaba ya Dijitali",
+    "scholarships": "Scholarships"
+  },
+  "media": {
+    "blogs": "Blogs na Habari",
+    "gallery": "Matunzio"
+  },
+  "hero": {
+    "badge": "Kuwezesha Mustakabali wa Afrika",
+    "title_prefix": "Kuwezesha Afrika kupitia",
+    "title_suffix": "Maarifa",
+    "description": "Pata elimu bora, rasilimali, na mwongozo wa kitaalamu kufikia malengo yako ya kitaaluma na TM EduBridge Online Academy.",
+    "cta_explore": "Gundua Kozi",
+    "cta_watch": "Tazama Utangulizi",
+    "stat_students": "Wanafunzi waliojiunga mwezi huu",
+    "float_certified": "Imethibitishwa",
+    "float_expert": "Kozi za Kitaalamu",
+    "float_success": "Kiwango cha Mafanikio"
+  },
+  "why_choose": {
+    "title": "Kwa Nini Uchague TM EduBridge?",
+    "subtitle": "Tunatoa huduma kamili za elimu zilizoundwa kwa ajili ya wanafunzi wa Afrika Mashariki.",
+    "features": {
+      "expert": { "title": "Mafunzo ya Kitaalamu", "desc": "Jifunze kutoka kwa wakufunzi waliohitimu na wenye uzoefu wa kufundisha." },
+      "resources": { "title": "Rasilimali Kamili", "desc": "Pata maktaba yetu ya dijitali yenye vitabu, majarida na mitihani iliyopita." },
+      "live": { "title": "Madarasa ya Moja kwa Moja", "desc": "Madarasa ya mtandaoni yenye usaidizi wa wakati halisi." },
+      "certs": { "title": "Vyeti", "desc": "Pata vyeti vinavyotambulika baada ya kumaliza kozi." },
+      "community": { "title": "Usaidizi wa Jamii", "desc": "Jiunge na jamii changamfu ya wanafunzi na wataalamu." },
+      "regional": { "title": "Uwepo wa Kikanda", "desc": "Tukiwa na ofisi kote Afrika Mashariki, tuko karibu nawe." }
+    }
+  },
+  "services": {
+    "title": "Huduma za Kisomo",
+    "subtitle": "Gundua anuwai ya programu za elimu zilizoundwa kukusaidia kufaulu katika kila hatua ya safari yako ya kitaaluma.",
+    "items": {
+      "thesis": { "title": "Uandishi wa Tasnifu na Ushauri", "desc": "Mwongozo wa kitaalamu kwa utafiti wako wa kitaaluma na maandalizi ya tasnifu." },
+      "proofreading": { "title": "Usahihishaji na Mpangilio", "desc": "Huduma za uhariri za kitaalamu kukamilisha nyaraka zako za kitaaluma." },
+      "research": { "title": "Makala ya Utafiti na Majarida", "desc": "Upatikanaji wa majarida ya kitaaluma na usaidizi wa makala ya utafiti." },
+      "scholarships": { "title": "Scholarships na Usaidizi wa Safari", "desc": "Usaidizi kamili wa maombi ya scholarships na programu za kimataifa." },
+      "advisory": { "title": "Ushauri wa Kitaaluma", "desc": "Mashauriano ya ana kwa ana kwa mipango ya kitaaluma na kazi." },
+      "study_abroad": { "title": "Scholarship Kusoma Nje", "desc": "Fursa za scholarships zilizofadhiliwa kikamilifu na kwa sehemu duniani kote." }
+    },
+    "cta": "Jifunze Zaidi"
+  }
+}

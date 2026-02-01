@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGraduationCap,
@@ -8,113 +8,50 @@ import {
   faUsers,
   faHeart,
 } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from 'react-i18next';
+// import { Facebook, Twitter, Instagram, Linkedin, ChevronLeft, ChevronRight } from 'lucide-react'; // Recommended replacement for SVG icons
+
+// --- DATA MAPPING HELPER ---
+// This ensures we map the icon strings from JSON to actual FontAwesome components
+const iconMap = {
+  graduation: faGraduationCap,
+  star: faStar,
+  access: faUniversalAccess,
+  lightbulb: faLightbulb,
+  users: faUsers,
+  heart: faHeart
+};
+
+// --- SUB-COMPONENT: Social Link ---
+const SocialLink = ({ href, bgClass, label, children }) => (
+  <a 
+    href={href} 
+    aria-label={label}
+    className={`w-8 h-8 rounded-full text-white flex items-center justify-center transition-all text-xs font-bold hover:scale-110 ${bgClass}`}
+  >
+    {children}
+  </a>
+);
 
 function AboutUsPage() {
-  const coreValues = [
-    {
-      id: 1,
-      icon: faGraduationCap,
-      title: "Quality Education",
-      description: "We are committed to providing the highest quality educational resources and experiences.",
-      color: "blue",
-    },
-    {
-      id: 2,
-      icon: faStar,
-      title: "Excellence",
-      description: "We strive for excellence in everything we do — from course content to student support.",
-      color: "yellow",
-    },
-    {
-      id: 3,
-      icon: faUniversalAccess,
-      title: "Accessibility",
-      description: "We believe education should be accessible to all, regardless of location or income.",
-      color: "green",
-    },
-    {
-      id: 4,
-      icon: faLightbulb,
-      title: "Innovation",
-      description: "We embrace innovative teaching methods and technologies to enhance the learning experience.",
-      color: "purple",
-    },
-    {
-      id: 5,
-      icon: faUsers,
-      title: "Community",
-      description: "We foster a supportive learning community where students can connect and grow together.",
-      color: "orange",
-    },
-    {
-      id: 6,
-      icon: faHeart,
-      title: "Empathy",
-      description: "We understand the challenges students face and provide compassionate support every step of the way.",
-      color: "pink",
-    },
-  ];
+  const { t } = useTranslation();
 
-  const teamMembers = [
-    {
-      id: 1,
-      name: "Adolphe NIYIGENA",
-      role: "Founder & CEO",
-      description: "Educational visionary with a passion for making quality education accessible to all African students.",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-    },
-    {
-      id: 2,
-      name: "Grace Mutoni",
-      role: "Head of Korean Language",
-      description: "Korean language expert with years of teaching experience both in Korea and across Africa.",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
-    },
-    {
-      id: 3,
-      name: "David Kamau",
-      role: "Lead Programming Instructor",
-      description: "Software engineer with a passion for teaching coding to the next generation of African developers.",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
-    },
-    {
-      id: 4,
-      name: "Sarah Okello",
-      role: "Academic Director",
-      description: "Education specialist with expertise in curriculum development and educational policy.",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
-    },
-    {
-      id: 5,
-      name: "Kofi Mensah",
-      role: "Head of Digital Learning",
-      description: "Specialist in educational technology with over 10 years of experience designing interactive online platforms for diverse learning environments.",
-      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop",
-    },
-  ];
-
-  const getIconColor = (color) => {
-    const colors = {
-      blue: "text-blue-500",
-      yellow: "text-yellow-500",
-      green: "text-green-500",
-      purple: "text-purple-500",
-      orange: "text-orange-500",
-      pink: "text-pink-500",
-    };
-    return colors[color] || "text-primary";
-  };
+  // 1. DYNAMIC DATA: We now pull the data structure from our translation file using t(..., { returnObjects: true })
+  // This allows the array to live in the JSON file, not the JS file.
+  const coreValues = t('about.core_values', { returnObjects: true });
+  const teamMembers = t('about.team_members', { returnObjects: true });
+  const founderMessage = t('about.founder_message_paragraphs', { returnObjects: true });
 
   const getIconBgColor = (color) => {
     const bgColors = {
-      blue: "bg-blue-100",
-      yellow: "bg-yellow-100",
-      green: "bg-green-100",
-      purple: "bg-purple-100",
-      orange: "bg-orange-100",
-      pink: "bg-pink-100",
+      blue: "bg-blue-100 text-blue-500",
+      yellow: "bg-yellow-100 text-yellow-500",
+      green: "bg-green-100 text-green-500",
+      purple: "bg-purple-100 text-purple-500",
+      orange: "bg-orange-100 text-orange-500",
+      pink: "bg-pink-100 text-pink-500",
     };
-    return bgColors[color] || "bg-primary/10";
+    return bgColors[color] || "bg-primary/10 text-primary";
   };
 
   return (
@@ -123,78 +60,63 @@ function AboutUsPage() {
       <section className="relative pt-32 pb-20 overflow-hidden bg-primary-gradient">
         <div className="absolute top-0 left-0 -translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl opacity-60 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10 text-center text-white">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6 font-serif">
-            About TM EduBridge
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6 font-serif text-white">
+            {t('about.hero_title')}
           </h1>
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-            Empowering Africa through knowledge, innovation, and accessible education
+            {t('about.hero_subtitle')}
           </p>
         </div>
       </section>
 
-      {/* Founder's Message Section */}
+      {/* Founder's Message Section - REFACTORED */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 font-serif">
-              Founder's Message
+              {t('about.founder_title')}
             </h2>
-            <p className="text-slate-600">A personal note from our visionary founder</p>
+            <p className="text-slate-600">{t('about.founder_subtitle')}</p>
           </div>
 
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              {/* Founder Profile */}
+              
+              {/* Founder Profile Card */}
               <div className="lg:col-span-1 flex flex-col items-center">
                 <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/20 mb-4">
                   <img
                     src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
-                    alt="Adolphe NIYIGENA"
+                    alt={t('about.founder_name')}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">Adolphe NIYIGENA</h3>
-                <p className="text-sm text-slate-600 mb-4">Founder & CEO</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-1">{t('about.founder_name')}</h3>
+                <p className="text-sm text-slate-600 mb-4">{t('about.founder_role')}</p>
                 
-                {/* Social Media Icons */}
                 <div className="flex gap-3">
-                  <a href="#" className="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-all text-xs font-bold">
-                    f
-                  </a>
-                  <a href="#" className="w-8 h-8 rounded-full bg-sky-500 hover:bg-sky-600 text-white flex items-center justify-center transition-all text-xs font-bold">
-                    𝕏
-                  </a>
-                  <a href="#" className="w-8 h-8 rounded-full bg-pink-600 hover:bg-pink-700 text-white flex items-center justify-center transition-all text-xs font-bold">
-                    IG
-                  </a>
-                  <a href="#" className="w-8 h-8 rounded-full bg-blue-700 hover:bg-blue-800 text-white flex items-center justify-center transition-all text-xs font-bold">
-                    in
-                  </a>
+                  <SocialLink href="#" bgClass="bg-blue-600 hover:bg-blue-700" label="Facebook">f</SocialLink>
+                  <SocialLink href="#" bgClass="bg-sky-500 hover:bg-sky-600" label="Twitter">𝕏</SocialLink>
+                  <SocialLink href="#" bgClass="bg-pink-600 hover:bg-pink-700" label="Instagram">IG</SocialLink>
+                  <SocialLink href="#" bgClass="bg-blue-700 hover:bg-blue-800" label="LinkedIn">in</SocialLink>
                 </div>
               </div>
 
-              {/* Message Content */}
+              {/* Message Content - MAPPED */}
               <div className="lg:col-span-3 space-y-4 text-slate-700 leading-relaxed">
-                <p className="font-medium">Dear Students, Parents, and Educators,</p>
+                <p className="font-medium">{t('about.founder_greeting')}</p>
                 
-                <p>
-                  Welcome to TM EduBridge Online Academy. My journey to establishing this platform began with a simple observation: across Africa, quality educational resources remain inaccessible to many talented students eager to learn and grow. After having personally benefited from the transformative power of education in my own life, I became passionate about creating a solution that could bridge this educational gap. I envisioned a platform where a student in a remote village in Rwanda could have the same quality educational experience as one in an urban center.
-                </p>
-                
-                <p>
-                  TM EduBridge was born from this vision — a comprehensive online academy that brings together courses, materials, and resources tailored to the educational needs of African students. From high school materials organized by country and curriculum to specialized courses in Korean language, programming, and university subjects, our platform aims to be a one-stop educational solution. What began as a small initiative has grown into a vibrant learning community with students from across the continent. Our team of dedicated educators shares my passion for accessible education and works tirelessly to create engaging, relevant content that helps students excel.
-                </p>
-                
-                <p>
-                  As we continue to grow, our commitment remains unchanged: to empower Africa through knowledge. We believe that education is the most powerful tool for individual and societal transformation, and we are dedicated to making quality education accessible to all. I invite you to join us on this educational journey. Whether you're a student seeking resources, a parent supporting your child's education, or an educator looking to contribute your expertise, there's a place for you in our community.
-                </p>
-                
-                <p className="font-medium">Together, let's build a brighter future through education.</p>
+                {/* Dynamic Paragraph Mapping */}
+                {founderMessage && founderMessage.map((paragraph, index) => (
+                    <p key={index}>{paragraph}</p>
+                ))}
+
+                <p className="font-medium">{t('about.founder_closing')}</p>
                 
                 <div className="pt-4">
-                  <p className="font-bold">Warm regards,</p>
-                  <p className="font-bold">Adolphe NIYIGENA</p>
-                  <p className="font-bold text-primary">Founder & CEO</p>
+                  <p className="font-bold">{t('about.founder_signoff_warm')}</p>
+                  <p className="font-bold">{t('about.founder_name')}</p>
+                  <p className="font-bold text-primary">{t('about.founder_role')}</p>
                 </div>
               </div>
             </div>
@@ -207,19 +129,20 @@ function AboutUsPage() {
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 font-serif">
-              Our Core Values
+              {t('about.values_title')}
             </h2>
-            <p className="text-slate-600">These principles guide everything we do at TM EduBridge</p>
+            <p className="text-slate-600">{t('about.values_subtitle')}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {coreValues.map((value) => (
+            {coreValues && coreValues.map((value, idx) => (
               <div
-                key={value.id}
-                className="bg-white rounded-2xl p-6 border border-slate-100 hover:shadow-xl hover:border-primary/20 transition-all"
+                key={idx}
+                className="bg-white rounded-2xl p-6 border border-slate-100 hover:shadow-xl hover:border-primary/20 transition-all group"
               >
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${getIconBgColor(value.color)}`}>
-                  <FontAwesomeIcon icon={value.icon} className={`text-2xl ${getIconColor(value.color)}`} />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors ${getIconBgColor(value.color)}`}>
+                  {/* We use the map because JSON only stores strings like "graduation", not the object */}
+                  <FontAwesomeIcon icon={iconMap[value.iconKey]} className="text-2xl" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{value.title}</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">{value.description}</p>
@@ -234,9 +157,9 @@ function AboutUsPage() {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 font-serif">
-              Meet Our Team
+               {t('about.team_title')}
             </h2>
-            <p className="text-slate-600">Dedicated educators and professionals committed to our mission</p>
+            <p className="text-slate-600">{t('about.team_subtitle')}</p>
           </div>
 
           <TeamSlider members={teamMembers} />
@@ -246,46 +169,44 @@ function AboutUsPage() {
   );
 }
 
-// Custom Team Slider Component
-
-
+// Optimized Team Slider
 const TeamSlider = ({ members }) => {
-  const [currentIndex, setCurrentIndex] = React.useState(0);
-  const [isPaused, setIsPaused] = React.useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [itemsPerPage, setItemsPerPage] = useState(4);
 
-  // Match the visual layout: 1 item on mobile, 2 on tablet, 4 on desktop
-  const [itemsPerPage, setItemsPerPage] = React.useState(4);
-
-  // Update itemsPerPage based on window width
-  React.useEffect(() => {
+  useEffect(() => {
     const updateSize = () => {
       if (window.innerWidth < 640) setItemsPerPage(1);
       else if (window.innerWidth < 1024) setItemsPerPage(2);
-      else setItemsPerPage(3);
+      else setItemsPerPage(3); // Adjusted max items to 3 for better readability
     };
     updateSize();
     window.addEventListener('resize', updateSize);
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  const totalPages = members.length;
+  // Safe Guard against empty data
+  if (!members || members.length === 0) return null;
+
+  const totalPages = Math.ceil(members.length / itemsPerPage); 
+  // NOTE: Simple pagination logic is often better than infinite scrolling for accessibility, 
+  // but sticking to your infinite loop logic requires checking boundaries carefully.
 
   const handleNext = () => {
-    // Loop back to 0 if we exceed the length, otherwise increment by 1
-    setCurrentIndex((prev) => (prev + 1) % totalPages);
+     setCurrentIndex((prev) => (prev + 1) % members.length);
   };
 
   const handlePrev = () => {
-    // Loop to the end if we go below 0
-    setCurrentIndex((prev) => (prev - 1 < 0 ? totalPages - 1 : prev - 1));
+    setCurrentIndex((prev) => (prev - 1 < 0 ? members.length - 1 : prev - 1));
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isPaused) {
       const interval = setInterval(handleNext, 3000);
       return () => clearInterval(interval);
     }
-  }, [isPaused, totalPages]);
+  }, [isPaused, members.length]); // Add members.length dependency
 
   return (
     <div 
@@ -293,32 +214,30 @@ const TeamSlider = ({ members }) => {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Prev Button */}
-      <button 
-        onClick={handlePrev}
-        className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-xl border border-slate-100 flex items-center justify-center text-slate-600 hover:text-primary transition-all hover:scale-110"
-      >
+      {/* Controls */}
+      <button onClick={handlePrev} aria-label="Previous member" className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-xl border border-slate-100 flex items-center justify-center text-slate-600 hover:text-primary transition-all hover:scale-110">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
       </button>
 
-      {/* Slider Window */}
       <div className="overflow-hidden py-4">
         <div 
           className="flex transition-transform duration-500 ease-in-out"
           style={{ 
-            transform: `translateX(-${currentIndex * (100 / itemsPerPage)}%)`,
+            // Logic updated to ensure smooth sliding based on items per page width
+            transform: `translateX(-${currentIndex * (100 / itemsPerPage)}%)`, 
           }}
         >
-          {members.map((member) => (
+          {members.map((member, idx) => (
             <div 
-              key={member.id} 
+              key={idx} 
               className="flex-shrink-0 px-4"
               style={{ width: `${100 / itemsPerPage}%` }}
             >
               <div className="flex flex-col items-center text-center group">
                 <div className="w-48 h-48 rounded-full overflow-hidden mb-6 border-4 border-slate-100 shadow-lg group-hover:border-primary/20 transition-all duration-500">
                   <img
-                    src={member.image}
+                    // Fallback image handling
+                    src={member.image || "https://via.placeholder.com/200"}
                     alt={member.name}
                     className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-110"
                   />
@@ -334,26 +253,9 @@ const TeamSlider = ({ members }) => {
         </div>
       </div>
 
-      {/* Next Button */}
-      <button 
-        onClick={handleNext}
-        className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-xl border border-slate-100 flex items-center justify-center text-slate-600 hover:text-primary transition-all hover:scale-110"
-      >
+      <button onClick={handleNext} aria-label="Next member" className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-xl border border-slate-100 flex items-center justify-center text-slate-600 hover:text-primary transition-all hover:scale-110">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
       </button>
-
-      {/* Pagination Dots */}
-      <div className="flex justify-center gap-2 mt-8">
-        {members.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setCurrentIndex(idx)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              idx === currentIndex ? "bg-primary w-8" : "bg-slate-300 w-2 hover:bg-slate-400"
-            }`}
-          />
-        ))}
-      </div>
     </div>
   );
 };

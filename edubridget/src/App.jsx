@@ -11,16 +11,17 @@ import WhatsAppButton from './components/WhatsAppButton';
 import LoadingSpinner from './components/LoadingSpinner';
 
 // Lazy Load Pages for Performance
-const Hero = lazy(() => import('./pages/home/Hero'));
-const WhyChoose = lazy(() => import('./pages/home/pages/WhyChoose'));
-const AcademicServices = lazy(() => import('./pages/home/pages/AcademicServices'));
-const CallToAction = lazy(() => import('./pages/home/pages/CallToAction'));
+// Lazy Load Pages for Performance
+const LandingPage = lazy(() => import('./pages/home/LandingPage'));
 
 // Legacy Pages
 const AboutUsPage = lazy(() => import('./pages/aboutUs/AboutUsPage'));
 const ContactPage = lazy(() => import('./pages/contact/contactPage'));
 const Signin = lazy(() => import('./pages/auth/SignInPage'));
 const Signup = lazy(() => import('./pages/auth/SignUpPage'));
+
+// New Pages
+const BlogDetailsPage = lazy(() => import('./pages/blog/BlogDetailsPage'));
 
 // New Pages
 const DigitalLibraryPage = lazy(() => import('./pages/library/DigitalLibraryPage'));
@@ -47,7 +48,12 @@ const ScrollToTop = () => {
   return null;
 };
 
+import usePageLanguage from './hooks/usePageLanguage';
+
 function App() {
+  usePageLanguage();
+
+
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -60,18 +66,13 @@ function App() {
       <ScrollToTop />
       <Toaster position="top-center" richColors toastOptions={{ style: { zIndex: 9999 } }} />
       <div className="flex flex-col min-h-screen">
-        <Header />
+        <Suspense fallback={<div className="h-16 bg-white shadow-sm" />}>
+          <Header />
+        </Suspense>
         <main className="flex-grow">
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
-              <Route path="/" element={
-                <>
-                  <Hero />
-                  <WhyChoose />
-                  <AcademicServices />
-                  <CallToAction />
-                </>
-              } />
+              <Route path="/" element={<LandingPage />} />
               <Route path="/aboutUsPage" element={<AboutUsPage />} />
               <Route path="/contactPage" element={<ContactPage />} />
               
@@ -84,6 +85,7 @@ function App() {
               <Route path="/gallery" element={<GalleryPage />} />
               <Route path="/partners" element={<PartnersPage />} />
               <Route path="/blogs" element={<BlogPage />} />
+              <Route path="/blogs/:id" element={<BlogDetailsPage />} />
               
               {/* Existing/Placeholder Routes */}
               <Route path="/coursesPage" element={<CoursesPage />} />

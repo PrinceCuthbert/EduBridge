@@ -1,36 +1,38 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { BookOpen, GraduationCap, Globe, Award, Users, MapPin } from 'lucide-react';
 
 export default function AcademicServices() {
+  const { t } = useTranslation();
   const services = [
     {
-      title: 'Thesis Writing & Consulting',
-      description: 'Expert guidance for your academic research and thesis preparation.',
+      title: t('services.items.thesis.title'),
+      description: t('services.items.thesis.desc'),
       icon: <BookOpen className="h-6 w-6" />
     },
     {
-      title: 'Proofreading & Formatting',
-      description: 'Professional editing services to perfect your academic documents.',
+      title: t('services.items.proofreading.title'),
+      description: t('services.items.proofreading.desc'),
       icon: <GraduationCap className="h-6 w-6" />
     },
     {
-      title: 'Research Papers & Journals',
-      description: 'Access to academic journals and assistance with research papers.',
+      title: t('services.items.research.title'),
+      description: t('services.items.research.desc'),
       icon: <Globe className="h-6 w-6" />
     },
     {
-      title: 'Scholarships & Travel Support',
-      description: 'Complete application support for scholarships and international programs.',
+      title: t('services.items.scholarships.title'),
+      description: t('services.items.scholarships.desc'),
       icon: <Award className="h-6 w-6" />
     },
     {
-      title: 'Academic Advisory & Consulting',
-      description: 'One-on-one consultations for academic and career planning.',
+      title: t('services.items.advisory.title'),
+      description: t('services.items.advisory.desc'),
       icon: <Users className="h-6 w-6" />
     },
     {
-      title: 'Scholarship to Study Abroad',
-      description: 'Fully funded and partial scholarship opportunities worldwide.',
+      title: t('services.items.study_abroad.title'),
+      description: t('services.items.study_abroad.desc'),
       icon: <MapPin className="h-6 w-6" />
     }
   ];
@@ -39,9 +41,9 @@ export default function AcademicServices() {
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-slate-900">Academic Services Offered</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-slate-900">{t('services.title')}</h2>
           <p className="text-slate-600 max-w-2xl mx-auto">
-            Comprehensive support for your academic and career journey.
+            {t('services.subtitle')}
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -110,7 +110,7 @@ const BranchesPage = () => {
               animate={{ opacity: 1, y: 0 }}
               className="text-center text-white"
             >
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
                 Our Branches
               </h1>
               <p className="text-xl text-white/90 max-w-2xl mx-auto">

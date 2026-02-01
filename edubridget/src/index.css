@@ -2,6 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    @apply scroll-smooth text-text-main antialiased bg-surface;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif text-text-main;
+  }
+
+  h1 {
+    @apply text-display-1 md:text-5xl lg:text-6xl mb-6;
+  }
+
+  h2 {
+    @apply text-display-2 md:text-4xl lg:text-5xl mb-4;
+  }
+
+  h3 {
+    @apply text-display-3 md:text-3xl lg:text-4xl mb-4;
+  }
+  
+  h4 {
+    @apply text-2xl font-bold mb-3;
+  }
+
+  p {
+    @apply font-sans text-body-base text-text-muted mb-4;
+  }
+}
+
 @layer utilities {
   /* Hide scrollbar for Chrome, Safari and Opera */
   .scrollbar-hide::-webkit-scrollbar {
