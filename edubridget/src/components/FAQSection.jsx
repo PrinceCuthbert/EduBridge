@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
-function FAQSection({ faqs, title = "Frequently Asked Questions", subtitle = "Find quick answers to common questions about our platform and services" }) {
+function FAQSection({ faqs, title = "Frequently Asked Questions", subtitle = "Find quick answers to common questions about our platform and services", showContactBtn = true }) {
   const [openFAQ, setOpenFAQ] = useState(null);
 
   return (
@@ -40,15 +40,17 @@ function FAQSection({ faqs, title = "Frequently Asked Questions", subtitle = "Fi
           ))}
         </div>
 
-        <div className="text-center mt-8">
-          <p className="text-slate-600 mb-4">Still have questions?</p>
-          <a
-            href="/contactPage"
-            className="inline-block px-6 py-3 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all shadow-lg"
-          >
-            Contact Support Team
-          </a>
-        </div>
+        {showContactBtn && (
+          <div className="text-center mt-8">
+            <p className="text-slate-600 mb-4">Still have questions?</p>
+            <a
+              href="/contactPage"
+              className="inline-block px-6 py-3 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all shadow-lg"
+            >
+              Contact Support Team
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );

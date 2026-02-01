@@ -14,6 +14,10 @@ import {
   MessageSquare
 } from "lucide-react";
 
+import { faqs } from "../../data/faqData";
+import FAQSection from "../../components/FAQSection";
+
+
 const socialIconMap = {
   facebook: Facebook,
   twitter: Twitter,
@@ -231,8 +235,8 @@ function ContactPage() {
                 <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
                   <MessageSquare size={24} className="text-white" />
                 </div>
-                <h3 className="font-bold text-xl mb-2">{t('contact.live_chat.title')}</h3>
-                <p className="text-white/80 text-sm mb-6">
+                <h3 className="font-bold text-xl mb-2 text-white">{t('contact.live_chat.title')}</h3>
+                <p className="text-white/80 text-sm mb-6 ">
                   {t('contact.live_chat.subtitle')}
                 </p>
                 <button 
@@ -249,14 +253,18 @@ function ContactPage() {
         </div>
       </div>
       
-       {/* Bottom CTA */}
-       <div className="py-16 text-center">
-          <h2 className="text-xl font-bold text-slate-900 mb-2">{t('contact.faq.title')}</h2>
-          <p className="text-slate-500 text-sm mb-6">{t('contact.faq.subtitle')}</p>
-          <button className="px-6 py-2 border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">
-            {t('contact.faq.button')}
-          </button>
-       </div>
+      {/* Bottom CTA */}
+      {/* FAQ Section */}
+ 
+    
+
+       <FAQSection 
+        faqs={faqs} 
+        title={t('contact.faq.title')}
+        subtitle={t('contact.faq.subtitle')}
+        showContactBtn={false}
+      />
+
 
     </div>
   );

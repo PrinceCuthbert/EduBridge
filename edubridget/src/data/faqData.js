@@ -1,33 +1,22 @@
-// Shared FAQ data for use across multiple pages
 export const faqs = [
   {
-    question: "Can I cancel my subscription anytime?",
-    answer:
-      "Yes, you can cancel your subscription at any time. Your access will continue until the end of your billing period.",
+    question: "How do I create an account?",
+    answer: "Click the 'Sign Up' button in the top-right corner and follow the registration process. You can sign up using your email or Google account."
   },
   {
-    question: "Are there any discounts for students?",
-    answer:
-      "We offer special student discounts with valid student ID verification. Contact our support team for more details.",
+    question: "What documents do I need for visa application?",
+    answer: "The required documents vary by country, but typically include a valid passport, visa application form, passport-sized photos, proof of financial means, and travel itinerary."
   },
   {
-    question: "What payment methods do you accept?",
-    answer:
-      "We accept credit/debit cards, mobile money, and bank transfers for most regions in Africa.",
+    question: "Can I apply for multiple scholarships at once?",
+    answer: "Yes, you can apply for multiple scholarships as long as you meet the eligibility criteria for each one. We recommend tailoring each application to the specific scholarship."
   },
   {
-    question: "Can I upgrade my membership plan?",
-    answer:
-      "Yes, you can upgrade your plan at any time. The price difference will be prorated for your current billing cycle.",
+    question: "How long does it take to get a visa?",
+    answer: "Visa processing times vary depending on the country and the type of visa. Most tourist visas take 2-4 weeks, while student visas can take 4-8 weeks."
   },
   {
-    question: "How do I access the courses?",
-    answer:
-      "Once you've enrolled in a course or have an active membership, you can access all your courses from your dashboard. Simply log in and navigate to 'My Courses'.",
-  },
-  {
-    question: "Can I download study materials for offline use?",
-    answer:
-      "Yes, many of our study materials are available for download. This feature is available to all paid members with downloadable content clearly marked.",
-  },
+    question: "Do you offer career counseling services?",
+    answer: "Yes, we offer personalized career counseling services to help you choose the right academic path and career goals."
+  }
 ];

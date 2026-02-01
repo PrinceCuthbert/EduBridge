@@ -1,28 +1,50 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash, faRightToBracket } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash, faRightToBracket, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from 'sonner';
 
 function SignInPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+  
+  // Navigate back to where they came from or default
+  const from = location.state?.from?.pathname || "/dashboard";
 
   const initialFormState = {
-  email: "",
-  password: "",
+    email: "",
+    password: "",
   };
 
   const [showPassword, setShowPassword] = useState(false);
-
   const [formData, setFormData] = useState(initialFormState);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
- const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Sign in:", formData);
-    
-    // 2. Reset the data
-    setFormData(initialFormState);
-    
-    // 3. Optional: Reset password visibility too?
-    setShowPassword(false); 
+    setError("");
+    setLoading(true);
+
+    try {
+      const user = await login(formData);
+      toast.success(`Welcome back, ${user.name}!`);
+      
+      // Intelligent redirection based on role
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate(from === '/admin/dashboard' ? '/dashboard' : from);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to sign in. Please check your credentials.");
+      toast.error("Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -30,6 +52,15 @@ function SignInPage() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  // Helper to pre-fill demo data
+  const fillDemo = (role) => {
+    if (role === 'admin') {
+      setFormData({ email: 'admin@edubridge.africa', password: 'admin123' });
+    } else {
+      setFormData({ email: 'student@test.com', password: 'student123' });
+    }
   };
 
   return (
@@ -54,6 +85,13 @@ function SignInPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg">
+                {error}
+              </div>
+            )}
+
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-xs font-semibold text-slate-700 mb-1">
@@ -67,7 +105,8 @@ function SignInPage() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="you@example.com"
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                disabled={loading}
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all disabled:opacity-50"
               />
             </div>
 
@@ -90,7 +129,8 @@ function SignInPage() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-10 transition-all"
+                  disabled={loading}
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-10 transition-all disabled:opacity-50"
                 />
                 <button
                   type="button"
@@ -117,10 +157,20 @@ function SignInPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-2.5 bg-primary hover:bg-primary-dark text-white font-bold text-sm rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+              disabled={loading}
+              className="w-full py-2.5 bg-primary hover:bg-primary-dark text-white font-bold text-sm rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Sign In
-              <FontAwesomeIcon icon={faRightToBracket} className="ml-1" />
+              {loading ? (
+                <>
+                  <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
+                  Signing In...
+                </>
+              ) : (
+                <>
+                  Sign In
+                  <FontAwesomeIcon icon={faRightToBracket} className="ml-1" />
+                </>
+              )}
             </button>
           </form>
           
@@ -131,20 +181,26 @@ function SignInPage() {
             </Link>
           </div>
 
-          {/* Demo Accounts - Optional, kept for utility */}
+          {/* Demo Accounts */}
           <div className="mt-6 pt-4 border-t border-slate-100">
-            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Demo Credentials</p>
+            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 text-center">Demo Credentials (Click to Fill)</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div className="p-2 bg-slate-50 rounded-lg text-[10px]">
+              <button 
+                onClick={() => fillDemo('admin')} 
+                className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-[10px] text-left transition-colors border border-slate-200"
+              >
                  <span className="font-bold block text-slate-800 mb-0.5">Admin</span>
-                 <span className="text-slate-500">admin@edubridge.com</span>
+                 <span className="text-slate-500">admin@edubridge.africa</span>
                  <span className="block text-slate-500">admin123</span>
-              </div>
-              <div className="p-2 bg-slate-50 rounded-lg text-[10px]">
+              </button>
+              <button 
+                onClick={() => fillDemo('student')}
+                className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-[10px] text-left transition-colors border border-slate-200"
+              >
                  <span className="font-bold block text-slate-800 mb-0.5">Student</span>
-                 <span className="text-slate-500">student@edubridge.com</span>
+                 <span className="text-slate-500">student@test.com</span>
                  <span className="block text-slate-500">student123</span>
-              </div>
+              </button>
             </div>
           </div>
         </div>
@@ -157,7 +213,7 @@ function SignInPage() {
           alt="Students studying nicely"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        {/* Overlay for text readability if needed, or colored tint */}
+        {/* Overlay */}
          <div className="absolute inset-0 bg-gradient-to-t from-primary/90 to-primary/40 mix-blend-multiply"></div>
          
          <div className="absolute bottom-0 left-0 right-0 p-12 text-white z-10">

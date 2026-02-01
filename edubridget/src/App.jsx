@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import 'aos/dist/aos.css';
 import AOS from 'aos';
@@ -50,9 +50,35 @@ const ScrollToTop = () => {
 
 import usePageLanguage from './hooks/usePageLanguage';
 
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute';
+
+// Admin Pages
+import AdminLayout from './pages/admin/AdminLayout';
+import AdminOverview from './pages/admin/AdminOverview';
+import ScholarshipManager from './pages/admin/ScholarshipManager';
+const ApplicationReview = lazy(() => import('./pages/admin/ApplicationReview'));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+
+// ... imports
+import StudentDashboardLayout from './pages/dashboard/StudentDashboardLayout';
+
+const PublicLayout = () => (
+  <>
+    <Suspense fallback={<div className="h-16 bg-white shadow-sm" />}>
+      <Header />
+    </Suspense>
+    <main className="flex-grow">
+      <Outlet />
+    </main>
+    <Footer />
+    <WhatsAppButton />
+  </>
+);
+
 function App() {
   usePageLanguage();
-
 
   useEffect(() => {
     AOS.init({
@@ -62,46 +88,87 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <ScrollToTop />
-      <Toaster position="top-center" richColors toastOptions={{ style: { zIndex: 9999 } }} />
-      <div className="flex flex-col min-h-screen">
-        <Suspense fallback={<div className="h-16 bg-white shadow-sm" />}>
-          <Header />
-        </Suspense>
-        <main className="flex-grow">
+    <AuthProvider>
+      <Router>
+        <ScrollToTop />
+        <Toaster position="top-center" richColors toastOptions={{ style: { zIndex: 9999 } }} />
+        <div className="flex flex-col min-h-screen">
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/aboutUsPage" element={<AboutUsPage />} />
-              <Route path="/contactPage" element={<ContactPage />} />
+              {/* Public Routes - Wrapped in PublicLayout */}
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={
+                  <PublicRoute>
+                    <LandingPage />
+                  </PublicRoute>
+                } />
+                <Route path="/aboutUsPage" element={<AboutUsPage />} />
+                <Route path="/contactPage" element={<ContactPage />} />
+                
+                {/* New Routes */}
+                <Route path="/library" element={<DigitalLibraryPage />} />
+                <Route path="/branches" element={<BranchesPage />} />
+                <Route path="/study-abroad" element={<StudyAbroadPage />} />
+                <Route path="/visa-consultation" element={<VisaConsultationPage />} />
+                <Route path="/scholarships" element={<ScholarshipsPage />} />
+                <Route path="/gallery" element={<GalleryPage />} />
+                <Route path="/partners" element={<PartnersPage />} />
+                <Route path="/blogs" element={<BlogPage />} />
+                <Route path="/blogs/:id" element={<BlogDetailsPage />} />
+                
+                {/* Existing/Placeholder Routes */}
+                <Route path="/coursesPage" element={<CoursesPage />} />
+                <Route path="/membershipPage" element={<MembershipPage />} />
+
+                {/* Auth Routes */}
+                <Route path="/signin" element={
+                  <PublicRoute>
+                    <Signin />
+                  </PublicRoute>
+                } />
+                <Route path="/signup" element={
+                  <PublicRoute>
+                    <Signup />
+                  </PublicRoute>
+                } />
+              </Route>
               
-              {/* New Routes */}
-              <Route path="/library" element={<DigitalLibraryPage />} />
-              <Route path="/branches" element={<BranchesPage />} />
-              <Route path="/study-abroad" element={<StudyAbroadPage />} />
-              <Route path="/visa-consultation" element={<VisaConsultationPage />} />
-              <Route path="/scholarships" element={<ScholarshipsPage />} />
-              <Route path="/gallery" element={<GalleryPage />} />
-              <Route path="/partners" element={<PartnersPage />} />
-              <Route path="/blogs" element={<BlogPage />} />
-              <Route path="/blogs/:id" element={<BlogDetailsPage />} />
+              {/* Protected Student Dashboard */}
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <StudentDashboardLayout />
+                  </ProtectedRoute>
+                } 
+              >
+                  <Route index element={<Dashboard />} />
+                  <Route path="profile" element={<div className="p-8">My Profile (Coming Soon)</div>} />
+              </Route>
+
+              {/* Admin Routes */}
+              <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                <Route path="dashboard" element={<AdminOverview />} />
+                <Route path="scholarships" element={<ScholarshipManager />} />
+                <Route path="applications" element={<ApplicationReview />} />
+                <Route path="visa" element={<div className="p-8">Visa Desk (Coming Soon)</div>} />
+                <Route path="users" element={<div className="p-8">User Registry (Coming Soon)</div>} />
+                <Route path="settings" element={<AdminSettings />} />
+              </Route>
               
-              {/* Existing/Placeholder Routes */}
-              <Route path="/coursesPage" element={<CoursesPage />} />
-              <Route path="/membershipPage" element={<MembershipPage />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              
-              {/* Auth Routes */}
-              <Route path="/signin" element={<Signin />} />
-              <Route path="/signup" element={<Signup />} />
             </Routes>
           </Suspense>
-        </main>
-        <Footer />
-        <WhatsAppButton />
-      </div>
-    </Router>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
