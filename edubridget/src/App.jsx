@@ -55,15 +55,16 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
 
-// Admin Pages
-import AdminLayout from './pages/admin/AdminLayout';
-import AdminOverview from './pages/admin/AdminOverview';
-import ScholarshipManager from './pages/admin/ScholarshipManager';
+// Admin Pages - Lazy Loaded
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
+const AdminOverview = lazy(() => import('./pages/admin/AdminOverview'));
+const ScholarshipManager = lazy(() => import('./pages/admin/ScholarshipManager'));
 const ApplicationReview = lazy(() => import('./pages/admin/ApplicationReview'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 
-// ... imports
-import StudentDashboardLayout from './pages/dashboard/StudentDashboardLayout';
+
+// Dashboard Layout - Lazy Loaded
+const StudentDashboardLayout = lazy(() => import('./pages/dashboard/StudentDashboardLayout'));
 
 const PublicLayout = () => (
   <>

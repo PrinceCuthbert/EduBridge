@@ -217,7 +217,7 @@ function SignInPage() {
          <div className="absolute inset-0 bg-gradient-to-t from-primary/90 to-primary/40 mix-blend-multiply"></div>
          
          <div className="absolute bottom-0 left-0 right-0 p-12 text-white z-10">
-            <h2 className="text-4xl font-bold mb-4">Bridge Your Future</h2>
+            <h2 className="text-4xl font-bold mb-4 text-white">Bridge Your Future</h2>
             <p className="text-lg text-white/90 max-w-md">Join thousands of East African students achieving their educational dreams worldwide.</p>
          </div>
       </div>

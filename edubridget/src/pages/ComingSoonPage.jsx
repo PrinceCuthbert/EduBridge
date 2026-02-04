@@ -16,9 +16,9 @@ const ComingSoonPage = () => {
           initial={{ opacity: 0, y: 20, scale: 0.5 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.8, duration: 0.4, type: "spring" }}
-          className="absolute -top-32 -right-16 bg-white border-2 border-primary p-4 rounded-3xl shadow-xl z-20 max-w-xs"
+          className="absolute -top-12 -right-4 md:-top-20 md:right-0 md:left-1/2 md:-translate-x-1/2 lg:-top-28 lg:left-auto lg:translate-x-0 lg:right-8 bg-white border-2 border-primary p-3 md:p-4 rounded-3xl shadow-xl z-20 max-w-[180px] md:max-w-xs"
         >
-          <p className="text-gray-800 font-bold text-sm md:text-base">
+          <p className="text-gray-800 font-bold text-xs md:text-sm lg:text-base">
             {filter} is coming soon! 🚀
           </p>
           {/* Bubble Tail */}

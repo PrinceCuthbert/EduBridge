@@ -237,7 +237,7 @@ function SignUpPage() {
         />
 
         <div className="absolute inset-0 flex flex-col justify-center px-16 text-white text-center">
-            <h2 className="text-4xl font-bold mb-6 drop-shadow-md">Start Your Journey Today</h2>
+            <h2 className="text-4xl font-bold mb-6 drop-shadow-md text-white">Start Your Journey Today</h2>
             <p className="text-lg text-white/90 mb-12 max-w-xl mx-auto font-light leading-relaxed">
                 Create your free account and unlock access to scholarships, online courses, and study abroad opportunities.
             </p>
