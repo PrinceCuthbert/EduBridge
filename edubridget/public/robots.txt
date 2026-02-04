@@ -1,0 +1,10 @@
+# Allow all web crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and dashboard pages (protected routes)
+Disallow: /admin
+Disallow: /dashboard
+
+# Point to sitemap
+Sitemap: https://tmedubridge.netlify.app/sitemap.xml
