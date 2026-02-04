@@ -115,9 +115,15 @@ const Navigation = () => {
                 {t('nav.academics')} <ChevronDown className="ml-1 h-3 w-3" />
               </button>
               <div className="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
-                <Link to="/coursesPage" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">{t('academics.high_school')}</Link>
-                <Link to="/coursesPage?filter=university" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">{t('academics.masters')}</Link>
-                <Link to="/coursesPage" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">{t('academics.online')}</Link>
+                {/* Original links - kept for future use */}
+                {/* <Link to="/coursesPage" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">{t('academics.high_school')}</Link> */}
+                {/* <Link to="/coursesPage?filter=university" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">{t('academics.masters')}</Link> */}
+                {/* <Link to="/coursesPage" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">{t('academics.online')}</Link> */}
+                
+                {/* New Coming Soon links */}
+                <Link to="/coming-soon?filter=High School Curriculum" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">{t('academics.high_school')}</Link>
+                <Link to="/coming-soon?filter=Master's Programs" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">{t('academics.masters')}</Link>
+                <Link to="/coming-soon?filter=Online Learning" className="block px-4 py-2 text-xs text-gray-700 hover:bg-slate-50 hover:text-primary">{t('academics.online')}</Link>
               </div>
             </div>
 
@@ -212,9 +218,15 @@ const Navigation = () => {
                     )}
                     {section === 'Academics' && (
                       <>
-                        <Link to="/coursesPage" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>{t('academics.high_school')}</Link>
-                        <Link to="/coursesPage?filter=university" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>{t('academics.masters')}</Link>
-                         <Link to="/coursesPage" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>{t('academics.online')}</Link>
+                        {/* Original links - kept for future use */}
+                        {/* <Link to="/coursesPage" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>{t('academics.high_school')}</Link> */}
+                        {/* <Link to="/coursesPage?filter=university" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>{t('academics.masters')}</Link> */}
+                        {/* <Link to="/coursesPage" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>{t('academics.online')}</Link> */}
+                        
+                        {/* New Coming Soon links */}
+                        <Link to="/coming-soon?filter=High School Curriculum" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>{t('academics.high_school')}</Link>
+                        <Link to="/coming-soon?filter=Master's Programs" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>{t('academics.masters')}</Link>
+                        <Link to="/coming-soon?filter=Online Learning" className="block px-3 py-2 text-sm text-gray-600 hover:text-primary" onClick={() => setIsOpen(false)}>{t('academics.online')}</Link>
                       </>
                     )}
                     {section === 'Global Opportunities' && (

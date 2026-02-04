@@ -3,32 +3,143 @@
 @tailwind utilities;
 
 @layer base {
+  /* 
+   * BASE FONT SIZE SETUP (Mobile-First)
+   * This is the foundation for all rem calculations
+   * 1rem will equal these values at different breakpoints
+   */
   html {
-    @apply scroll-smooth text-text-main antialiased bg-surface;
+    /* Mobile: 14px base (small screens) */
+    font-size: 87.5%; /* 14px if browser default is 16px */
+    
+    @apply scroll-smooth antialiased bg-surface;
   }
-  
+
+  /* Tablet: 15px base */
+  @media (min-width: 640px) {
+    html {
+      font-size: 93.75%; /* 15px */
+    }
+  }
+
+  /* Desktop: 16px base (standard) */
+  @media (min-width: 1024px) {
+    html {
+      font-size: 100%; /* 16px */
+    }
+  }
+
+  /* Large Desktop: 18px base */
+  @media (min-width: 1536px) {
+    html {
+      font-size: 112.5%; /* 18px */
+    }
+  }
+
+  /* 
+   * BODY - Inherits the responsive base font size
+   */
+  body {
+    @apply font-sans text-text-main;
+    font-size: 1rem; /* Scales with html font-size */
+    line-height: 1.6;
+  }
+
+  /* 
+   * HEADINGS - Use rem for scalability
+   * These will automatically scale based on viewport
+   */
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif text-text-main;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
   }
 
   h1 {
-    @apply text-display-1 md:text-5xl lg:text-6xl mb-6;
+    font-size: 2rem;     /* Mobile: 28px, Desktop: 32px, Large: 36px */
   }
 
   h2 {
-    @apply text-display-2 md:text-4xl lg:text-5xl mb-4;
+    font-size: 1.5rem;   /* Mobile: 21px, Desktop: 24px, Large: 27px */
   }
 
   h3 {
-    @apply text-display-3 md:text-3xl lg:text-4xl mb-4;
+    font-size: 1.25rem;  /* Mobile: 17.5px, Desktop: 20px, Large: 22.5px */
   }
   
   h4 {
-    @apply text-2xl font-bold mb-3;
+    font-size: 1.125rem; /* Mobile: 15.75px, Desktop: 18px, Large: 20.25px */
   }
 
+  h5 {
+    font-size: 1rem;     /* Matches body */
+  }
+
+  h6 {
+    font-size: 0.875rem; /* Slightly smaller than body */
+  }
+
+  /* 
+   * PARAGRAPHS & TEXT
+   */
   p {
-    @apply font-sans text-body-base text-text-muted mb-4;
+    @apply font-sans text-text-muted;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  /* Small text */
+  small {
+    font-size: 0.875rem; /* 87.5% of base */
+  }
+
+  /* 
+   * FORM ELEMENTS - CRITICAL FOR CONSISTENCY
+   * Force inputs to inherit responsive typography
+   */
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+    font-size: inherit; /* Inherits from parent or body */
+    line-height: inherit;
+  }
+
+  /* Specific input sizing for better UX */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 1rem; /* Prevents iOS zoom on focus when < 16px */
+  }
+
+  /* Labels */
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  /* Buttons */
+  button {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  /* 
+   * LINKS
+   */
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 }
 

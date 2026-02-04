@@ -21,13 +21,25 @@ export default {
         serif: ['Playfair Display', 'serif'],
       },
       fontSize: {
-        // Semantic Scale (Mobile First)
-        'display-1': ['3rem', { lineHeight: '1.2', fontWeight: '700' }], // Mobile H1
-        'display-2': ['2.25rem', { lineHeight: '1.3', fontWeight: '700' }], // Mobile H2
-        'display-3': ['1.875rem', { lineHeight: '1.3', fontWeight: '700' }], // Mobile H3
-        'body-lg': ['1.125rem', { lineHeight: '1.6', fontWeight: '400' }], // Large Body
-        'body-base': ['1rem', { lineHeight: '1.6', fontWeight: '400' }], // Base Body
-        'caption': ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }],
+        // Base sizes (rem-based)
+        'xs': ['0.75rem', { lineHeight: '1.5' }],      // 12px base
+        'sm': ['0.875rem', { lineHeight: '1.5' }],     // 14px base
+        'base': ['1rem', { lineHeight: '1.6' }],       // 16px base (body text)
+        'lg': ['1.125rem', { lineHeight: '1.6' }],     // 18px base
+        'xl': ['1.25rem', { lineHeight: '1.5' }],      // 20px base
+        '2xl': ['1.5rem', { lineHeight: '1.4' }],      // 24px base
+        '3xl': ['1.875rem', { lineHeight: '1.3' }],    // 30px base
+        '4xl': ['2.25rem', { lineHeight: '1.2' }],     // 36px base
+        '5xl': ['3rem', { lineHeight: '1.2' }],        // 48px base
+        '6xl': ['3.75rem', { lineHeight: '1.1' }],     // 60px base
+        
+        // Semantic sizes (aligned with index.css)
+        'display-1': ['2rem', { lineHeight: '1.2', fontWeight: '700' }],      // h1
+        'display-2': ['1.5rem', { lineHeight: '1.3', fontWeight: '700' }],    // h2
+        'display-3': ['1.25rem', { lineHeight: '1.3', fontWeight: '700' }],   // h3
+        'body-lg': ['1.125rem', { lineHeight: '1.6', fontWeight: '400' }],    // Large body
+        'body-base': ['1rem', { lineHeight: '1.6', fontWeight: '400' }],      // Base body
+        'caption': ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }],    // Small text
       },
       colors: {
         primary: {

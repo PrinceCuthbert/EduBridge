@@ -37,6 +37,7 @@ const BlogPage = lazy(() => import('./pages/blog/BlogPage'));
 const CoursesPage = lazy(() => import('./pages/coursesPage/coursesPage'));
 const MembershipPage = lazy(() => import('./pages/membership/MembershipPage'));
 const Dashboard = lazy(() => import('./pages/dashboard/Dashboard'));
+const ComingSoonPage = lazy(() => import('./pages/ComingSoonPage'));
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -119,6 +120,7 @@ function App() {
                 {/* Existing/Placeholder Routes */}
                 <Route path="/coursesPage" element={<CoursesPage />} />
                 <Route path="/membershipPage" element={<MembershipPage />} />
+                <Route path="/coming-soon" element={<ComingSoonPage />} />
 
                 {/* Auth Routes */}
                 <Route path="/signin" element={

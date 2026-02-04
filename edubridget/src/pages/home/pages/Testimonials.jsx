@@ -28,7 +28,7 @@ const Testimonials = () => {
     <section className="py-24 bg-slate-50 relative overflow-hidden">
       {/* Decorative quotes in background */}
       <div className="absolute top-10 left-10 text-slate-200 opacity-20 pointer-events-none">
-        <FontAwesomeIcon icon={faQuoteLeft} className="text-[15rem]" />
+        <FontAwesomeIcon icon={faQuoteLeft} className="text-[10rem]" />
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
@@ -45,13 +45,13 @@ const Testimonials = () => {
           {reviews.map((review, index) => (
             <div 
               key={index} 
-              className="bg-white p-10 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col group"
+              className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col group"
             >
-              <div className="mb-8 text-primary/20 group-hover:text-primary transition-colors duration-500">
-                <FontAwesomeIcon icon={faQuoteLeft} className="text-4xl" />
+              <div className="mb-4 text-primary/20 group-hover:text-primary transition-colors duration-500">
+                <FontAwesomeIcon icon={faQuoteLeft} className="text-2xl" />
               </div>
               
-              <blockquote className="text-slate-700 leading-relaxed mb-10 flex-grow italic text-lg">
+              <blockquote className="text-slate-700 leading-relaxed mb-6 flex-grow italic text-base">
                 "{review.text}"
               </blockquote>
               
