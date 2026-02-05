@@ -11,7 +11,8 @@ import {
   Twitter, 
   Instagram, 
   Linkedin,
-  MessageSquare
+  MessageSquare,
+  Send
 } from "lucide-react";
 
 import { faqs } from "../../data/faqData";
@@ -60,8 +61,8 @@ function ContactPage() {
           
           {/* LEFT COLUMN: Contact Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 p-8 border border-slate-100">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">{t('contact.form_title')}</h2>
+            <div className="bg-white rounded-3xl shadow-soft-xl p-8 md:p-10 border border-slate-100 animate-in fade-in slide-in-from-bottom-4">
+              <h2 className="font-serif text-3xl text-slate-900 mb-8">{t('contact.form_title')}</h2>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 {state.succeeded && (
@@ -73,76 +74,84 @@ function ContactPage() {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">{t('contact.labels.full_name')} *</label>
+                  {/* Full Name */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700 ml-1">{t('contact.labels.full_name')} *</label>
                     <input
                       name="fullName"
                       type="text"
                       placeholder={t('contact.placeholders.full_name')}
                       required
                       disabled={state.submitting}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all disabled:opacity-50"
+                      className="w-full px-5 py-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all placeholder:text-slate-400 disabled:opacity-50"
                     />
                     <ValidationError prefix="Name" field="fullName" errors={state.errors} className="text-red-500 text-xs mt-1" />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">{t('contact.labels.email')} *</label>
+                  
+                  {/* Email */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700 ml-1">{t('contact.labels.email')} *</label>
                     <input
                       name="email"
                       type="email"
                       placeholder={t('contact.placeholders.email')}
                       required
                       disabled={state.submitting}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all disabled:opacity-50"
+                      className="w-full px-5 py-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all placeholder:text-slate-400 disabled:opacity-50"
                     />
                     <ValidationError prefix="Email" field="email" errors={state.errors} className="text-red-500 text-xs mt-1" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">{t('contact.labels.phone')}</label>
+                  {/* Phone */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700 ml-1">{t('contact.labels.phone')}</label>
                     <input
                       name="phone"
                       type="tel"
                       placeholder={t('contact.placeholders.phone')}
                       disabled={state.submitting}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all disabled:opacity-50"
+                      className="w-full px-5 py-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all placeholder:text-slate-400 disabled:opacity-50"
                     />
                   </div>
-                  <div>
-                     <label className="block text-sm font-medium text-slate-700 mb-2">{t('contact.labels.subject')} *</label>
+                  
+                  {/* Subject */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700 ml-1">{t('contact.labels.subject')} *</label>
                     <input
                       name="subject"
                       type="text"
                       placeholder={t('contact.placeholders.subject')}
                       required
                       disabled={state.submitting}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all disabled:opacity-50"
+                      className="w-full px-5 py-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all placeholder:text-slate-400 disabled:opacity-50"
                     />
-                     <ValidationError prefix="Subject" field="subject" errors={state.errors} className="text-red-500 text-xs mt-1" />
+                    <ValidationError prefix="Subject" field="subject" errors={state.errors} className="text-red-500 text-xs mt-1" />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">{t('contact.labels.message')} *</label>
+                {/* Message */}
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-700 ml-1">{t('contact.labels.message')} *</label>
                   <textarea
                     name="message"
-                    rows={6}
+                    rows={5}
                     placeholder={t('contact.placeholders.message')}
                     required
                     disabled={state.submitting}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none transition-all disabled:opacity-50"
+                    className="w-full px-5 py-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all resize-none placeholder:text-slate-400 disabled:opacity-50"
                   ></textarea>
                   <ValidationError prefix="Message" field="message" errors={state.errors} className="text-red-500 text-xs mt-1" />
                 </div>
 
+                {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={state.submitting}
-                  className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl shadow-lg hover:shadow-primary/30 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full md:w-auto px-10 py-4 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl shadow-lg shadow-primary/20 transform transition hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  <MessageCircle size={20} />
+                  <Send size={18} />
                   {state.submitting ? t('contact.sending') : t('contact.submit_button')}
                 </button>
               </form>

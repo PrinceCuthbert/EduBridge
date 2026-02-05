@@ -1,9 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Quote, X, MapPin } from 'lucide-react';
+import { X, MapPin, GraduationCap } from 'lucide-react';
 
 const galleryItems = [
   {
@@ -56,120 +53,180 @@ const galleryItems = [
     studentName: "David Kim",
     university: "University of Tokyo",
     country: "Japan",
-    image: "https://images.unsplash.com/photo-1590012314607-6da99daace58?q=80&w=1470&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1470&auto=format&fit=crop",
     testimony: "Highly recommend EduBridge for anyone looking to study in Asia. They have great connections and knowledge.",
     program: "Robotics"
   }
 ];
 
 export default function GalleryPage() {
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [activeImage, setActiveImage] = useState(null);
+  const modalRef = useRef(null);
+
+  // Outside-click detection
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        setActiveImage(null);
+      }
+    };
+
+    if (activeImage) {
+      document.addEventListener('mousedown', handleClickOutside);
+      // ESC key to close
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') setActiveImage(null);
+      };
+      document.addEventListener('keydown', handleEscape);
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('keydown', handleEscape);
+      };
+    }
+  }, [activeImage]);
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Hero Section */}
       <div className="text-white py-16" style={{ backgroundColor: '#1e3a8a' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-white">Success Stories</h1>
+          <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-white font-serif">Success Stories</h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto">
             See where our students are studying and hear about their journey with EduBridge.
           </p>
         </div>
       </div>
 
+      {/* Masonry Grid Gallery */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-6">
             {galleryItems.map((item) => (
               <motion.div
                 key={item.id}
-                layoutId={`card-${item.id}`}
-                whileHover={{ y: -5 }}
-                className="cursor-pointer"
-                onClick={() => setSelectedItem(item)}
+                className="break-inside-avoid mb-6 cursor-pointer group"
+                onClick={() => setActiveImage(item)}
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.2 }}
               >
-                <Card className="overflow-hidden border-slate-200 hover:shadow-xl transition-shadow bg-white h-full flex flex-col">
-                  <div className="relative h-64 overflow-hidden">
-                    <img 
-                      src={item.image} 
-                      alt={item.studentName} 
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                      <div>
-                        <h3 className="text-white font-bold text-lg">{item.studentName}</h3>
-                        <p className="text-white/90 text-sm flex items-center">
-                          <MapPin className="h-3 w-3 mr-1" /> {item.university}, {item.country}
-                        </p>
-                      </div>
+                <div className="relative overflow-hidden rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300">
+                  <img 
+                    src={item.image} 
+                    alt={item.studentName} 
+                    className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  
+                  {/* Overlay with gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                    <h3 className="text-white font-bold text-xl mb-1">{item.studentName}</h3>
+                    <p className="text-white/90 text-sm flex items-center mb-2">
+                      <MapPin className="h-4 w-4 mr-1" /> {item.country}
+                    </p>
+                    <div className="flex items-center gap-2 text-white/80 text-xs">
+                      <GraduationCap className="h-4 w-4" />
+                      <span>{item.program}</span>
                     </div>
                   </div>
-                  <CardContent className="p-6 flex-grow flex flex-col">
-                    <div className="mb-4">
-                      <Badge variant="secondary" className="bg-secondary/10 text-secondary hover:bg-secondary/20 mb-2">
-                        {item.program}
-                      </Badge>
-                      <p className="text-slate-600 italic line-clamp-3 text-sm">"{item.testimony}"</p>
-                    </div>
-                    <Button variant="link" className="mt-auto px-0 text-primary">
-                      Read more
-                    </Button>
-                  </CardContent>
-                </Card>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Isolated Lightbox Modal */}
       <AnimatePresence>
-        {selectedItem && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedItem(null)}>
+        {activeImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[100] flex items-center justify-center p-4"
+          >
+            {/* Modal Content */}
             <motion.div
-              layoutId={`card-${selectedItem.id}`}
-              className="bg-white rounded-2xl overflow-hidden max-w-3xl w-full shadow-2xl relative"
-              onClick={(e) => e.stopPropagation()}
+              ref={modalRef}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative max-w-5xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl"
             >
+              {/* Close Button */}
               <button 
-                onClick={() => setSelectedItem(null)}
-                className="absolute top-4 right-4 z-10 p-2 bg-black/20 hover:bg-black/40 rounded-full text-white transition-colors"
+                onClick={() => setActiveImage(null)}
+                className="absolute top-4 right-4 z-20 p-3 bg-slate-900/80 hover:bg-slate-900 rounded-full text-white transition-colors backdrop-blur-sm"
               >
                 <X className="h-6 w-6" />
               </button>
-              
+
               <div className="grid md:grid-cols-2">
-                <div className="h-64 md:h-full relative">
+                {/* Image Section with Watermark */}
+                <div className="relative h-[400px] md:h-[600px] bg-slate-100">
                   <img 
-                    src={selectedItem.image} 
-                    alt={selectedItem.studentName} 
+                    src={activeImage.image} 
+                    alt={activeImage.studentName} 
                     className="w-full h-full object-cover"
                   />
+                  
+                  {/* EduBridge Watermark */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                    <div className="flex items-center gap-3">
+                      {/* Logo SVG */}
+                      <div className="w-10 h-10 flex-shrink-0">
+                        <svg viewBox="0 0 48 48" className="w-full h-full">
+                          <path d="M 8 40 Q 24 8, 40 40" fill="none" stroke="url(#lightboxGradient1)" strokeWidth="3" strokeLinecap="round" />
+                          <path d="M 12 38 Q 24 14, 36 38" fill="none" stroke="url(#lightboxGradient2)" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+                          <defs>
+                            <linearGradient id="lightboxGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                              <stop offset="0%" stopColor="#60a5fa" />
+                              <stop offset="100%" stopColor="#93c5fd" />
+                            </linearGradient>
+                            <linearGradient id="lightboxGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                              <stop offset="0%" stopColor="#93c5fd" />
+                              <stop offset="100%" stopColor="#bfdbfe" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-white font-bold text-lg">EduBridge</p>
+                        <p className="text-white/80 text-xs italic">Bridging Dreams</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="p-8 flex flex-col justify-center">
+
+                {/* Content Section */}
+                <div className="p-8 md:p-10 flex flex-col justify-center bg-white">
                   <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-slate-900 mb-1">{selectedItem.studentName}</h2>
-                    <p className="text-primary font-medium text-lg mb-2">{selectedItem.university}</p>
-                    <div className="flex items-center text-slate-500 text-sm">
-                      <MapPin className="h-4 w-4 mr-1" /> {selectedItem.country}
+                    <h2 className="text-3xl font-bold text-slate-900 mb-2 font-serif">{activeImage.studentName}</h2>
+                    <p className="text-primary font-semibold text-lg mb-2">{activeImage.university}</p>
+                    <div className="flex items-center text-slate-500 text-sm gap-1">
+                      <MapPin className="h-4 w-4" />
+                      <span>{activeImage.country}</span>
                     </div>
                   </div>
                   
-                  <div className="relative pl-8 mb-6">
-                    <Quote className="absolute top-0 left-0 h-6 w-6 text-primary/20" />
-                    <p className="text-slate-600 text-lg leading-relaxed italic">
-                      {selectedItem.testimony}
+                  <div className="relative pl-6 mb-6 border-l-4 border-primary/20">
+                    <p className="text-slate-600 text-base leading-relaxed italic">
+                      "{activeImage.testimony}"
                     </p>
                   </div>
 
-                  <div className="space-y-2">
-                    <p className="text-sm text-slate-500 uppercase tracking-wide font-semibold">Program</p>
-                    <Badge variant="outline" className="text-base py-1 px-3 border-primary/20 bg-primary/5 text-primary">
-                      {selectedItem.program}
-                    </Badge>
+                  <div className="space-y-3">
+                    <p className="text-xs text-slate-500 uppercase tracking-wide font-bold">Program</p>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl border border-primary/20">
+                      <GraduationCap className="h-5 w-5" />
+                      <span className="font-semibold">{activeImage.program}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

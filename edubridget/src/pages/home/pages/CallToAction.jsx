@@ -35,14 +35,14 @@ export default function CallToAction() {
         {/* Buttons - Same size, centered */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link to="/signin" className="w-full sm:w-auto">
-            <button className="group w-full sm:w-auto min-w-[200px] px-8 py-4 bg-accent hover:bg-accent-light text-slate-900 rounded-2xl font-bold hover:shadow-glow-amber hover:scale-105 active:scale-95 transition-all shadow-xl text-base">
+            <button className="group w-full sm:w-auto min-w-[200px] px-6 py-3 bg-accent hover:bg-accent-light text-slate-900 rounded-2xl font-bold hover:shadow-glow-amber hover:scale-105 active:scale-95 transition-all shadow-xl text-base">
               Start Learning Today
               <ArrowRight className="inline-block ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </button>
           </Link>
           
           <Link to="/contactPage" className="w-full sm:w-auto">
-            <button className="w-full sm:w-auto min-w-[200px] px-8 py-4 bg-white/10 backdrop-blur-md border-2 border-white/40 text-white rounded-2xl font-bold hover:bg-white/20 hover:border-white/60 transition-all text-base">
+            <button className="w-full sm:w-auto min-w-[200px] px-6 py-3 bg-white/10 backdrop-blur-md border-2 border-white/40 text-white rounded-2xl font-bold hover:bg-white/20 hover:border-white/60 transition-all text-base">
               Get in Touch
             </button>
           </Link>

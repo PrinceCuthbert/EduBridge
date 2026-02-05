@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Play, X, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -6,6 +6,27 @@ import { Link } from 'react-router-dom';
 const Hero = () => {
   const { t } = useTranslation();
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const videoRef = useRef(null);
+
+  // Ensure video plays continuously and never pauses
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      // Force play on mount
+      video.play().catch(err => console.log('Video autoplay prevented:', err));
+      
+      // Prevent pause on any interaction
+      const handlePause = () => {
+        video.play().catch(err => console.log('Video play prevented:', err));
+      };
+      
+      video.addEventListener('pause', handlePause);
+      
+      return () => {
+        video.removeEventListener('pause', handlePause);
+      };
+    }
+  }, []);
 
   return (
     <>
@@ -13,11 +34,12 @@ const Hero = () => {
         {/* Video Background */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <video 
+            ref={videoRef}
             autoPlay 
             loop 
             muted 
             playsInline
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
             poster="/Students.png"
           >
             <source src="/education-background.mp4" type="video/mp4" />
@@ -64,8 +86,8 @@ const Hero = () => {
               
               {/* CTAs with amber primary button */}
               <div className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start">
-                <Link to="/coursesPage">
-                  <button className="w-full sm:w-auto px-8 py-4 bg-accent hover:bg-accent-light text-slate-900 rounded-2xl font-bold shadow-glow-amber hover:shadow-glow-amber hover:scale-105 active:scale-95 transition-all text-lg">
+                <Link to="/signin">
+                  <button className="w-full sm:w-auto px-6 py-3 bg-accent hover:bg-accent-light text-slate-900 rounded-2xl font-bold shadow-glow-amber hover:shadow-glow-amber hover:scale-105 active:scale-95 transition-all text-base">
                     Start Learning Today
                     <ArrowRight className="inline-block ml-2 h-5 w-5" />
                   </button>
@@ -73,10 +95,10 @@ const Hero = () => {
                 
                 <button 
                   onClick={() => setIsVideoOpen(true)}
-                  className="w-full sm:w-auto px-8 py-4 flex items-center justify-center gap-3 text-white font-semibold hover:bg-white/10 border-2 border-white/30 rounded-2xl backdrop-blur-sm transition-all group text-lg"
+                  className="w-full sm:w-auto px-6 py-3 flex items-center justify-center gap-3 text-white font-semibold hover:bg-white/10 border-2 border-white/30 rounded-2xl backdrop-blur-sm transition-all group text-base"
                 >
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 group-hover:scale-110 transition-all">
-                    <Play size={18} className="fill-white ml-0.5" />
+                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 group-hover:scale-110 transition-all">
+                    <Play size={16} className="fill-white ml-0.5" />
                   </div>
                   Watch Intro
                 </button>
