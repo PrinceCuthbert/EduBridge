@@ -46,7 +46,7 @@ function ContactPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Configure Header Hero Section - Modern & Clean */}
-      <section className="bg-primary-gradient py-20 text-center text-white">
+      <section className="py-20 text-center text-white" style={{ backgroundColor: '#1e3a8a' }}>
         <div className="container mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 font-serif text-white">{t('contact.hero_title')}</h1>
           <p className="text-lg text-white/90 max-w-2xl mx-auto">

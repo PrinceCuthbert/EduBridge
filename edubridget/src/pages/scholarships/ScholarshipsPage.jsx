@@ -66,7 +66,7 @@ const ScholarshipsPage = () => {
     <div className="min-h-screen bg-slate-50">
       <main>
         {/* Hero */}
-        <section className="bg-primary-gradient py-16 md:py-20">
+        <section className="py-16 md:py-20" style={{ backgroundColor: '#1e3a8a' }}>
           <div className="container mx-auto px-4 md:px-8">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
