@@ -61,6 +61,12 @@ const AdminOverview = lazy(() => import('./pages/admin/AdminOverview'));
 const ScholarshipManager = lazy(() => import('./pages/admin/ScholarshipManager'));
 const ApplicationReview = lazy(() => import('./pages/admin/ApplicationReview'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const ContentManagement = lazy(() => import('./pages/admin/ContentManagement'));
+const BranchManagement = lazy(() => import('./pages/admin/BranchManagement'));
+const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
+const FinancialReports = lazy(() => import('./pages/admin/FinancialReports'));
+const Analytics = lazy(() => import('./pages/admin/Analytics'));
+const VisaCases = lazy(() => import('./pages/admin/VisaCases'));
 
 
 // Dashboard Layout - Lazy Loaded
@@ -160,10 +166,14 @@ function App() {
               >
                 <Route index element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="dashboard" element={<AdminOverview />} />
-                <Route path="scholarships" element={<ScholarshipManager />} />
+                <Route path="users" element={<UserManagement />} />
                 <Route path="applications" element={<ApplicationReview />} />
-                <Route path="visa" element={<div className="p-8">Visa Desk (Coming Soon)</div>} />
-                <Route path="users" element={<div className="p-8">User Registry (Coming Soon)</div>} />
+                <Route path="visa" element={<VisaCases />} />
+                <Route path="scholarships" element={<ScholarshipManager />} />
+                <Route path="cms" element={<ContentManagement />} />
+                <Route path="branches" element={<BranchManagement />} />
+                <Route path="finance" element={<FinancialReports />} />
+                <Route path="analytics" element={<Analytics />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
               

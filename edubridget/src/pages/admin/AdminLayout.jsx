@@ -41,12 +41,13 @@ export default function AdminLayout() {
     { label: "Applications", path: "/admin/applications", icon: FileText },
     { label: "Visa Cases", path: "/admin/visa", icon: Plane },
     { label: "Scholarships", path: "/admin/scholarships", icon: GraduationCap },
-    // { label: 'Content (CMS)', path: '/admin/cms', icon: ScrollText },
-    // { label: 'Branches', path: '/admin/branches', icon: Building2 },
-    // { label: 'Financial Reports', path: '/admin/finance', icon: DollarSign },
-    // { label: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
-    // { label: 'Settings', path: '/admin/settings', icon: Settings },
+    { label: 'Content (CMS)', path: '/admin/cms', icon: ScrollText },
+    { label: 'Branches', path: '/admin/branches', icon: Building2 },
+    { label: 'Financial Reports', path: '/admin/finance', icon: DollarSign },
+    { label: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
   ];
+
+  const settingsItem = { label: 'Settings', path: '/admin/settings', icon: Settings };
 
   const handleLogout = () => {
     logout();
@@ -148,6 +149,30 @@ export default function AdminLayout() {
               </Link>
             );
           })}
+
+          {/* Settings at Bottom of Nav */}
+          <Link
+            to={settingsItem.path}
+            className={`
+              flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200
+              ${
+                location.pathname === settingsItem.path
+                  ? "bg-primary text-white shadow-lg shadow-primary/20"
+                  : "hover:bg-slate-800 hover:text-white"
+              }
+              ${isCollapsed ? "justify-center" : ""}
+            `}
+            title={isCollapsed ? settingsItem.label : ""}>
+            <settingsItem.icon
+              size={20}
+              className={`flex-shrink-0 ${location.pathname === settingsItem.path ? "text-white" : "text-slate-400"}`}
+            />
+            {!isCollapsed && (
+              <span className="font-medium text-sm whitespace-nowrap">
+                {settingsItem.label}
+              </span>
+            )}
+          </Link>
         </nav>
 
         {/* User Profile & Footer Actions */}
@@ -207,9 +232,22 @@ export default function AdminLayout() {
               <Menu size={24} />
             </button>
             <h1 className="text-xl font-bold text-slate-800 hidden sm:block">
-              {navItems.find((i) => i.path === location.pathname)?.label ||
-                "Dashboard"}
+              {navItems.find((i) => i.path === location.pathname)?.label || settingsItem.path === location.pathname ? settingsItem.label : "Dashboard"}
             </h1>
+          </div>
+
+          {/* Search Bar */}
+          <div className="flex-1 max-w-md mx-8 hidden md:block">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full px-4 py-2 pl-10 bg-slate-50 border-0 rounded-lg focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all text-sm"
+              />
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
           </div>
 
           <div className="flex items-center gap-4">

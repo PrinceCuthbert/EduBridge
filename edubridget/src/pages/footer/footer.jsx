@@ -22,9 +22,9 @@ const Footer = () => {
   return (
     <footer className="bg-slate-900 text-slate-300 pt-20 pb-10">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-16">
           {/* Branding Section */}
-          <div className="space-y-6">
+          <div className="space-y-6 md:col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                 <img src="/vite.svg" alt="Logo" className="w-6 h-6 invert brightness-0" />
@@ -36,7 +36,7 @@ const Footer = () => {
             </p>
             <div className="flex items-center gap-4">
               {socialLinks && socialLinks.map((social, i) => {
-                const Icon = iconMap[social.iconKey] || Facebook; // Fallback
+                const Icon = iconMap[social.iconKey] || Facebook;
                 return (
                   <a 
                     key={i} 
@@ -53,38 +53,41 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Explore Links */}
-          <div>
-            <h3 className="text-white font-bold text-lg mb-6 uppercase tracking-wider text-sm">{t('footer.explore_title')}</h3>
-            <ul className="space-y-3">
-              {explore && explore.map((link, index) => (
-                <li key={index}>
-                  <Link to={link.path} className="hover:text-primary transition-colors duration-300 flex items-center gap-2 group text-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-primary transition-colors" />
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Two-column grid on mobile for Explore and Academics */}
+          <div className="grid grid-cols-2 md:contents gap-8">
+            {/* Explore Links */}
+            <div>
+              <h3 className="text-white font-bold text-lg mb-6 uppercase tracking-wider text-sm">{t('footer.explore_title')}</h3>
+              <ul className="space-y-3">
+                {explore && explore.map((link, index) => (
+                  <li key={index}>
+                    <Link to={link.path} className="hover:text-primary transition-colors duration-300 flex items-center gap-2 group text-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-primary transition-colors" />
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Academics Links */}
-          <div>
-            <h3 className="text-white font-bold text-lg mb-6 uppercase tracking-wider text-sm">{t('footer.academics_title')}</h3>
-            <ul className="space-y-3">
-              {academics && academics.map((link, index) => (
-                <li key={index}>
-                  <Link to={link.path} className="hover:text-primary transition-colors duration-300 flex items-center gap-2 group text-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-primary transition-colors" />
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {/* Academics Links */}
+            <div>
+              <h3 className="text-white font-bold text-lg mb-6 uppercase tracking-wider text-sm">{t('footer.academics_title')}</h3>
+              <ul className="space-y-3">
+                {academics && academics.map((link, index) => (
+                  <li key={index}>
+                    <Link to={link.path} className="hover:text-primary transition-colors duration-300 flex items-center gap-2 group text-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-primary transition-colors" />
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           {/* Contact Info */}
-          <div>
+          <div className="md:col-span-2 lg:col-span-1">
             <h3 className="text-white font-bold text-lg mb-8 uppercase tracking-wider text-sm">{t('footer.contact_title')}</h3>
             <ul className="space-y-6">
               <li className="flex items-start gap-4">
@@ -103,7 +106,7 @@ const Footer = () => {
           </div>
 
           {/* Newsletter */}
-          <div>
+          <div className="md:col-span-2 lg:col-span-1">
             <h3 className="text-white font-bold text-lg mb-8 uppercase tracking-wider text-sm">{t('footer.newsletter.title')}</h3>
             <p className="text-slate-400 mb-6 leading-relaxed">
               {t('footer.newsletter.description')}
