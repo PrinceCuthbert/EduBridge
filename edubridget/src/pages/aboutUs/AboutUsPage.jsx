@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGraduationCap,
@@ -7,12 +7,12 @@ import {
   faLightbulb,
   faUsers,
   faHeart,
+  faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from 'react-i18next';
-// import { Facebook, Twitter, Instagram, Linkedin, ChevronLeft, ChevronRight } from 'lucide-react'; // Recommended replacement for SVG icons
+import { motion, useInView } from 'framer-motion';
 
 // --- DATA MAPPING HELPER ---
-// This ensures we map the icon strings from JSON to actual FontAwesome components
 const iconMap = {
   graduation: faGraduationCap,
   star: faStar,
@@ -27,7 +27,7 @@ const SocialLink = ({ href, bgClass, label, children }) => (
   <a 
     href={href} 
     aria-label={label}
-    className={`w-8 h-8 rounded-full text-white flex items-center justify-center transition-all text-xs font-bold hover:scale-110 ${bgClass}`}
+    className={`w-10 h-10 rounded-full text-white flex items-center justify-center transition-all text-sm font-bold hover:scale-110 hover:shadow-lg ${bgClass}`}
   >
     {children}
   </a>
@@ -36,226 +36,498 @@ const SocialLink = ({ href, bgClass, label, children }) => (
 function AboutUsPage() {
   const { t } = useTranslation();
 
-  // 1. DYNAMIC DATA: We now pull the data structure from our translation file using t(..., { returnObjects: true })
-  // This allows the array to live in the JSON file, not the JS file.
   const coreValues = t('about.core_values', { returnObjects: true });
   const teamMembers = t('about.team_members', { returnObjects: true });
-  const founderMessage = t('about.founder_message_paragraphs', { returnObjects: true });
 
-  const getIconBgColor = (color) => {
-    const bgColors = {
-      blue: "bg-blue-100 text-blue-500",
-      yellow: "bg-yellow-100 text-yellow-500",
-      green: "bg-green-100 text-green-500",
-      purple: "bg-purple-100 text-purple-500",
-      orange: "bg-orange-100 text-orange-500",
-      pink: "bg-pink-100 text-pink-500",
-    };
-    return bgColors[color] || "bg-primary/10 text-primary";
-  };
+  // Journey timeline data
+  const journeyMilestones = [
+    { year: "2018", title: "Founded", description: "TM EduBridge was established with a vision to transform education in East Africa" },
+    { year: "2019", title: "First Cohort", description: "Successfully enrolled and mentored 100+ students" },
+    { year: "2020", title: "Digital Innovation", description: "Launched our comprehensive online learning platform" },
+    { year: "2022", title: "Global Partnerships", description: "Established partnerships with 20+ international universities" },
+    { year: "2024", title: "Expanding Impact", description: "Reached 5,000+ students across multiple countries" },
+    { year: "2026", title: "AI-Driven Learning", description: "Pioneering personalized education with cutting-edge technology" }
+  ];
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden" style={{ backgroundColor: '#1e3a8a' }}>
-        <div className="absolute top-0 left-0 -translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl opacity-60 pointer-events-none" />
+    <div className="min-h-screen bg-[#F9F9F9]">
+      {/* Hero Section - Enhanced with gradient overlay */}
+      <section className="relative pt-32 pb-24 overflow-hidden bg-gradient-to-br from-[#1A237E] via-[#283593] to-[#1A237E]">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob" />
+          <div className="absolute top-40 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000" />
+          <div className="absolute bottom-20 left-1/3 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000" />
+        </div>
+        
         <div className="container mx-auto px-6 relative z-10 text-center text-white">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6 font-serif text-white">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="font-bold leading-tight mb-4 text-white"
+            style={{ 
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 'clamp(2rem, 5vw, 4.5rem)'
+            }}
+          >
             {t('about.hero_title')}
-          </h1>
-          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-base md:text-lg text-white/95 max-w-2xl mx-auto leading-relaxed"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          >
             {t('about.hero_subtitle')}
-          </p>
+          </motion.p>
         </div>
       </section>
 
-      {/* Founder's Message Section - REFACTORED */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 font-serif">
+      {/* Founder's Message Section - Redesigned with soft-rectangular mask */}
+      <section className="py-12 md:py-16 bg-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-yellow-50/30 to-transparent pointer-events-none" />
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-10 md:mb-12"
+          >
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1A237E] mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
               {t('about.founder_title')}
             </h2>
-            <p className="text-slate-600">{t('about.founder_subtitle')}</p>
-          </div>
+            <p className="text-slate-600 text-sm md:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+              {t('about.founder_subtitle')}
+            </p>
+          </motion.div>
 
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="max-w-[1400px] mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
               
-              {/* Founder Profile Card */}
-              <div className="lg:col-span-1 flex flex-col items-center">
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/20 mb-4">
-                  <img
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
-                    alt={t('about.founder_name')}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">{t('about.founder_name')}</h3>
-                <p className="text-sm text-slate-600 mb-4">{t('about.founder_role')}</p>
-                
-                <div className="flex gap-3">
-                  <SocialLink href="#" bgClass="bg-blue-600 hover:bg-blue-700" label="Facebook">f</SocialLink>
-                  <SocialLink href="#" bgClass="bg-sky-500 hover:bg-sky-600" label="Twitter">𝕏</SocialLink>
-                  <SocialLink href="#" bgClass="bg-pink-600 hover:bg-pink-700" label="Instagram">IG</SocialLink>
-                  <SocialLink href="#" bgClass="bg-blue-700 hover:bg-blue-800" label="LinkedIn">in</SocialLink>
-                </div>
-              </div>
+              {/* Founder Profile Card - Circular on all screens */}
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+                className="lg:col-span-4 flex flex-col items-center"
+              >
+                {/* Circular Image with 3D Hover Effect */}
+                <motion.div 
+                  className="relative w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 mb-6"
+                  whileHover={{ rotate: 2, scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div 
+                    className="w-full h-full overflow-hidden shadow-2xl rounded-full border-4 border-white/80"
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop"
+                      alt={t('about.founder_name')}
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    />
+                  </div>
+                </motion.div>
 
-              {/* Message Content - MAPPED */}
-              <div className="lg:col-span-3 space-y-4 text-slate-700 leading-relaxed">
-                <p className="font-medium">{t('about.founder_greeting')}</p>
-                
-                {/* Dynamic Paragraph Mapping */}
-                {founderMessage && founderMessage.map((paragraph, index) => (
-                    <p key={index}>{paragraph}</p>
-                ))}
-
-                <p className="font-medium">{t('about.founder_closing')}</p>
-                
-                <div className="pt-4">
-                  <p className="font-bold">{t('about.founder_signoff_warm')}</p>
-                  <p className="font-bold">{t('about.founder_name')}</p>
-                  <p className="font-bold text-primary">{t('about.founder_role')}</p>
+                {/* Founder Info Card */}
+                <div className="text-center">
+                  <h3 className="text-2xl md:text-3xl font-bold text-[#1A237E] mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    {t('about.founder_name')}
+                  </h3>
+                  <p className="text-sm md:text-base font-semibold text-yellow-600 mb-4 uppercase tracking-wide" style={{ fontFamily: "'Inter', sans-serif" }}>
+                      {t('about.founder_role')}
+                    </p>
+                  
+                  {/* Social Links */}
+                  <div className="flex gap-3 justify-center mt-4">
+                      <SocialLink href="#" bgClass="bg-blue-600 hover:bg-blue-700" label="Facebook">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                      </SocialLink>
+                      <SocialLink href="#" bgClass="bg-sky-500 hover:bg-sky-600" label="Twitter">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                      </SocialLink>
+                      <SocialLink href="#" bgClass="bg-gradient-to-br from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600" label="Instagram">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/></svg>
+                      </SocialLink>
+                      <SocialLink href="#" bgClass="bg-blue-700 hover:bg-blue-800" label="LinkedIn">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                      </SocialLink>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
+
+              {/* Message Content - Concise and impactful */}
+              <motion.div 
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+                className="lg:col-span-8 space-y-4 text-slate-700 text-sm md:text-base leading-relaxed"
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                <p className="text-base md:text-lg font-semibold text-[#1A237E]">Dear Future Leaders,</p>
+                
+                <p>
+                  At TM EduBridge, we believe <strong>education is the most powerful catalyst for transformation</strong>. Our mission is to bridge the gap between ambition and achievement, empowering students across East Africa to access world-class learning opportunities.
+                </p>
+
+                <p>
+                  We've built more than a platform—we've created a <strong>community of dreamers, innovators, and change-makers</strong>. From personalized mentorship to cutting-edge digital resources, every aspect of EduBridge is designed with your success in mind.
+                </p>
+
+                <p>
+                  Together, we're not just preparing for the future—<strong>we're building it</strong>.
+                </p>
+                
+                <div className="pt-5 border-t border-slate-200">
+                  <p className="font-semibold text-base md:text-lg text-[#1A237E]">With unwavering commitment,</p>
+                  <p className="font-bold text-lg md:text-xl mt-1" style={{ fontFamily: "'Playfair Display', serif" }}>{t('about.founder_name')}</p>
+                  <p className="text-yellow-600 font-semibold uppercase tracking-wide text-sm">{t('about.founder_role')}</p>
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Core Values Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 font-serif">
+      {/* Core Values Section - Bento Grid / Asymmetrical Layout with Glassmorphism */}
+      <section className="py-12 md:py-16 bg-gradient-to-br from-slate-50 to-slate-100 relative overflow-hidden">
+        <div className="absolute top-10 right-10 w-96 h-96 bg-yellow-200/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 left-10 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl" />
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-10 md:mb-12"
+          >
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1A237E] mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
               {t('about.values_title')}
             </h2>
-            <p className="text-slate-600">{t('about.values_subtitle')}</p>
-          </div>
+            <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto" style={{ fontFamily: "'Inter', sans-serif" }}>
+              {t('about.values_subtitle')}
+            </p>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {coreValues && coreValues.map((value, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-2xl p-6 border border-slate-100 hover:shadow-xl hover:border-primary/20 transition-all group"
-              >
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors ${getIconBgColor(value.color)}`}>
-                  {/* We use the map because JSON only stores strings like "graduation", not the object */}
-                  <FontAwesomeIcon icon={iconMap[value.iconKey]} className="text-2xl" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{value.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{value.description}</p>
-              </div>
-            ))}
+          {/* 3×2 Grid - Uniform Card Sizes on Large Screens */}
+          <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+            {coreValues && coreValues.map((value, idx) => {
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                className="group relative overflow-hidden rounded-2xl md:rounded-[32px] p-6 md:p-7 lg:p-8 flex flex-col justify-between transition-all duration-300"
+                  style={{
+                  background: 'rgba(255, 255, 255, 0.7)',
+                  backdropFilter: 'blur(24px)',
+                  WebkitBackdropFilter: 'blur(24px)',
+                  border: '1px solid rgba(255, 255, 255, 0.4)',
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
+                }}
+                >
+                  {/* Enhanced glassmorphism overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  
+                  <div className="relative z-10">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 group-hover:bg-[#1A237E] group-hover:text-white ${
+                      value.color === 'yellow' ? 'bg-yellow-100 text-yellow-600' :
+                      value.color === 'blue' ? 'bg-blue-100 text-blue-600' :
+                      value.color === 'green' ? 'bg-green-100 text-green-600' :
+                      value.color === 'purple' ? 'bg-purple-100 text-purple-600' :
+                      value.color === 'orange' ? 'bg-orange-100 text-orange-600' :
+                      value.color === 'pink' ? 'bg-pink-100 text-pink-600' :
+                      'bg-indigo-100 text-indigo-600'
+                    }`}>
+                      <FontAwesomeIcon icon={iconMap[value.iconKey]} className="text-2xl" />
+                    </div>
+                    <h3 className="text-xl md:text-2xl font-bold text-[#1A237E] mb-3 group-hover:text-yellow-600 transition-colors duration-300" style={{ fontFamily: "'Playfair Display', serif" }}>
+                      {value.title}
+                    </h3>
+                    <p className="text-slate-600 text-base md:text-lg leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
+                      {value.description}
+                    </p>
+                  </div>
+                  
+                  {/* Decorative corner accent */}
+                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-yellow-300/20 rounded-full blur-2xl group-hover:bg-yellow-400/30 transition-colors" />
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Our Journey - Vertical Timeline with Framer Motion */}
+      <section className="py-12 md:py-16 bg-white">
+        <div className="container mx-auto px-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-10 md:mb-12"
+          >
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1A237E] mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Our Journey
+            </h2>
+            <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto" style={{ fontFamily: "'Inter', sans-serif" }}>
+              Milestones that shaped our mission to transform education
+            </p>
+          </motion.div>
+
+          <div className="max-w-[1400px] mx-auto relative">
+            {/* Vertical line */}
+            <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#1A237E] via-yellow-500 to-[#1A237E]" />
+            
+            <div className="space-y-8 md:space-y-10">
+              {journeyMilestones.map((milestone, idx) => (
+                <TimelineItem 
+                  key={idx} 
+                  milestone={milestone} 
+                  index={idx}
+                  isLeft={idx % 2 === 0}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Team Slider Section */}
-      <section className="py-20 bg-white">
+      <section className="py-12 md:py-16 bg-gradient-to-br from-slate-50 to-white">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 font-serif">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-10 md:mb-12"
+          >
+            <h2 className="text-2xl md:text-3xl font-bold text-[#1A237E] mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
                {t('about.team_title')}
             </h2>
-            <p className="text-slate-600">{t('about.team_subtitle')}</p>
-          </div>
+            <p className="text-slate-600 text-sm md:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+              {t('about.team_subtitle')}
+            </p>
+          </motion.div>
 
-          <TeamSlider members={teamMembers} />
+          <InfiniteTeamSlider members={teamMembers} />
         </div>
       </section>
     </div>
   );
 }
 
-// Optimized Team Slider
-const TeamSlider = ({ members }) => {
+// Timeline Item Component with scroll-reveal animation
+const TimelineItem = ({ milestone, index, isLeft }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, x: isLeft ? -50 : 50 }}
+      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: isLeft ? -50 : 50 }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      className={`relative flex items-center ${isLeft ? 'md:justify-start' : 'md:justify-end'}`}
+    >
+      {/* Timeline node */}
+      <div className="absolute left-6 md:left-1/2 -translate-x-1/2 z-20">
+        <motion.div 
+          initial={{ scale: 0 }}
+          animate={isInView ? { scale: 1 } : { scale: 0 }}
+          transition={{ duration: 0.4, delay: index * 0.1 + 0.3 }}
+          className="w-5 h-5 rounded-full bg-yellow-500 border-4 border-white shadow-lg"
+        />
+      </div>
+
+      {/* Content card */}
+      <div className={`w-full md:w-5/12 ml-16 md:ml-0 ${isLeft ? 'md:mr-auto md:pr-8 lg:pr-12' : 'md:ml-auto md:pl-8 lg:pl-12'}`}>
+        <div 
+          className="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-100"
+          style={{ backdropFilter: 'blur(10px)' }}
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <span className="inline-block px-3 py-1 bg-[#1A237E] text-white font-bold rounded-full text-xs md:text-sm">
+              {milestone.year}
+            </span>
+            <FontAwesomeIcon icon={faCheckCircle} className="text-yellow-500 text-lg" />
+          </div>
+          <h3 className="text-base md:text-lg font-bold text-[#1A237E] mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
+            {milestone.title}
+          </h3>
+          <p className="text-slate-600 text-sm leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
+            {milestone.description}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// Infinite Team Slider - Optimized for true circular loop showing 3 members
+const InfiniteTeamSlider = ({ members }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [itemsPerPage, setItemsPerPage] = useState(4);
+  const [itemsPerPage, setItemsPerPage] = useState(3);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const updateSize = () => {
       if (window.innerWidth < 640) setItemsPerPage(1);
       else if (window.innerWidth < 1024) setItemsPerPage(2);
-      else setItemsPerPage(3); // Adjusted max items to 3 for better readability
+      else setItemsPerPage(3);
     };
     updateSize();
     window.addEventListener('resize', updateSize);
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  // Safe Guard against empty data
   if (!members || members.length === 0) return null;
 
-  const totalPages = Math.ceil(members.length / itemsPerPage); 
-  // NOTE: Simple pagination logic is often better than infinite scrolling for accessibility, 
-  // but sticking to your infinite loop logic requires checking boundaries carefully.
+  // Create infinite loop by triplicating the array
+  const extendedMembers = [...members, ...members, ...members];
+  const startOffset = members.length; // Start from the middle copy
 
   const handleNext = () => {
-     setCurrentIndex((prev) => (prev + 1) % members.length);
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrentIndex(prev => prev + 1);
   };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 < 0 ? members.length - 1 : prev - 1));
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrentIndex(prev => prev - 1);
   };
 
+  const handleTransitionEnd = () => {
+    setIsTransitioning(false);
+    // Reset to middle copy when reaching boundaries
+    if (currentIndex >= members.length + startOffset) {
+      setCurrentIndex(startOffset);
+    } else if (currentIndex < startOffset) {
+      setCurrentIndex(startOffset + members.length - 1);
+    }
+  };
+
+  // Auto-play
   useEffect(() => {
     if (!isPaused) {
-      const interval = setInterval(handleNext, 3000);
+      const interval = setInterval(handleNext, 3500);
       return () => clearInterval(interval);
     }
-  }, [isPaused, members.length]); // Add members.length dependency
+  }, [isPaused, currentIndex]);
+
+  // Initialize at start offset
+  useEffect(() => {
+    setCurrentIndex(startOffset);
+  }, [members.length]);
+
+  const translateValue = -(currentIndex * (100 / itemsPerPage));
 
   return (
     <div 
-      className="relative max-w-7xl mx-auto px-8"
+      className="relative max-w-7xl mx-auto px-12 md:px-16"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Controls */}
-      <button onClick={handlePrev} aria-label="Previous member" className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-xl border border-slate-100 flex items-center justify-center text-slate-600 hover:text-primary transition-all hover:scale-110">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      {/* Navigation Buttons */}
+      <button 
+        onClick={handlePrev} 
+        aria-label="Previous members" 
+        className="absolute -left-2 md:left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 bg-white rounded-full shadow-2xl border border-slate-200 flex items-center justify-center text-[#1A237E] hover:bg-[#1A237E] hover:text-white transition-all hover:scale-110 disabled:opacity-50"
+        disabled={isTransitioning}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m15 18-6-6 6-6"/>
+        </svg>
       </button>
 
-      <div className="overflow-hidden py-4">
+      <div className="overflow-hidden py-6">
         <div 
-          className="flex transition-transform duration-500 ease-in-out"
-          style={{ 
-            // Logic updated to ensure smooth sliding based on items per page width
-            transform: `translateX(-${currentIndex * (100 / itemsPerPage)}%)`, 
-          }}
+          className={`flex ${isTransitioning ? 'transition-transform duration-500 ease-in-out' : ''}`}
+          style={{ transform: `translateX(${translateValue}%)` }}
+          onTransitionEnd={handleTransitionEnd}
         >
-          {members.map((member, idx) => (
+          {extendedMembers.map((member, idx) => (
             <div 
-              key={idx} 
+              key={`${member.name}-${idx}`}
               className="flex-shrink-0 px-4"
               style={{ width: `${100 / itemsPerPage}%` }}
             >
-              <div className="flex flex-col items-center text-center group">
-                <div className="w-48 h-48 rounded-full overflow-hidden mb-6 border-4 border-slate-100 shadow-lg group-hover:border-primary/20 transition-all duration-500">
-                  <img
-                    // Fallback image handling
-                    src={member.image || "https://via.placeholder.com/200"}
-                    alt={member.name}
-                    className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-110"
-                  />
+              <motion.div 
+                whileHover={{ y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col items-center text-center group"
+              >
+                {/* Image with soft glow effect */}
+                <div className="relative w-36 h-36 md:w-44 md:h-44 mb-4 md:mb-5">
+                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-purple-500 rounded-full opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-500" />
+                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white shadow-2xl">
+                    <img
+                      src={member.image || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop"}
+                      alt={member.name}
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110"
+                    />
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">{member.name}</h3>
-                <p className="text-sm font-bold text-primary mb-2 uppercase tracking-wide">{member.role}</p>
-                <p className="text-xs text-slate-500 leading-relaxed max-w-[200px] mx-auto line-clamp-3">
+
+                <h3 className="text-lg md:text-xl font-bold text-[#1A237E] mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  {member.name}
+                </h3>
+                <p className="text-xs md:text-sm font-bold text-yellow-600 mb-2 uppercase tracking-wider" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  {member.role}
+                </p>
+                <p className="text-xs md:text-sm text-slate-600 leading-relaxed max-w-[200px] md:max-w-[220px] mx-auto" style={{ fontFamily: "'Inter', sans-serif" }}>
                   {member.description}
                 </p>
-              </div>
+              </motion.div>
             </div>
           ))}
         </div>
       </div>
 
-      <button onClick={handleNext} aria-label="Next member" className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-xl border border-slate-100 flex items-center justify-center text-slate-600 hover:text-primary transition-all hover:scale-110">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      <button 
+        onClick={handleNext} 
+        aria-label="Next members" 
+        className="absolute -right-2 md:right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 bg-white rounded-full shadow-2xl border border-slate-200 flex items-center justify-center text-[#1A237E] hover:bg-[#1A237E] hover:text-white transition-all hover:scale-110 disabled:opacity-50"
+        disabled={isTransitioning}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m9 18 6-6-6-6"/>
+        </svg>
       </button>
+
+      {/* Indicator dots */}
+      <div className="flex justify-center gap-2 mt-8">
+        {members.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => {
+              if (!isTransitioning) {
+                setIsTransitioning(true);
+                setCurrentIndex(startOffset + idx);
+              }
+            }}
+            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+              (currentIndex - startOffset) % members.length === idx
+                ? 'bg-[#1A237E] w-8'
+                : 'bg-slate-300 hover:bg-slate-400'
+            }`}
+            aria-label={`Go to slide ${idx + 1}`}
+          />
+        ))}
+      </div>
     </div>
   );
 };
