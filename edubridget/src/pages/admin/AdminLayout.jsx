@@ -40,7 +40,7 @@ export default function AdminLayout() {
     { label: "Manage Users", path: "/admin/users", icon: Users },
     { label: "Applications", path: "/admin/applications", icon: FileText },
     { label: "Visa Cases", path: "/admin/visa", icon: Plane },
-    { label: "Scholarships", path: "/admin/scholarships", icon: GraduationCap },
+    { label: "University Programs", path: "/admin/programs", icon: GraduationCap },
     { label: 'Content (CMS)', path: '/admin/cms', icon: ScrollText },
     { label: 'Branches', path: '/admin/branches', icon: Building2 },
     { label: 'Financial Reports', path: '/admin/finance', icon: DollarSign },
@@ -118,7 +118,7 @@ export default function AdminLayout() {
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto modern-scrollbar">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
@@ -231,9 +231,9 @@ export default function AdminLayout() {
               className="p-2 -ml-2 rounded-lg hover:bg-slate-100 text-slate-600 lg:hidden">
               <Menu size={24} />
             </button>
-            <h1 className="text-xl font-bold text-slate-800 hidden sm:block">
+            {/* <h1 className="text-xl font-bold text-slate-800 hidden sm:block">
               {navItems.find((i) => i.path === location.pathname)?.label || settingsItem.path === location.pathname ? settingsItem.label : "Dashboard"}
-            </h1>
+            </h1> */}
           </div>
 
           {/* Search Bar */}
@@ -251,6 +251,7 @@ export default function AdminLayout() {
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Notification bell*/}
             <div className="flex items-center">
               <button className="p-2 mr-4 text-slate-400 hover:text-primary transition-colors relative">
                 <Bell size={24} />
@@ -325,7 +326,7 @@ export default function AdminLayout() {
         </header>
 
         {/* Viewport for Routes */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-8">
+        <main className="flex-1 overflow-y-auto modern-scrollbar-light p-4 lg:p-8">
           <Outlet />
         </main>
       </div>

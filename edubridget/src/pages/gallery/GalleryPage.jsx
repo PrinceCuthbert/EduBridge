@@ -2,62 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, GraduationCap } from 'lucide-react';
 
-const galleryItems = [
-  {
-    id: 1,
-    studentName: "Sarah Mitesio",
-    university: "University of Toronto",
-    country: "Canada",
-    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1470&auto=format&fit=crop",
-    testimony: "EduBridge made my dream of studying in Canada a reality. The visa process was smooth, and they guided me every step of the way.",
-    program: "Computer Science"
-  },
-  {
-    id: 2,
-    studentName: "John Doe",
-    university: "University of Melbourne",
-    country: "Australia",
-    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1470&auto=format&fit=crop",
-    testimony: "I never thought I could get a scholarship to study in Australia. The team at EduBridge helped me find the perfect opportunity.",
-    program: "Business Administration"
-  },
-  {
-    id: 3,
-    studentName: "Emily Davis",
-    university: "Seoul National University",
-    country: "South Korea",
-    image: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1449&auto=format&fit=crop",
-    testimony: "Studying in Korea has been an amazing cultural experience. Thank you EduBridge for the support!",
-    program: "International Relations"
-  },
-   {
-    id: 4,
-    studentName: "Michael Brown",
-    university: "Technical University of Munich",
-    country: "Germany",
-    image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1470&auto=format&fit=crop",
-    testimony: "The guidance on German student visas was invaluable. I'm now pursuing my Masters in Engineering at a top university.",
-    program: "Mechanical Engineering"
-  },
-  {
-    id: 5,
-    studentName: "Lisa Wang",
-    university: "University of Manchester",
-    country: "UK",
-    image: "https://images.unsplash.com/photo-1627556704290-2b1f5853ff78?q=80&w=1470&auto=format&fit=crop",
-    testimony: "From application to arrival, EduBridge was there. The pre-departure orientation really helped me prepare for life in the UK.",
-    program: "Psychology"
-  },
-  {
-    id: 6,
-    studentName: "David Kim",
-    university: "University of Tokyo",
-    country: "Japan",
-    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1470&auto=format&fit=crop",
-    testimony: "Highly recommend EduBridge for anyone looking to study in Asia. They have great connections and knowledge.",
-    program: "Robotics"
-  }
-];
+import { MOCK_MEDIA as galleryItems } from '@/data/mockData';
 
 export default function GalleryPage() {
   const [activeImage, setActiveImage] = useState(null);

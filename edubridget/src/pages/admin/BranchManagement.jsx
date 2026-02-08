@@ -1,7 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Building, Users, MapPin, Phone, Mail, Clock, Edit, Trash2, UserCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import Modal from '../../components/Modal';
+
+// Mock data - Replace with API calls
+const MOCK_BRANCHES = [
+  {
+    id: 1,
+    name: 'EduBridge Rwanda HQ',
+    location: 'Kigali, Rwanda',
+    address: 'KG 123 Street, Nyarugenge District',
+    phone: '+250 788 123 456',
+    email: 'rwanda@edubridge.com',
+    hours: 'Mon-Fri: 8AM-6PM, Sat: 8AM-1PM',
+    staff: 12,
+    managerName: 'Jean Claude Niyonzima',
+    status: 'Active'
+  },
+  {
+    id: 2,
+    name: 'EduBridge Kenya',
+    location: 'Nairobi, Kenya',
+    address: 'Westlands Business Park, Tower A',
+    phone: '+254 700 123 456',
+    email: 'kenya@edubridge.com',
+    hours: 'Mon-Fri: 8AM-6PM',
+    staff: 8,
+    managerName: 'Sarah Wanjiku',
+    status: 'Active'
+  },
+  {
+    id: 3,
+    name: 'EduBridge Uganda',
+    location: 'Kampala, Uganda',
+    address: 'Plot 24, Nakasero Road',
+    phone: '+256 772 123 456',
+    email: 'uganda@edubridge.com',
+    hours: 'Mon-Fri: 8:30AM-5:30PM',
+ 
+    staff: 6,
+    managerName: 'David Ochieng',
+    status: 'Active'
+  },
+  {
+    id: 4,
+    name: 'EduBridge Tanzania',
+    location: 'Dar es Salaam, Tanzania',
+    address: 'Posta Road, CBD',
+    phone: '+255 755 123 456',
+    email: 'tanzania@edubridge.com',
+    hours: 'Opening Q2 2024',
+  
+    staff: 2,
+    managerName: 'Amina Hassan',
+    status: 'Coming Soon'
+  },
+];
 
 export default function BranchManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,77 +67,47 @@ export default function BranchManagement() {
     phone: '',
     email: '',
     hours: '',
-    students: 0,
     staff: 0,
     managerName: '',
     status: 'Active'
   });
 
-  const [branches, setBranches] = useState([
-    {
-      id: 1,
-      name: 'EduBridge Rwanda HQ',
-      location: 'Kigali, Rwanda',
-      address: 'KG 123 Street, Nyarugenge District',
-      phone: '+250 788 123 456',
-      email: 'rwanda@edubridge.com',
-      hours: 'Mon-Fri: 8AM-6PM, Sat: 8AM-1PM',
-      students: 856,
-      staff: 12,
-      managerName: 'Jean Claude Niyonzima',
-      status: 'Active'
-    },
-    {
-      id: 2,
-      name: 'EduBridge Kenya',
-      location: 'Nairobi, Kenya',
-      address: 'Westlands Business Park, Tower A',
-      phone: '+254 700 123 456',
-      email: 'kenya@edubridge.com',
-      hours: 'Mon-Fri: 8AM-6PM',
-      students: 623,
-      staff: 8,
-      managerName: 'Sarah Wanjiku',
-      status: 'Active'
-    },
-    {
-      id: 3,
-      name: 'EduBridge Uganda',
-      location: 'Kampala, Uganda',
-      address: 'Plot 24, Nakasero Road',
-      phone: '+256 772 123 456',
-      email: 'uganda@edubridge.com',
-      hours: 'Mon-Fri: 8:30AM-5:30PM',
-      students: 445,
-      staff: 6,
-      managerName: 'David Ochieng',
-      status: 'Active'
-    },
-    {
-      id: 4,
-      name: 'EduBridge Tanzania',
-      location: 'Dar es Salaam, Tanzania',
-      address: 'Posta Road, CBD',
-      phone: '+255 755 123 456',
-      email: 'tanzania@edubridge.com',
-      hours: 'Opening Q2 2024',
-      students: 0,
-      staff: 2,
-      managerName: 'Amina Hassan',
-      status: 'Coming Soon'
-    },
-  ]);
+  // Initialize state as empty - ready for API
+  const [branches, setBranches] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch branches on mount - Replace with actual API call
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        setLoading(true);
+        // TODO: Replace with actual API call
+        // const response = await branchAPI.getAll();
+        // setBranches(response.data);
+        
+        // Simulating API call
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setBranches(MOCK_BRANCHES);
+      } catch (error) {
+        toast.error('Failed to load branches');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBranches();
+  }, []);
 
   const stats = [
     { label: 'Active Branches', value: branches.filter(b => b.status === 'Active').length, icon: Building, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Total Students', value: branches.reduce((sum, b) => sum + b.students, 0).toLocaleString(), icon: Users, color: 'text-green-600', bg: 'bg-green-50' },
     { label: 'Total Staff', value: branches.reduce((sum, b) => sum + b.staff, 0), icon: UserCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
     { label: 'Countries', value: new Set(branches.map(b => b.location.split(', ')[1])).size, icon: MapPin, color: 'text-yellow-600', bg: 'bg-yellow-50' },
   ];
 
   const handleAddBranch = () => {
     setEditingBranch(null);
-    setFormData({ name: '', location: '', address: '', phone: '', email: '', hours: '', students: 0, staff: 0, managerName: '', status: 'Active' });
+    setFormData({ name: '', location: '', address: '', phone: '', email: '', hours: '', staff: 0, managerName: '', status: 'Active' });
     setIsModalOpen(true);
   };
 
@@ -96,7 +120,6 @@ export default function BranchManagement() {
       phone: branch.phone,
       email: branch.email,
       hours: branch.hours,
-      students: branch.students,
       staff: branch.staff,
       managerName: branch.managerName,
       status: branch.status
@@ -201,11 +224,9 @@ export default function BranchManagement() {
                 <Clock size={16} className="text-slate-400" />
                 <span>{branch.hours}</span>
               </div>
-              <div className="flex items-center gap-4 text-slate-600 pt-2 border-t border-slate-100">
-                <span className="flex items-center gap-2">
-                  <Users size={16} className="text-slate-400" />
-                  {branch.students} students, {branch.staff} staff
-                </span>
+              <div className="flex items-center gap-2 text-slate-600 pt-2 border-t border-slate-100">
+                <UserCircle size={16} className="text-slate-400" />
+                <span>{branch.staff} staff members</span>
               </div>
             </div>
 
@@ -323,20 +344,9 @@ export default function BranchManagement() {
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Students</label>
-              <input
-                type="number"
-                required
-                min="0"
-                value={formData.students}
-                onChange={(e) => setFormData({ ...formData, students: parseInt(e.target.value) || 0 })}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Staff</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Staff Count</label>
               <input
                 type="number"
                 required
@@ -344,6 +354,7 @@ export default function BranchManagement() {
                 value={formData.staff}
                 onChange={(e) => setFormData({ ...formData, staff: parseInt(e.target.value) || 0 })}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                placeholder="8"
               />
             </div>
             <div>

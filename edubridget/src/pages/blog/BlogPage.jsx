@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-import { blogs } from '../../data/blogs';
+import { MOCK_BLOGS as blogs } from '../../data/mockData';
 
 const ITEMS_PER_PAGE = 6;
 

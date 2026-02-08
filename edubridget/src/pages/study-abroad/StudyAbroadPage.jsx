@@ -3,30 +3,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, DollarSign, Plane, ChevronLeft, ChevronRight } from 'lucide-react';
-
-// Move static data outside component to prevent re-creation
-const UNIVERSITIES_D2 = [
-  { name: 'DAEGU ARTS UNIVERSITY', code: 'D-2', tags: ['ON SALE'], country: 'South Korea' },
-  { name: 'TRUONG DAI HOC YEWON ( D2, D2-3)', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: 'Tongmyong University', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: '서울여자대학교 (Seoul Women\'s Univ)', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: '충북보건과학대학교', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: '예술예술대학교', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: 'KYUNGSANG UNIVERSITY', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: 'GEOJE UNIVERSITY', code: 'D-2', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: 'CATHOLIC UNIVERSITY', code: 'D-2', tags: ['NEW'], country: 'South Korea' },
-];
-
-const UNIVERSITIES_D4 = [
-  { name: 'Daegu Arts University', code: 'D-4', tags: ['ON SALE'], country: 'South Korea' },
-  { name: 'Tongmyong University', code: 'D-4', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: 'STU - VIET NAM', code: 'D-4-1', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: 'Songguk University', code: 'D-4-1', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: 'Seoul Theological Univ', code: 'D-4-1', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: 'Seoul Women\'s University', code: 'D-4-1', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: 'Kwang Woon University', code: 'D-4-1', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-  { name: 'Daejin University', code: 'D-4-1', tags: ['NEW', 'ON SALE'], country: 'South Korea' },
-];
+import { useNavigate } from 'react-router-dom';
+import { MOCK_PROGRAMS } from '../../data/mockData';
 
 const DESTINATIONS = [
   {
@@ -81,41 +59,48 @@ const DESTINATIONS = [
 
 const LOADING_PROP = "lazy";
 
-const UniversityCard = React.memo(({ university }) => (
-  <div className="flex-shrink-0 w-48 flex flex-col items-center group cursor-pointer p-2">
-    <div className="w-24 h-24 rounded-full bg-white border border-slate-100 flex items-center justify-center mb-4 overflow-hidden relative shadow-sm group-hover:shadow-md transition-all">
-       <img 
-        src={`https://ui-avatars.com/api/?name=${university.code}&background=random&color=fff&size=128&font-size=0.33`} 
-        alt={university.name} 
-        loading={LOADING_PROP}
-        className="w-full h-full object-cover"
-      />
-    </div>
-    <div className="text-center w-full">
-      <div className="text-[10px] text-slate-500 font-semibold mb-1 uppercase tracking-wider">{university.code}</div>
-      <h3 className="font-bold text-xs text-slate-900 mb-2 line-clamp-2 min-h-[32px] px-1 leading-tight">
-        {university.name}
-      </h3>
-      
-      <div className="flex flex-col gap-1 items-center mt-1">
-         {university.tags?.map((tag, i) => (
-            <Badge 
-              key={i} 
-              variant="secondary" 
-              className={`
-                text-[10px] px-2 py-0.5 h-5
-                ${tag === 'BEST' ? 'bg-emerald-500 text-white hover:bg-emerald-600' : ''}
-                ${tag === 'NEW' ? 'bg-emerald-500 text-white hover:bg-emerald-600' : ''}
-                ${tag === 'ON SALE' ? 'bg-rose-500 text-white hover:bg-rose-600' : ''}
-              `}
-            >
-              {tag}
-            </Badge>
-         ))}
+const UniversityCard = React.memo(({ university }) => {
+  const navigate = useNavigate();
+
+  return (
+    <div 
+      onClick={() => navigate(`/study-abroad/${university.id}`)}
+      className="flex-shrink-0 w-48 flex flex-col items-center group cursor-pointer p-2"
+    >
+      <div className="w-24 h-24 rounded-full bg-white border border-slate-100 flex items-center justify-center mb-4 overflow-hidden relative shadow-sm group-hover:shadow-md transition-all">
+         <img 
+          src={university.logo || `https://ui-avatars.com/api/?name=${university.visaType}&background=random&color=fff&size=128&font-size=0.33`} 
+          alt={university.universityName} 
+          loading={LOADING_PROP}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <div className="text-center w-full">
+        <div className="text-[10px] text-slate-500 font-semibold mb-1 uppercase tracking-wider">{university.visaType}</div>
+        <h3 className="font-bold text-xs text-slate-900 mb-2 line-clamp-2 min-h-[32px] px-1 leading-tight">
+          {university.universityName}
+        </h3>
+        
+        <div className="flex flex-col gap-1 items-center mt-1">
+           {university.tags?.map((tag, i) => (
+              <Badge 
+                key={i} 
+                variant="secondary" 
+                className={`
+                  text-[10px] px-2 py-0.5 h-5
+                  ${tag === 'BEST' ? 'bg-emerald-500 text-white hover:bg-emerald-600' : ''}
+                  ${tag === 'NEW' ? 'bg-emerald-500 text-white hover:bg-emerald-600' : ''}
+                  ${tag === 'ON SALE' ? 'bg-rose-500 text-white hover:bg-rose-600' : ''}
+                `}
+              >
+                {tag}
+              </Badge>
+           ))}
+        </div>
       </div>
     </div>
-  </div>
-));
+  );
+});
 
 const UniversitySection = React.memo(({ title, visaType, universities, subtitle }) => {
   const scrollContainerRef = useRef(null);
@@ -173,6 +158,9 @@ const UniversitySection = React.memo(({ title, visaType, universities, subtitle 
 });
 
 export default function StudyAbroadPage() {
+  const d2Programs = useMemo(() => MOCK_PROGRAMS.filter(p => p.visaType === 'D-2'), []);
+  const d4Programs = useMemo(() => MOCK_PROGRAMS.filter(p => p.visaType === 'D-4'), []);
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -193,7 +181,7 @@ export default function StudyAbroadPage() {
             title="D-2" 
             visaType="VISA" 
             subtitle="Available Universities (Degree Program)" 
-            universities={UNIVERSITIES_D2} 
+            universities={d2Programs} 
           />
           
           <div className="w-full h-px bg-slate-100 my-8"></div>
@@ -202,7 +190,7 @@ export default function StudyAbroadPage() {
             title="D-4" 
             visaType="VISA" 
             subtitle="List of Universities Offering Korean & English Programs" 
-            universities={UNIVERSITIES_D4} 
+            universities={d4Programs} 
           />
 
         </div>

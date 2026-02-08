@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   GraduationCap, 
@@ -11,6 +11,71 @@ import {
   BarChart3
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
+
+// Mock stats data - Replace with API call
+const MOCK_STATS = [
+  { 
+    title: 'Total Students', 
+    value: '0',
+    icon: Users,
+    iconColor: 'text-blue-600',
+    iconBg: 'bg-blue-50'
+  },
+  { 
+    title: 'Pending Applications', 
+    value: '0',
+    icon: FileText,
+    iconColor: 'text-yellow-600',
+    iconBg: 'bg-yellow-50'
+  },
+  { 
+    title: 'Active Visa Cases', 
+    value: '0',
+    icon: Plane,
+    iconColor: 'text-purple-600',
+    iconBg: 'bg-purple-50'
+  },
+  { 
+    title: 'Total Programs', 
+    value: '0',
+    icon: Award,
+    iconColor: 'text-green-600',
+    iconBg: 'bg-green-50'
+  },
+];
+
+// Quick actions configuration - Can be customized per admin role
+const QUICK_ACTIONS_CONFIG = [
+  { 
+    label: 'Manage Programs', 
+    icon: Award, 
+    iconColor: 'text-green-600',
+    iconBg: 'bg-green-50',
+    path: '/admin/programs'
+  },
+  { 
+    label: 'Manage Branches', 
+    icon: Building2, 
+    iconColor: 'text-green-600',
+    iconBg: 'bg-green-50',
+    path: '/admin/branches'
+  },
+  { 
+    label: 'Update Content', 
+    icon: ScrollText, 
+    iconColor: 'text-purple-600',
+    iconBg: 'bg-purple-50',
+    path: '/admin/cms'
+  },
+  { 
+    label: 'View Reports', 
+    icon: BarChart3, 
+    iconColor: 'text-yellow-600',
+    iconBg: 'bg-yellow-50',
+    path: '/admin/finance'
+  },
+];
 
 /**
  * AdminOverview Component
@@ -18,91 +83,76 @@ import { Link } from 'react-router-dom';
  * Modern SaaS dashboard matching the reference design
  */
 export default function AdminOverview() {
-  
-  // Stats Data - showing 0 as in reference
-  const stats = [
-    { 
-      title: 'Total Students', 
-      value: '0',
-      icon: Users,
-      iconColor: 'text-blue-600',
-      iconBg: 'bg-blue-50'
-    },
-    { 
-      title: 'Pending Applications', 
-      value: '0',
-      icon: FileText,
-      iconColor: 'text-yellow-600',
-      iconBg: 'bg-yellow-50'
-    },
-    { 
-      title: 'Active Visa Cases', 
-      value: '0',
-      icon: Plane,
-      iconColor: 'text-purple-600',
-      iconBg: 'bg-purple-50'
-    },
-    { 
-      title: 'Total Scholarships', 
-      value: '0',
-      icon: Award,
-      iconColor: 'text-green-600',
-      iconBg: 'bg-green-50'
-    },
-  ];
+  // Initialize state as empty - ready for API
+  const [stats, setStats] = useState([]);
+  const [quickActions, setQuickActions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Quick Actions
-  const quickActions = [
-    { 
-      label: 'Add Scholarship', 
-      icon: Award, 
-      iconColor: 'text-green-600',
-      iconBg: 'bg-green-50',
-      path: '/admin/scholarships'
-    },
-    { 
-      label: 'Manage Branches', 
-      icon: Building2, 
-      iconColor: 'text-green-600',
-      iconBg: 'bg-green-50',
-      path: '/admin/branches'
-    },
-    { 
-      label: 'Update Content', 
-      icon: ScrollText, 
-      iconColor: 'text-purple-600',
-      iconBg: 'bg-purple-50',
-      path: '/admin/cms'
-    },
-    { 
-      label: 'View Reports', 
-      icon: BarChart3, 
-      iconColor: 'text-yellow-600',
-      iconBg: 'bg-yellow-50',
-      path: '/admin/finance'
-    },
-  ];
+  // Fetch dashboard data on mount - Replace with actual API call
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        // TODO: Replace with actual API call
+        // const response = await dashboardAPI.getOverview();
+        // setStats(response.data.stats);
+        // setQuickActions(response.data.quickActions);
+        
+        // Simulating API call
+        await new Promise(resolve => setTimeout(resolve, 300));
+        setStats(MOCK_STATS);
+        setQuickActions(QUICK_ACTIONS_CONFIG);
+      } catch (error) {
+        toast.error('Failed to load dashboard data');
+        console.error(error);
+        // Fallback to mock data on error
+        setStats(MOCK_STATS);
+        setQuickActions(QUICK_ACTIONS_CONFIG);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
 
   return (
     <div className="space-y-6">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <div key={index} className="bg-white p-6 rounded-xl border border-slate-200 hover:shadow-md transition-shadow">
+      {/* Loading State */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-white p-6 rounded-xl border border-slate-200 animate-pulse">
               <div className="flex items-start justify-between mb-3">
-                <div className={`p-2.5 rounded-lg ${stat.iconBg}`}>
-                  <Icon size={20} className={stat.iconColor} />
-                </div>
-                <TrendingUp size={16} className="text-green-500" />
+                <div className="w-10 h-10 bg-slate-200 rounded-lg"></div>
+                <div className="w-4 h-4 bg-slate-200 rounded"></div>
               </div>
-              <h3 className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</h3>
-              <p className="text-sm text-slate-500 font-medium">{stat.title}</p>
+              <div className="h-8 bg-slate-200 rounded mb-2"></div>
+              <div className="h-4 bg-slate-200 rounded w-3/4"></div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {stats.map((stat, index) => {
+              const Icon = stat.icon;
+              return (
+                <div key={index} className="bg-white p-6 rounded-xl border border-slate-200 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`p-2.5 rounded-lg ${stat.iconBg}`}>
+                      <Icon size={20} className={stat.iconColor} />
+                    </div>
+                    <TrendingUp size={16} className="text-green-500" />
+                  </div>
+                  <h3 className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</h3>
+                  <p className="text-sm text-slate-500 font-medium">{stat.title}</p>
+                </div>
+              );
+            })}
+          </div>
 
       {/* Quick Actions Section */}
       <div className="bg-white rounded-xl border border-slate-200 p-6">
@@ -127,6 +177,8 @@ export default function AdminOverview() {
           })}
         </div>
       </div>
+        </>
+      )}
 
       {/* Recent Applications & Active Visa Cases */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

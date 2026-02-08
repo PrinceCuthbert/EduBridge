@@ -4,62 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { GraduationCap, Calendar, DollarSign, Globe, ChevronRight, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const scholarships = [
-  {
-    title: "Global Excellence Scholarship",
-    amount: "Up to $10,000",
-    deadline: "March 31, 2024",
-    location: "Global",
-    type: "Merit-based",
-    description: "Awarded to high-achieving international students demonstrating academic excellence.",
-    tags: ["Undergraduate", "Postgraduate"]
-  },
-  {
-    title: "STEM Future Leaders",
-    amount: "Full Tuition",
-    deadline: "April 15, 2024",
-    location: "USA, UK, Canada",
-    type: "Subject-specific",
-    description: "Supporting the next generation of leaders in Science, Technology, Engineering, and Math.",
-    tags: ["Masters", "PhD", "research"]
-  },
-  {
-    title: "Women in Tech Grant",
-    amount: "$5,000",
-    deadline: "May 1, 2024",
-    location: "Europe",
-    type: "Diversity",
-    description: "Encouraging diversity in technology fields through financial support for female students.",
-    tags: ["Undergraduate", "Computer Science"]
-  },
-  {
-    title: "East Africa Merit Award",
-    amount: "Partial Funding",
-    deadline: "June 20, 2024",
-    location: "East Africa",
-    type: "Regional",
-    description: "Specific opportunities for students from East African community member states.",
-    tags: ["Any Degree"]
-  },
-  {
-    title: "Research Innovation Fellowship",
-    amount: "$15,000 + Stipend",
-    deadline: "Rolling",
-    location: "South Korea",
-    type: "Research",
-    description: "For advanced research projects in partnership with leading Korean universities.",
-    tags: ["PhD", "Post-doc"]
-  },
-  {
-    title: "Arts & Humanities Scholarship",
-    amount: "$3,000",
-    deadline: "July 1, 2024",
-    location: "UK",
-    type: "Arts",
-    description: "Supporting creative minds in pursuing degrees in arts, humanities, and social sciences.",
-    tags: ["Bachelor", "Master"]
-  }
-];
+import { MOCK_SCHOLARSHIPS } from "@/data/mockData";
 
 const ScholarshipsPage = () => {
   return (
@@ -111,7 +56,7 @@ const ScholarshipsPage = () => {
         <section className="py-16">
           <div className="container mx-auto px-4 md:px-8">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {scholarships.map((scholarship, index) => (
+              {MOCK_SCHOLARSHIPS.map((scholarship, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}

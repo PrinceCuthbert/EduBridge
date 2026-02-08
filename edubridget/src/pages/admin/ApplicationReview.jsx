@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Filter, 
@@ -15,6 +15,54 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Mock applications data - Replace with API calls
+const MOCK_APPLICATIONS = [
+  {
+    id: "APP-2024-001",
+    studentName: "Alice Mutesi",
+    scholarship: "Global Excellence Scholarship",
+    date: "2024-02-01",
+    status: "Pending",
+    email: "alice@example.com",
+    phone: "+250 788 123 456",
+    gpa: "3.8",
+    documents: ["Passport.pdf", "Transcripts.pdf", "CV.pdf"]
+  },
+  {
+    id: "APP-2024-002",
+    studentName: "David Kwizera",
+    scholarship: "DAAD Master Studies",
+    date: "2024-01-28",
+    status: "Under Review",
+    email: "david@example.com",
+    phone: "+250 788 654 321",
+    gpa: "3.5",
+    documents: ["Passport.pdf", "CV.pdf"]
+  },
+  {
+    id: "APP-2024-003",
+    studentName: "Sarah Uwase",
+    scholarship: "Fullbright Program",
+    date: "2024-01-25",
+    status: "Correction Needed",
+    email: "sarah@example.com",
+    phone: "+250 788 987 654",
+    gpa: "3.9",
+    documents: ["Passport.pdf"] 
+  },
+  {
+    id: "APP-2024-004",
+    studentName: "John Doe",
+    scholarship: "Global Excellence Scholarship",
+    date: "2024-02-02",
+    status: "Qualified",
+    email: "john@example.com",
+    phone: "+250 788 111 222",
+    gpa: "4.0",
+    documents: ["Passport.pdf", "Transcripts.pdf", "CV.pdf", "Recommendation.pdf"]
+  }
+];
+
 /**
  * ApplicationReview Component
  * 
@@ -22,7 +70,7 @@ import { toast } from 'sonner';
  * Features:
  * 1. Master Table: List of all submissions with status filters.
  * 2. Review Modal: Detailed view of a single application allows:
- *    - Viewing/Editing student data (Fixing typos etc.)
+ *    - Viewing/Editing student data (Fixing typos etc.).
  *    - Viewing uploaded documents.
  *    - Adding Admin Notes (Internal).
  *    - Sending Student Feedback (External).
@@ -33,53 +81,32 @@ export default function ApplicationReview() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [selectedApp, setSelectedApp] = useState(null); // Controls Modal
   
-  // Dummy Data
-  const [applications, setApplications] = useState([
-    {
-      id: "APP-2024-001",
-      studentName: "Alice Mutesi",
-      scholarship: "Global Excellence Scholarship",
-      date: "2024-02-01",
-      status: "Pending",
-      email: "alice@example.com",
-      phone: "+250 788 123 456",
-      gpa: "3.8",
-      documents: ["Passport.pdf", "Transcripts.pdf", "CV.pdf"]
-    },
-    {
-      id: "APP-2024-002",
-      studentName: "David Kwizera",
-      scholarship: "DAAD Master Studies",
-      date: "2024-01-28",
-      status: "Under Review",
-      email: "david@example.com",
-      phone: "+250 788 654 321",
-      gpa: "3.5",
-      documents: ["Passport.pdf", "CV.pdf"]
-    },
-    {
-      id: "APP-2024-003",
-      studentName: "Sarah Uwase",
-      scholarship: "Fullbright Program",
-      date: "2024-01-25",
-      status: "Correction Needed",
-      email: "sarah@example.com",
-      phone: "+250 788 987 654",
-      gpa: "3.9",
-      documents: ["Passport.pdf"] 
-    },
-     {
-      id: "APP-2024-004",
-      studentName: "John Doe",
-      scholarship: "Global Excellence Scholarship",
-      date: "2024-02-02",
-      status: "Qualified",
-      email: "john@example.com",
-      phone: "+250 788 111 222",
-      gpa: "4.0",
-      documents: ["Passport.pdf", "Transcripts.pdf", "CV.pdf", "Recommendation.pdf"]
-    }
-  ]);
+  // Initialize state as empty - ready for API and CRUD operations
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Fetch applications on mount - Replace with actual API call
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        setLoading(true);
+        // TODO: Replace with actual API call
+        // const response = await applicationAPI.getAll();
+        // setApplications(response.data);
+        
+        // Simulating API call
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setApplications(MOCK_APPLICATIONS);
+      } catch (error) {
+        toast.error('Failed to load applications');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplications();
+  }, []);
 
   // Derived state for filtered list
   const filteredApps = applications.filter(app => {
@@ -154,7 +181,7 @@ export default function ApplicationReview() {
 
       {/* Master Table */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto modern-scrollbar-light">
           <table className="w-full text-left border-collapse min-w-[800px]">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-bold tracking-wider">
@@ -259,7 +286,7 @@ function ReviewModal({ application, onClose, onSave }) {
         <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
             
             {/* Left Column: Student Data (Scrollable) */}
-            <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50 border-r border-slate-200">
+            <div className="flex-1 overflow-y-auto modern-scrollbar-light p-6 bg-slate-50/50 border-r border-slate-200">
                
                <div className="flex items-center gap-4 mb-6">
                  <button 
@@ -331,7 +358,7 @@ function ReviewModal({ application, onClose, onSave }) {
             {/* Right Column: Action Panel */}
             <div className="w-full lg:w-96 p-6 bg-white flex flex-col h-full border-l border-slate-200">
                
-               <div className="flex-1 space-y-6 overflow-y-auto mb-4">
+               <div className="flex-1 space-y-6 overflow-y-auto modern-scrollbar-light mb-4">
                   
                   {/* Internal Notes */}
                   <div>

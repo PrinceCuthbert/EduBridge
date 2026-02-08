@@ -12,7 +12,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto modern-scrollbar-light">
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black/50 transition-opacity"

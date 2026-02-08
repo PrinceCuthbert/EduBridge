@@ -297,7 +297,7 @@ const Navigation = () => {
               </div>
 
               {/* Scrollable Navigation Area with Icons */}
-              <div className="flex-1 overflow-y-auto px-4 py-6">
+              <div className="flex-1 overflow-y-auto modern-scrollbar-light px-4 py-6">
                 <nav className="space-y-2">
                   {/* Home Link */}
                   <Link 

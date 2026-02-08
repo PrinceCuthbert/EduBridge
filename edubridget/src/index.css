@@ -155,6 +155,42 @@
     scrollbar-width: none;  /* Firefox */
   }
 
+  /* Modern, ultra-thin scrollbar */
+  .modern-scrollbar {
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgb(51 65 85 / 0.5) transparent;
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  .modern-scrollbar::-webkit-scrollbar {
+    width: 5px; /* Ultra-thin width */
+  }
+
+  .modern-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+  }
+
+  .modern-scrollbar::-webkit-scrollbar-thumb {
+    background: rgb(51 65 85 / 0.4); /* slate-700 with transparency */
+    border-radius: 10px;
+    transition: background 0.2s ease;
+  }
+
+  .modern-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgb(71 85 105 / 0.7); /* slate-600 on hover */
+  }
+
+  /* For light backgrounds - variant */
+  .modern-scrollbar-light::-webkit-scrollbar-thumb {
+    background: rgb(203 213 225 / 0.5); /* slate-300 */
+  }
+
+  .modern-scrollbar-light::-webkit-scrollbar-thumb:hover {
+    background: rgb(148 163 184 / 0.7); /* slate-400 */
+  }
+
   /* Blob animation for hero section */
   @keyframes blob {
     0% {

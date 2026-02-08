@@ -27,6 +27,8 @@ const BlogDetailsPage = lazy(() => import('./pages/blog/BlogDetailsPage'));
 const DigitalLibraryPage = lazy(() => import('./pages/library/DigitalLibraryPage'));
 const BranchesPage = lazy(() => import('./pages/branches/BranchesPage'));
 const StudyAbroadPage = lazy(() => import('./pages/study-abroad/StudyAbroadPage'));
+const ProgramDetail = lazy(() => import('./pages/study-abroad/ProgramDetail'));
+const AdminProgramDetail = lazy(() => import('./pages/admin/AdminProgramDetail'));
 const VisaConsultationPage = lazy(() => import('./pages/visa/VisaConsultationPage'));
 const ScholarshipsPage = lazy(() => import('./pages/scholarships/ScholarshipsPage'));
 const GalleryPage = lazy(() => import('./pages/gallery/GalleryPage'));
@@ -61,7 +63,11 @@ const AdminOverview = lazy(() => import('./pages/admin/AdminOverview'));
 const ScholarshipManager = lazy(() => import('./pages/admin/ScholarshipManager'));
 const ApplicationReview = lazy(() => import('./pages/admin/ApplicationReview'));
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
-const ContentManagement = lazy(() => import('./pages/admin/ContentManagement'));
+import ContentManagement from './pages/admin/ContentManagement';
+import CMSScholarships from './pages/admin/cms/CMSScholarships';
+import CMSLibrary from './pages/admin/cms/CMSLibrary';
+import CMSPosts from './pages/admin/cms/CMSPosts';
+import CMSMedia from './pages/admin/cms/CMSMedia';
 const BranchManagement = lazy(() => import('./pages/admin/BranchManagement'));
 const UserManagement = lazy(() => import('./pages/admin/UserManagement'));
 const FinancialReports = lazy(() => import('./pages/admin/FinancialReports'));
@@ -117,6 +123,7 @@ function App() {
                 <Route path="/library" element={<DigitalLibraryPage />} />
                 <Route path="/branches" element={<BranchesPage />} />
                 <Route path="/study-abroad" element={<StudyAbroadPage />} />
+                <Route path="/study-abroad/:id" element={<ProgramDetail />} />
                 <Route path="/visa-consultation" element={<VisaConsultationPage />} />
                 <Route path="/scholarships" element={<ScholarshipsPage />} />
                 <Route path="/gallery" element={<GalleryPage />} />
@@ -169,8 +176,15 @@ function App() {
                 <Route path="users" element={<UserManagement />} />
                 <Route path="applications" element={<ApplicationReview />} />
                 <Route path="visa" element={<VisaCases />} />
-                <Route path="scholarships" element={<ScholarshipManager />} />
-                <Route path="cms" element={<ContentManagement />} />
+                <Route path="programs" element={<ScholarshipManager />} />
+                <Route path="programs/:id" element={<AdminProgramDetail />} />
+                <Route path="cms" element={<ContentManagement />}>
+                  <Route index element={<Navigate to="scholarships" replace />} />
+                  <Route path="scholarships" element={<CMSScholarships />} />
+                  <Route path="library" element={<CMSLibrary />} />
+                  <Route path="posts" element={<CMSPosts />} />
+                  <Route path="media" element={<CMSMedia />} />
+                </Route>
                 <Route path="branches" element={<BranchManagement />} />
                 <Route path="finance" element={<FinancialReports />} />
                 <Route path="analytics" element={<Analytics />} />

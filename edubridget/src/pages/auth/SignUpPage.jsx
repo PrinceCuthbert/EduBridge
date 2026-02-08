@@ -3,6 +3,8 @@ import { Link,  useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faUserPlus, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { toast } from 'sonner';
+// TODO: Uncomment when axios is installed
+// import { authAPI } from '../../api/services';
 
 function SignUpPage() {
   const navigate = useNavigate();
@@ -38,16 +40,38 @@ function SignUpPage() {
     return () => {};
   }, []);
 
+  // Password validation helper
+  const validatePassword = (password) => {
+    const hasMinLength = password.length >= 8;
+    const hasNumber = /\d/.test(password);
+    const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    if (!hasMinLength) return "Password must be at least 8 characters";
+    if (!hasNumber) return "Password must contain at least one number";
+    if (!hasSymbol) return "Password must contain at least one symbol";
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     
+    // Validate password match
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match!");
       toast.error("Passwords do not match");
       return;
     }
 
+    // Validate password strength
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) {
+      setError(passwordError);
+      toast.error(passwordError);
+      return;
+    }
+
+    // Validate terms agreement
     if (!formData.agreeToTerms) {
       setError("Please agree to the Terms of Service and Privacy Policy");
       toast.error("Please accept the terms");
@@ -57,13 +81,41 @@ function SignUpPage() {
     setLoading(true);
 
     try {
-      // TODO: Implement actual registration logic
-      toast.success("Account created successfully!");
+      // Prepare data for backend - remove client-only fields
+      const registrationData = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phoneNumber: formData.phoneNumber.trim(),
+        country: formData.country,
+        password: formData.password,
+        // Don't send confirmPassword or agreeToTerms to backend
+      };
+
+      // TODO: Replace with actual API call when backend is ready
+      // const response = await authAPI.register(registrationData);
+      // localStorage.setItem('token', response.token);
+      // localStorage.setItem('user', JSON.stringify(response.user));
+      
+      // Simulating API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      console.log('Registration data prepared for backend:', registrationData);
+      
+      toast.success("Account created successfully! Please sign in.");
+      
+      // Reset form
+      setFormData(initialFormState);
+      
+      // Navigate to sign in
       navigate('/signin');
     } catch (err) {
-      console.error(err);
-      setError(err.message || "Failed to create account");
-      toast.error("Registration failed");
+      console.error('Registration error:', err);
+      
+      // Handle specific error responses from backend
+      const errorMessage = err.response?.data?.message || err.message || "Failed to create account";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

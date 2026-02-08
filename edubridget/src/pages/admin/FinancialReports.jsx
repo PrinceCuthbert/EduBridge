@@ -158,7 +158,7 @@ export default function FinancialReports() {
           <h3 className="font-bold text-slate-900 mb-1">Service Revenue Breakdown</h3>
           <p className="text-sm text-slate-500">Detailed view of revenue by service</p>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto modern-scrollbar-light">
           <table className="w-full">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">

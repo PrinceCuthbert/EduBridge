@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, Search, Filter, FileText, Calendar, DollarSign, Upload, Eye, Edit, Trash2, CheckCircle, Clock, AlertCircle, XCircle, User, MapPin, Phone, Mail } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Filter, FileText, Calendar, DollarSign, Upload, Eye, Edit, Trash2, CheckCircle, Clock, AlertCircle, XCircle, User, MapPin, Phone, Mail, Download, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import Modal from '../../components/Modal';
 
@@ -25,67 +25,93 @@ export default function VisaCases() {
     notes: ''
   });
 
-  const [cases, setCases] = useState([
-    {
-      id: 1,
-      clientName: 'John Kariuki',
-      email: 'john.k@email.com',
-      phone: '+254 700 123 456',
-      country: 'Canada',
-      visaType: 'Study Visa',
-      appointmentDate: '2024-02-15',
-      appointmentType: 'Online',
-      consultationFee: '$150',
-      status: 'In Progress',
-      documents: ['Passport', 'Admission Letter', 'Bank Statement'],
-      notes: 'All documents submitted',
-      createdAt: '2024-02-01'
-    },
-    {
-      id: 2,
-      clientName: 'Sarah Wanjiku',
-      email: 'sarah.w@email.com',
-      phone: '+254 722 456 789',
-      country: 'UK',
-      visaType: 'Work Visa',
-      appointmentDate: '2024-02-18',
-      appointmentType: 'Offline',
-      consultationFee: '$200',
-      status: 'Approved',
-      documents: ['Passport', 'Job Offer', 'Police Clearance'],
-      notes: 'Visa approved',
-      createdAt: '2024-01-25'
-    },
-    { id: 3,
-      clientName: 'David Omondi',
-      email: 'david.o@email.com',
-      phone: '+254 711 789 123',
-      country: 'Australia',
-      visaType: 'Tourist Visa',
-      appointmentDate: '2024-02-20',
-      appointmentType: 'Online',
-      consultationFee: '$100',
-      status: 'Pending Documents',
-      documents: ['Passport'],
-      notes: 'Waiting for bank statements',
-      createdAt: '2024-02-05'
-    },
-    {
-      id: 4,
-      clientName: 'Grace Mutua',
-      email: 'grace.m@email.com',
-      phone: '+254 733 456 789',
-      country: 'USA',
-      visaType: 'Business Visa',
-      appointmentDate: '2024-02-12',
-      appointmentType: 'Offline',
-      consultationFee: '$250',
-      status: 'Rejected',
-      documents: ['Passport', 'Business License', 'Tax Returns'],
-      notes: 'Resubmission recommended',
-      createdAt: '2024-01-20'
-    },
-  ]);
+// Mock data moved outside component
+const MOCK_CASES = [
+  {
+    id: 1,
+    clientName: 'John Kariuki',
+    email: 'john.k@email.com',
+    phone: '+254 700 123 456',
+    country: 'Canada',
+    visaType: 'Study Visa',
+    appointmentDate: '2024-02-15',
+    appointmentType: 'Online',
+    consultationFee: '$150',
+    status: 'In Progress',
+    documents: ['Passport', 'Admission Letter', 'Bank Statement'],
+    notes: 'All documents submitted',
+    createdAt: '2024-02-01'
+  },
+  {
+    id: 2,
+    clientName: 'Sarah Wanjiku',
+    email: 'sarah.w@email.com',
+    phone: '+254 722 456 789',
+    country: 'UK',
+    visaType: 'Work Visa',
+    appointmentDate: '2024-02-18',
+    appointmentType: 'Offline',
+    consultationFee: '$200',
+    status: 'Approved',
+    documents: ['Passport', 'Job Offer', 'Police Clearance'],
+    notes: 'Visa approved',
+    createdAt: '2024-01-25'
+  },
+  {
+    id: 3,
+    clientName: 'David Omondi',
+    email: 'david.o@email.com',
+    phone: '+254 711 987 654',
+    country: 'USA',
+    visaType: 'General Visit',
+    appointmentDate: '2024-02-20',
+    appointmentType: 'Online',
+    consultationFee: '$100',
+    status: 'Pending Documents',
+    documents: ['Passport'],
+    notes: 'Missing bank statement',
+    createdAt: '2024-02-05'
+  },
+  {
+    id: 4,
+    clientName: 'Grace Mutua',
+    email: 'grace.m@email.com',
+    phone: '+254 733 456 789',
+    country: 'USA',
+    visaType: 'Business Visa',
+    appointmentDate: '2024-02-12',
+    appointmentType: 'Offline',
+    consultationFee: '$250',
+    status: 'Rejected',
+    documents: ['Passport', 'Business License', 'Tax Returns'],
+    notes: 'Resubmission recommended',
+    createdAt: '2024-01-20'
+  }
+];
+  // Cases state initialized as empty array
+  const [cases, setCases] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchCases = async () => {
+      try {
+        setLoading(true);
+        // TODO: Replace with actual API call
+        // const response = await casesAPI.getAll();
+        // setCases(response.data);
+        
+        // Simulating API call
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setCases(MOCK_CASES);
+      } catch (error) {
+        toast.error('Failed to load cases');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCases();
+  }, []);
 
   const stats = [
     { label: 'Total Cases', value: cases.length, icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -158,14 +184,32 @@ export default function VisaCases() {
   };
 
   const handleDeleteCase = (caseItem) => {
-    if (window.confirm(`Are you sure you want to delete case for ${caseItem.clientName}?`)) {
-      setCases(cases.filter(c => c.id !== caseItem.id));
-      toast.success(`Case for ${caseItem.clientName} deleted successfully`);
-    }
+    toast(`Are you sure you want to delete case for ${caseItem.clientName}?`, {
+      action: {
+        label: 'Delete',
+        onClick: () => {
+          setCases(cases.filter(c => c.id !== caseItem.id));
+          toast.success(`Case for ${caseItem.clientName} deleted successfully`);
+        },
+      },
+      cancel: {
+        label: 'Cancel',
+      },
+      duration: 5000,
+    });
   };
 
-  const handleSubmit = (e) => {
+  const handleExport = (format) => {
+    toast.info(`Export as ${format.toUpperCase()} - Feature available after installing axios and xlsx packages`);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 600));
+
     if (editingCase) {
       setCases(cases.map(c => c.id === editingCase.id ? { ...c, ...formData } : c));
       toast.success(`Case for ${formData.clientName} updated successfully`);
@@ -178,6 +222,8 @@ export default function VisaCases() {
       setCases([...cases, newCase]);
       toast.success(`Case for ${formData.clientName} added successfully`);
     }
+    
+    setLoading(false);
     setIsModalOpen(false);
   };
 
@@ -246,12 +292,24 @@ export default function VisaCases() {
             <option value="Approved">Approved</option>
             <option value="Rejected">Rejected</option>
           </select>
+          <div className="relative">
+            <button className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg bg-white hover:bg-slate-50 transition-colors text-sm group h-full">
+              <Download size={18} className="text-slate-500" />
+              <span>Export</span>
+              <ChevronDown size={14} className="text-slate-400" />
+            </button>
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 p-1">
+              <button onClick={() => handleExport('csv')} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 rounded-md">Export as CSV</button>
+              <button onClick={() => handleExport('excel')} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 rounded-md">Export as Excel</button>
+              <button onClick={() => handleExport('pdf')} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 rounded-md">Export as PDF</button>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Cases Table */}
       <div className="bg-white rounded-xl border border-slate-200">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto modern-scrollbar-light">
           <table className="w-full min-w-[800px]">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
@@ -265,7 +323,26 @@ export default function VisaCases() {
               </tr>
             </thead>
             <tbody>
-              {filteredCases.map((caseItem) => (
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="py-16 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-3"></div>
+                      <p className="text-slate-500 text-sm">Loading cases...</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredCases.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="py-16 text-center text-slate-500">
+                    <div className="flex flex-col items-center justify-center">
+                      <Search size={32} className="text-slate-300 mb-3" />
+                      <p>No cases found matching your criteria</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredCases.map((caseItem) => (
                 <tr key={caseItem.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                   <td className="py-4 px-6">
                     <div>
@@ -314,7 +391,7 @@ export default function VisaCases() {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
         </div>
@@ -476,9 +553,10 @@ export default function VisaCases() {
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+              disabled={loading}
+              className="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
             >
-              {editingCase ? 'Update Case' : 'Create Case'}
+              {loading ? 'Saving...' : editingCase ? 'Update Case' : 'Create Case'}
             </button>
           </div>
         </form>
