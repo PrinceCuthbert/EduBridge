@@ -4,101 +4,36 @@ import { Search, Plus, Edit, Trash2, BookOpen, FileText, Upload, Link } from 'lu
 import { toast } from 'sonner';
 import Modal from '../../../components/Modal';
 import { MOCK_LIBRARY_RESOURCES } from '../../../data/mockData';
+import { useCMSManager } from '@/hooks/useCMSManager'; // Custom hook
 
 export default function CMSLibrary() {
-  const [resources, setResources] = useState(MOCK_LIBRARY_RESOURCES);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    type: 'E-book',
-    author: '',
-    year: '',
-    pages: '',
-    category: '',
-    link: '',
-    fileUrl: ''
-  });
-
-  const filteredResources = resources.filter(item => 
-    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.category.toLowerCase().includes(searchQuery.toLowerCase())
+  const {
+    items: filteredResources,
+    handleSearch,
+    searchQuery,
+    setSearchQuery,
+    isModalOpen,
+    setIsModalOpen,
+    formData,
+    setFormData,
+    editingItem,
+    handleAdd,
+    handleEdit,
+    handleDelete,
+    handleSubmit
+  } = useCMSManager(
+    MOCK_LIBRARY_RESOURCES,
+    { title: '', type: 'E-book', author: '', year: new Date().getFullYear().toString(), pages: '', category: '', link: '', fileUrl: '' },
+    ['title', 'category']
   );
-
-  const handleAdd = () => {
-    setEditingItem(null);
-    setFormData({
-      title: '',
-      type: 'E-book',
-      author: '',
-      year: new Date().getFullYear().toString(),
-      pages: '',
-      category: '',
-      link: '',
-      fileUrl: ''
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (item) => {
-    setEditingItem(item);
-    setFormData({
-      title: item.title,
-      type: item.type,
-      author: item.author,
-      year: item.year,
-      pages: item.pages,
-      category: item.category,
-      link: item.link || '',
-      fileUrl: item.fileUrl || ''
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this resource?')) {
-      const updated = resources.filter(r => r.id !== id);
-      setResources(updated);
-      const index = MOCK_LIBRARY_RESOURCES.findIndex(r => r.id === id);
-      if (index !== -1) MOCK_LIBRARY_RESOURCES.splice(index, 1);
-      toast.success('Resource deleted');
-    }
-  };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Simulate upload
       const fakeUrl = URL.createObjectURL(file);
       setFormData({ ...formData, fileUrl: fakeUrl });
       toast.success('File uploaded successfully');
     }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (editingItem) {
-      const updated = resources.map(r => 
-        r.id === editingItem.id ? { ...r, ...formData } : r
-      );
-      setResources(updated);
-      const index = MOCK_LIBRARY_RESOURCES.findIndex(r => r.id === editingItem.id);
-      if (index !== -1) {
-        MOCK_LIBRARY_RESOURCES[index] = { ...MOCK_LIBRARY_RESOURCES[index], ...formData };
-      }
-      toast.success('Resource updated');
-    } else {
-      const newItem = {
-        id: Math.max(...resources.map(r => r.id), 0) + 1,
-        ...formData
-      };
-      setResources([...resources, newItem]);
-      MOCK_LIBRARY_RESOURCES.push(newItem);
-      toast.success('Resource added');
-    }
-    setIsModalOpen(false);
   };
 
   return (
@@ -155,7 +90,7 @@ export default function CMSLibrary() {
                        <button onClick={() => handleEdit(item)} className="p-2 text-slate-400 hover:text-primary rounded-lg hover:bg-slate-100">
                         <Edit size={18} />
                       </button>
-                      <button onClick={() => handleDelete(item.id)} className="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50">
+                      <button onClick={() => handleDelete(item.id, 'Resource')} className="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50">
                         <Trash2 size={18} />
                       </button>
                     </div>
@@ -177,7 +112,7 @@ export default function CMSLibrary() {
         onClose={() => setIsModalOpen(false)}
         title={editingItem ? 'Edit Resource' : 'Add New Resource'}
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={(e) => handleSubmit(e, 'Resource')} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
             <input 

@@ -351,7 +351,7 @@ const TimelineItem = ({ milestone, index, isLeft }) => {
       </div>
 
       {/* Content card */}
-      <div className={`w-full md:w-5/12 ml-16 md:ml-0 ${isLeft ? 'md:mr-auto md:pr-8 lg:pr-12' : 'md:ml-auto md:pl-8 lg:pl-12'}`}>
+      <div className={`flex-1 md:w-5/12 ml-16 md:ml-0 ${isLeft ? 'md:mr-auto md:pr-8 lg:pr-12' : 'md:ml-auto md:pl-8 lg:pl-12'}`}>
         <div 
           className="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-100"
           style={{ backdropFilter: 'blur(10px)' }}

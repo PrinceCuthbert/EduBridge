@@ -4,61 +4,28 @@ import { Search, Plus, Trash2, Edit, Upload, Image as ImageIcon } from 'lucide-r
 import { toast } from 'sonner';
 import Modal from '../../../components/Modal';
 import { MOCK_MEDIA } from '../../../data/mockData';
+import { useCMSManager } from '@/hooks/useCMSManager'; // Custom hook
 
 export default function CMSMedia() {
-  const [media, setMedia] = useState(MOCK_MEDIA);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
-  const [formData, setFormData] = useState({
-    studentName: '',
-    university: '',
-    country: '',
-    program: '',
-    testimony: '',
-    image: ''
-  });
-
-  const filteredMedia = media.filter(item => 
-    item.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.country.toLowerCase().includes(searchQuery.toLowerCase())
+  const {
+    items: filteredMedia,
+    handleSearch,
+    searchQuery,
+    setSearchQuery,
+    isModalOpen,
+    setIsModalOpen,
+    formData,
+    setFormData,
+    editingItem,
+    handleAdd,
+    handleEdit,
+    handleDelete,
+    handleSubmit
+  } = useCMSManager(
+    MOCK_MEDIA,
+    { studentName: '', university: '', country: '', program: '', testimony: '', image: '' },
+    ['studentName', 'country']
   );
-
-  const handleAdd = () => {
-    setEditingItem(null);
-    setFormData({
-      studentName: '',
-      university: '',
-      country: '',
-      program: '',
-      testimony: '',
-      image: ''
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (item) => {
-    setEditingItem(item);
-    setFormData({
-      studentName: item.studentName || '',
-      university: item.university || '',
-      country: item.country || '',
-      program: item.program || '',
-      testimony: item.testimony || '',
-      image: item.image || ''
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this story?')) {
-      const updated = media.filter(m => m.id !== id);
-      setMedia(updated);
-      const index = MOCK_MEDIA.findIndex(m => m.id === id);
-      if (index !== -1) MOCK_MEDIA.splice(index, 1);
-      toast.success('Story deleted');
-    }
-  };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -67,31 +34,6 @@ export default function CMSMedia() {
       setFormData({ ...formData, image: fakeUrl });
       toast.success('Image uploaded');
     }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (editingItem) {
-      const updated = media.map(m => 
-        m.id === editingItem.id ? { ...m, ...formData } : m
-      );
-      setMedia(updated);
-      const index = MOCK_MEDIA.findIndex(m => m.id === editingItem.id);
-      if (index !== -1) {
-        MOCK_MEDIA[index] = { ...MOCK_MEDIA[index], ...formData };
-      }
-      toast.success('Story updated');
-    } else {
-      const newItem = {
-        id: Math.max(...media.map(m => m.id), 0) + 1,
-        ...formData
-      };
-      setMedia([...media, newItem]);
-      MOCK_MEDIA.push(newItem);
-      toast.success('Story added');
-    }
-    setIsModalOpen(false);
   };
 
   return (
@@ -139,7 +81,7 @@ export default function CMSMedia() {
                       <Edit size={18} />
                     </button>
                     <button 
-                      onClick={() => handleDelete(item.id)} 
+                      onClick={() => handleDelete(item.id, 'Story')} 
                       className="p-2 bg-white text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors"
                     >
                       <Trash2 size={18} />
@@ -170,7 +112,7 @@ export default function CMSMedia() {
         onClose={() => setIsModalOpen(false)}
         title={editingItem ? 'Edit Success Story' : 'Add New Success Story'}
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={(e) => handleSubmit(e, 'Story')} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Student Name</label>

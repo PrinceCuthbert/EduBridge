@@ -10,6 +10,7 @@ export default function VisaCases() {
   const [selectedCase, setSelectedCase] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [viewingDocument, setViewingDocument] = useState(null);
 
   const [formData, setFormData] = useState({
     clientName: '',
@@ -634,9 +635,14 @@ const MOCK_CASES = [
               </h3>
               <div className="flex flex-wrap gap-2">
                 {selectedCase.documents.map((doc, index) => (
-                  <span key={index} className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                  <button
+                    key={index}
+                    onClick={() => setViewingDocument(doc)}
+                    className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <FileText size={12} />
                     {doc}
-                  </span>
+                  </button>
                 ))}
               </div>
             </div>
@@ -648,6 +654,46 @@ const MOCK_CASES = [
                 <p className="text-sm text-slate-600">{selectedCase.notes}</p>
               </div>
             )}
+          </div>
+        </Modal>
+      )}
+
+      {/* Document Viewer Modal */}
+      {viewingDocument && (
+        <Modal
+          isOpen={!!viewingDocument}
+          onClose={() => setViewingDocument(null)}
+          title={`Document View: ${viewingDocument}`}
+          size="lg"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-2 bg-slate-50 rounded-lg border border-slate-200">
+              <div className="flex items-center gap-2">
+                <FileText className="text-primary" size={20} />
+                <span className="font-semibold text-slate-700">{viewingDocument}.pdf</span>
+              </div>
+              <button className="text-sm text-primary hover:underline flex items-center gap-1">
+                <Download size={14} /> Download
+              </button>
+            </div>
+            
+            <div className="bg-slate-100 border border-slate-200 rounded-lg p-8 min-h-[500px] flex flex-col items-center justify-center">
+               <div className="w-full max-w-2xl bg-white shadow-lg p-8 min-h-[600px] flex flex-col items-center">
+                  <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-6">
+                    <FileText size={40} className="text-slate-300" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-800 mb-2">{viewingDocument}</h3>
+                  <p className="text-slate-500 mb-8 text-center">This is a simulation of the submitted document.<br/>In a real environment, the actual PDF or image would be rendered here.</p>
+                  
+                  <div className="w-full space-y-4 animate-pulse">
+                    <div className="h-4 bg-slate-100 rounded w-full"></div>
+                    <div className="h-4 bg-slate-100 rounded w-5/6"></div>
+                    <div className="h-4 bg-slate-100 rounded w-full"></div>
+                    <div className="h-4 bg-slate-100 rounded w-4/5"></div>
+                    <div className="h-32 bg-slate-100 rounded w-full mt-4"></div>
+                  </div>
+               </div>
+            </div>
           </div>
         </Modal>
       )}

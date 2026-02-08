@@ -12,7 +12,7 @@
     /* Mobile: 14px base (small screens) */
     font-size: 87.5%; /* 14px if browser default is 16px */
     
-    @apply scroll-smooth antialiased bg-surface;
+    @apply scroll-smooth antialiased bg-surface overflow-x-hidden;
   }
 
   /* Tablet: 15px base */
@@ -40,9 +40,14 @@
    * BODY - Inherits the responsive base font size
    */
   body {
-    @apply font-sans text-text-main;
+    @apply font-sans text-text-main overflow-x-hidden w-full;
     font-size: 1rem; /* Scales with html font-size */
     line-height: 1.6;
+    position: relative;
+  }
+  
+  #root {
+    @apply w-full overflow-x-hidden;
   }
 
   /* 

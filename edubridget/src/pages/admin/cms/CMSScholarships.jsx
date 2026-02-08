@@ -4,94 +4,28 @@ import { Search, Plus, Edit, Trash2, Award, DollarSign, Calendar, Globe } from '
 import { toast } from 'sonner';
 import Modal from '../../../components/Modal';
 import { MOCK_SCHOLARSHIPS } from '../../../data/mockData';
+import { useCMSManager } from '@/hooks/useCMSManager'; // Custom hook
 
 export default function CMSScholarships() {
-  const [scholarships, setScholarships] = useState(MOCK_SCHOLARSHIPS);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    amount: '',
-    deadline: '',
-    location: '',
-    type: 'Merit-based',
-    description: '',
-    tags: ''
-  });
-
-  const filteredScholarships = scholarships.filter(item => 
-    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.location.toLowerCase().includes(searchQuery.toLowerCase())
+  const {
+    items: filteredScholarships,
+    handleSearch,
+    searchQuery,
+    setSearchQuery,
+    isModalOpen,
+    setIsModalOpen,
+    formData,
+    setFormData,
+    editingItem,
+    handleAdd,
+    handleEdit,
+    handleDelete,
+    handleSubmit
+  } = useCMSManager(
+    MOCK_SCHOLARSHIPS,
+    { title: '', amount: '', deadline: '', location: '', type: 'Merit-based', description: '', tags: [] },
+    ['title', 'location']
   );
-
-  const handleAdd = () => {
-    setEditingItem(null);
-    setFormData({
-      title: '',
-      amount: '',
-      deadline: '',
-      location: '',
-      type: 'Merit-based',
-      description: '',
-      tags: ''
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (item) => {
-    setEditingItem(item);
-    setFormData({
-      title: item.title,
-      amount: item.amount,
-      deadline: item.deadline,
-      location: item.location,
-      type: item.type,
-      description: item.description,
-      tags: item.tags.join(', ')
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this scholarship?')) {
-      const updated = scholarships.filter(s => s.id !== id);
-      setScholarships(updated);
-      // Update MOCK
-      const index = MOCK_SCHOLARSHIPS.findIndex(s => s.id === id);
-      if (index !== -1) MOCK_SCHOLARSHIPS.splice(index, 1);
-      toast.success('Scholarship deleted');
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const tagsArray = formData.tags.split(',').map(t => t.trim()).filter(t => t);
-    
-    if (editingItem) {
-      const updated = scholarships.map(s => 
-        s.id === editingItem.id ? { ...s, ...formData, tags: tagsArray } : s
-      );
-      setScholarships(updated);
-      // Update MOCK
-      const index = MOCK_SCHOLARSHIPS.findIndex(s => s.id === editingItem.id);
-      if (index !== -1) {
-        MOCK_SCHOLARSHIPS[index] = { ...MOCK_SCHOLARSHIPS[index], ...formData, tags: tagsArray };
-      }
-      toast.success('Scholarship updated');
-    } else {
-      const newItem = {
-        id: Math.max(...scholarships.map(s => s.id), 0) + 1,
-        ...formData,
-        tags: tagsArray,
-        status: 'Active'
-      };
-      setScholarships([...scholarships, newItem]);
-      MOCK_SCHOLARSHIPS.push(newItem);
-      toast.success('Scholarship added');
-    }
-    setIsModalOpen(false);
-  };
 
   return (
     <div className="space-y-6">
@@ -142,10 +76,10 @@ export default function CMSScholarships() {
                   <td className="px-6 py-4 text-slate-600">{item.location}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
-                      <button onClick={() => handleEdit(item)} className="p-2 text-slate-400 hover:text-primary rounded-lg hover:bg-slate-100">
+                       <button onClick={() => handleEdit(item)} className="p-2 text-slate-400 hover:text-primary rounded-lg hover:bg-slate-100">
                         <Edit size={18} />
                       </button>
-                      <button onClick={() => handleDelete(item.id)} className="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50">
+                      <button onClick={() => handleDelete(item.id, 'Scholarship')} className="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50">
                         <Trash2 size={18} />
                       </button>
                     </div>
@@ -167,7 +101,7 @@ export default function CMSScholarships() {
         onClose={() => setIsModalOpen(false)}
         title={editingItem ? 'Edit Scholarship' : 'Add New Scholarship'}
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={(e) => handleSubmit(e, 'Scholarship')} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
             <input 
@@ -192,7 +126,7 @@ export default function CMSScholarships() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Deadline</label>
               <input 
-                type="date" // Using native date input for simplicity as requested "modern" only for timeline earlier
+                type="date"
                 value={formData.deadline}
                 onChange={e => setFormData({...formData, deadline: e.target.value})}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary"
