@@ -1,15 +1,62 @@
-import React, { useState } from 'react';
-import { X, Download, FileText, Image as ImageIcon, ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  X,
+  Download,
+  FileText,
+  Image as ImageIcon,
+  ZoomIn,
+  ZoomOut,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
-export default function DocumentViewer({ documents, isOpen, onClose, currentIndex = 0 }) {
+export default function DocumentViewer({
+  documents,
+  isOpen,
+  onClose,
+  currentIndex = 0,
+}) {
   const [index, setIndex] = useState(currentIndex);
   const [zoom, setZoom] = useState(100);
 
-  if (!isOpen || !documents || documents.length === 0) return null;
+  if (!isOpen) return null;
+
+  // Empty state: No documents available
+  if (!documents || documents.length === 0) {
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div
+          className="fixed inset-0 bg-black/80 transition-opacity"
+          onClick={onClose}
+        />
+
+        <div className="flex min-h-full items-center justify-center p-4">
+          <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl p-8 text-center">
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 transition-colors">
+              <X className="w-5 h-5 text-slate-500" />
+            </button>
+
+            <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-slate-900 mb-2">
+              No Documents Found
+            </h3>
+            <p className="text-sm text-slate-500">
+              There are no documents available to view at this time.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const currentDoc = documents[index];
-  const isPDF = currentDoc?.type?.includes('pdf') || currentDoc?.name?.endsWith('.pdf');
-  const isImage = currentDoc?.type?.includes('image') || /\.(jpg|jpeg|png|gif|webp)$/i.test(currentDoc?.name);
+  const isPDF =
+    currentDoc?.type?.includes("pdf") || currentDoc?.name?.endsWith(".pdf");
+  const isImage =
+    currentDoc?.type?.includes("image") ||
+    /\.(jpg|jpeg|png|gif|webp)$/i.test(currentDoc?.name);
 
   const handleNext = () => {
     if (index < documents.length - 1) {
@@ -25,18 +72,53 @@ export default function DocumentViewer({ documents, isOpen, onClose, currentInde
     }
   };
 
-  const handleDownload = () => {
-    // Create download link
-    const link = document.createElement('a');
-    link.href = currentDoc.url;
-    link.download = currentDoc.name;
-    link.click();
+  const handleDownload = async () => {
+    try {
+      // Check if currentDoc has required properties
+      if (!currentDoc?.url || !currentDoc?.name) {
+        console.error("Invalid document: missing url or name");
+        return;
+      }
+
+      // Fetch the file as blob for proper download
+      const response = await fetch(currentDoc.url);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch document: ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+
+      // Create blob URL and download
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = currentDoc.name;
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error("Download error:", error);
+      }
+      // Fallback: try direct link download
+      const link = document.createElement("a");
+      link.href = currentDoc.url;
+      link.download = currentDoc.name;
+      link.click();
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto modern-scrollbar-light">
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/80 transition-opacity" onClick={onClose} />
+      <div
+        className="fixed inset-0 bg-black/80 transition-opacity"
+        onClick={onClose}
+      />
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
@@ -44,7 +126,9 @@ export default function DocumentViewer({ documents, isOpen, onClose, currentInde
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-slate-50">
             <div>
-              <h3 className="text-lg font-bold text-slate-900">{currentDoc?.name}</h3>
+              <h3 className="text-lg font-bold text-slate-900">
+                {currentDoc?.name}
+              </h3>
               <p className="text-sm text-slate-500">
                 Document {index + 1} of {documents.length}
               </p>
@@ -55,8 +139,7 @@ export default function DocumentViewer({ documents, isOpen, onClose, currentInde
                 <div className="flex items-center gap-2 mr-4">
                   <button
                     onClick={() => setZoom(Math.max(50, zoom - 25))}
-                    className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
-                  >
+                    className="p-2 hover:bg-slate-200 rounded-lg transition-colors">
                     <ZoomOut size={18} />
                   </button>
                   <span className="text-sm font-medium text-slate-700 min-w-[60px] text-center">
@@ -64,20 +147,20 @@ export default function DocumentViewer({ documents, isOpen, onClose, currentInde
                   </span>
                   <button
                     onClick={() => setZoom(Math.min(200, zoom + 25))}
-                    className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
-                  >
+                    className="p-2 hover:bg-slate-200 rounded-lg transition-colors">
                     <ZoomIn size={18} />
                   </button>
                 </div>
               )}
               <button
                 onClick={handleDownload}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-              >
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
                 <Download size={18} />
                 Download
               </button>
-              <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-lg transition-colors">
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-slate-200 rounded-lg transition-colors">
                 <X size={20} className="text-slate-600" />
               </button>
             </div>
@@ -102,11 +185,12 @@ export default function DocumentViewer({ documents, isOpen, onClose, currentInde
               ) : (
                 <div className="text-center py-16">
                   <FileText size={64} className="text-slate-400 mx-auto mb-4" />
-                  <p className="text-slate-600 mb-4">Preview not available for this file type</p>
+                  <p className="text-slate-600 mb-4">
+                    Preview not available for this file type
+                  </p>
                   <button
                     onClick={handleDownload}
-                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
-                  >
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">
                     Download to View
                   </button>
                 </div>
@@ -120,8 +204,7 @@ export default function DocumentViewer({ documents, isOpen, onClose, currentInde
               <button
                 onClick={handlePrev}
                 disabled={index === 0}
-                className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
+                className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                 <ChevronLeft size={18} />
                 Previous
               </button>
@@ -129,9 +212,14 @@ export default function DocumentViewer({ documents, isOpen, onClose, currentInde
                 {documents.map((_, i) => (
                   <button
                     key={i}
-                    onClick={() => { setIndex(i); setZoom(100); }}
+                    onClick={() => {
+                      setIndex(i);
+                      setZoom(100);
+                    }}
                     className={`w-2 h-2 rounded-full transition-colors ${
-                      i === index ? 'bg-primary' : 'bg-slate-300 hover:bg-slate-400'
+                      i === index
+                        ? "bg-primary"
+                        : "bg-slate-300 hover:bg-slate-400"
                     }`}
                   />
                 ))}
@@ -139,8 +227,7 @@ export default function DocumentViewer({ documents, isOpen, onClose, currentInde
               <button
                 onClick={handleNext}
                 disabled={index === documents.length - 1}
-                className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
+                className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                 Next
                 <ChevronRight size={18} />
               </button>

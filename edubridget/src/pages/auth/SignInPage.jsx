@@ -168,8 +168,12 @@ function SignInPage() {
                 <Link
                   to="/"
                   className="inline-flex items-center justify-center mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#1A237E] via-[#283593] to-[#1A237E] rounded-xl flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-lg">EB</span>
+                  <div className="w-12 h-12">
+                    <img
+                      src="/tmlogo.jpg"
+                      alt="TM EduBridge Logo"
+                      className="w-full h-full rounded-full object-cover ring-2 ring-primary/30 shadow-lg"
+                    />
                   </div>
                   <span className="ml-3 text-xl font-bold text-slate-900">
                     EduBridge
@@ -310,6 +314,7 @@ function SignInPage() {
                     size="large"
                     logo_alignment="left"
                     auto_select={false}
+                    useOneTap={false}
                     use_fedcm_for_prompt={false}
                   />
                 </div>

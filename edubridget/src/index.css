@@ -11,7 +11,7 @@
   html {
     /* Mobile: 14px base (small screens) */
     font-size: 87.5%; /* 14px if browser default is 16px */
-    
+
     @apply scroll-smooth antialiased bg-surface overflow-x-hidden;
   }
 
@@ -45,16 +45,65 @@
     line-height: 1.6;
     position: relative;
   }
-  
+
   #root {
     @apply w-full overflow-x-hidden;
+  }
+
+  /* 
+   * MODERN SCROLLBAR - Global Application
+   * Applied to all scrollable elements by default
+   */
+  * {
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 116, 139, 0.3) transparent;
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      rgba(100, 116, 139, 0.4),
+      rgba(71, 85, 105, 0.5)
+    );
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      180deg,
+      rgba(30, 64, 175, 0.6),
+      rgba(29, 78, 216, 0.7)
+    );
+    transform: scaleY(1.1);
+  }
+
+  /* Scrollbar corner (when both scrollbars are visible) */
+  *::-webkit-scrollbar-corner {
+    background: transparent;
   }
 
   /* 
    * HEADINGS - Use rem for scalability
    * These will automatically scale based on viewport
    */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-serif text-text-main;
     font-weight: 700;
     line-height: 1.2;
@@ -62,23 +111,23 @@
   }
 
   h1 {
-    font-size: 2rem;     /* Mobile: 28px, Desktop: 32px, Large: 36px */
+    font-size: 2rem; /* Mobile: 28px, Desktop: 32px, Large: 36px */
   }
 
   h2 {
-    font-size: 1.5rem;   /* Mobile: 21px, Desktop: 24px, Large: 27px */
+    font-size: 1.5rem; /* Mobile: 21px, Desktop: 24px, Large: 27px */
   }
 
   h3 {
-    font-size: 1.25rem;  /* Mobile: 17.5px, Desktop: 20px, Large: 22.5px */
+    font-size: 1.25rem; /* Mobile: 17.5px, Desktop: 20px, Large: 22.5px */
   }
-  
+
   h4 {
     font-size: 1.125rem; /* Mobile: 15.75px, Desktop: 18px, Large: 20.25px */
   }
 
   h5 {
-    font-size: 1rem;     /* Matches body */
+    font-size: 1rem; /* Matches body */
   }
 
   h6 {
@@ -156,44 +205,75 @@
 
   /* Hide scrollbar for IE, Edge and Firefox */
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 
-  /* Modern, ultra-thin scrollbar */
-  .modern-scrollbar {
-    /* Firefox */
+  /* Premium scrollbar variant with primary color */
+  .scrollbar-primary {
     scrollbar-width: thin;
-    scrollbar-color: rgb(51 65 85 / 0.5) transparent;
+    scrollbar-color: rgba(26, 35, 126, 0.4) transparent;
   }
 
-  /* Webkit browsers (Chrome, Safari, Edge) */
-  .modern-scrollbar::-webkit-scrollbar {
-    width: 5px; /* Ultra-thin width */
+  .scrollbar-primary::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
   }
 
-  .modern-scrollbar::-webkit-scrollbar-track {
+  .scrollbar-primary::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-primary::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      rgba(26, 35, 126, 0.5),
+      rgba(30, 64, 175, 0.6)
+    );
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+
+  .scrollbar-primary::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      180deg,
+      rgba(26, 35, 126, 0.8),
+      rgba(30, 64, 175, 0.9)
+    );
+  }
+
+  /* Minimal invisible scrollbar that appears on hover */
+  .scrollbar-hover {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+  }
+
+  .scrollbar-hover:hover {
+    scrollbar-color: rgba(100, 116, 139, 0.3) transparent;
+  }
+
+  .scrollbar-hover::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  .scrollbar-hover::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-hover::-webkit-scrollbar-thumb {
     background: transparent;
     border-radius: 10px;
+    transition: background 0.3s ease;
   }
 
-  .modern-scrollbar::-webkit-scrollbar-thumb {
-    background: rgb(51 65 85 / 0.4); /* slate-700 with transparency */
-    border-radius: 10px;
-    transition: background 0.2s ease;
+  .scrollbar-hover:hover::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.3);
   }
 
-  .modern-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgb(71 85 105 / 0.7); /* slate-600 on hover */
-  }
-
-  /* For light backgrounds - variant */
-  .modern-scrollbar-light::-webkit-scrollbar-thumb {
-    background: rgb(203 213 225 / 0.5); /* slate-300 */
-  }
-
-  .modern-scrollbar-light::-webkit-scrollbar-thumb:hover {
-    background: rgb(148 163 184 / 0.7); /* slate-400 */
+  .scrollbar-hover::-webkit-scrollbar-thumb:hover {
+    background: rgba(71, 85, 105, 0.5);
   }
 
   /* Blob animation for hero section */

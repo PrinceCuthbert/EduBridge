@@ -1,59 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Building, Users, MapPin, Phone, Mail, Clock, Edit, Trash2, UserCircle } from 'lucide-react';
-import { toast } from 'sonner';
-import Modal from '../../components/Modal';
+import React, { useState, useEffect } from "react";
+import {
+  Plus,
+  Building,
+  Users,
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Edit,
+  Trash2,
+  UserCircle,
+} from "lucide-react";
+import { toast } from "sonner";
+import Modal from "../../components/Modal";
 
 // Mock data - Replace with API calls
 const MOCK_BRANCHES = [
   {
     id: 1,
-    name: 'EduBridge Rwanda HQ',
-    location: 'Kigali, Rwanda',
-    address: 'KG 123 Street, Nyarugenge District',
-    phone: '+250 788 123 456',
-    email: 'rwanda@edubridge.com',
-    hours: 'Mon-Fri: 8AM-6PM, Sat: 8AM-1PM',
+    name: "EduBridge Rwanda HQ",
+    location: "Kigali, Rwanda",
+    address: "KG 123 Street, Nyarugenge District",
+    phone: "+250 788 123 456",
+    email: "rwanda@edubridge.com",
+    hours: "Mon-Fri: 8AM-6PM, Sat: 8AM-1PM",
     staff: 12,
-    managerName: 'Jean Claude Niyonzima',
-    status: 'Active'
+    managerName: "Jean Claude Niyonzima",
+    status: "Active",
   },
   {
     id: 2,
-    name: 'EduBridge Kenya',
-    location: 'Nairobi, Kenya',
-    address: 'Westlands Business Park, Tower A',
-    phone: '+254 700 123 456',
-    email: 'kenya@edubridge.com',
-    hours: 'Mon-Fri: 8AM-6PM',
+    name: "EduBridge Kenya",
+    location: "Nairobi, Kenya",
+    address: "Westlands Business Park, Tower A",
+    phone: "+254 700 123 456",
+    email: "kenya@edubridge.com",
+    hours: "Mon-Fri: 8AM-6PM",
     staff: 8,
-    managerName: 'Sarah Wanjiku',
-    status: 'Active'
+    managerName: "Sarah Wanjiku",
+    status: "Active",
   },
   {
     id: 3,
-    name: 'EduBridge Uganda',
-    location: 'Kampala, Uganda',
-    address: 'Plot 24, Nakasero Road',
-    phone: '+256 772 123 456',
-    email: 'uganda@edubridge.com',
-    hours: 'Mon-Fri: 8:30AM-5:30PM',
- 
+    name: "EduBridge Uganda",
+    location: "Kampala, Uganda",
+    address: "Plot 24, Nakasero Road",
+    phone: "+256 772 123 456",
+    email: "uganda@edubridge.com",
+    hours: "Mon-Fri: 8:30AM-5:30PM",
+
     staff: 6,
-    managerName: 'David Ochieng',
-    status: 'Active'
+    managerName: "David Ochieng",
+    status: "Active",
   },
   {
     id: 4,
-    name: 'EduBridge Tanzania',
-    location: 'Dar es Salaam, Tanzania',
-    address: 'Posta Road, CBD',
-    phone: '+255 755 123 456',
-    email: 'tanzania@edubridge.com',
-    hours: 'Opening Q2 2024',
-  
+    name: "EduBridge Tanzania",
+    location: "Dar es Salaam, Tanzania",
+    address: "Posta Road, CBD",
+    phone: "+255 755 123 456",
+    email: "tanzania@edubridge.com",
+    hours: "Opening Q2 2024",
+
     staff: 2,
-    managerName: 'Amina Hassan',
-    status: 'Coming Soon'
+    managerName: "Amina Hassan",
+    status: "Coming Soon",
   },
 ];
 
@@ -61,15 +72,15 @@ export default function BranchManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBranch, setEditingBranch] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    location: '',
-    address: '',
-    phone: '',
-    email: '',
-    hours: '',
+    name: "",
+    location: "",
+    address: "",
+    phone: "",
+    email: "",
+    hours: "",
     staff: 0,
-    managerName: '',
-    status: 'Active'
+    managerName: "",
+    status: "Active",
   });
 
   // Initialize state as empty - ready for API
@@ -84,13 +95,15 @@ export default function BranchManagement() {
         // TODO: Replace with actual API call
         // const response = await branchAPI.getAll();
         // setBranches(response.data);
-        
+
         // Simulating API call
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
         setBranches(MOCK_BRANCHES);
       } catch (error) {
-        toast.error('Failed to load branches');
-        console.error(error);
+        toast.error("Failed to load branches");
+        if (import.meta.env.DEV) {
+          console.error("Branches fetch error:", error);
+        }
       } finally {
         setLoading(false);
       }
@@ -100,14 +113,42 @@ export default function BranchManagement() {
   }, []);
 
   const stats = [
-    { label: 'Active Branches', value: branches.filter(b => b.status === 'Active').length, icon: Building, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Total Staff', value: branches.reduce((sum, b) => sum + b.staff, 0), icon: UserCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Countries', value: new Set(branches.map(b => b.location.split(', ')[1])).size, icon: MapPin, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+    {
+      label: "Active Branches",
+      value: branches.filter((b) => b.status === "Active").length,
+      icon: Building,
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+    },
+    {
+      label: "Total Staff",
+      value: branches.reduce((sum, b) => sum + b.staff, 0),
+      icon: UserCircle,
+      color: "text-blue-600",
+      bg: "bg-blue-50",
+    },
+    {
+      label: "Countries",
+      value: new Set(branches.map((b) => b.location.split(", ")[1])).size,
+      icon: MapPin,
+      color: "text-yellow-600",
+      bg: "bg-yellow-50",
+    },
   ];
 
   const handleAddBranch = () => {
     setEditingBranch(null);
-    setFormData({ name: '', location: '', address: '', phone: '', email: '', hours: '', staff: 0, managerName: '', status: 'Active' });
+    setFormData({
+      name: "",
+      location: "",
+      address: "",
+      phone: "",
+      email: "",
+      hours: "",
+      staff: 0,
+      managerName: "",
+      status: "Active",
+    });
     setIsModalOpen(true);
   };
 
@@ -122,14 +163,18 @@ export default function BranchManagement() {
       hours: branch.hours,
       staff: branch.staff,
       managerName: branch.managerName,
-      status: branch.status
+      status: branch.status,
     });
     setIsModalOpen(true);
   };
 
   const handleDeleteBranch = (branchId, branchName) => {
-    if (window.confirm(`Are you sure you want to delete "${branchName}"? This action cannot be undone.`)) {
-      setBranches(branches.filter(b => b.id !== branchId));
+    if (
+      window.confirm(
+        `Are you sure you want to delete "${branchName}"? This action cannot be undone.`,
+      )
+    ) {
+      setBranches(branches.filter((b) => b.id !== branchId));
       toast.success(`${branchName} deleted successfully`);
     }
   };
@@ -137,12 +182,16 @@ export default function BranchManagement() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (editingBranch) {
-      setBranches(branches.map(b => b.id === editingBranch.id ? { ...b, ...formData } : b));
+      setBranches(
+        branches.map((b) =>
+          b.id === editingBranch.id ? { ...b, ...formData } : b,
+        ),
+      );
       toast.success(`${formData.name} updated successfully`);
     } else {
       const newBranch = {
-        id: Math.max(...branches.map(b => b.id), 0) + 1,
-        ...formData
+        id: Math.max(...branches.map((b) => b.id), 0) + 1,
+        ...formData,
       };
       setBranches([...branches, newBranch]);
       toast.success(`${formData.name} added successfully`);
@@ -151,7 +200,9 @@ export default function BranchManagement() {
   };
 
   const getStatusColor = (status) => {
-    return status === 'Active' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700';
+    return status === "Active"
+      ? "bg-blue-100 text-blue-700"
+      : "bg-green-100 text-green-700";
   };
 
   return (
@@ -159,13 +210,16 @@ export default function BranchManagement() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">Branch Management</h2>
-          <p className="text-sm md:text-base text-slate-600">Manage regional offices and contact details</p>
+          <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">
+            Branch Management
+          </h2>
+          <p className="text-sm md:text-base text-slate-600">
+            Manage regional offices and contact details
+          </p>
         </div>
-        <button 
+        <button
           onClick={handleAddBranch}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap"
-        >
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap">
           <Plus size={18} />
           Add Branch
         </button>
@@ -176,11 +230,16 @@ export default function BranchManagement() {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-white p-6 rounded-xl border border-slate-200">
-              <div className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center mb-4`}>
+            <div
+              key={index}
+              className="bg-white p-6 rounded-xl border border-slate-200">
+              <div
+                className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center mb-4`}>
                 <Icon size={24} className={stat.color} />
               </div>
-              <h3 className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</h3>
+              <h3 className="text-3xl font-bold text-slate-900 mb-1">
+                {stat.value}
+              </h3>
               <p className="text-sm text-slate-500 font-medium">{stat.label}</p>
             </div>
           );
@@ -190,7 +249,9 @@ export default function BranchManagement() {
       {/* Branches Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {branches.map((branch) => (
-          <div key={branch.id} className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-md transition-shadow">
+          <div
+            key={branch.id}
+            className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-md transition-shadow">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -204,7 +265,8 @@ export default function BranchManagement() {
                   </p>
                 </div>
               </div>
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(branch.status)}`}>
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(branch.status)}`}>
                 {branch.status}
               </span>
             </div>
@@ -235,26 +297,35 @@ export default function BranchManagement() {
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-primary font-semibold text-sm">
-                    {branch.managerName.split(' ').map(n => n[0]).join('')}
+                    {branch.managerName
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
                   </span>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">{branch.managerName}</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {branch.managerName}
+                  </p>
                   <p className="text-xs text-slate-500">Branch Manager</p>
                 </div>
               </div>
               <div className="flex gap-2">
-                <button 
+                <button
                   onClick={() => handleEditBranch(branch)}
-                  className="p-2 hover:bg-blue-50 rounded-lg transition-colors group"
-                >
-                  <Edit size={16} className="text-slate-600 group-hover:text-blue-600" />
+                  className="p-2 hover:bg-blue-50 rounded-lg transition-colors group">
+                  <Edit
+                    size={16}
+                    className="text-slate-600 group-hover:text-blue-600"
+                  />
                 </button>
-                <button 
+                <button
                   onClick={() => handleDeleteBranch(branch.id, branch.name)}
-                  className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
-                >
-                  <Trash2 size={16} className="text-slate-600 group-hover:text-red-600" />
+                  className="p-2 hover:bg-red-50 rounded-lg transition-colors group">
+                  <Trash2
+                    size={16}
+                    className="text-slate-600 group-hover:text-red-600"
+                  />
                 </button>
               </div>
             </div>
@@ -266,29 +337,36 @@ export default function BranchManagement() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingBranch ? 'Edit Branch' : 'Add New Branch'}
-        size="lg"
-      >
+        title={editingBranch ? "Edit Branch" : "Add New Branch"}
+        size="lg">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Branch Name</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Branch Name
+              </label>
               <input
                 type="text"
                 required
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                 placeholder="EduBridge Kenya"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Location</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Location
+              </label>
               <input
                 type="text"
                 required
                 value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, location: e.target.value })
+                }
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                 placeholder="Nairobi, Kenya"
               />
@@ -296,12 +374,16 @@ export default function BranchManagement() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Address</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Address
+            </label>
             <input
               type="text"
               required
               value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, address: e.target.value })
+              }
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               placeholder="Westlands Business Park, Tower A"
             />
@@ -309,23 +391,31 @@ export default function BranchManagement() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Phone</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Phone
+              </label>
               <input
                 type="tel"
                 required
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                 placeholder="+254 700 123 456"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Email
+              </label>
               <input
                 type="email"
                 required
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                 placeholder="kenya@edubridge.com"
               />
@@ -333,12 +423,16 @@ export default function BranchManagement() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Operating Hours</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Operating Hours
+            </label>
             <input
               type="text"
               required
               value={formData.hours}
-              onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, hours: e.target.value })
+              }
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               placeholder="Mon-Fri: 8AM-6PM"
             />
@@ -346,25 +440,35 @@ export default function BranchManagement() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Staff Count</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Staff Count
+              </label>
               <input
                 type="number"
                 required
                 min="0"
                 value={formData.staff}
-                onChange={(e) => setFormData({ ...formData, staff: parseInt(e.target.value) || 0 })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    staff: parseInt(e.target.value) || 0,
+                  })
+                }
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                 placeholder="8"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Status</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Status
+              </label>
               <select
                 required
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-              >
+                onChange={(e) =>
+                  setFormData({ ...formData, status: e.target.value })
+                }
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                 <option value="Active">Active</option>
                 <option value="Coming Soon">Coming Soon</option>
                 <option value="Closed">Closed</option>
@@ -373,12 +477,16 @@ export default function BranchManagement() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Manager Name</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Manager Name
+            </label>
             <input
               type="text"
               required
               value={formData.managerName}
-              onChange={(e) => setFormData({ ...formData, managerName: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, managerName: e.target.value })
+              }
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               placeholder="Sarah Wanjiku"
             />
@@ -388,15 +496,13 @@ export default function BranchManagement() {
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-5 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
-            >
+              className="px-5 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              {editingBranch ? 'Update Branch' : 'Add Branch'}
+              className="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+              {editingBranch ? "Update Branch" : "Add Branch"}
             </button>
           </div>
         </form>

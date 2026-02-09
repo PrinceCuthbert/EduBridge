@@ -1,16 +1,26 @@
-import { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { MapPin, Phone, Mail, Clock, User, Building2 } from 'lucide-react';
-import { renderToString } from 'react-dom/server';
+import { useEffect, useRef } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  LayersControl,
+} from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { MapPin, Phone, Mail, Clock, User, Building2 } from "lucide-react";
+import { renderToString } from "react-dom/server";
 
 // Fix for default marker icons in Leaflet with Vite/Webpack
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
 /**
@@ -20,12 +30,11 @@ L.Icon.Default.mergeOptions({
 const createCustomIcon = (isHeadOffice = false) => {
   const iconHtml = renderToString(
     <div className="relative">
-      <div 
-        className={`w-10 h-10 rounded-full ${isHeadOffice ? 'bg-accent' : 'bg-primary'} 
+      <div
+        className={`w-10 h-10 rounded-full ${isHeadOffice ? "bg-accent" : "bg-primary"} 
                     shadow-lg flex items-center justify-center border-4 border-white
                     transform -translate-y-1/2`}
-        style={{ position: 'relative' }}
-      >
+        style={{ position: "relative" }}>
         <MapPin className="h-5 w-5 text-white" fill="white" />
       </div>
       {isHeadOffice && (
@@ -33,12 +42,12 @@ const createCustomIcon = (isHeadOffice = false) => {
           <Building2 className="h-3 w-3 text-accent" />
         </div>
       )}
-    </div>
+    </div>,
   );
 
   return L.divIcon({
     html: iconHtml,
-    className: 'custom-marker-icon',
+    className: "custom-marker-icon",
     iconSize: [40, 40],
     iconAnchor: [20, 40],
     popupAnchor: [0, -40],
@@ -56,7 +65,7 @@ const MapController = ({ selectedBranch, branches, onMarkerClick }) => {
   useEffect(() => {
     if (selectedBranch && selectedBranch.coordinates) {
       const { lat, lng } = selectedBranch.coordinates;
-      
+
       // Smooth fly to selected branch
       map.flyTo([lat, lng], 13, {
         duration: 1.5,
@@ -64,12 +73,15 @@ const MapController = ({ selectedBranch, branches, onMarkerClick }) => {
       });
 
       // Auto-open popup after flight completes
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         const marker = markersRef.current[selectedBranch.country];
         if (marker) {
           marker.openPopup();
         }
       }, 1600); // Slightly after animation completes
+
+      // Cleanup timeout to prevent memory leak
+      return () => clearTimeout(timeoutId);
     }
   }, [selectedBranch, map]);
 
@@ -87,8 +99,7 @@ const MapController = ({ selectedBranch, branches, onMarkerClick }) => {
             click: () => {
               onMarkerClick(branch);
             },
-          }}
-        >
+          }}>
           <Popup className="custom-popup" maxWidth={300}>
             <div className="p-2">
               {/* Header */}
@@ -114,21 +125,25 @@ const MapController = ({ selectedBranch, branches, onMarkerClick }) => {
                   <MapPin className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
                   <span className="text-slate-700">{branch.address}</span>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4 text-primary flex-shrink-0" />
-                  <a href={`tel:${branch.phone}`} className="text-primary hover:underline">
+                  <a
+                    href={`tel:${branch.phone}`}
+                    className="text-primary hover:underline">
                     {branch.phone}
                   </a>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-primary flex-shrink-0" />
-                  <a href={`mailto:${branch.email}`} className="text-primary hover:underline text-xs">
+                  <a
+                    href={`mailto:${branch.email}`}
+                    className="text-primary hover:underline text-xs">
                     {branch.email}
                   </a>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-primary flex-shrink-0" />
                   <span className="text-slate-700">{branch.hours}</span>
@@ -147,19 +162,19 @@ const MapController = ({ selectedBranch, branches, onMarkerClick }) => {
  * TypeScript-compatible, scalable architecture
  * Now with Satellite View toggle!
  */
-const InteractiveMap = ({ 
-  branches, 
-  selectedBranch, 
+const InteractiveMap = ({
+  branches,
+  selectedBranch,
   onMarkerClick,
   defaultCenter = { lat: -1.9441, lng: 30.0619 }, // East Africa center
   defaultZoom = 5,
-  className = ""
+  className = "",
 }) => {
   // Smart center logic: selected branch or East Africa region
-  const mapCenter = selectedBranch?.coordinates 
+  const mapCenter = selectedBranch?.coordinates
     ? [selectedBranch.coordinates.lat, selectedBranch.coordinates.lng]
     : [defaultCenter.lat, defaultCenter.lng];
-  
+
   const initialZoom = selectedBranch ? 13 : defaultZoom;
 
   return (
@@ -180,8 +195,7 @@ const InteractiveMap = ({
         zoom={initialZoom}
         scrollWheelZoom={true}
         className="h-full w-full rounded-2xl shadow-lift z-10 relative"
-        style={{ minHeight: '450px' }}
-      >
+        style={{ minHeight: "450px" }}>
         {/* Layer Control - Toggle between Street and Satellite */}
         <LayersControl position="topright">
           {/* Street Map (Default) */}
@@ -191,19 +205,19 @@ const InteractiveMap = ({
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
           </LayersControl.BaseLayer>
-          
+
           {/* Satellite View */}
           <LayersControl.BaseLayer name="Satellite View">
             <TileLayer
-              attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+              attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
               maxZoom={19}
             />
           </LayersControl.BaseLayer>
         </LayersControl>
-        
-        <MapController 
-          selectedBranch={selectedBranch} 
+
+        <MapController
+          selectedBranch={selectedBranch}
           branches={branches}
           onMarkerClick={onMarkerClick}
         />

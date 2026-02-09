@@ -225,12 +225,7 @@ function ResourcesPage() {
           />
         );
       case "national-exams":
-        return (
-          <NationalExams
-            countries={examData}
-            subjects={subjects}
-          />
-        );
+        return <NationalExams countries={examData} subjects={subjects} />;
       case "university":
         return <UniversitiesTab />;
       case "books":
@@ -240,14 +235,20 @@ function ResourcesPage() {
       case "blog":
         return <BlogAndNewsTab />;
       default:
-        return null;
+        return (
+          <div className="flex items-center justify-center py-20">
+            <p className="text-slate-600 text-lg">Content not available</p>
+          </div>
+        );
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-20 overflow-hidden" style={{ backgroundColor: '#1e3a8a' }}>
+      <section
+        className="relative pt-32 pb-16 lg:pt-40 lg:pb-20 overflow-hidden"
+        style={{ backgroundColor: "#1e3a8a" }}>
         <div className="absolute top-0 left-0 -translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl opacity-60 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10 text-center text-white">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6 font-serif text-white">
@@ -267,7 +268,7 @@ function ResourcesPage() {
             {/* Fade indicators on edges for scroll hint */}
             <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10 hidden md:block" />
             <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 hidden md:block" />
-            
+
             {/* Scrollable tabs container */}
             <div className="flex items-center gap-2 py-4 overflow-x-auto scrollbar-hide scroll-smooth">
               <div className="flex items-center gap-2 px-2">
@@ -279,14 +280,13 @@ function ResourcesPage() {
                       activeTab === tab.id
                         ? "bg-primary text-white shadow-lg shadow-primary/20 scale-105"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:scale-105"
-                    }`}
-                  >
+                    }`}>
                     {tab.label}
                   </button>
                 ))}
               </div>
             </div>
-            
+
             {/* Mobile scroll hint */}
             <div className="md:hidden text-center pb-2">
               <p className="text-xs text-slate-400 flex items-center justify-center gap-1">
@@ -300,11 +300,9 @@ function ResourcesPage() {
       </section>
 
       {/* Tab Content */}
-      <section className="py-12">
-        {renderTabContent()}
-      </section>
+      <section className="py-12">{renderTabContent()}</section>
     </div>
-  ); 
+  );
 }
 
 export default ResourcesPage;

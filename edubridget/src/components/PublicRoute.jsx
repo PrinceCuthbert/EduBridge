@@ -1,19 +1,14 @@
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const PublicRoute = ({ children }) => {
-  const { isAuthenticated, isAdmin, isStudent } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
 
   if (isAuthenticated) {
-    if (isAdmin) {
-      return <Navigate to="/admin/dashboard" replace />;
-    }
-    if (isStudent) {
-      return <Navigate to="/dashboard" replace />;
-    }
-    // Fallback if role is unknown or valid but not handled above
-    return <Navigate to="/dashboard" replace />;
+    // Redirect authenticated users to their respective dashboard
+    const redirectPath = isAdmin ? "/admin/dashboard" : "/dashboard";
+    return <Navigate to={redirectPath} replace />;
   }
 
   return children ? children : <Outlet />;

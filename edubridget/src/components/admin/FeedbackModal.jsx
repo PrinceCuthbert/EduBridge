@@ -1,31 +1,41 @@
-import React, { useState } from 'react';
-import { X, Send, FileText, Mail } from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { X, Send, FileText, Mail } from "lucide-react";
+import { toast } from "sonner";
 
-export default function FeedbackModal({ isOpen, onClose, application, onSubmit }) {
+export default function FeedbackModal({
+  isOpen,
+  onClose,
+  application,
+  onSubmit,
+}) {
   const [feedback, setFeedback] = useState({
-    message: '',
+    message: "",
     sendEmail: true,
     requestDocuments: false,
     documents: [],
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const templates = [
     {
-      name: 'Request Additional Info',
-      message: 'Thank you for your application. We need some additional information to process your request. Please provide the following documents:\n\n1. \n2. \n3. '
+      name: "Request Additional Info",
+      message:
+        "Thank you for your application. We need some additional information to process your request. Please provide the following documents:\n\n1. \n2. \n3. ",
     },
     {
-      name: 'Application Approved',
-      message: 'Congratulations! Your application has been approved. We will contact you shortly with the next steps.'
+      name: "Application Approved",
+      message:
+        "Congratulations! Your application has been approved. We will contact you shortly with the next steps.",
     },
     {
-      name: 'Application Under Review',
-      message: 'Your application is currently under review. We will notify you of any updates within the next 5-7 business days.'
+      name: "Application Under Review",
+      message:
+        "Your application is currently under review. We will notify you of any updates within the next 5-7 business days.",
     },
     {
-      name: 'Request Clarification',
-      message: 'We have reviewed your application and need some clarification on the following:\n\n'
+      name: "Request Clarification",
+      message:
+        "We have reviewed your application and need some clarification on the following:\n\n",
     },
   ];
 
@@ -35,14 +45,38 @@ export default function FeedbackModal({ isOpen, onClose, application, onSubmit }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!feedback.message.trim()) {
-      toast.error('Please enter a feedback message');
+      toast.error("Please enter a feedback message");
       return;
     }
 
-    await onSubmit(feedback);
-    setFeedback({ message: '', sendEmail: true, requestDocuments: false, documents: [] });
+    setIsSubmitting(true);
+
+    try {
+      await onSubmit(feedback);
+
+      // Reset form on success
+      setFeedback({
+        message: "",
+        sendEmail: true,
+        requestDocuments: false,
+        documents: [],
+      });
+
+      toast.success("Feedback sent successfully!");
+      onClose();
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error("Failed to send feedback:", error);
+      }
+
+      toast.error(
+        error?.message || "Failed to send feedback. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -50,7 +84,10 @@ export default function FeedbackModal({ isOpen, onClose, application, onSubmit }
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto modern-scrollbar-light">
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={onClose} />
+      <div
+        className="fixed inset-0 bg-black/50 transition-opacity"
+        onClick={onClose}
+      />
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
@@ -58,12 +95,16 @@ export default function FeedbackModal({ isOpen, onClose, application, onSubmit }
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-slate-200">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Send Feedback</h2>
+              <h2 className="text-xl font-bold text-slate-900">
+                Send Feedback
+              </h2>
               <p className="text-sm text-slate-500 mt-1">
                 {application?.studentName} - {application?.scholarship}
               </p>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
               <X size={20} className="text-slate-400" />
             </button>
           </div>
@@ -72,15 +113,16 @@ export default function FeedbackModal({ isOpen, onClose, application, onSubmit }
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Quick Templates */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-3">Quick Templates</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-3">
+                Quick Templates
+              </label>
               <div className="grid grid-cols-2 gap-2">
                 {templates.map((template, index) => (
                   <button
                     key={index}
                     type="button"
                     onClick={() => handleTemplateSelect(template)}
-                    className="px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-primary/5 hover:border-primary hover:text-primary transition-colors text-left"
-                  >
+                    className="px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-primary/5 hover:border-primary hover:text-primary transition-colors text-left">
                     {template.name}
                   </button>
                 ))}
@@ -89,12 +131,16 @@ export default function FeedbackModal({ isOpen, onClose, application, onSubmit }
 
             {/* Feedback Message */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Feedback Message</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Feedback Message
+              </label>
               <textarea
                 required
                 rows="8"
                 value={feedback.message}
-                onChange={(e) => setFeedback({ ...feedback, message: e.target.value })}
+                onChange={(e) =>
+                  setFeedback({ ...feedback, message: e.target.value })
+                }
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none modern-scrollbar-light"
                 placeholder="Enter your feedback message..."
               />
@@ -109,12 +155,19 @@ export default function FeedbackModal({ isOpen, onClose, application, onSubmit }
                 <input
                   type="checkbox"
                   checked={feedback.sendEmail}
-                  onChange={(e) => setFeedback({ ...feedback, sendEmail: e.target.checked })}
+                  onChange={(e) =>
+                    setFeedback({ ...feedback, sendEmail: e.target.checked })
+                  }
                   className="w-4 h-4 text-primary rounded focus:ring-primary/20"
                 />
                 <div className="flex items-center gap-2">
-                  <Mail size={18} className="text-slate-400 group-hover:text-primary" />
-                  <span className="text-sm font-medium text-slate-700">Send email notification to student</span>
+                  <Mail
+                    size={18}
+                    className="text-slate-400 group-hover:text-primary"
+                  />
+                  <span className="text-sm font-medium text-slate-700">
+                    Send email notification to student
+                  </span>
                 </div>
               </label>
 
@@ -122,12 +175,22 @@ export default function FeedbackModal({ isOpen, onClose, application, onSubmit }
                 <input
                   type="checkbox"
                   checked={feedback.requestDocuments}
-                  onChange={(e) => setFeedback({ ...feedback, requestDocuments: e.target.checked })}
+                  onChange={(e) =>
+                    setFeedback({
+                      ...feedback,
+                      requestDocuments: e.target.checked,
+                    })
+                  }
                   className="w-4 h-4 text-primary rounded focus:ring-primary/20"
                 />
                 <div className="flex items-center gap-2">
-                  <FileText size={18} className="text-slate-400 group-hover:text-primary" />
-                  <span className="text-sm font-medium text-slate-700">Request additional documents</span>
+                  <FileText
+                    size={18}
+                    className="text-slate-400 group-hover:text-primary"
+                  />
+                  <span className="text-sm font-medium text-slate-700">
+                    Request additional documents
+                  </span>
                 </div>
               </label>
             </div>
@@ -135,10 +198,17 @@ export default function FeedbackModal({ isOpen, onClose, application, onSubmit }
             {/* Preview */}
             {feedback.sendEmail && (
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                <h4 className="text-sm font-semibold text-slate-700 mb-2">Email Preview</h4>
+                <h4 className="text-sm font-semibold text-slate-700 mb-2">
+                  Email Preview
+                </h4>
                 <div className="text-sm text-slate-600 space-y-1">
-                  <p><strong>To:</strong> {application?.email}</p>
-                  <p><strong>Subject:</strong> Update on Your {application?.scholarship} Application</p>
+                  <p>
+                    <strong>To:</strong> {application?.email}
+                  </p>
+                  <p>
+                    <strong>Subject:</strong> Update on Your{" "}
+                    {application?.scholarship} Application
+                  </p>
                   <div className="mt-3 p-3 bg-white rounded border border-slate-200 max-h-32 overflow-y-auto modern-scrollbar-light">
                     <p className="whitespace-pre-wrap">{feedback.message}</p>
                   </div>
@@ -151,16 +221,41 @@ export default function FeedbackModal({ isOpen, onClose, application, onSubmit }
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
-              >
+                disabled={isSubmitting}
+                className="px-5 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex items-center gap-2 px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-              >
-                <Send size={18} />
-                Send Feedback
+                disabled={isSubmitting}
+                className="flex items-center gap-2 px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
+                {isSubmitting ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send size={18} />
+                    Send Feedback
+                  </>
+                )}
               </button>
             </div>
           </form>

@@ -18,7 +18,6 @@ import WhatsAppButton from "./components/WhatsAppButton";
 import LoadingSpinner from "./components/LoadingSpinner";
 
 // Lazy Load Pages for Performance
-// Lazy Load Pages for Performance
 const LandingPage = lazy(() => import("./pages/home/LandingPage"));
 
 // Legacy Pages
@@ -29,6 +28,7 @@ const Signup = lazy(() => import("./pages/auth/SignUpPage"));
 
 // New Pages
 const BlogDetailsPage = lazy(() => import("./pages/blog/BlogDetailsPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 // New Pages
 const DigitalLibraryPage = lazy(
@@ -233,6 +233,9 @@ function App() {
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
+
+              {/* 404 Catch-All Route */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </div>
