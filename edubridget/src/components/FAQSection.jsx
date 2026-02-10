@@ -27,11 +27,11 @@ function FAQSection({
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-6">
             <HelpCircle className="w-8 h-8 text-primary" />
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl md:text-4xl font-bold text-slate-900 mb-4">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="text-md text-slate-600 max-w-2xl mx-auto">
               {subtitle}
             </p>
           )}

@@ -30,7 +30,7 @@ export default function CMSPosts() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-slate-800">Blog Posts & News</h2>
+        <h2 className="text-2xl font-bold text-slate-900">Blog Posts & News</h2>
         <button 
           onClick={handleAdd}
           className="bg-primary text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-primary/90"

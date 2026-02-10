@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { ChevronRight, Heart, Share2, Printer, MapPin, Calendar, FileText, CheckCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { BASE_URL } from "../../config/api";
+
 export default function ProgramDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -15,14 +17,52 @@ export default function ProgramDetail() {
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
-    // Simulate API fetch
-    setLoading(true);
-    setTimeout(() => {
-      const foundProgram = MOCK_PROGRAMS.find(p => p.id === parseInt(id));
-      setProgram(foundProgram);
-      setLoading(false);
-    }, 500);
+    const fetchProgram = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${BASE_URL}/programs/${id}`);
+        if (!res.ok) throw new Error("Program not found");
+        const data = await res.json();
+        setProgram(data);
+      } catch (error) {
+        console.error("Error fetching program:", error);
+        toast.error("Failed to load program details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProgram();
   }, [id]);
+
+
+  const handleApply = async () => {
+    try {
+      // Check if user is logged in
+      const user = JSON.parse(localStorage.getItem("edubridge-user")); 
+      
+      // Simulate loading
+      setLoading(true);
+
+      // Simulate API call
+      // const res = await fetch(`${BASE_URL}/applications`, { 
+      //   method: "POST",
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ programId: id, userId: user?.id }) 
+      // });
+      
+      // Simulate delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast.success("Application started successfully! (Demo)");
+      navigate('/dashboard'); // creating a flow
+      
+    } catch (error) {
+      toast.error(error.message || "Failed to apply");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -208,7 +248,7 @@ export default function ProgramDetail() {
                  </div>
 
                  <div className="space-y-3">
-                   <Button className="w-full bg-emerald-600 hover:bg-emerald-700 h-11 text-base">
+                   <Button onClick={handleApply} className="w-full bg-emerald-600 hover:bg-emerald-700 h-11 text-base">
                      Apply Now
                    </Button>
                    <div className="grid grid-cols-2 gap-3">

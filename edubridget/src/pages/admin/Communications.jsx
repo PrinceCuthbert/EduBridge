@@ -100,8 +100,8 @@ export default function Communications() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">Communications</h2>
-        <p className="text-slate-600">Send notifications and messages to students</p>
+        <h1 className="text-2xl font-bold text-slate-900">Communications</h1>
+        <p className="text-slate-500 text-sm">Send notifications and messages to students</p>
       </div>
 
       {/* Stats */}

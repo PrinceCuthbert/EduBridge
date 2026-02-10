@@ -42,8 +42,8 @@ export default function Analytics() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Analytics & Reports</h2>
-          <p className="text-slate-600">Performance metrics and insights</p>
+          <h1 className="text-2xl font-bold text-slate-900">Analytics & Reports</h1>
+          <p className="text-slate-500 text-sm">Performance metrics and insights</p>
         </div>
 
         <div className="flex items-center gap-3">

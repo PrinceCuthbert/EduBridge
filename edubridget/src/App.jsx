@@ -92,6 +92,7 @@ const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const FinancialReports = lazy(() => import("./pages/admin/FinancialReports"));
 const Analytics = lazy(() => import("./pages/admin/Analytics"));
 const VisaCases = lazy(() => import("./pages/admin/VisaCases"));
+const Communications = lazy(() => import("./pages/admin/Communications"));
 
 // Dashboard Layout - Lazy Loaded
 const StudentDashboardLayout = lazy(
@@ -231,6 +232,7 @@ function App() {
                 <Route path="branches" element={<BranchManagement />} />
                 <Route path="finance" element={<FinancialReports />} />
                 <Route path="analytics" element={<Analytics />} />
+                <Route path="communications" element={<Communications />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
 

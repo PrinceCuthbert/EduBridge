@@ -1,151 +1,155 @@
 import React, { useState } from 'react';
-import { Search, Plus, Filter, MoreVertical, Edit2, Trash2, XCircle, FileText, Globe, Calendar, MapPin, CheckCircle, Clock } from 'lucide-react';
+import { Plus, Edit, Trash2, FileText, Globe, Calendar, CheckCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { MOCK_PROGRAMS } from '../../data/mockData';
-
+import { MOCK_SCHOLARSHIPS } from '../../data/mockData';
+import AdminPageHeader from "../../components/admin/AdminPageHeader";
+import AdminStatsGrid from "../../components/admin/AdminStatsGrid";
+import AdminFilterBar from "../../components/admin/AdminFilterBar";
+import AdminTable from "../../components/admin/AdminTable";
 
 export default function ScholarshipManager() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
-  // Programs Data
-  const [programs, setPrograms] = useState(MOCK_PROGRAMS);
+  // Scholarships Data
+  const [scholarships, setScholarships] = useState(MOCK_SCHOLARSHIPS);
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this program?')) {
-      setPrograms(programs.filter(p => p.id !== id));
-      // Remove from MOCK_PROGRAMS for session persistence
-      const idx = MOCK_PROGRAMS.findIndex(p => p.id === id);
-      if (idx !== -1) MOCK_PROGRAMS.splice(idx, 1);
-      toast.success('Program deleted');
-    }
+  const handleDelete = (id, title) => {
+    toast.promise(
+      new Promise((resolve, reject) => {
+        if (window.confirm(`Remove scholarship for ${title}?`)) {
+          setScholarships(scholarships.filter(s => s.id !== id));
+          // Remove from MOCK_SCHOLARSHIPS for session persistence
+          const idx = MOCK_SCHOLARSHIPS.findIndex(s => s.id === id);
+          if (idx !== -1) MOCK_SCHOLARSHIPS.splice(idx, 1);
+          resolve();
+        } else {
+          reject();
+        }
+      }),
+      {
+        loading: 'Processing deletion...',
+        success: 'Scholarship removed from database',
+        error: 'Action cancelled',
+      }
+    );
   };
 
-  const filteredPrograms = programs.filter(p => {
-    const matchesSearch = p.universityName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'All' || p.status === statusFilter;
+  const filteredScholarships = scholarships.filter(s => {
+    const matchesSearch = s.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || s.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900">University Programs</h2>
-          <p className="text-slate-500">Manage Study Abroad programs (D-2, D-4)</p>
-        </div>
-        <button 
-          onClick={() => navigate('/admin/programs/new')}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-        >
-          <Plus size={20} />
-          Add Program
-        </button>
-      </div>
+  const stats = [
+    { label: 'Total Volume', value: scholarships.length, icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Active Grants', value: scholarships.filter(s => s.status === 'Active').length, icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { label: 'Expiring Soon', value: '3', icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: 'Global Partners', value: '12', icon: Globe, color: 'text-purple-600', bg: 'bg-purple-50' }
+  ];
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-          <input
-            type="text"
-            placeholder="Search universities..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-          />
+  const columns = [
+    {
+      header: "Scholarship Dossier",
+      render: (item) => (
+        <div className="flex flex-col pt-0.5">
+          <span className="font-serif text-[#0F172A] group-hover:text-blue-600 transition-colors text-[17px] antialiased tracking-tight">{item.title}</span>
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mt-1 opacity-70 line-clamp-1">
+              {item.description}
+          </span>
         </div>
-        <div className="flex items-center gap-2">
-          <Filter size={20} className="text-slate-400" />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+      )
+    },
+    {
+      header: "Grant Allocation",
+      render: (item) => (
+        <span className="font-bold text-emerald-600 text-sm tracking-tight">{item.amount}</span>
+      )
+    },
+    {
+      header: "Deadline Date",
+      render: (item) => (
+        <div className="flex items-center gap-2.5 text-slate-500 font-bold text-[10px] uppercase tracking-[0.15em] opacity-80">
+          <Calendar size={14} className="text-slate-300" />
+          {item.deadline}
+        </div>
+      )
+    },
+    {
+      header: "Target Region",
+      render: (item) => (
+        <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-tight">
+          <Globe size={14} className="text-slate-300" />
+          {item.location}
+        </div>
+      )
+    },
+    {
+      header: "Action Control",
+      className: "text-right pr-12",
+      render: (item) => (
+        <div className="flex items-center justify-end gap-3">
+          <button 
+            onClick={() => navigate(`/admin/programs/${item.id}`)}
+            className="px-6 py-3 bg-[#0F172A] text-white rounded-[1.25rem] font-bold text-[11px] uppercase tracking-widest hover:bg-[#1E293B] hover:shadow-lg transition-all active:scale-95 flex items-center gap-2.5 shadow-md group-hover:translate-x-[-4px]"
           >
-            <option value="All">All Status</option>
-            <option value="Active">Active</option>
-            <option value="Draft">Draft</option>
-            <option value="Archived">Archived</option>
-          </select>
+            <Edit size={16} />
+            Edit
+          </button>
+          <button 
+            onClick={() => handleDelete(item.id, item.title)}
+            className="p-3 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+          >
+            <Trash2 size={20} />
+          </button>
         </div>
-      </div>
+      )
+    }
+  ];
 
-      {/* List */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">University</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Visa Type</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Country</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Status</th>
-                <th className="text-right py-4 px-6 text-sm font-semibold text-slate-600">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredPrograms.map((program) => (
-                <tr key={program.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="py-4 px-6">
-                    <div>
-                      <h3 className="font-semibold text-slate-900">{program.universityName}</h3>
-                      <div className="flex gap-1 mt-1">
-                        {program.tags?.map((tag, i) => (
-                          <span key={i} className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${program.visaType === 'D-2' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'}`}>
-                      {program.visaType}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6 text-sm text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <Globe size={14} />
-                      {program.country}
-                    </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${
-                      program.status === 'Active' ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-600'
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${program.status === 'Active' ? 'bg-green-500' : 'bg-slate-400'}`} />
-                      {program.status || 'Active'}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="flex items-center justify-end gap-2">
-                      <button 
-                        onClick={() => navigate(`/admin/programs/${program.id}`)}
-                        className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-primary transition-colors"
-                        title="Edit Details"
-                      >
-                        <Edit2 size={18} />
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(program.id)}
-                        className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-red-600 transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+  return (
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+      <AdminPageHeader 
+        title="University Grants" 
+        subtitle="Manage global scholarship programs and partner university offerings."
+        count={filteredScholarships.length}
+        countLabel="active programs"
+        primaryAction={{
+          label: "New Scholarship",
+          icon: Plus,
+          onClick: () => navigate('/admin/programs/new'),
+          rotateIcon: true
+        }}
+      />
 
+      <AdminStatsGrid stats={stats} />
 
+      <AdminFilterBar 
+        searchQuery={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search scholarships..."
+        filterOptions={['All', 'Active', 'Draft', 'Archived']}
+        activeFilter={statusFilter}
+        onFilterChange={setStatusFilter}
+      />
+
+      <AdminTable 
+        columns={columns}
+        data={filteredScholarships}
+        isLoading={false}
+        emptyState={
+           <div className="flex flex-col items-center max-w-sm mx-auto">
+              <div className="w-24 h-24 bg-slate-50/50 rounded-[2.5rem] flex items-center justify-center mb-8 border border-slate-100">
+                <FileText size={40} className="text-slate-200" />
+              </div>
+              <h4 className="text-xl font-serif text-[#0F172A] mb-2 tracking-tight">No Scholarships Found</h4>
+              <p className="text-[13px] font-medium text-slate-400 mb-6 leading-relaxed antialiased">
+                No scholarship programs match your current search criteria.
+              </p>
+           </div>
+        }
+      />
     </div>
   );
 }
-

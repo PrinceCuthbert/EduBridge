@@ -6,8 +6,10 @@ import { MapPin, Phone, Mail, Clock, User, ChevronRight, Building2 } from "lucid
 import { Link } from "react-router-dom";
 import InteractiveMap from "@/components/InteractiveMap";
 import { branches } from "@/data/branches";
+import { useTranslation } from "react-i18next";
 
 const BranchesPage = () => {
+  const { t } = useTranslation();
   // State to track selected branch for the map
   const [selectedBranch, setSelectedBranch] = useState(branches[0]); // Default to Rwanda (Head Office)
 
@@ -23,10 +25,10 @@ const BranchesPage = () => {
               className="text-center text-white"
             >
               <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-                Our Branches
+                {t('branches_page.hero_title')}
               </h1>
               <p className="text-xl text-white/90 max-w-2xl mx-auto">
-                Visit any of our offices across East Africa for in-person consultation and support.
+                {t('branches_page.hero_subtitle')}
               </p>
             </motion.div>
           </div>
@@ -37,9 +39,9 @@ const BranchesPage = () => {
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 font-serif">
-                Find Us
+                {t('branches_page.find_us.title')}
               </h2>
-              <p className="text-slate-600">Visit any of our offices across East Africa</p>
+              <p className="text-slate-600">{t('branches_page.find_us.subtitle')}</p>
             </div>
 
             {/* Branch Tabs */}
@@ -118,7 +120,7 @@ const BranchesPage = () => {
                   <Card className={`h-full overflow-hidden border-slate-200 shadow-sm hover:shadow-lg transition-shadow bg-white ${branch.isHeadOffice ? "border-primary ring-1 ring-primary/20" : ""}`}>
                     {branch.isHeadOffice && (
                       <div className="bg-primary text-white text-center py-2 text-sm font-medium">
-                        🏢 Head Office
+                        🏢 {t('branches_page.head_office_badge')}
                       </div>
                     )}
                     <div 
@@ -165,7 +167,7 @@ const BranchesPage = () => {
                       </div>
 
                       <Button variant="outline" className="w-full border-slate-200 hover:bg-slate-50 hover:text-primary" size="sm">
-                        Contact This Branch
+                        {t('branches_page.contact_branch_button')}
                         <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>
                     </CardContent>
@@ -180,14 +182,14 @@ const BranchesPage = () => {
         <section className="py-16 bg-white text-center">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
-              Can't Visit in Person?
+              {t('branches_page.cta.title')}
             </h2>
             <p className="text-slate-600 mb-8 max-w-xl mx-auto">
-              Book an online consultation and get the same expert guidance from anywhere.
+              {t('branches_page.cta.description')}
             </p>
             <Link to="/visa-consultation">
               <Button size="lg" className="bg-primary hover:bg-primary-dark text-white">
-                Book Online Consultation
+                {t('branches_page.cta.button')}
               </Button>
             </Link>
           </div>

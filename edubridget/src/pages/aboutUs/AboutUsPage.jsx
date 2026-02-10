@@ -39,41 +39,7 @@ function AboutUsPage() {
   const teamMembers = t("about.team_members", { returnObjects: true });
 
   // Journey timeline data
-  const journeyMilestones = [
-    {
-      year: "2018",
-      title: "Founded",
-      description:
-        "TM EduBridge was established with a vision to transform education in East Africa",
-    },
-    {
-      year: "2019",
-      title: "First Cohort",
-      description: "Successfully enrolled and mentored 100+ students",
-    },
-    {
-      year: "2020",
-      title: "Digital Innovation",
-      description: "Launched our comprehensive online learning platform",
-    },
-    {
-      year: "2022",
-      title: "Global Partnerships",
-      description:
-        "Established partnerships with 20+ international universities",
-    },
-    {
-      year: "2024",
-      title: "Expanding Impact",
-      description: "Reached 5,000+ students across multiple countries",
-    },
-    {
-      year: "2026",
-      title: "AI-Driven Learning",
-      description:
-        "Pioneering personalized education with cutting-edge technology",
-    },
-  ];
+  const journeyMilestones = t("about.journey_milestones", { returnObjects: true });
 
   return (
     <div className="min-h-screen bg-[#F9F9F9]">
@@ -226,37 +192,18 @@ function AboutUsPage() {
                 className="lg:col-span-8 space-y-4 text-slate-700 text-sm md:text-base leading-relaxed"
                 style={{ fontFamily: "'Inter', sans-serif" }}>
                 <p className="text-base md:text-lg font-semibold text-[#1A237E]">
-                  Dear Future Leaders,
+                  {t("about.ceo_message.dear")}
                 </p>
 
-                <p>
-                  At TM EduBridge, we believe{" "}
-                  <strong>
-                    education is the most powerful catalyst for transformation
-                  </strong>
-                  . Our mission is to bridge the gap between ambition and
-                  achievement, empowering students across East Africa to access
-                  world-class learning opportunities.
-                </p>
+                <p dangerouslySetInnerHTML={{ __html: t("about.ceo_message.p1") }} />
 
-                <p>
-                  We've built more than a platform—we've created a{" "}
-                  <strong>
-                    community of dreamers, innovators, and change-makers
-                  </strong>
-                  . From personalized mentorship to cutting-edge digital
-                  resources, every aspect of EduBridge is designed with your
-                  success in mind.
-                </p>
+                <p dangerouslySetInnerHTML={{ __html: t("about.ceo_message.p2") }} />
 
-                <p>
-                  Together, we're not just preparing for the future—
-                  <strong>we're building it</strong>.
-                </p>
+                <p dangerouslySetInnerHTML={{ __html: t("about.ceo_message.p3") }} />
 
                 <div className="pt-5 border-t border-slate-200">
                   <p className="font-semibold text-base md:text-lg text-[#1A237E]">
-                    With unwavering commitment,
+                    {t("about.ceo_message.commitment")}
                   </p>
                   <p
                     className="font-bold text-lg md:text-xl mt-1"
@@ -376,12 +323,12 @@ function AboutUsPage() {
             <h2
               className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1A237E] mb-3"
               style={{ fontFamily: "'Playfair Display', serif" }}>
-              Our Journey
+              {t("about.journey_title")}
             </h2>
             <p
               className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto"
               style={{ fontFamily: "'Inter', sans-serif" }}>
-              Milestones that shaped our mission to transform education
+              {t("about.journey_subtitle")}
             </p>
           </motion.div>
 

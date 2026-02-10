@@ -220,7 +220,7 @@ export const MOCK_BLOGS = [
     excerpt:
       "Preparing for your student visa interview? Here are the top 10 tips to ensure you make a great impression and secure your visa.",
     image:
-      "https://placehold.co/800x600/1e40af/ffffff/png?text=Visa+Interview+Tips&font=roboto",
+      "https://images.unsplash.com/photo-1569091791842-7cf9646552dd?q=80&w=2070&auto=format&fit=crop",
   },
   {
     id: 2,
@@ -231,7 +231,7 @@ export const MOCK_BLOGS = [
     excerpt:
       "Discover the most prestigious and fully funded scholarships available for African students looking to study abroad this year.",
     image:
-      "https://placehold.co/800x600/2563eb/ffffff/png?text=Scholarships+2024&font=roboto",
+      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop",
   },
   {
     id: 3,
@@ -242,7 +242,7 @@ export const MOCK_BLOGS = [
     excerpt:
       "Sarah shares her experience of adapting to Korean culture, food, and university life as an international student.",
     image:
-      "https://placehold.co/800x600/7c3aed/ffffff/png?text=Life+in+Korea&font=roboto",
+      "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=2006&auto=format&fit=crop",
   },
   {
     id: 4,
@@ -253,7 +253,7 @@ export const MOCK_BLOGS = [
     excerpt:
       "Break down the four sections of the IELTS exam: Listening, Reading, Writing, and Speaking, with expert strategies for each.",
     image:
-      "https://placehold.co/800x600/059669/ffffff/png?text=IELTS+Exam+Guide&font=roboto",
+      "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=2071&auto=format&fit=crop",
   },
   {
     id: 5,
@@ -264,7 +264,7 @@ export const MOCK_BLOGS = [
     excerpt:
       "Did you know public universities in Germany are tuition-free? Learn how you can access world-class education for free.",
     image:
-      "https://placehold.co/800x600/dc2626/ffffff/png?text=Study+in+Germany&font=roboto",
+      "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=2070&auto=format&fit=crop",
   },
   {
     id: 6,
@@ -275,7 +275,7 @@ export const MOCK_BLOGS = [
     excerpt:
       "Don't forget the essentials! Here is the ultimate packing checklist for students moving abroad for the first time.",
     image:
-      "https://placehold.co/800x600/ea580c/ffffff/png?text=Packing+Checklist&font=roboto",
+      "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop",
   },
   {
     id: 7,
@@ -286,7 +286,7 @@ export const MOCK_BLOGS = [
     excerpt:
       "Learning a new language opens up career opportunities and enhances cognitive abilities. Here's why you should start today.",
     image:
-      "https://placehold.co/800x600/0891b2/ffffff/png?text=Learn+Languages&font=roboto",
+      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1974&auto=format&fit=crop",
   },
   {
     id: 8,
@@ -297,7 +297,7 @@ export const MOCK_BLOGS = [
     excerpt:
       "Your SOP is your story. Learn how to write a compelling narrative that convinces admissions officers you are the perfect candidate.",
     image:
-      "https://placehold.co/800x600/be123c/ffffff/png?text=Statement+of+Purpose&font=roboto",
+      "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=2073&auto=format&fit=crop",
   },
 ];
 
@@ -308,7 +308,7 @@ export const MOCK_MEDIA = [
     university: "University of Toronto",
     country: "Canada",
     image:
-      "https://placehold.co/1470x980/1e40af/ffffff/png?text=University+of+Toronto&font=roboto",
+      "https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=2070&auto=format&fit=crop",
     testimony:
       "EduBridge made my dream of studying in Canada a reality. The visa process was smooth, and they guided me every step of the way.",
     program: "Computer Science",
@@ -319,7 +319,7 @@ export const MOCK_MEDIA = [
     university: "University of Melbourne",
     country: "Australia",
     image:
-      "https://placehold.co/1470x980/2563eb/ffffff/png?text=University+of+Melbourne&font=roboto",
+      "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2070&auto=format&fit=crop",
     testimony:
       "I never thought I could get a scholarship to study in Australia. The team at EduBridge helped me find the perfect opportunity.",
     program: "Business Administration",
@@ -330,7 +330,7 @@ export const MOCK_MEDIA = [
     university: "Seoul National University",
     country: "South Korea",
     image:
-      "https://placehold.co/1470x980/7c3aed/ffffff/png?text=Seoul+National+University&font=roboto",
+      "https://images.unsplash.com/photo-1596423984534-722a944fb401?q=80&w=1964&auto=format&fit=crop",
     testimony:
       "Studying in Korea has been an amazing cultural experience. Thank you EduBridge for the support!",
     program: "International Relations",
@@ -341,7 +341,7 @@ export const MOCK_MEDIA = [
     university: "Technical University of Munich",
     country: "Germany",
     image:
-      "https://placehold.co/1470x980/dc2626/ffffff/png?text=TU+Munich&font=roboto",
+      "https://images.unsplash.com/photo-1565034946487-077786996e27?q=80&w=2070&auto=format&fit=crop",
     testimony:
       "The guidance on German student visas was invaluable. I'm now pursuing my Masters in Engineering at a top university.",
     program: "Mechanical Engineering",
@@ -352,7 +352,7 @@ export const MOCK_MEDIA = [
     university: "University of Manchester",
     country: "UK",
     image:
-      "https://placehold.co/1470x980/059669/ffffff/png?text=University+of+Manchester&font=roboto",
+      "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=2049&auto=format&fit=crop",
     testimony:
       "From application to arrival, EduBridge was there. The pre-departure orientation really helped me prepare for life in the UK.",
     program: "Psychology",
@@ -363,9 +363,124 @@ export const MOCK_MEDIA = [
     university: "University of Tokyo",
     country: "Japan",
     image:
-      "https://placehold.co/1470x980/ea580c/ffffff/png?text=University+of+Tokyo&font=roboto",
+      "https://images.unsplash.com/photo-1624813583594-526cb3b925b9?q=80&w=1934&auto=format&fit=crop",
     testimony:
       "Highly recommend EduBridge for anyone looking to study in Asia. They have great connections and knowledge.",
     program: "Robotics",
+  },
+];
+
+export const MOCK_PARTNERS = [
+  {
+    id: 1,
+    name: "Kyungsung University",
+    enName: "Kyungsung University",
+    logo: "https://ui-avatars.com/api/?name=Kyungsung+University&background=1e40af&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-2",
+  },
+  {
+    id: 2,
+    name: "Geoje University",
+    enName: "Geoje University",
+    logo: "https://ui-avatars.com/api/?name=Geoje+University&background=2563eb&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-2",
+  },
+  {
+    id: 3,
+    name: "Seoul Theological",
+    enName: "Seoul Theological Univ",
+    logo: "https://ui-avatars.com/api/?name=Seoul+Theological&background=7c3aed&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-2",
+  },
+  {
+    id: 4,
+    name: "Gangseo University",
+    enName: "Gangseo University",
+    logo: "https://ui-avatars.com/api/?name=Gangseo+University&background=dc2626&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-2",
+  },
+  {
+    id: 5,
+    name: "Indu University",
+    enName: "Indu University",
+    logo: "https://ui-avatars.com/api/?name=Indu+University&background=059669&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-2",
+  },
+  {
+    id: 6,
+    name: "Calvin University",
+    enName: "Calvin University",
+    logo: "https://ui-avatars.com/api/?name=Calvin+University&background=ea580c&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-2",
+  },
+  {
+    id: 7,
+    name: "Daejin University",
+    enName: "Daejin University",
+    logo: "https://ui-avatars.com/api/?name=Daejin+University&background=0891b2&color=fff&size=128&bold=true",
+    badge: "BEST",
+    type: "D-2",
+  },
+  {
+    id: 8,
+    name: "Soongsil University",
+    enName: "Soongsil University",
+    logo: "https://ui-avatars.com/api/?name=Soongsil+University&background=be123c&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-2",
+  },
+  {
+    id: 9,
+    name: "Tongwon University",
+    enName: "Tongwon University",
+    logo: "https://ui-avatars.com/api/?name=Tongwon+University&background=4f46e5&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-4-1",
+  },
+  {
+    id: 10,
+    name: "Seoul Theological",
+    enName: "STU - VIET NAM",
+    logo: "https://ui-avatars.com/api/?name=STU+VIETNAM&background=16a34a&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-4-1",
+  },
+  {
+    id: 11,
+    name: "Chungbuk Health",
+    enName: "Chungbuk Health Science",
+    logo: "https://ui-avatars.com/api/?name=Chungbuk+Health&background=0369a1&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-4-1",
+  },
+  {
+    id: 12,
+    name: "Seoul Theological",
+    enName: "STU",
+    logo: "https://ui-avatars.com/api/?name=Seoul+Theological&background=7c3aed&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-4-1",
+  },
+  {
+    id: 13,
+    name: "Seoul Women Univ",
+    enName: "Seoul Women's Univ",
+    logo: "https://ui-avatars.com/api/?name=Seoul+Women&background=db2777&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-4-1",
+  },
+  {
+    id: 14,
+    name: "Kwang Woon",
+    enName: "Kwang Woon Univ",
+    logo: "https://ui-avatars.com/api/?name=Kwang+Woon&background=0d9488&color=fff&size=128&bold=true",
+    badge: "NEW",
+    type: "D-4-1",
   },
 ];

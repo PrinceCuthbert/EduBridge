@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
@@ -10,111 +10,9 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import OptimizedImage from "@/components/OptimizedImage";
-
-// Mock Data for Universities
-const d2Universities = [
-  {
-    name: "Kyungsung University",
-    enName: "Kyungsung University",
-    logo: "https://ui-avatars.com/api/?name=Kyungsung+University&background=1e40af&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-2",
-  },
-  {
-    name: "Geoje University",
-    enName: "Geoje University",
-    logo: "https://ui-avatars.com/api/?name=Geoje+University&background=2563eb&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-2",
-  },
-  {
-    name: "Seoul Theological",
-    enName: "Seoul Theological Univ",
-    logo: "https://ui-avatars.com/api/?name=Seoul+Theological&background=7c3aed&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-2",
-  },
-  {
-    name: "Gangseo University",
-    enName: "Gangseo University",
-    logo: "https://ui-avatars.com/api/?name=Gangseo+University&background=dc2626&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-2",
-  },
-  {
-    name: "Indu University",
-    enName: "Indu University",
-    logo: "https://ui-avatars.com/api/?name=Indu+University&background=059669&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-2",
-  },
-  {
-    name: "Calvin University",
-    enName: "Calvin University",
-    logo: "https://ui-avatars.com/api/?name=Calvin+University&background=ea580c&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-2",
-  },
-  {
-    name: "Daejin University",
-    enName: "Daejin University",
-    logo: "https://ui-avatars.com/api/?name=Daejin+University&background=0891b2&color=fff&size=128&bold=true",
-    badge: "BEST",
-    type: "D-2",
-  },
-  {
-    name: "Soongsil University",
-    enName: "Soongsil University",
-    logo: "https://ui-avatars.com/api/?name=Soongsil+University&background=be123c&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-2",
-  },
-];
-
-const d4Universities = [
-  {
-    name: "Tongwon University",
-    enName: "Tongwon University",
-    logo: "https://ui-avatars.com/api/?name=Tongwon+University&background=4f46e5&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-4-1",
-  },
-  {
-    name: "Seoul Theological",
-    enName: "STU - VIET NAM",
-    logo: "https://ui-avatars.com/api/?name=STU+VIETNAM&background=16a34a&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-4-1",
-  },
-  {
-    name: "Chungbuk Health",
-    enName: "Chungbuk Health Science",
-    logo: "https://ui-avatars.com/api/?name=Chungbuk+Health&background=0369a1&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-4-1",
-  },
-  {
-    name: "Seoul Theological",
-    enName: "STU",
-    logo: "https://ui-avatars.com/api/?name=Seoul+Theological&background=7c3aed&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-4-1",
-  },
-  {
-    name: "Seoul Women Univ",
-    enName: "Seoul Women's Univ",
-    logo: "https://ui-avatars.com/api/?name=Seoul+Women&background=db2777&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-4-1",
-  },
-  {
-    name: "Kwang Woon",
-    enName: "Kwang Woon Univ",
-    logo: "https://ui-avatars.com/api/?name=Kwang+Woon&background=0d9488&color=fff&size=128&bold=true",
-    badge: "NEW",
-    type: "D-4-1",
-  },
-];
+import { BASE_URL } from "@/config/api";
+import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 // Custom Slider Component
 const UniversitySlider = ({ items, title }) => {
@@ -222,6 +120,32 @@ const UniversitySlider = ({ items, title }) => {
 };
 
 export default function PartnersPage() {
+  const { t } = useTranslation();
+  const [partners, setPartners] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${BASE_URL}/partners`);
+        if (!res.ok) throw new Error("Failed to load partners");
+        const data = await res.json();
+        setPartners(data);
+      } catch (error) {
+        console.error("Error loading partners:", error);
+        toast.error("Failed to load partners");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPartners();
+  }, []);
+
+  const d2Universities = partners.filter(p => p.type === 'D-2');
+  const d4Universities = partners.filter(p => p.type === 'D-4-1');
+
   return (
     <div className="min-h-screen bg-white">
       {/* Top Categories */}
@@ -231,22 +155,22 @@ export default function PartnersPage() {
             {[
               {
                 icon: BookOpen,
-                label: "Language Training",
+                label: t("partners_page.categories.language_training"),
                 color: "bg-emerald-100 text-emerald-600",
               },
               {
                 icon: Building2,
-                label: "University",
+                label: t("partners_page.categories.university"),
                 color: "bg-orange-100 text-orange-600",
               },
               {
                 icon: GraduationCap,
-                label: "Graduate school",
+                label: t("partners_page.categories.graduate_school"),
                 color: "bg-blue-100 text-blue-600",
               },
               {
                 icon: FileText,
-                label: "Required documents",
+                label: t("partners_page.categories.required_documents"),
                 color: "bg-purple-100 text-purple-600",
               },
             ].map((item, idx) => (
@@ -269,14 +193,22 @@ export default function PartnersPage() {
       {/* Sliders Section */}
       <section className="pb-20">
         <div className="max-w-7xl mx-auto px-6">
-          <UniversitySlider
-            items={d2Universities}
-            title="Available Universities (D-2)"
-          />
-          <UniversitySlider
-            items={d4Universities}
-            title="Available Universities (D-4-1)"
-          />
+          {loading ? (
+             <div className="flex justify-center p-12">
+               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+             </div>
+          ) : (
+            <>
+              <UniversitySlider
+                items={d2Universities}
+                title={t("partners_page.sliders.d2_title")}
+              />
+              <UniversitySlider
+                items={d4Universities}
+                title={t("partners_page.sliders.d4_title")}
+              />
+            </>
+          )}
         </div>
       </section>
     </div>

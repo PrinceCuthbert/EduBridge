@@ -2,7 +2,10 @@ import React from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons";
 
+import { useTranslation } from "react-i18next";
+
 const Testimonials = () => {
+  const { t } = useTranslation();
   const reviews = [
     {
       name: "Jane M.",
@@ -34,10 +37,10 @@ const Testimonials = () => {
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 font-primary">
-            What Our Learners Say
+            {t('home_page.testimonials.title')}
           </h2>
           <p className="text-lg text-slate-600 leading-relaxed">
-            Hear from students and educators across Africa who have benefited from TM EduBridge.
+            {t('home_page.testimonials.subtitle')}
           </p>
         </div>
 

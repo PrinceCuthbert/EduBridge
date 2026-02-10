@@ -106,7 +106,54 @@
     ],
     "about_us": "Kuhusu Edu Bridge",
     "branches": "Matawi",
-    "partners": "Washirika"
+    "partners": "Washirika",
+    "ceo_message": {
+      "dear": "Ndugu Viongozi wa Baadaye,",
+      "p1": "Katika TM EduBridge, tunaamini <strong>elimu ni kichocheo chenye nguvu zaidi cha mabadiliko</strong>. Dhamira yetu ni kuziba pengo kati ya matamanio na mafanikio, tukiwawezesha wanafunzi kote Afrika Mashariki kupata fursa za kujifunza za kiwango cha kimataifa.",
+      "p2": "Tumejenga zaidi ya jukwaa — tumeunda <strong>jamii ya wenye ndoto, wavumbuzi, na waleta mabadiliko</strong>. Kutoka kwa ushauri wa kibinafnia hadi rasilimali za kisasa za kidijitali, kila nyanja ya EduBridge imeundwa kwa kuzingatia mafanikio yako.",
+      "p3": "Pamoja, hatuandai tu siku zijazo — <strong>tunazijenga</strong>.",
+      "commitment": "Kwa kujitolea thabiti,"
+    },
+    "message_badges": {
+      "excellence_title": "Ubora wa Kimataifa",
+      "excellence_desc": "Kuunganisha wanafunzi na ulimwengu",
+      "talent_title": "Kuwezesha Vipaji",
+      "talent_desc": "Kulea kizazi kijacho cha viongozi"
+    },
+    "journey_title": "Safari Yetu",
+    "journey_subtitle": "Hatua muhimu zilizounda dhamira yetu ya kubadilisha elimu",
+    "journey_milestones": [
+      {
+        "year": "2018",
+        "title": "Ilianzishwa",
+        "description": "TM EduBridge ilianzishwa kwa maono ya kubadilisha elimu barani Afrika Mashariki"
+      },
+      {
+        "year": "2019",
+        "title": "Kundi la Kwanza",
+        "description": "Iliwasajili na kuwashauri zaidi ya wanafunzi 100 kwa mafanikio"
+      },
+      {
+        "year": "2020",
+        "title": "Ubunifu wa Kidijitali",
+        "description": "Tulizindua jukwaa letu kamili la mafunzo ya mtandaoni"
+      },
+      {
+        "year": "2022",
+        "title": "Ushirikiano wa Kimataifa",
+        "description": "Tulianzisha ushirikiano na zaidi ya vyuo vikuu 20 vya kimataifa"
+      },
+      {
+        "year": "2024",
+        "title": "Kupanua Athari",
+        "description": "Tumewafikia zaidi ya wanafunzi 5,000 katika nchi mbalimbali"
+      },
+      {
+        "year": "2026",
+        "title": "Mafunzo ya AI",
+        "description": "Tunaanzisha elimu ya kibinafsi kwa kutumia teknolojia ya kisasa"
+      }
+    ]
   },
   "footer": {
     "brand": {
@@ -153,7 +200,7 @@
   },
   "contact": {
     "hero_title": "Wasiliana Nasi",
-    "hero_subtitle": "Una maswali? Tuko hapa kusaidia. Wasiliana nasi na tutakujibu haraka iwezekanavyo.",
+    "hero_subtitle": "Ikiwa unatafuta mahali pazuri au unahitaji ushauri wa kitaalamu, timu yetu iko hapa kukusaidia kila hatua ya njia.",
     "form_title": "Tutumie Ujumbe",
     "form_success": "✓ Asante! Tutawasiliana nawe hivi karibuni.",
     "labels": {
@@ -182,9 +229,9 @@
     },
     "regional_offices_title": "Ofisi za Kikanda",
     "regional_offices": [
-      { "country": "Rwanda (Makao Makuu)", "phone": "+250 788 123 456" },
-      { "country": "Uganda", "phone": "+256 772 123 456" },
-      { "country": "Kenya", "phone": "+254 722 123 456" }
+      { "country": "Rwanda (Makao Makuu)", "phone": "+250 788 123 456", "address": "Mtaa wa KG 123, Nyarugenge, Kigali, Rwanda", "hours": "Jumatatu–Ijumaa: Saa 4 Asubuhi–Saa 12 Jioni, Jpili: Saa 4 Asubuhi–Saa 11 Jioni" },
+      { "country": "Uganda", "phone": "+256 772 123 456", "address": "Plot 45, Kampala Rd, Kampala, Uganda", "hours": "Jumatatu–Ijumaa: Saa 4 Asubuhi–Saa 12 Jioni, Jpili: Saa 4 Asubuhi–Saa 11 Jioni" },
+      { "country": "Kenya", "phone": "+254 722 123 456", "address": "Barabara ya Moi, Nairobi, Kenya", "hours": "Jumatatu–Ijumaa: Saa 4 Asubuhi–Saa 12 Jioni, Jpili: Saa 4 Asubuhi–Saa 11 Jioni" }
     ],
     "follow_us": "Tufuate",
     "social_links": [
@@ -196,7 +243,26 @@
     "live_chat": {
       "title": "Mazungumzo ya Moja kwa Moja",
       "subtitle": "Zungumza na timu yetu ya usaidizi kwa wakati halisi.",
-      "button": "Anza Mazungumzo"
+      "button": "Anza Mazungumzo",
+      "available": "Inapatikana 24/7",
+      "desc": "Zungumza nasi wakati wowote mtandaoni hapa"
+    },
+    "help_title": "Tunawezaje Kukusaidia?",
+    "help_subtitle": "Chagua njia rahisi zaidi ya kuwasiliana na timu yetu ya wataalamu",
+    "call_card": {
+      "title": "Tupigie Simu",
+      "desc": "Zungumza na wataalamu na upate majibu ya haraka",
+      "button": "Piga Sasa"
+    },
+    "email_card": {
+      "title": "Tutumie Barua Pepe",
+      "desc": "Wataalamu wetu watakujibu haraka",
+      "button": "Tuma Barua Pepe"
+    },
+    "offices": {
+      "title": "Tembelea Ofisi Zetu",
+      "get_directions": "Pata Maelekezo",
+      "hours_label": "Jumatatu–Ijumaa: Saa 4 Asubuhi–Saa 12 Jioni, Jpili: Saa 4 Asubuhi–Saa 11 Jioni"
     },
     "faq": {
       "title": "Unatafuta Majibu ya Haraka?",
@@ -347,6 +413,11 @@
     "blogs": "Blogs na Habari",
     "gallery": "Matunzio"
   },
+  "blog": {
+    "hero_title": "Blogu na Habari",
+    "hero_subtitle": "Habari za hivi punde, miongozo, na hadithi za wanafunzi ili kukupa taarifa.",
+    "read_article": "Soma Makala"
+  },
   "hero": {
     "badge": "Kuwezesha Mustakabali wa Afrika",
     "title_prefix": "Kuwezesha Afrika kupitia",
@@ -383,5 +454,228 @@
       "study_abroad": { "title": "Scholarship Kusoma Nje", "desc": "Fursa za scholarships zilizofadhiliwa kikamilifu na kwa sehemu duniani kote." }
     },
     "cta": "Jifunze Zaidi"
+  },
+  "scholarships_page": {
+    "hero_title": "Scholarships na Msaada wa Kifedha",
+    "hero_subtitle": "Pata fursa za ufadhili kusaidia safari yako ya elimu nje ya nchi.",
+    "stats": {
+        "awarded": "Scholarships Zilizotolewa",
+        "students_funded": "Wanafunzi Waliofadhiliwa",
+        "partners": "Taasisi Washirika",
+        "guidance": "Usaidizi wa Mwongozo"
+    },
+    "loading": "Inapakia scholarships...",
+    "view_details": "Angalia Maelezo",
+    "view_all": "Angalia Fursa Zote",
+    "cta_title": "Unahitaji Msaada Kupata Scholarship?",
+    "cta_desc": "Washauri wetu wanaweza kukusaidia kutambua scholarships unazostahiki na kukuongoza kupitia mchakato wa maombi.",
+    "cta_button": "Wasiliana na Mshauri",
+    "deadline_prefix": "Mwisho wa Kutuma: "
+  },
+  "library_page": {
+    "hero_title": "Maktaba ya Dijitali",
+    "hero_subtitle": "Fikia maelfu ya rasilimali za kitaaluma kiganjani mwako",
+    "search_placeholder": "Tafuta vitabu, majarida, makala...",
+    "browse_title": "Vinjari kwa Aina",
+    "featured_title": "Rasilimali Zinazovutia",
+    "loading": "Inapakia rasilimali...",
+    "preview": "Onyesho la Awali",
+    "download": "Pakua",
+    "categories": {
+      "ebooks": "Vitabu vya Kielektroniki",
+      "journals": "Majarida ya Kitaaluma",
+      "papers": "Makala ya Utafiti",
+      "thesis": "Tasnifu na Dissertations",
+      "past_papers": "Mitihani Iliyopita"
+    },
+    "items_count": "Vitu {{count}}",
+    "author": "Mwandishi: {{author}}",
+    "details": "Mwaka: {{year}} | Kurasa: {{pages}}"
+  },
+  "gallery_page": {
+    "hero_title": "Hadithi za Mafanikio",
+    "hero_subtitle": "Angalia wapi wanafunzi wetu wanasoma na kusikia kuhusu safari yao na EduBridge.",
+    "slogan": "Kutimiza Ndoto",
+    "program_label": "Programu"
+  },
+  "study_abroad_page": {
+    "hero_title": "Programu za Masomo ya Nje",
+    "hero_subtitle": "Njia yako ya elimu ya kimataifa - fursa za kujifadhili na scholarships",
+    "universities": {
+      "d2_subtitle": "Vyuo Vikuu Vinavyopatikana (Programu ya Shahada)",
+      "d4_subtitle": "Orodha ya Vyuo Vikuu Vinavyotoa Programu za Kikorea na Kiingereza",
+      "no_programs": "Hakuna programu zinazopatikana kwa sasa.",
+      "loading": "Inapakia programu...",
+      "visa_label": "VISA"
+    },
+    "destinations": {
+      "title": "Nchi Maarufu za Masomo",
+      "subtitle": "Chunguza nchi bora kwa wanafunzi wa kimataifa na makadirio ya gharama",
+      "tuition_fees": "Ada ya Masomo",
+      "living_costs": "Gharama za Maisha",
+      "key_features": "Vipengele Muhimu:",
+      "learn_more": "Jifunze Zaidi"
+    },
+    "process": {
+      "title": "Mchakato wa Maombi",
+      "subtitle": "Tunakuongoza katika kila hatua ya safari yako ya masomo nje ya nchi",
+      "steps": {
+        "consultation": { "title": "Ushauri", "desc": "Ushauri wa bure kuelewa malengo yako" },
+        "search": { "title": "Utafutaji wa Chuo", "desc": "Tafuta chuo kinachokufaa zaidi" },
+        "application": { "title": "Maombi", "desc": "Msaada kamili wa maombi na maandalizi ya nyaraka" },
+        "visa": { "title": "Visa na Safari", "desc": "Mwongozo wa visa na mwelekeo wa kabla ya kuondoka" }
+      }
+    }
+  },
+  "home_page": {
+    "hero": {
+      "live_label": "MOJA KWA MOJA",
+      "live_text": "{{count}}+ Wanafunzi Mtandaoni Sasa",
+      "title_prefix": "Jifunze kutoka kwa Walio Bora",
+      "title_suffix": "Afrika Mashariki",
+      "subtitle": "Pata elimu ya kiwango cha dunia, rasilimali, na mwongozo wa kitaalamu kufikia malengo yako ya kitaaluma—hapa Kigali, Nairobi na kwingineko.",
+      "cta_primary": "Anza Kujifunza Leo",
+      "cta_secondary": "Tazama Utangulizi",
+      "students_joined": "Wanafunzi waliojiunga mwezi huu",
+      "certified_badge": "Imethibitishwa",
+      "expert_courses": "Kozi za Kitaalamu",
+      "success_rate": "Kiwango cha Mafanikio"
+    },
+    "services": {
+      "title": "Huduma Zetu za Kitaaluma",
+      "subtitle": "Suluhisho lako la moja kwa moja kwa ubora wa kitaaluma",
+      "items": {
+        "writing": {
+          "title": "Ubora wa Uandishi wa Kitaaluma",
+          "desc": "Usaidizi wa kitaalamu kwa tasnifu na makala za utafiti kutoka kwa wataalamu wakuu wa Afrika Mashariki"
+        },
+        "proofreading": {
+          "title": "Uhaliri wa Kitaalamu",
+          "desc": "Boresha kazi yako na huduma zetu za uhariri makini na uhakikisho wa ubora"
+        },
+        "research": {
+          "title": "Mwongozo wa Utafiti",
+          "desc": "Ongoza miradi tata ya utafiti na ushauri na rasilimali zilizojitolea"
+        },
+        "scholarship": {
+          "title": "Fursa za Scholarships",
+          "desc": "Fungua ufadhili wa ndoto zako na ulinganifu wa kibinafsi wa scholarships"
+        },
+        "advisory": {
+          "title": "Ushauri wa Kazi",
+          "desc": "Mwongozo wa kimkakati kutoka kwa wataalamu wa tasnia wanaounda mustakabali wa Afrika Mashariki"
+        },
+        "global": {
+          "title": "Njia Yako kwa Vyuo Vikuu vya Dunia",
+          "desc": "Usaidizi wa kusoma nje ya nchi bila mshono—kutoka maombi hadi mafanikio ya visa"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "Wanafunzi Wetu Wanasema Nini",
+      "subtitle": "Sikia kutoka kwa wanafunzi na waelimishaji kote Afrika ambao wamenufaika na TM EduBridge."
+    }
+  },
+  "partners_page": {
+    "categories": {
+      "language_training": "Mafunzo ya Lugha",
+      "university": "Chuo Kikuu",
+      "graduate_school": "Shule ya Uzamili",
+      "required_documents": "Nyaraka Zinazohitajika"
+    },
+    "sliders": {
+      "d2_title": "Vyuo Vikuu Vinavyopatikana (D-2)",
+      "d4_title": "Vyuo Vikuu Vinavyopatikana (D-4-1)"
+    }
+  },
+  "visa_page": {
+    "hero_title": "Ushauri wa Visa",
+    "hero_subtitle": "Mwongozo wa kitaalamu kwa mchakato wako wa maombi ya visa ili kuhakikisha viwango vya juu vya mafanikio.",
+    "stats": {
+      "success_rate": "Kiwango cha Mafanikio ya Visa",
+      "processed": "Visa Zilizoshughulikiwa",
+      "countries": "Nchi Zilizofikiwa",
+      "experience": "Miaka ya Uzoefu"
+    },
+    "services": {
+      "title": "Huduma Zetu",
+      "most_popular": "Maarufu Zaidi",
+      "select_package": "Chagua Kifurushi"
+    },
+    "services_list": {
+      "consultation": {
+        "title": "Ushauri wa Visa ya Mwanafunzi",
+        "duration": "Dakika 45",
+        "features": ["Tathmini ya ustahiki wa visa", "Orodha ya nyaraka", "Mapitio ya maombi", "Vidokezo vya maandalizi ya mahojiano"]
+      },
+      "full_support": {
+        "title": "Usaidizi Kamili wa Maombi",
+        "duration": "Usaidizi kamili",
+        "features": ["Maandalizi kamili ya nyaraka", "Uwasilishaji wa maombi", "Uratibu na ubalozi", "Kufundisha mahojiano ya visa"]
+      },
+      "premium": {
+        "title": "Kifurushi cha Premium",
+        "duration": "Mwanzo hadi mwisho",
+        "features": ["Kila kitu katika Usaidizi Kamili", "Msaada wa maombi ya chuo kikuu", "Msaada wa scholarship", "Mwelekeo wa kabla ya kuondoka"]
+      }
+    },
+    "booking": {
+      "title": "Weka Miadi ya Ushauri",
+      "labels": {
+        "name": "Jina Kamili",
+        "email": "Barua Pepe",
+        "phone": "Nambari ya Simu",
+        "country": "Nchi Yako",
+        "destination": "Nchi Unayoenda",
+        "type": "Aina ya Ushauri",
+        "date": "Tarehe na Muda Unaopendelea",
+        "message": "Maelezo ya Ziada"
+      },
+      "placeholders": {
+        "select_country": "Chagua nchi",
+        "select_destination": "Chagua unakoenda",
+        "select_type": "Chagua aina",
+        "date": "Chagua tarehe na muda",
+        "message": "Tuambie kuhusu hali yako na malengo..."
+      },
+      "types": {
+        "online": "Mtandaoni (Simu ya Video)",
+        "in_person": "Ana kwa Ana",
+        "phone": "Simu ya Sauti"
+      },
+      "submit_button": "Weka Miadi"
+    },
+    "contact_info": {
+      "title": "Maelezo ya Mawasiliano",
+      "phone": "Simu",
+      "email": "Barua Pepe",
+      "office": "Ofisi",
+      "checklist_title": "Orodha ya Nyaraka Zinazohitajika",
+      "checklist": [
+        "Pasipoti Halali (miezi 6+ ya uhalali)",
+        "Transkripti na Vyeti vya Kitaaluma",
+        "Uthibitisho wa Ustadi wa Kiingereza (IELTS/TOEFL)",
+        "Taarifa za Benki (miezi 3-6)",
+        "Barua ya Kuhubiliwa kutoka Chuo Kikuu",
+        "Picha za Pasipoti",
+        "Barua ya Kusudi",
+        "Barua za Mapendekezo"
+      ]
+    }
+  },
+  "branches_page": {
+    "hero_title": "Matawi Yetu",
+    "hero_subtitle": "Tembelea ofisi yetu yoyote kote Afrika Mashariki kwa ushauri na usaidizi wa ana kwa ana.",
+    "find_us": {
+      "title": "Tupate",
+      "subtitle": "Tembelea ofisi yetu yoyote kote Afrika Mashariki"
+    },
+    "head_office_badge": "Makao Makuu",
+    "contact_branch_button": "Wasiliana na Tawi Hili",
+    "cta": {
+      "title": "Huwezi Kuja Ana kwa Ana?",
+      "description": "Weka miadi ya ushauri mtandaoni na upate mwongozo uleule wa kitaalamu kutoka popote.",
+      "button": "Weka Miadi ya Ushauri Mtandaoni"
+    }
   }
 }

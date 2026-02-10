@@ -42,12 +42,12 @@ function ContactPage() {
             <div className="flex items-center justify-center gap-3 mb-4">
               <span className="text-yellow-500 text-2xl">◆</span>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Get In Touch
+                {t('contact.hero_title')}
               </h1>
               <span className="text-yellow-500 text-2xl">◆</span>
             </div>
             <p className="text-lg text-white/90 max-w-3xl mx-auto">
-              Whether you're looking for the perfect place or need expert advice, our team is here to help you every step of the way.
+              {t('contact.hero_subtitle')}
             </p>
           </motion.div>
         </div>
@@ -58,79 +58,79 @@ function ContactPage() {
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
-              How Can We Help?
+              {t("contact.help_title")}
             </h2>
             <p className="text-slate-600 max-w-2xl mx-auto">
-              Choose the most convenient way to connect with our team of property experts
+              {t("contact.help_subtitle")}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {/* Call Us Card */}
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 text-center hover:shadow-xl transition-all"
-            >
-              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Phone className="text-[#1A237E]" size={28} />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Call Us</h3>
-              <p className="text-sm text-slate-500 mb-4">Speak with experts and quick response</p>
-              <a href="tel:+250788123456" className="text-[#1A237E] font-semibold text-sm hover:underline">
-                + (250) 788 123 456
-              </a>
-              <button className="mt-4 w-full py-3 bg-gradient-to-r from-[#1A237E] via-[#283593] to-[#1A237E] hover:from-[#283593] hover:to-[#1A237E] text-white font-bold rounded-lg transition-all shadow-md">
-                Call Now
-              </button>
-            </motion.div>
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               transition={{ duration: 0.5 }}
+               className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 text-center hover:shadow-xl transition-all"
+             >
+               <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                 <Phone className="text-[#1A237E]" size={28} />
+               </div>
+               <h3 className="text-xl font-bold text-slate-900 mb-2">{t("contact.call_card.title")}</h3>
+               <p className="text-sm text-slate-500 mb-4">{t("contact.call_card.desc")}</p>
+               <a href="tel:+250788123456" className="text-[#1A237E] font-semibold text-sm hover:underline">
+                 + (250) 788 123 456
+               </a>
+               <button className="mt-4 w-full py-3 bg-gradient-to-r from-[#1A237E] via-[#283593] to-[#1A237E] hover:from-[#283593] hover:to-[#1A237E] text-white font-bold rounded-lg transition-all shadow-md">
+                 {t("contact.call_card.button")}
+               </button>
+             </motion.div>
 
-            {/* Email Us Card */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 text-center hover:shadow-xl transition-all"
-            >
-              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="text-[#1A237E]" size={28} />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Email Us</h3>
-              <p className="text-sm text-slate-500 mb-4">Our experts will respond you promptly</p>
-              <a href="mailto:info@edubridge.africa" className="text-[#1A237E] font-semibold text-sm hover:underline">
-                hello@gathertonng.com
-              </a>
-              <button className="mt-4 w-full py-3 bg-gradient-to-r from-[#1A237E] via-[#283593] to-[#1A237E] hover:from-[#283593] hover:to-[#1A237E] text-white font-bold rounded-lg transition-all shadow-md">
-                Send Email
-              </button>
-            </motion.div>
+             {/* Email Us Card */}
+             <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               transition={{ duration: 0.5, delay: 0.1 }}
+               className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 text-center hover:shadow-xl transition-all"
+             >
+               <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                 <Mail className="text-[#1A237E]" size={28} />
+               </div>
+               <h3 className="text-xl font-bold text-slate-900 mb-2">{t("contact.email_card.title")}</h3>
+               <p className="text-sm text-slate-500 mb-4">{t("contact.email_card.desc")}</p>
+               <a href="mailto:info@edubridge.africa" className="text-[#1A237E] font-semibold text-sm hover:underline">
+                 info@edubridge.africa
+               </a>
+               <button className="mt-4 w-full py-3 bg-gradient-to-r from-[#1A237E] via-[#283593] to-[#1A237E] hover:from-[#283593] hover:to-[#1A237E] text-white font-bold rounded-lg transition-all shadow-md">
+                 {t("contact.email_card.button")}
+               </button>
+             </motion.div>
 
-            {/* Live Chat Card */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 text-center hover:shadow-xl transition-all"
-            >
-              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageCircle className="text-[#1A237E]" size={28} />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Live Chat</h3>
-              <p className="text-sm text-slate-500 mb-4">Chat with us anytime online here</p>
-              <p className="text-[#1A237E] font-semibold text-sm">
-                Available 24/7
-              </p>
-              <button 
-                onClick={() => window.open('https://wa.me/250798697809', '_blank')}
-                className="mt-4 w-full py-3 bg-gradient-to-r from-[#1A237E] via-[#283593] to-[#1A237E] hover:from-[#283593] hover:to-[#1A237E] text-white font-bold rounded-lg transition-all shadow-md"
-              >
-                Start Chat
-              </button>
-            </motion.div>
+             {/* Live Chat Card */}
+             <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               transition={{ duration: 0.5, delay: 0.2 }}
+               className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100 text-center hover:shadow-xl transition-all"
+             >
+               <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                 <MessageCircle className="text-[#1A237E]" size={28} />
+               </div>
+               <h3 className="text-xl font-bold text-slate-900 mb-2">{t("contact.live_chat.title")}</h3>
+               <p className="text-sm text-slate-500 mb-4">{t("contact.live_chat.desc")}</p>
+               <p className="text-[#1A237E] font-semibold text-sm">
+                 {t("contact.live_chat.available")}
+               </p>
+               <button 
+                 onClick={() => window.open('https://wa.me/250798697809', '_blank')}
+                 className="mt-4 w-full py-3 bg-gradient-to-r from-[#1A237E] via-[#283593] to-[#1A237E] hover:from-[#283593] hover:to-[#1A237E] text-white font-bold rounded-lg transition-all shadow-md"
+               >
+                 {t("contact.live_chat.button")}
+               </button>
+             </motion.div>
           </div>
         </div>
       </section>
@@ -143,7 +143,7 @@ function ContactPage() {
             {/* Send Us a Message */}
             <div>
               <h2 className="text-3xl font-bold text-slate-900 mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Send Us a Message
+                {t("contact.form_title")}
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -157,11 +157,11 @@ function ContactPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-2 block">Full Name</label>
+                    <label className="text-sm font-semibold text-slate-700 mb-2 block">{t("contact.labels.full_name")}</label>
                     <input
                       name="fullName"
                       type="text"
-                      placeholder="Your full name"
+                      placeholder={t("contact.placeholders.full_name")}
                       required
                       disabled={state.submitting}
                       className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#1A237E] focus:border-[#1A237E] outline-none transition-all"
@@ -169,11 +169,11 @@ function ContactPage() {
                   </div>
                   
                   <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-2 block">Email Address</label>
+                    <label className="text-sm font-semibold text-slate-700 mb-2 block">{t("contact.labels.email")}</label>
                     <input
                       name="email"
                       type="email"
-                      placeholder="your@email.com"
+                      placeholder={t("contact.placeholders.email")}
                       required
                       disabled={state.submitting}
                       className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#1A237E] focus:border-[#1A237E] outline-none transition-all"
@@ -183,22 +183,22 @@ function ContactPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-2 block">Phone Number</label>
+                    <label className="text-sm font-semibold text-slate-700 mb-2 block">{t("contact.labels.phone")}</label>
                     <input
                       name="phone"
                       type="tel"
-                      placeholder="+1 (555) 000-0000"
+                      placeholder={t("contact.placeholders.phone")}
                       disabled={state.submitting}
                       className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#1A237E] focus:border-[#1A237E] outline-none transition-all"
                     />
                   </div>
                   
                   <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-2 block">Subject</label>
+                    <label className="text-sm font-semibold text-slate-700 mb-2 block">{t("contact.labels.subject")}</label>
                     <input
                       name="subject"
                       type="text"
-                      placeholder="Select a subject"
+                      placeholder={t("contact.placeholders.subject")}
                       required
                       disabled={state.submitting}
                       className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#1A237E] focus:border-[#1A237E] outline-none transition-all"
@@ -207,11 +207,11 @@ function ContactPage() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-semibold text-slate-700 mb-2 block">Message</label>
+                  <label className="text-sm font-semibold text-slate-700 mb-2 block">{t("contact.labels.message")}</label>
                   <textarea
                     name="message"
                     rows={5}
-                    placeholder="Tell us about your inquiry, preferences, or any questions..."
+                    placeholder={t("contact.placeholders.message")}
                     required
                     disabled={state.submitting}
                     className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all resize-none"
@@ -224,7 +224,7 @@ function ContactPage() {
                   className="w-full py-4 bg-gradient-to-r from-[#1A237E] via-[#283593] to-[#1A237E] hover:from-[#283593] hover:to-[#1A237E] text-white font-bold rounded-lg shadow-lg transform transition-all hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70"
                 >
                   <Send size={18} />
-                  {state.submitting ? 'Sending...' : 'Send Message'}
+                  {state.submitting ? t("contact.sending") : t("contact.submit_button")}
                 </button>
               </form>
             </div>
@@ -232,7 +232,7 @@ function ContactPage() {
             {/* Visit Our Offices */}
             <div>
               <h2 className="text-3xl font-bold text-slate-900 mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Visit Our Offices
+                {t("contact.offices.title")}
               </h2>
 
               <div className="space-y-5">
@@ -244,7 +244,7 @@ function ContactPage() {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-bold text-slate-900 text-lg mb-1">{office.country}</h3>
-                        <p className="text-sm text-slate-500">KG 123 St, Nyarugenge, Kigali, Rwanda</p>
+                        <p className="text-sm text-slate-500">{office.address}</p>
                       </div>
                     </div>
                     
@@ -255,12 +255,12 @@ function ContactPage() {
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Clock size={16} className="text-slate-400" />
-                        <span className="text-slate-600">Mon–Fri: 10AM–6PM, Sat: 10AM–5PM</span>
+                        <span className="text-slate-600">{office.hours}</span>
                       </div>
                     </div>
                     
                     <button className="mt-4 w-full py-2.5 border-2 border-[#1A237E] text-[#1A237E] font-bold rounded-lg hover:bg-blue-50 transition-colors">
-                      Get Directions
+                      {t("contact.offices.get_directions")}
                     </button>
                   </div>
                 ))}

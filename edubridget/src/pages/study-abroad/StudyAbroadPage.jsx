@@ -1,4 +1,5 @@
-import React, { useState, useRef, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,10 +9,13 @@ import {
   Plane,
   ChevronLeft,
   ChevronRight,
+  Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { MOCK_PROGRAMS } from "../../data/mockData";
 import OptimizedImage from "@/components/OptimizedImage";
+import { BASE_URL } from "../../config/api";
+import { toast } from "sonner";
+import { MOCK_PROGRAMS } from "../../data/mockData"; // Keep as fallback type or initial state shape reference if needed, but we will fetch
 
 const DESTINATIONS = [
   {
@@ -136,7 +140,7 @@ const UniversityCard = React.memo(({ university }) => {
 });
 
 const UniversitySection = React.memo(
-  ({ title, visaType, universities, subtitle }) => {
+  ({ title, visaType, universities, subtitle, loading }) => {
     const scrollContainerRef = useRef(null);
 
     const scroll = (direction) => {
@@ -148,6 +152,25 @@ const UniversitySection = React.memo(
         });
       }
     };
+
+    if (loading) {
+       return (
+         <div className="mb-12">
+           <div className="flex items-center gap-3 mb-2">
+             <div className="h-6 w-32 bg-slate-200 animate-pulse rounded"></div>
+           </div>
+           <p className="h-4 w-64 bg-slate-100 animate-pulse rounded mb-6"></p>
+           <div className="flex gap-4">
+               {[1,2,3,4].map(i => (
+                  <div key={i} className="w-48 flex flex-col items-center">
+                      <div className="w-24 h-24 rounded-full bg-slate-200 animate-pulse mb-4"></div>
+                      <div className="h-4 w-32 bg-slate-200 animate-pulse rounded mb-2"></div>
+                  </div>
+               ))}
+           </div>
+         </div>
+       );
+    }
 
     return (
       <div className="mb-12">
@@ -184,6 +207,11 @@ const UniversitySection = React.memo(
             {universities.map((uni, i) => (
               <UniversityCard key={i} university={uni} />
             ))}
+            {universities.length === 0 && (
+                <div className="w-full text-center py-8 text-slate-500 text-sm">
+                    No programs available at the moment.
+                </div>
+            )}
           </div>
         </div>
       </div>
@@ -192,13 +220,43 @@ const UniversitySection = React.memo(
 );
 
 export default function StudyAbroadPage() {
+  const { t } = useTranslation();
+  const [programs, setPrograms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        setLoading(true);
+        // FETCH DATA WHEN PAGE LOADS
+        const res = await fetch(`${BASE_URL}/programs`);
+        
+        if (!res.ok) {
+           throw new Error("Failed to fetch programs");
+        }
+
+        const data = await res.json();
+        setPrograms(data);
+      } catch (err) {
+        console.error("Error fetching programs:", err);
+        setError(err.message);
+        toast.error("Failed to load programs");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPrograms();
+  }, []); // Empty dependency array = run once on mount
+
   const d2Programs = useMemo(
-    () => MOCK_PROGRAMS.filter((p) => p.visaType === "D-2"),
-    [],
+    () => programs.filter((p) => p.visaType === "D-2"),
+    [programs],
   );
   const d4Programs = useMemo(
-    () => MOCK_PROGRAMS.filter((p) => p.visaType === "D-4"),
-    [],
+    () => programs.filter((p) => p.visaType === "D-4"),
+    [programs],
   );
 
   return (
@@ -207,11 +265,10 @@ export default function StudyAbroadPage() {
       <div className="text-white py-16" style={{ backgroundColor: "#1e3a8a" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-white">
-            Study Abroad Programs
+            {t('study_abroad_page.hero_title')}
           </h1>
           <p className="text-xl text-white/90">
-            Your gateway to international education - self-sponsored and
-            scholarship opportunities
+            {t('study_abroad_page.hero_subtitle')}
           </p>
         </div>
       </div>
@@ -221,18 +278,20 @@ export default function StudyAbroadPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <UniversitySection
             title="D-2"
-            visaType="VISA"
-            subtitle="Available Universities (Degree Program)"
+            visaType={t('study_abroad_page.universities.visa_label')}
+            subtitle={t('study_abroad_page.universities.d2_subtitle')}
             universities={d2Programs}
+            loading={loading}
           />
 
           <div className="w-full h-px bg-slate-100 my-8"></div>
 
           <UniversitySection
             title="D-4"
-            visaType="VISA"
-            subtitle="List of Universities Offering Korean & English Programs"
+            visaType={t('study_abroad_page.universities.visa_label')}
+            subtitle={t('study_abroad_page.universities.d4_subtitle')}
             universities={d4Programs}
+            loading={loading}
           />
         </div>
       </section>
@@ -242,11 +301,10 @@ export default function StudyAbroadPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4 text-slate-900">
-              Popular Study Destinations
+              {t('study_abroad_page.destinations.title')}
             </h2>
             <p className="text-slate-600 max-w-2xl mx-auto">
-              Explore top countries for international students with detailed
-              cost estimates
+              {t('study_abroad_page.destinations.subtitle')}
             </p>
           </div>
 
@@ -277,7 +335,7 @@ export default function StudyAbroadPage() {
                       <DollarSign className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
                       <div>
                         <div className="text-sm font-semibold text-slate-900">
-                          Tuition Fees
+                          {t('study_abroad_page.destinations.tuition_fees')}
                         </div>
                         <div className="text-sm text-slate-600">
                           {destination.tuition}
@@ -288,7 +346,7 @@ export default function StudyAbroadPage() {
                       <MapPin className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
                       <div>
                         <div className="text-sm font-semibold text-slate-900">
-                          Living Costs
+                          {t('study_abroad_page.destinations.living_costs')}
                         </div>
                         <div className="text-sm text-slate-600">
                           {destination.living}
@@ -299,7 +357,7 @@ export default function StudyAbroadPage() {
 
                   <div className="border-t border-slate-100 pt-4 mb-4">
                     <h4 className="text-sm font-semibold mb-2 text-slate-900">
-                      Key Features:
+                      {t('study_abroad_page.destinations.key_features')}
                     </h4>
                     <ul className="space-y-1">
                       {destination.features.map((feature, idx) => (
@@ -314,7 +372,7 @@ export default function StudyAbroadPage() {
                   </div>
 
                   <Button className="w-full bg-primary hover:bg-primary-dark">
-                    <Plane className="mr-2 h-4 w-4" /> Learn More
+                    <Plane className="mr-2 h-4 w-4" /> {t('study_abroad_page.destinations.learn_more')}
                   </Button>
                 </CardContent>
               </Card>
@@ -328,44 +386,25 @@ export default function StudyAbroadPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4 text-slate-900">
-              Application Process
+              {t('study_abroad_page.process.title')}
             </h2>
             <p className="text-slate-600 max-w-2xl mx-auto">
-              We guide you through every step of your study abroad journey
+              {t('study_abroad_page.process.subtitle')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                step: "1",
-                title: "Consultation",
-                desc: "Free consultation to understand your goals",
-              },
-              {
-                step: "2",
-                title: "University Search",
-                desc: "Find the best match for your profile",
-              },
-              {
-                step: "3",
-                title: "Application",
-                desc: "Complete application support and document preparation",
-              },
-              {
-                step: "4",
-                title: "Visa & Travel",
-                desc: "Visa guidance and pre-departure orientation",
-              },
-            ].map((item, index) => (
+            {['consultation', 'search', 'application', 'visa'].map((stepKey, index) => (
               <div key={index} className="text-center">
                 <div className="w-16 h-16 bg-primary-gradient rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg">
-                  {item.step}
+                  {index + 1}
                 </div>
                 <h3 className="font-semibold text-lg mb-2 text-slate-900">
-                  {item.title}
+                  {t(`study_abroad_page.process.steps.${stepKey}.title`)}
                 </h3>
-                <p className="text-slate-600 text-sm">{item.desc}</p>
+                <p className="text-slate-600 text-sm">
+                  {t(`study_abroad_page.process.steps.${stepKey}.desc`)}
+                </p>
               </div>
             ))}
           </div>

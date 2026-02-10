@@ -5,6 +5,10 @@ import App from "./App.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import "./index.css";
 import "./i18n";
+import { initMockBackend } from './utils/mockBackend';
+
+// Initialize Mock Backend
+initMockBackend();
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 

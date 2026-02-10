@@ -106,7 +106,54 @@
     ],
     "about_us": "About Edu Bridge",
     "branches": "Branches",
-    "partners": "Partners"
+    "partners": "Partners",
+    "ceo_message": {
+      "dear": "Dear Future Leaders,",
+      "p1": "At TM EduBridge, we believe <strong>education is the most powerful catalyst for transformation</strong>. Our mission is to bridge the gap between ambition and achievement, empowering students across East Africa to access world-class learning opportunities.",
+      "p2": "We've built more than a platform—we've created a <strong>community of dreamers, innovators, and change-makers</strong>. From personalized mentorship to cutting-edge digital resources, every aspect of EduBridge is designed with your success in mind.",
+      "p3": "Together, we're not just preparing for the future—<strong>we're building it</strong>.",
+      "commitment": "With unwavering commitment,"
+    },
+    "message_badges": {
+      "excellence_title": "Global Excellence",
+      "excellence_desc": "Connecting students to the world",
+      "talent_title": "Empowering Talent",
+      "talent_desc": "Nurturing the next generation of leaders"
+    },
+    "journey_title": "Our Journey",
+    "journey_subtitle": "Milestones that shaped our mission to transform education",
+    "journey_milestones": [
+      {
+        "year": "2018",
+        "title": "Founded",
+        "description": "TM EduBridge was established with a vision to transform education in East Africa"
+      },
+      {
+        "year": "2019",
+        "title": "First Cohort",
+        "description": "Successfully enrolled and mentored 100+ students"
+      },
+      {
+        "year": "2020",
+        "title": "Digital Innovation",
+        "description": "Launched our comprehensive online learning platform"
+      },
+      {
+        "year": "2022",
+        "title": "Global Partnerships",
+        "description": "Established partnerships with 20+ international universities"
+      },
+      {
+        "year": "2024",
+        "title": "Expanding Impact",
+        "description": "Reached 5,000+ students across multiple countries"
+      },
+      {
+        "year": "2026",
+        "title": "AI-Driven Learning",
+        "description": "Pioneering personalized education with cutting-edge technology"
+      }
+    ]
   },
   "footer": {
     "brand": {
@@ -152,8 +199,8 @@
     "terms": "Terms of Service"
   },
   "contact": {
-    "hero_title": "Contact Us",
-    "hero_subtitle": "Have questions? We're here to help. Reach out to us and we'll respond as soon as possible.",
+    "hero_title": "Get In Touch",
+    "hero_subtitle": "Whether you're looking for the perfect place or need expert advice, our team is here to help you every step of the way.",
     "form_title": "Send Us a Message",
     "form_success": "✓ Thank you! We'll be in touch shortly.",
     "labels": {
@@ -182,9 +229,9 @@
     },
     "regional_offices_title": "Regional Offices",
     "regional_offices": [
-      { "country": "Rwanda (HQ)", "phone": "+250 788 123 456" },
-      { "country": "Uganda", "phone": "+256 772 123 456" },
-      { "country": "Kenya", "phone": "+254 722 123 456" }
+      { "country": "Rwanda (HQ)", "phone": "+250 788 123 456", "address": "KG 123 St, Nyarugenge, Kigali, Rwanda", "hours": "Mon–Fri: 10AM–6PM, Sat: 10AM–5PM" },
+      { "country": "Uganda", "phone": "+256 772 123 456", "address": "Plot 45, Kampala Rd, Kampala, Uganda", "hours": "Mon–Fri: 10AM–6PM, Sat: 10AM–5PM" },
+      { "country": "Kenya", "phone": "+254 722 123 456", "address": "Moi Avenue, Nairobi, Kenya", "hours": "Mon–Fri: 10AM–6PM, Sat: 10AM–5PM" }
     ],
     "follow_us": "Follow Us",
     "social_links": [
@@ -196,7 +243,26 @@
     "live_chat": {
       "title": "Live Chat",
       "subtitle": "Chat with our support team in real-time.",
-      "button": "Start Chat"
+      "button": "Start Chat",
+      "available": "Available 24/7",
+      "desc": "Chat with us anytime online here"
+    },
+    "help_title": "How Can We Help?",
+    "help_subtitle": "Choose the most convenient way to connect with our team of experts",
+    "call_card": {
+      "title": "Call Us",
+      "desc": "Speak with experts and quick response",
+      "button": "Call Now"
+    },
+    "email_card": {
+      "title": "Email Us",
+      "desc": "Our experts will respond you promptly",
+      "button": "Send Email"
+    },
+    "offices": {
+      "title": "Visit Our Offices",
+      "get_directions": "Get Directions",
+      "hours_label": "Mon–Fri: 10AM–6PM, Sat: 10AM–5PM"
     },
     "faq": {
       "title": "Looking for Quick Answers?",
@@ -347,6 +413,11 @@
     "blogs": "Blogs & News",
     "gallery": "Gallery"
   },
+  "blog": {
+    "hero_title": "Blog & News",
+    "hero_subtitle": "Latest updates, guides, and student stories to keep you informed.",
+    "read_article": "Read Article"
+  },
   "hero": {
     "badge": "Empowering Africa's Future",
     "title_prefix": "Empowering Africa through",
@@ -383,5 +454,228 @@
       "study_abroad": { "title": "Scholarship to Study Abroad", "desc": "Fully funded and partial scholarship opportunities worldwide." }
     },
     "cta": "Learn More"
+  },
+  "scholarships_page": {
+    "hero_title": "Scholarships & Financial Aid",
+    "hero_subtitle": "Find funding opportunities to support your educational journey abroad.",
+    "stats": {
+        "awarded": "Scholarships Awarded",
+        "students_funded": "Students Funded",
+        "partners": "Partner Institutions",
+        "guidance": "Guidance Support"
+    },
+    "loading": "Loading scholarships...",
+    "view_details": "View Details",
+    "view_all": "View All Opportunities",
+    "cta_title": "Need Help Finding a Scholarship?",
+    "cta_desc": "Our counselors can help you identify scholarships you are eligible for and guide you through the application process.",
+    "cta_button": "Contact a Counselor",
+    "deadline_prefix": "Deadline: "
+  },
+  "library_page": {
+    "hero_title": "Digital Library",
+    "hero_subtitle": "Access thousands of academic resources at your fingertips",
+    "search_placeholder": "Search for books, journals, papers...",
+    "browse_title": "Browse by Category",
+    "featured_title": "Featured Resources",
+    "loading": "Loading resources...",
+    "preview": "Preview",
+    "download": "Download",
+    "categories": {
+      "ebooks": "E-books",
+      "journals": "Academic Journals",
+      "papers": "Research Papers",
+      "thesis": "Thesis & Dissertations",
+      "past_papers": "Past Exam Papers"
+    },
+    "items_count": "{{count}} items",
+    "author": "Author: {{author}}",
+    "details": "Year: {{year}} | Pages: {{pages}}"
+  },
+  "gallery_page": {
+    "hero_title": "Success Stories",
+    "hero_subtitle": "See where our students are studying and hear about their journey with EduBridge.",
+    "slogan": "Bridging Dreams",
+    "program_label": "Program"
+  },
+  "study_abroad_page": {
+    "hero_title": "Study Abroad Programs",
+    "hero_subtitle": "Your gateway to international education - self-sponsored and scholarship opportunities",
+    "universities": {
+      "d2_subtitle": "Available Universities (Degree Program)",
+      "d4_subtitle": "List of Universities Offering Korean & English Programs",
+      "no_programs": "No programs available at the moment.",
+      "loading": "Loading programs...",
+      "visa_label": "VISA"
+    },
+    "destinations": {
+      "title": "Popular Study Destinations",
+      "subtitle": "Explore top countries for international students with detailed cost estimates",
+      "tuition_fees": "Tuition Fees",
+      "living_costs": "Living Costs",
+      "key_features": "Key Features:",
+      "learn_more": "Learn More"
+    },
+    "process": {
+      "title": "Application Process",
+      "subtitle": "We guide you through every step of your study abroad journey",
+      "steps": {
+        "consultation": { "title": "Consultation", "desc": "Free consultation to understand your goals" },
+        "search": { "title": "University Search", "desc": "Find the best match for your profile" },
+        "application": { "title": "Application", "desc": "Complete application support and document preparation" },
+        "visa": { "title": "Visa & Travel", "desc": "Visa guidance and pre-departure orientation" }
+      }
+    }
+  },
+  "home_page": {
+    "hero": {
+      "live_label": "LIVE",
+      "live_text": "{{count}}+ Students Online Now",
+      "title_prefix": "Learn from the Best",
+      "title_suffix": "in East Africa",
+      "subtitle": "Access world-class education, resources, and expert guidance to achieve your academic goals—right here in Kigali, Nairobi, and beyond.",
+      "cta_primary": "Start Learning Today",
+      "cta_secondary": "Watch Intro",
+      "students_joined": "Students joined this month",
+      "certified_badge": "Certified",
+      "expert_courses": "Expert Courses",
+      "success_rate": "Success Rate"
+    },
+    "services": {
+      "title": "Our Academic Services",
+      "subtitle": "Your one-stop solution for academic excellence",
+      "items": {
+        "writing": {
+          "title": "Academic Writing Excellence",
+          "desc": "Professional thesis and research paper support from East Africa's top academic experts"
+        },
+        "proofreading": {
+          "title": "Expert Proofreading",
+          "desc": "Polish your work with our meticulous editing and quality assurance services"
+        },
+        "research": {
+          "title": "Research Guidance",
+          "desc": "Navigate complex research projects with dedicated mentorship and resources"
+        },
+        "scholarship": {
+          "title": "Scholarship Opportunities",
+          "desc": "Unlock funding for your dreams with personalized scholarship matching"
+        },
+        "advisory": {
+          "title": "Career Advisory",
+          "desc": "Strategic guidance from industry professionals shaping East Africa's future"
+        },
+        "global": {
+          "title": "Your Pathway to Global Campuses",
+          "desc": "Seamless study abroad support—from applications to visa success"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "What Our Learners Say",
+      "subtitle": "Hear from students and educators across Africa who have benefited from TM EduBridge."
+    }
+  },
+  "partners_page": {
+    "categories": {
+      "language_training": "Language Training",
+      "university": "University",
+      "graduate_school": "Graduate school",
+      "required_documents": "Required documents"
+    },
+    "sliders": {
+      "d2_title": "Available Universities (D-2)",
+      "d4_title": "Available Universities (D-4-1)"
+    }
+  },
+  "visa_page": {
+    "hero_title": "Visa Consultation",
+    "hero_subtitle": "Expert guidance for your visa application process to ensure higher success rates.",
+    "stats": {
+      "success_rate": "Visa Success Rate",
+      "processed": "Visas Processed",
+      "countries": "Countries Covered",
+      "experience": "Years Experience"
+    },
+    "services": {
+      "title": "Our Services",
+      "most_popular": "Most Popular",
+      "select_package": "Select Package"
+    },
+    "services_list": {
+      "consultation": {
+        "title": "Student Visa Consultation",
+        "duration": "45 min",
+        "features": ["Visa eligibility assessment", "Document checklist", "Application review", "Interview prep tips"]
+      },
+      "full_support": {
+        "title": "Full Application Support",
+        "duration": "Full support",
+        "features": ["Complete document preparation", "Application submission", "Embassy coordination", "Visa interview coaching"]
+      },
+      "premium": {
+        "title": "Premium Package",
+        "duration": "End-to-end",
+        "features": ["Everything in Full Support", "University application help", "Scholarship assistance", "Pre-departure orientation"]
+      }
+    },
+    "booking": {
+      "title": "Book a Consultation",
+      "labels": {
+        "name": "Full Name",
+        "email": "Email",
+        "phone": "Phone Number",
+        "country": "Your Country",
+        "destination": "Destination Country",
+        "type": "Consultation Type",
+        "date": "Preferred Date & Time",
+        "message": "Additional Information"
+      },
+      "placeholders": {
+        "select_country": "Select country",
+        "select_destination": "Select destination",
+        "select_type": "Select type",
+        "date": "Select your preferred date & time",
+        "message": "Tell us about your situation and goals..."
+      },
+      "types": {
+        "online": "Online (Video Call)",
+        "in_person": "In-Person",
+        "phone": "Phone Call"
+      },
+      "submit_button": "Book Appointment"
+    },
+    "contact_info": {
+      "title": "Contact Information",
+      "phone": "Phone",
+      "email": "Email",
+      "office": "Office",
+      "checklist_title": "Required Documents Checklist",
+      "checklist": [
+        "Valid Passport (6+ months validity)",
+        "Academic Transcripts & Certificates",
+        "Proof of English Proficiency (IELTS/TOEFL)",
+        "Bank Statements (3-6 months)",
+        "Admission Letter from University",
+        "Passport-sized Photographs",
+        "Statement of Purpose",
+        "Recommendation Letters"
+      ]
+    }
+  },
+  "branches_page": {
+    "hero_title": "Our Branches",
+    "hero_subtitle": "Visit any of our offices across East Africa for in-person consultation and support.",
+    "find_us": {
+      "title": "Find Us",
+      "subtitle": "Visit any of our offices across East Africa"
+    },
+    "head_office_badge": "Head Office",
+    "contact_branch_button": "Contact This Branch",
+    "cta": {
+      "title": "Can't Visit in Person?",
+      "description": "Book an online consultation and get the same expert guidance from anywhere.",
+      "button": "Book Online Consultation"
+    }
   }
 }

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import DateTimePicker from "@/components/ui/DateTimePicker";
 import AnimatedCounter from "@/components/AnimatedCounter";
+import { useTranslation } from "react-i18next";
 import {
   Select,
   SelectContent,
@@ -18,56 +19,31 @@ import { FileCheck, MapPin, CheckCircle, Phone, Mail } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
-const services = [
-  {
-    title: "Student Visa Consultation",
-    price: "$50",
-    duration: "45 min",
-    features: [
-      "Visa eligibility assessment",
-      "Document checklist",
-      "Application review",
-      "Interview prep tips",
-    ],
-  },
-  {
-    title: "Full Application Support",
-    price: "$200",
-    duration: "Full support",
-    features: [
-      "Complete document preparation",
-      "Application submission",
-      "Embassy coordination",
-      "Visa interview coaching",
-    ],
-  },
-  {
-    title: "Premium Package",
-    price: "$350",
-    duration: "End-to-end",
-    features: [
-      "Everything in Full Support",
-      "University application help",
-      "Scholarship assistance",
-      "Pre-departure orientation",
-    ],
-  },
-];
-
-const countries = [
-  "United States",
-  "United Kingdom",
-  "Canada",
-  "Australia",
-  "Germany",
-  "France",
-  "Japan",
-  "South Korea",
-  "Netherlands",
-  "Other",
-];
-
 const VisaConsultationPage = () => {
+  const { t } = useTranslation();
+  
+  // Move services inside component to use t()
+  const services = [
+    {
+      title: t('visa_page.services_list.consultation.title'),
+      price: "$50",
+      duration: t('visa_page.services_list.consultation.duration'),
+      features: t('visa_page.services_list.consultation.features', { returnObjects: true }) || [],
+    },
+    {
+      title: t('visa_page.services_list.full_support.title'),
+      price: "$200",
+      duration: t('visa_page.services_list.full_support.duration'),
+      features: t('visa_page.services_list.full_support.features', { returnObjects: true }) || [],
+    },
+    {
+      title: t('visa_page.services_list.premium.title'),
+      price: "$350",
+      duration: t('visa_page.services_list.premium.duration'),
+      features: t('visa_page.services_list.premium.features', { returnObjects: true }) || [],
+    },
+  ];
+
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -134,11 +110,10 @@ const VisaConsultationPage = () => {
           <div className="container mx-auto px-4 md:px-8">
             <div data-aos="fade-up" className="text-center text-white">
               <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-                Visa & Migration Consultation
+                {t('visa_page.hero_title')}
               </h1>
               <p className="text-xl text-white/90 max-w-2xl mx-auto">
-                Expert guidance for student visas, work permits, and migration.
-                95% visa success rate.
+                {t('visa_page.hero_subtitle')}
               </p>
             </div>
           </div>
@@ -152,25 +127,25 @@ const VisaConsultationPage = () => {
                 <p className="text-3xl font-bold text-primary">
                   <AnimatedCounter end={95} duration={2000} suffix="%" />
                 </p>
-                <p className="text-sm text-slate-500">Visa Success Rate</p>
+                <p className="text-sm text-slate-500">{t('visa_page.stats.success_rate')}</p>
               </div>
               <div>
                 <p className="text-3xl font-bold text-primary">
                   <AnimatedCounter end={2500} duration={2000} suffix="+" />
                 </p>
-                <p className="text-sm text-slate-500">Visas Processed</p>
+                <p className="text-sm text-slate-500">{t('visa_page.stats.processed')}</p>
               </div>
               <div>
                 <p className="text-3xl font-bold text-primary">
                   <AnimatedCounter end={25} duration={2000} suffix="+" />
                 </p>
-                <p className="text-sm text-slate-500">Countries Covered</p>
+                <p className="text-sm text-slate-500">{t('visa_page.stats.countries')}</p>
               </div>
               <div>
                 <p className="text-3xl font-bold text-primary">
                   <AnimatedCounter end={10} duration={2000} suffix="+" />
                 </p>
-                <p className="text-sm text-slate-500">Years Experience</p>
+                <p className="text-sm text-slate-500">{t('visa_page.stats.experience')}</p>
               </div>
             </div>
           </div>
@@ -181,7 +156,7 @@ const VisaConsultationPage = () => {
           <div className="container mx-auto px-4">
             <div data-aos="fade-up" className="text-center mb-12">
               <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                Our Services
+                {t('visa_page.services.title')}
               </h2>
             </div>
 
@@ -195,7 +170,7 @@ const VisaConsultationPage = () => {
                     className={`h-full border-slate-200 shadow-sm transition-all hover:shadow-md bg-white ${index === 1 ? "border-primary ring-1 ring-primary/20" : ""}`}>
                     {index === 1 && (
                       <div className="bg-primary text-white text-center py-2 text-sm font-medium">
-                        Most Popular
+                        {t('visa_page.services.most_popular')}
                       </div>
                     )}
                     <CardContent className="p-6">
@@ -227,7 +202,7 @@ const VisaConsultationPage = () => {
                             : "w-full"
                         }
                         variant={index === 1 ? "default" : "outline"}>
-                        Select Package
+                        {t('visa_page.services.select_package')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -244,13 +219,13 @@ const VisaConsultationPage = () => {
               {/* Form */}
               <div data-aos="fade-right">
                 <h2 className="text-3xl font-bold text-slate-900 mb-6">
-                  Book a Consultation
+                  {t('visa_page.booking.title')}
                 </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Full Name *</Label>
+                      <Label htmlFor="name">{t('visa_page.booking.labels.name')} *</Label>
                       <Input
                         id="name"
                         required
@@ -261,7 +236,7 @@ const VisaConsultationPage = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email *</Label>
+                      <Label htmlFor="email">{t('visa_page.booking.labels.email')} *</Label>
                       <Input
                         id="email"
                         type="email"
@@ -276,7 +251,7 @@ const VisaConsultationPage = () => {
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number *</Label>
+                      <Label htmlFor="phone">{t('visa_page.booking.labels.phone')} *</Label>
                       <Input
                         id="phone"
                         required
@@ -287,13 +262,13 @@ const VisaConsultationPage = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="country">Your Country *</Label>
+                      <Label htmlFor="country">{t('visa_page.booking.labels.country')} *</Label>
                       <Select
                         onValueChange={(value) =>
                           setFormData({ ...formData, country: value })
                         }>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select country" />
+                          <SelectValue placeholder={t('visa_page.booking.placeholders.select_country')} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="rwanda">Rwanda</SelectItem>
@@ -309,13 +284,13 @@ const VisaConsultationPage = () => {
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="destination">Destination Country *</Label>
+                      <Label htmlFor="destination">{t('visa_page.booking.labels.destination')} *</Label>
                       <Select
                         onValueChange={(value) =>
                           setFormData({ ...formData, destination: value })
                         }>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select destination" />
+                          <SelectValue placeholder={t('visa_page.booking.placeholders.select_destination')} />
                         </SelectTrigger>
                         <SelectContent>
                           {countries.map((c) => (
@@ -330,28 +305,28 @@ const VisaConsultationPage = () => {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="consultationType">
-                        Consultation Type *
+                        {t('visa_page.booking.labels.type')} *
                       </Label>
                       <Select
                         onValueChange={(value) =>
                           setFormData({ ...formData, consultationType: value })
                         }>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
+                          <SelectValue placeholder={t('visa_page.booking.placeholders.select_type')} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="online">
-                            Online (Video Call)
+                            {t('visa_page.booking.types.online')}
                           </SelectItem>
-                          <SelectItem value="in-person">In-Person</SelectItem>
-                          <SelectItem value="phone">Phone Call</SelectItem>
+                          <SelectItem value="in-person">{t('visa_page.booking.types.in_person')}</SelectItem>
+                          <SelectItem value="phone">{t('visa_page.booking.types.phone')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="preferredDate">Preferred Date & Time</Label>
+                    <Label htmlFor="preferredDate">{t('visa_page.booking.labels.date')}</Label>
                     <DateTimePicker
                       value={formData.preferredDate}
                       onChange={(value) =>
@@ -360,15 +335,15 @@ const VisaConsultationPage = () => {
                           preferredDate: value,
                         })
                       }
-                      placeholder="Select your preferred date & time"
+                      placeholder={t('visa_page.booking.placeholders.date')}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message">Additional Information</Label>
+                    <Label htmlFor="message">{t('visa_page.booking.labels.message')}</Label>
                     <Textarea
                       id="message"
-                      placeholder="Tell us about your situation and goals..."
+                      placeholder={t('visa_page.booking.placeholders.message')}
                       rows={4}
                       value={formData.message}
                       onChange={(e) =>
@@ -381,7 +356,7 @@ const VisaConsultationPage = () => {
                     type="submit"
                     size="lg"
                     className="w-full bg-primary hover:bg-primary-dark">
-                    Book Appointment
+                    {t('visa_page.booking.submit_button')}
                   </Button>
                 </form>
               </div>
@@ -391,7 +366,7 @@ const VisaConsultationPage = () => {
                 <Card className="border-slate-200">
                   <CardContent className="p-6">
                     <h3 className="font-bold text-lg mb-4 text-slate-900">
-                      Contact Information
+                      {t('visa_page.contact_info.title')}
                     </h3>
                     <div className="space-y-4">
                       <div className="flex items-center gap-3">
@@ -399,7 +374,7 @@ const VisaConsultationPage = () => {
                           <Phone className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <p className="text-sm text-slate-500">Phone</p>
+                          <p className="text-sm text-slate-500">{t('visa_page.contact_info.phone')}</p>
                           <p className="font-medium text-slate-900">
                             +250 788 123 456
                           </p>
@@ -410,7 +385,7 @@ const VisaConsultationPage = () => {
                           <Mail className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <p className="text-sm text-slate-500">Email</p>
+                          <p className="text-sm text-slate-500">{t('visa_page.contact_info.email')}</p>
                           <p className="font-medium text-slate-900">
                             visa@edubridge.africa
                           </p>
@@ -421,7 +396,7 @@ const VisaConsultationPage = () => {
                           <MapPin className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <p className="text-sm text-slate-500">Office</p>
+                          <p className="text-sm text-slate-500">{t('visa_page.contact_info.office')}</p>
                           <p className="font-medium text-slate-900">
                             Kigali, Rwanda (Head Office)
                           </p>
@@ -434,19 +409,10 @@ const VisaConsultationPage = () => {
                 <Card className="border-slate-200">
                   <CardContent className="p-6">
                     <h3 className="font-bold text-lg mb-4 text-slate-900">
-                      Required Documents Checklist
+                      {t('visa_page.contact_info.checklist_title')}
                     </h3>
                     <ul className="space-y-3">
-                      {[
-                        "Valid Passport (6+ months validity)",
-                        "Academic Transcripts & Certificates",
-                        "Proof of English Proficiency (IELTS/TOEFL)",
-                        "Bank Statements (3-6 months)",
-                        "Admission Letter from University",
-                        "Passport-sized Photographs",
-                        "Statement of Purpose",
-                        "Recommendation Letters",
-                      ].map((doc) => (
+                      {(t('visa_page.contact_info.checklist', {returnObjects: true}) || []).map((doc) => (
                         <li
                           key={doc}
                           className="flex items-center gap-2 text-sm text-slate-600">

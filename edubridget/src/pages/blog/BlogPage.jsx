@@ -1,16 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { MOCK_BLOGS as blogs } from "../../data/mockData";
 import OptimizedImage from "@/components/OptimizedImage";
+import { BASE_URL } from "../../config/api";
+import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const ITEMS_PER_PAGE = 6;
 
 export default function BlogPage() {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${BASE_URL}/blogs`);
+        if (!res.ok) throw new Error("Failed to load blogs");
+        const data = await res.json();
+        setBlogs(data);
+      } catch (error) {
+        console.error("Error loading blogs:", error);
+        toast.error("Failed to load blogs");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
 
   // Pagination Logic
   const totalPages = Math.ceil(blogs.length / ITEMS_PER_PAGE);
@@ -28,15 +52,22 @@ export default function BlogPage() {
     <div className="min-h-screen bg-slate-50">
       <div className="text-white py-16" style={{ backgroundColor: "#1e3a8a" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold mb-4 text-white">Blog & News</h1>
+          <h1 className="text-4xl font-bold mb-4 text-white">
+            {t("blog.hero_title")}
+          </h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto">
-            Latest updates, guides, and student stories to keep you informed.
+            {t("blog.hero_subtitle")}
           </p>
         </div>
       </div>
 
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {loading ? (
+             <div className="flex justify-center p-12">
+               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+             </div>
+          ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {currentBlogs.map((blog) => (
               <Card
@@ -72,7 +103,7 @@ export default function BlogPage() {
                     <Button
                       variant="ghost"
                       className="mt-auto px-0 text-primary hover:text-primary-dark hover:bg-transparent justify-start w-fit group/btn">
-                      Read Article{" "}
+                      {t("blog.read_article")}{" "}
                       <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
                     </Button>
                   </Link>
@@ -80,9 +111,10 @@ export default function BlogPage() {
               </Card>
             ))}
           </div>
+          )}
 
           {/* Pagination Controls */}
-          {totalPages > 1 && (
+          {!loading && totalPages > 1 && (
             <div className="flex justify-center items-center gap-2 mt-8">
               <Button
                 variant="outline"

@@ -30,7 +30,7 @@ export default function CMSScholarships() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-slate-800">Scholarships</h2>
+        <h2 className="text-2xl font-bold text-slate-900">Scholarships</h2>
         <button 
           onClick={handleAdd}
           className="bg-primary text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-primary/90"
@@ -53,6 +53,8 @@ export default function CMSScholarships() {
           </div>
         </div>
 
+        {/* Table section */}
+      <div className="bg-white rounded-[2rem] border border-slate-200/60 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-slate-50 border-b border-slate-200">
@@ -93,7 +95,8 @@ export default function CMSScholarships() {
               No scholarships found matching your search.
             </div>
           )}
-        </div>
+          </div>
+          </div>
       </div>
 
       <Modal

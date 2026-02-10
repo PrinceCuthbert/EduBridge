@@ -106,7 +106,54 @@
     ],
     "about_us": "À propos de Edu Bridge",
     "branches": "Succursales",
-    "partners": "Partenaires"
+    "partners": "Partenaires",
+    "ceo_message": {
+      "dear": "Chers futurs leaders,",
+      "p1": "Chez TM EduBridge, we believe <strong>l'éducation est le catalyseur le plus puissant de la transformation</strong>. Notre mission est de combler l'écart entre l'ambition et la réussite, en permettant aux étudiants de toute l'Afrique de l'Est d'accéder à des opportunités d'apprentissage de classe mondiale.",
+      "p2": "Nous avons construit plus qu'une plateforme — nous avons créé une <strong>communauté de rêveurs, d'innovateurs et d'acteurs de changement</strong>. Du mentorat personnalisé aux ressources numériques de pointe, chaque aspect d'EduBridge est conçu en pensant à votre réussite.",
+      "p3": "Ensemble, nous ne nous contentons pas de préparer l'avenir — <strong>nous le construisons</strong>.",
+      "commitment": "Avec un engagement indéfectible,"
+    },
+    "message_badges": {
+      "excellence_title": "Excellence Mondiale",
+      "excellence_desc": "Connecter les étudiants au monde",
+      "talent_title": "Valorisation des Talents",
+      "talent_desc": "Former la prochaine génération de leaders"
+    },
+    "journey_title": "Notre Parcours",
+    "journey_subtitle": "Les étapes clés qui ont façonné notre mission pour transformer l'éducation",
+    "journey_milestones": [
+      {
+        "year": "2018",
+        "title": "Fondée",
+        "description": "TM EduBridge a été créé avec la vision de transformer l'éducation en Afrique de l'Est"
+      },
+      {
+        "year": "2019",
+        "title": "Première Cohorte",
+        "description": "Plus de 100 étudiants inscrits et mentorés avec succès"
+      },
+      {
+        "year": "2020",
+        "title": "Innovation Numérique",
+        "description": "Lancement de notre plateforme complète d'apprentissage en ligne"
+      },
+      {
+        "year": "2022",
+        "title": "Partenariats Mondiaux",
+        "description": "Établissement de partenariats avec plus de 20 universités internationales"
+      },
+      {
+        "year": "2024",
+        "title": "Impact Croissant",
+        "description": "Plus de 5 000 étudiants atteints dans plusieurs pays"
+      },
+      {
+        "year": "2026",
+        "title": "Apprentissage piloté par l'IA",
+        "description": "Pionnier de l'éducation personnalisée avec une technologie de pointe"
+      }
+    ]
   },
   "footer": {
     "brand": {
@@ -152,8 +199,8 @@
     "terms": "Conditions d'Utilisation"
   },
   "contact": {
-    "hero_title": "Contactez-nous",
-    "hero_subtitle": "Vous avez des questions ? Nous sommes là pour vous aider. Contactez-nous et nous vous répondrons dès que possible.",
+    "hero_title": "Entrer en Contact",
+    "hero_subtitle": "Que vous cherchiez l'endroit idéal ou ayez besoin de conseils d'experts, notre équipe est là pour vous aider à chaque étape.",
     "form_title": "Envoyez-nous un Message",
     "form_success": "✓ Merci ! Nous vous contacterons sous peu.",
     "labels": {
@@ -182,9 +229,9 @@
     },
     "regional_offices_title": "Bureaux Régionaux",
     "regional_offices": [
-      { "country": "Rwanda (Siège)", "phone": "+250 788 123 456" },
-      { "country": "Ouganda", "phone": "+256 772 123 456" },
-      { "country": "Kenya", "phone": "+254 722 123 456" }
+      { "country": "Rwanda (Siège)", "phone": "+250 788 123 456", "address": "Rue KG 123, Nyarugenge, Kigali, Rwanda", "hours": "Lun–Ven : 10h–18h, Sam : 10h–17h" },
+      { "country": "Ouganda", "phone": "+256 772 123 456", "address": "Route de Kampala, Kampala, Ouganda", "hours": "Lun–Ven : 10h–18h, Sam : 10h–17h" },
+      { "country": "Kenya", "phone": "+254 722 123 456", "address": "Avenue Moi, Nairobi, Kenya", "hours": "Lun–Ven : 10h–18h, Sam : 10h–17h" }
     ],
     "follow_us": "Suivez-nous",
     "social_links": [
@@ -196,7 +243,26 @@
     "live_chat": {
       "title": "Chat en Direct",
       "subtitle": "Discutez avec notre équipe de support en temps réel.",
-      "button": "Démarrer le Chat"
+      "button": "Démarrer le Chat",
+      "available": "Disponible 24/7",
+      "desc": "Discutez avec nous à tout moment en ligne ici"
+    },
+    "help_title": "Comment pouvons-nous vous aider ?",
+    "help_subtitle": "Choisissez le moyen le plus pratique de contacter notre équipe d'experts",
+    "call_card": {
+      "title": "Appelez-nous",
+      "desc": "Parlez à des experts et réponse rapide",
+      "button": "Appeler maintenant"
+    },
+    "email_card": {
+      "title": "Envoyez-nous un e-mail",
+      "desc": "Nos experts vous répondront rapidement",
+      "button": "Envoyer un e-mail"
+    },
+    "offices": {
+      "title": "Visitez nos bureaux",
+      "get_directions": "Obtenir l'itinéraire",
+      "hours_label": "Lun–Ven : 10h–18h, Sam : 10h–17h"
     },
     "faq": {
       "title": "Vous Cherchez des Réponses Rapides ?",
@@ -347,6 +413,11 @@
     "blogs": "Blogs et Actualités",
     "gallery": "Galerie"
   },
+  "blog": {
+    "hero_title": "Blog et Actualités",
+    "hero_subtitle": "Dernières mises à jour, guides et histoires d'étudiants pour vous tenir informé.",
+    "read_article": "Lire l'article"
+  },
   "hero": {
     "badge": "Autonomiser l'avenir de l'Afrique",
     "title_prefix": "Autonomiser l'Afrique par",
@@ -383,5 +454,228 @@
       "study_abroad": { "title": "Bourse pour Étudier à l'Étranger", "desc": "Opportunités de bourses entièrement financées et partielles dans le monde entier." }
     },
     "cta": "En Savoir Plus"
+  },
+  "scholarships_page": {
+    "hero_title": "Bourses et Aides Financières",
+    "hero_subtitle": "Trouvez des opportunités de financement pour soutenir votre parcours éducatif à l'étranger.",
+    "stats": {
+        "awarded": "Bourses Attribuées",
+        "students_funded": "Étudiants Financés",
+        "partners": "Institutions Partenaires",
+        "guidance": "Soutien et Conseils"
+    },
+    "loading": "Chargement des bourses...",
+    "view_details": "Voir les Détails",
+    "view_all": "Voir Toutes les Opportunités",
+    "cta_title": "Besoin d'aide pour trouver une bourse ?",
+    "cta_desc": "Nos conseillers peuvent vous aider à identifier les bourses auxquelles vous êtes éligible et vous guider tout au long du processus de candidature.",
+    "cta_button": "Contacter un Conseiller",
+    "deadline_prefix": "Date limite : "
+  },
+  "library_page": {
+    "hero_title": "Bibliothèque Numérique",
+    "hero_subtitle": "Accédez à des milliers de ressources académiques au bout de vos doigts",
+    "search_placeholder": "Rechercher des livres, journaux, mémoires...",
+    "browse_title": "Parcourir par Catégorie",
+    "featured_title": "Ressources en Vedette",
+    "loading": "Chargement des ressources...",
+    "preview": "Aperçu",
+    "download": "Télécharger",
+    "categories": {
+      "ebooks": "E-books",
+      "journals": "Journaux Académiques",
+      "papers": "Papiers de Recherche",
+      "thesis": "Thèses et Dissertations",
+      "past_papers": "Anciens Examens"
+    },
+    "items_count": "Articles : {{count}}",
+    "author": "Auteur : {{author}}",
+    "details": "Année : {{year}} | Pages : {{pages}}"
+  },
+  "gallery_page": {
+    "hero_title": "Histoires de Réussite",
+    "hero_subtitle": "Découvrez où étudient nos étudiants et écoutez leur parcours avec EduBridge.",
+    "slogan": "Concrétiser les Rêves",
+    "program_label": "Programme"
+  },
+  "study_abroad_page": {
+    "hero_title": "Programmes d'Études à l'Étranger",
+    "hero_subtitle": "Votre passerelle vers l'éducation internationale - opportunités autofinancées et bourses d'études",
+    "universities": {
+      "d2_subtitle": "Universités Disponibles (Programme Diplômant)",
+      "d4_subtitle": "Liste des Universités Offrant des Programmes en Coréen et Anglais",
+      "no_programs": "Aucun programme disponible pour le moment.",
+      "loading": "Chargement des programmes...",
+      "visa_label": "VISA"
+    },
+    "destinations": {
+      "title": "Destinations d'Études Populaires",
+      "subtitle": "Explorez les meilleurs pays pour les étudiants internationaux avec des estimations de coûts détaillées",
+      "tuition_fees": "Frais de Scolarité",
+      "living_costs": "Coût de la Vie",
+      "key_features": "Caractéristiques Clés :",
+      "learn_more": "En Savoir Plus"
+    },
+    "process": {
+      "title": "Processus de Candidature",
+      "subtitle": "Nous vous guidons à chaque étape de votre voyage d'études à l'étranger",
+      "steps": {
+        "consultation": { "title": "Consultation", "desc": "Consultation gratuite pour comprendre vos objectifs" },
+        "search": { "title": "Recherche d'Université", "desc": "Trouvez la meilleure correspondance pour votre profil" },
+        "application": { "title": "Candidature", "desc": "Soutien complet à la candidature et préparation des documents" },
+        "visa": { "title": "Visa & Voyage", "desc": "Orientation visa et pré-départ" }
+      }
+    }
+  },
+  "home_page": {
+    "hero": {
+      "live_label": "EN DIRECT",
+      "live_text": "{{count}}+ Étudiants en ligne maintenant",
+      "title_prefix": "Apprenez avec les Meilleurs",
+      "title_suffix": "en Afrique de l'Est",
+      "subtitle": "Accédez à une éducation de classe mondiale, des ressources et des conseils d'experts pour atteindre vos objectifs académiques, ici même à Kigali, Nairobi et au-delà.",
+      "cta_primary": "Commencer à Apprendre",
+      "cta_secondary": "Regarder l'Intro",
+      "students_joined": "Étudiants inscrits ce mois-ci",
+      "certified_badge": "Certifié",
+      "expert_courses": "Cours Experts",
+      "success_rate": "Taux de Réussite"
+    },
+    "services": {
+      "title": "Nos Services Académiques",
+      "subtitle": "Votre solution unique pour l'excellence académique",
+      "items": {
+        "writing": {
+          "title": "Excellence en Rédaction Académique",
+          "desc": "Soutien professionnel pour thèses et mémoires par les meilleurs experts d'Afrique de l'Est"
+        },
+        "proofreading": {
+          "title": "Relecture Experte",
+          "desc": "Perfectionnez votre travail avec nos services de correction méticuleuse et d'assurance qualité"
+        },
+        "research": {
+          "title": "Orientation de Recherche",
+          "desc": "Naviguez dans des projets de recherche complexes avec un mentorat et des ressources dédiés"
+        },
+        "scholarship": {
+          "title": "Opportunités de Bourses",
+          "desc": "Débloquez des financements pour vos rêves avec une mise en relation personnalisée pour les bourses"
+        },
+        "advisory": {
+          "title": "Conseil de Carrière",
+          "desc": "Orientation stratégique par des professionnels de l'industrie façonnant l'avenir de l'Afrique de l'Est"
+        },
+        "global": {
+          "title": "Votre Chemin vers les Campus Mondiaux",
+          "desc": "Soutien transparent pour étudier à l'étranger, des candidatures au succès du visa"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "Ce Que Disent Nos Apprenants",
+      "subtitle": "Écoutez les étudiants et les éducateurs de toute l'Afrique qui ont bénéficié de TM EduBridge."
+    }
+  },
+  "partners_page": {
+    "categories": {
+      "language_training": "Formation linguistique",
+      "university": "Université",
+      "graduate_school": "École supérieure",
+      "required_documents": "Documents requis"
+    },
+    "sliders": {
+      "d2_title": "Universités Disponibles (D-2)",
+      "d4_title": "Universités Disponibles (D-4-1)"
+    }
+  },
+  "visa_page": {
+    "hero_title": "Consultation Visa",
+    "hero_subtitle": "Conseils d'experts pour votre processus de demande de visa afin de garantir des taux de réussite plus élevés.",
+    "stats": {
+      "success_rate": "Taux de Réussite Visa",
+      "processed": "Visas Traités",
+      "countries": "Pays Couverts",
+      "experience": "Années d'Expérience"
+    },
+    "services": {
+      "title": "Nos Services",
+      "most_popular": "Plus Populaire",
+      "select_package": "Sélectionner le Forfait"
+    },
+    "services_list": {
+      "consultation": {
+        "title": "Consultation Visa Étudiant",
+        "duration": "45 min",
+        "features": ["Évaluation d'éligibilité visa", "Liste de contrôle documents", "Examen de la demande", "Conseils préparation entretien"]
+      },
+      "full_support": {
+        "title": "Support Complet Candidature",
+        "duration": "Support complet",
+        "features": ["Préparation complète documents", "Soumission demande", "Coordination ambassade", "Coaching entretien visa"]
+      },
+      "premium": {
+        "title": "Forfait Premium",
+        "duration": "De bout en bout",
+        "features": ["Tout du Support Complet", "Aide candidature université", "Assistance bourses", "Orientation pré-départ"]
+      }
+    },
+    "booking": {
+      "title": "Réserver une Consultation",
+      "labels": {
+        "name": "Nom Complet",
+        "email": "Email",
+        "phone": "Numéro de Téléphone",
+        "country": "Votre Pays",
+        "destination": "Pays de Destination",
+        "type": "Type de Consultation",
+        "date": "Date et Heure Préférées",
+        "message": "Informations Supplémentaires"
+      },
+      "placeholders": {
+        "select_country": "Sélectionnez le pays",
+        "select_destination": "Sélectionnez la destination",
+        "select_type": "Sélectionnez le type",
+        "date": "Sélectionnez votre date et heure préférées",
+        "message": "dites-nous en plus..."
+      },
+      "types": {
+        "online": "En ligne (Appel Vidéo)",
+        "in_person": "En Personne",
+        "phone": "Appel Téléphonique"
+      },
+      "submit_button": "Réserver un Rendez-vous"
+    },
+    "contact_info": {
+      "title": "Informations de Contact",
+      "phone": "Téléphone",
+      "email": "Email",
+      "office": "Bureau",
+      "checklist_title": "Liste de Contrôle des Documents Requis",
+      "checklist": [
+        "Passeport valide (validité de 6+ mois)",
+        "Relevés de notes et certificats académiques",
+        "Preuve de maîtrise de l'anglais (IELTS/TOEFL)",
+        "Relevés bancaires (3-6 mois)",
+        "Lettre d'admission de l'université",
+        "Photos format passeport",
+        "Lettre de motivation",
+        "Lettres de recommandation"
+      ]
+    }
+  },
+  "branches_page": {
+    "hero_title": "Nos Succursales",
+    "hero_subtitle": "Visitez l'un de nos bureaux en Afrique de l'Est pour une consultation et un soutien en personne.",
+    "find_us": {
+      "title": "Trouvez-nous",
+      "subtitle": "Visitez l'un de nos bureaux en Afrique de l'Est"
+    },
+    "head_office_badge": "Siège Social",
+    "contact_branch_button": "Contacter cette Succursale",
+    "cta": {
+      "title": "Vous ne pouvez pas visiter en personne ?",
+      "description": "Réservez une consultation en ligne et obtenez les mêmes conseils d'experts, où que vous soyez.",
+      "button": "Réserver une Consultation en Ligne"
+    }
   }
 }

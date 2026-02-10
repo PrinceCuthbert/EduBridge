@@ -73,30 +73,28 @@ const Hero = () => {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
                 </span>
-                <span className="text-accent font-bold">● LIVE</span>
-                <span>2,400+ Students Online Now</span>
+                <span className="text-accent font-bold">● {t('home_page.hero.live_label')}</span>
+                <span>{t('home_page.hero.live_text', { count: '2,400' })}</span>
               </div>
 
               {/* Heading with updated micro-copy */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 font-serif">
-                Learn from the Best{" "}
+                {t('home_page.hero.title_prefix')}{" "}
                 <span className="block mt-2 bg-gradient-to-r from-accent via-accent-light to-secondary bg-clip-text text-transparent">
-                  in East Africa
+                  {t('home_page.hero.title_suffix')}
                 </span>
               </h1>
 
               {/* Subheading with regional context */}
               <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                Access world-class education, resources, and expert guidance to
-                achieve your academic goals—right here in Kigali, Nairobi, and
-                beyond.
+                {t('home_page.hero.subtitle')}
               </p>
 
               {/* CTAs with amber primary button */}
               <div className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start">
                 <Link to="/signin">
                   <button className="w-full sm:w-auto px-6 py-3 bg-accent hover:bg-accent-light text-slate-900 rounded-2xl font-bold shadow-glow-amber hover:shadow-glow-amber hover:scale-105 active:scale-95 transition-all text-base">
-                    Start Learning Today
+                    {t('home_page.hero.cta_primary')}
                     <ArrowRight className="inline-block ml-2 h-5 w-5" />
                   </button>
                 </Link>
@@ -107,7 +105,7 @@ const Hero = () => {
                   <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 group-hover:scale-110 transition-all">
                     <Play size={16} className="fill-white ml-0.5" />
                   </div>
-                  Watch Intro
+                  {t('home_page.hero.cta_secondary')}
                 </button>
               </div>
 
@@ -135,8 +133,7 @@ const Hero = () => {
                   ))}
                 </div>
                 <p className="text-sm text-white/90 font-medium">
-                  <strong className="text-white text-lg">10k+</strong> Students
-                  joined this month
+                  <strong className="text-white text-lg">10k+</strong> {t('home_page.hero.students_joined')}
                 </p>
               </div>
             </div>
@@ -175,10 +172,10 @@ const Hero = () => {
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">
-                        Certified
+                        {t('home_page.hero.certified_badge')}
                       </p>
                       <p className="text-sm font-bold text-slate-900">
-                        Expert Courses
+                        {t('home_page.hero.expert_courses')}
                       </p>
                     </div>
                   </div>
@@ -188,7 +185,7 @@ const Hero = () => {
                 <div className="absolute -bottom-8 -left-8 bg-gradient-to-br from-accent to-accent-light p-6 rounded-2xl shadow-lift hover:scale-105 transition-transform cursor-default">
                   <p className="text-3xl font-bold text-slate-900 mb-1">98%</p>
                   <p className="text-sm text-slate-700 font-semibold">
-                    Success Rate
+                    {t('home_page.hero.success_rate')}
                   </p>
                 </div>
               </div>

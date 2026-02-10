@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from "react";
 import {
-  Search,
-  Filter,
   Plus,
   Users,
-  UserCircle,
-  Shield,
+  UserCheck,
+  ShieldCheck,
   Edit,
   Trash2,
   Eye,
-  X,
-  ChevronDown,
+  Filter,
   Download,
+  Phone,
 } from "lucide-react";
 import { toast } from "sonner";
 import Modal from "../../components/Modal";
+import AdminPageHeader from "../../components/admin/AdminPageHeader";
+import AdminStatsGrid from "../../components/admin/AdminStatsGrid";
+import AdminFilterBar from "../../components/admin/AdminFilterBar";
+import AdminTable from "../../components/admin/AdminTable";
 
 // Mock data moved outside component
 const MOCK_USERS = [
@@ -48,6 +50,16 @@ const MOCK_USERS = [
     status: "Inactive",
     joined: "2024-01-20",
   },
+  {
+    id: 4, 
+    name: "John Doe",
+    email: "john@example.com",
+    role: "Student",
+    phone: "+250 788 111 222",
+    country: "Kenya",
+    status: "Active",
+    joined: "2024-02-01",
+  }
 ];
 
 export default function UserManagement() {
@@ -79,10 +91,6 @@ export default function UserManagement() {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        // TODO: Replace with actual API call when backend is ready
-        // const response = await userAPI.getAll();
-        // setUsers(response.data);
-
         // Simulating API call
         await new Promise((resolve) => setTimeout(resolve, 800));
         setUsers(MOCK_USERS);
@@ -106,21 +114,24 @@ export default function UserManagement() {
       value: users.length,
       icon: Users,
       color: "text-blue-600",
-      bg: "bg-blue-50",
+      bg: "bg-blue-50/50",
+      trend: "Total ecosystem",
     },
     {
       label: "Students",
       value: users.filter((u) => u.role === "Student").length,
-      icon: UserCircle,
-      color: "text-green-600",
-      bg: "bg-green-50",
+      icon: UserCheck,
+      color: "text-emerald-600",
+      bg: "bg-emerald-50/50",
+      trend: "Verified students",
     },
     {
       label: "Admins",
       value: users.filter((u) => u.role === "Admin").length,
-      icon: Shield,
-      color: "text-purple-600",
-      bg: "bg-purple-50",
+      icon: ShieldCheck,
+      color: "text-indigo-600",
+      bg: "bg-indigo-50/50",
+      trend: "System administrators",
     },
   ];
 
@@ -204,473 +215,330 @@ export default function UserManagement() {
     setSearchQuery("");
   };
 
-  const getStatusColor = (status) => {
-    return status === "Active"
-      ? "bg-green-100 text-green-700"
-      : "bg-gray-100 text-gray-700";
-  };
-
-  const getRoleBadgeColor = (role) => {
-    return role === "Admin"
-      ? "bg-purple-100 text-purple-700"
-      : "bg-blue-100 text-blue-700";
-  };
+  // Table Columns Definition
+  const columns = [
+    {
+      header: "Entity Profile",
+      render: (user) => (
+        <div className="flex items-center gap-5">
+          <img 
+            src={`https://ui-avatars.com/api/?name=${user.name}&background=f1f5f9&color=6366f1`} 
+            className="w-11 h-11 rounded-2xl border border-white shadow-sm ring-1 ring-slate-100 transition-transform group-hover:scale-110 duration-500" 
+            alt={user.name} 
+          />
+          <div>
+              <p className="text-[17px] font-serif text-[#0F172A] group-hover:text-blue-600 transition-colors antialiased tracking-tight">{user.name}</p>
+              <p className="text-[10px] font-mono font-bold text-slate-400 tracking-wider mt-0.5 lowercase opacity-70">{user.email}</p>
+          </div>
+        </div>
+      )
+    },
+    {
+      header: "Classification",
+      className: "px-8",
+      render: (user) => (
+        <span className={`px-3 py-1.5 rounded-xl text-[10px] font-bold tracking-widest uppercase border transition-all ${user.role === 'Admin' ? 'bg-indigo-50 text-indigo-600 border-indigo-100 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-100'}`}>
+          {user.role}
+        </span>
+      )
+    },
+    {
+      header: "Communication Log",
+      className: "px-8",
+      render: (user) => (
+        <span className="text-[13px] font-bold text-slate-700 flex items-center gap-3">
+          <Phone size={14} className="text-slate-300" />
+          {user.phone}
+        </span>
+      )
+    },
+    {
+      header: "Regionality",
+      className: "px-8 text-center",
+      render: (user) => (
+         <span className="text-[13px] font-bold text-[#0F172A] tracking-tight flex justify-center">{user.country}</span>
+      )
+    },
+    {
+      header: "Registry Status",
+      className: "px-8 text-center",
+      render: (user) => (
+        <div className="flex items-center justify-center gap-3">
+          <div className={`w-2 h-2 rounded-full ${user.status === 'Active' ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-300'}`} />
+          <span className={`text-[10px] font-bold uppercase tracking-widest ${user.status === 'Active' ? 'text-emerald-600' : 'text-slate-400'}`}>{user.status}</span>
+        </div>
+      )
+    },
+    {
+      header: "Operational Control",
+      className: "px-10 text-right pr-12",
+      render: (user) => (
+        <div className="flex items-center justify-end gap-3 pr-2">
+          <button onClick={(e) => { e.stopPropagation(); handleViewProfile(user); }} className="p-3 text-slate-300 hover:text-blue-600 hover:bg-white hover:shadow-md rounded-[1.25rem] transition-all bg-transparent group-hover:bg-white shadow-none" title="View Profile">
+              <Eye size={20} />
+          </button>
+          <button onClick={(e) => { e.stopPropagation(); handleEditUser(user); }} className="p-3 text-slate-300 hover:text-amber-600 hover:bg-white hover:shadow-md rounded-[1.25rem] transition-all" title="Edit">
+              <Edit size={20} />
+          </button>
+          <button onClick={(e) => { e.stopPropagation(); handleDelete(user); }} className="p-3 text-slate-300 hover:text-red-500 hover:bg-white hover:shadow-md rounded-[1.25rem] transition-all" title="Delete">
+              <Trash2 size={20} />
+          </button>
+        </div>
+      )
+    }
+  ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">
-          User Management
-        </h2>
-        <p className="text-slate-600">Manage students and staff accounts</p>
-      </div>
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+      <AdminPageHeader 
+        title="User Directory" 
+        subtitle="Manage student ecosystem and administrative authority."
+        count={users.length}
+        primaryAction={{
+          label: "Register New Entity",
+          icon: Plus,
+          onClick: handleAddUser,
+          rotateIcon: true
+        }}
+      />
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={index}
-              className="bg-white p-6 rounded-xl border border-slate-200">
-              <div
-                className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center mb-4`}>
-                <Icon size={24} className={stat.color} />
-              </div>
-              <h3 className="text-3xl font-bold text-slate-900 mb-1">
-                {stat.value}
-              </h3>
-              <p className="text-sm text-slate-500 font-medium">{stat.label}</p>
-            </div>
-          );
-        })}
-      </div>
+      <AdminStatsGrid stats={stats} />
 
-      {/* Table Container */}
-      <div className="bg-white rounded-xl border border-slate-200">
-        {/* Search and Filter Bar */}
-        <div className="p-6 border-b border-slate-200">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <div className="relative flex-1">
-              <Search
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-slate-50 border-0 rounded-lg focus:ring-2 focus:ring-primary/20 transition-all text-sm"
-              />
-            </div>
-            <button
+      <AdminFilterBar 
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Query by Principal Name, Correspondence Email, or Nationality..."
+        secondaryActions={
+          <div className="flex items-center gap-2.5">
+            <button 
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors text-sm">
-              <Filter size={18} />
-              Filters
-              {(filters.role !== "All" ||
-                filters.status !== "All" ||
-                filters.country !== "All") && (
-                <span className="w-2 h-2 bg-primary rounded-full"></span>
-              )}
+              className={`flex-1 xl:flex-none flex items-center justify-center gap-3 px-6 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all ${showFilters ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+                <Filter size={18} />
+                Parameters
+                {Object.values(filters).some(v => v !== "All") && <span className="w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)]" />}
             </button>
-            <div className="relative">
-              <button className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors text-sm group">
-                <Download size={18} />
-                Export
-                <ChevronDown size={14} />
-              </button>
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-                <button
-                  onClick={() => handleExport("csv")}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50">
-                  Export as CSV
-                </button>
-                <button
-                  onClick={() => handleExport("excel")}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50">
-                  Export as Excel
-                </button>
-                <button
-                  onClick={() => handleExport("api")}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50">
-                  Export All (API)
-                </button>
-              </div>
-            </div>
-            <button
-              onClick={handleAddUser}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm">
-              <Plus size={18} />
-              Add User
+            <button 
+              onClick={() => handleExport('csv')}
+              className="flex-1 xl:flex-none flex items-center justify-center gap-3 px-7 py-3 bg-white border border-slate-200 rounded-2xl text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
+                <Download size={18} className="text-slate-300" />
+                Log Export
             </button>
           </div>
+        }
+      />
 
-          {/* Advanced Filters */}
-          {showFilters && (
-            <div className="mt-4 p-4 bg-slate-50 rounded-lg space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <select
-                  value={filters.role}
-                  onChange={(e) =>
-                    setFilters({ ...filters, role: e.target.value })
-                  }
-                  className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                  <option value="All">All Roles</option>
-                  <option value="Student">Student</option>
-                  <option value="Admin">Admin</option>
-                </select>
-                <select
-                  value={filters.status}
-                  onChange={(e) =>
-                    setFilters({ ...filters, status: e.target.value })
-                  }
-                  className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                  <option value="All">All Status</option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
-                <select
-                  value={filters.country}
-                  onChange={(e) =>
-                    setFilters({ ...filters, country: e.target.value })
-                  }
-                  className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                  <option value="All">All Countries</option>
-                  <option value="Rwanda">Rwanda</option>
-                  <option value="Kenya">Kenya</option>
-                  <option value="Uganda">Uganda</option>
-                  <option value="Tanzania">Tanzania</option>
-                  <option value="Burundi">Burundi</option>
-                </select>
-              </div>
-              <button
-                onClick={clearFilters}
-                className="text-sm text-primary hover:text-primary-dark font-medium">
-                Clear all filters
-              </button>
-            </div>
-          )}
+      {/* Parameter Panel - Kept local as it's specific */}
+      {showFilters && (
+        <div className="bg-slate-50/40 p-10 rounded-[2.5rem] border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 animate-in slide-in-from-top-6 duration-500 shadow-inner">
+          <div className="space-y-3">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em] px-1">Functional Role</label>
+            <select
+              value={filters.role}
+              onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+              className="w-full px-6 py-3.5 bg-white border border-slate-100 rounded-2xl text-[13px] font-bold text-[#0F172A] outline-none focus:border-blue-500 transition-all shadow-sm hover:shadow-md">
+              <option value="All">All Classifications</option>
+              <option value="Student">Undergraduate/Postgrad</option>
+              <option value="Admin">System Executive</option>
+            </select>
+          </div>
+          <div className="space-y-3">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em] px-1">Registry Status</label>
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+              className="w-full px-6 py-3.5 bg-white border border-slate-100 rounded-2xl text-[13px] font-bold text-[#0F172A] outline-none focus:border-blue-500 transition-all shadow-sm hover:shadow-md">
+              <option value="All">All Registries</option>
+              <option value="Active">Operational</option>
+              <option value="Inactive">Deactivated</option>
+            </select>
+          </div>
+          <div className="space-y-3">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em] px-1">Regional Presence</label>
+            <select
+              value={filters.country}
+              onChange={(e) => setFilters({ ...filters, country: e.target.value })}
+              className="w-full px-6 py-3.5 bg-white border border-slate-100 rounded-2xl text-[13px] font-bold text-[#0F172A] outline-none focus:border-blue-500 transition-all shadow-sm hover:shadow-md">
+              <option value="All">All Regions</option>
+              <option value="Rwanda">Rwanda</option>
+              <option value="Kenya">Kenya</option>
+              <option value="Uganda">Uganda</option>
+            </select>
+          </div>
+          <div className="md:col-span-3 pt-2 text-right">
+             <button onClick={clearFilters} className="text-[10px] font-bold text-blue-600 uppercase tracking-widest hover:underline px-2">Reset Global Parameters</button>
+          </div>
         </div>
+      )}
 
-        {/* Table */}
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="text-center">
-              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-slate-500">Loading users...</p>
-            </div>
-          </div>
-        ) : users && users.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-              <Users size={36} className="text-slate-400" />
-            </div>
-            <p className="font-semibold text-slate-700 mb-1">No users found</p>
-            <p className="text-sm text-slate-500">
-              Try adjusting your search or filters
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto modern-scrollbar-light">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50">
-                    <th className="text-left py-3 px-6 text-sm font-semibold text-slate-600 uppercase">
-                      User
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600 uppercase">
-                      Role
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600 uppercase">
-                      Contact
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600 uppercase">
-                      Country
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600 uppercase">
-                      Status
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600 uppercase">
-                      Joined
-                    </th>
-                    <th className="text-right py-3 px-6 text-sm font-semibold text-slate-600 uppercase">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => (
-                    <tr
-                      key={user.id}
-                      className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                            <span className="text-primary font-semibold text-sm">
-                              {user.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-medium text-slate-900">
-                              {user.name}
-                            </p>
-                            <p className="text-sm text-slate-500">
-                              {user.email}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${getRoleBadgeColor(user.role)}`}>
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="text-sm text-slate-600">
-                          {user.phone}
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 text-sm text-slate-600">
-                        {user.country}
-                      </td>
-                      <td className="py-4 px-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(user.status)}`}>
-                          {user.status}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-sm text-slate-600">
-                        {user.joined}
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleViewProfile(user)}
-                            className="p-2 hover:bg-blue-50 rounded-lg transition-colors group"
-                            title="View Profile">
-                            <Eye
-                              size={16}
-                              className="text-slate-400 group-hover:text-blue-600"
-                            />
-                          </button>
-                          <button
-                            onClick={() => handleEditUser(user)}
-                            className="p-2 hover:bg-blue-50 rounded-lg transition-colors group">
-                            <Edit
-                              size={16}
-                              className="text-slate-400 group-hover:text-blue-600"
-                            />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(user)}
-                            className="p-2 hover:bg-red-50 rounded-lg transition-colors group">
-                            <Trash2
-                              size={16}
-                              className="text-slate-400 group-hover:text-red-600"
-                            />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-      </div>
+      <AdminTable 
+        columns={columns}
+        data={users}
+        isLoading={loading}
+      />
 
-      {/* Add/Edit User Modal */}
+      {/* Add/Edit Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingUser ? "Edit User" : "Add New User"}
-        size="md">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Full Name
-              </label>
+        title={editingUser ? "Modify Entity Record" : "Entity Registration"}
+        size="lg"
+        className="rounded-[2.5rem] shadow-2xl border-0">
+        <form onSubmit={handleSubmit} className="space-y-10 p-10">
+          <div className="space-y-8">
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Principal Legal Name</label>
               <input
                 type="text"
                 required
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                placeholder="John Doe"
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-8 py-5 bg-slate-50/50 border border-slate-100 rounded-3xl text-[15px] focus:border-blue-500 focus:bg-white outline-none font-bold text-[#0F172A] transition-all shadow-sm hover:shadow-md"
+                placeholder="Full Name"
               />
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                required
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                placeholder="john@example.com"
-              />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+               <div className="space-y-3">
+                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Correspondence Email</label>
+                 <input
+                   type="email"
+                   required
+                   value={formData.email}
+                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                   className="w-full px-8 py-5 bg-slate-50/50 border border-slate-100 rounded-3xl text-[15px] focus:border-blue-500 focus:bg-white outline-none font-bold text-[#0F172A] transition-all shadow-sm font-mono lowercase"
+                   placeholder="Email Address"
+                 />
+               </div>
+               <div className="space-y-3">
+                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Tele-Communication</label>
+                 <input
+                   type="tel"
+                   required
+                   value={formData.phone}
+                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                   className="w-full px-8 py-5 bg-slate-50/50 border border-slate-100 rounded-3xl text-[15px] focus:border-blue-500 focus:bg-white outline-none font-bold text-[#0F172A] transition-all shadow-sm"
+                   placeholder="Phone ID"
+                 />
+               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+               <div className="space-y-3">
+                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] px-1">System Hierarchy</label>
+                 <select
+                   required
+                   value={formData.role}
+                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                   className="w-full px-8 py-5 bg-slate-50/50 border border-slate-100 rounded-3xl text-[15px] focus:border-blue-500 focus:bg-white outline-none font-bold text-[#0F172A] transition-all shadow-sm appearance-none">
+                   <option value="Student">Student Dossier</option>
+                   <option value="Admin">Executive Control</option>
+                 </select>
+               </div>
+               <div className="space-y-3">
+                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Regional Origin</label>
+                 <select
+                   required
+                   value={formData.country}
+                   onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                   className="w-full px-8 py-5 bg-slate-50/50 border border-slate-100 rounded-3xl text-[15px] focus:border-blue-500 focus:bg-white outline-none font-bold text-[#0F172A] transition-all shadow-sm appearance-none">
+                   <option value="">Select Region</option>
+                   <option value="Rwanda">Rwanda Hub</option>
+                   <option value="Kenya">Kenya Node</option>
+                   <option value="Uganda">Uganda Sector</option>
+                   <option value="Tanzania">Tanzania Axis</option>
+                 </select>
+               </div>
+            </div>
+
+            <div className="space-y-4">
+               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Engagement Status</label>
+               <div className="flex gap-4 p-2 bg-slate-50/50 border border-slate-100 rounded-3xl">
+                  {['Active', 'Inactive'].map((status) => (
+                    <button
+                      key={status}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, status })}
+                      className={`flex-1 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all ${formData.status === status ? 'bg-white text-blue-600 shadow-xl border border-blue-50' : 'text-slate-400 hover:text-slate-700'}`}>
+                       {status}
+                    </button>
+                  ))}
+               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Phone
-              </label>
-              <input
-                type="tel"
-                required
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                placeholder="+250 788 123 456"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Country
-              </label>
-              <select
-                required
-                value={formData.country}
-                onChange={(e) =>
-                  setFormData({ ...formData, country: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                <option value="">Select Country</option>
-                <option value="Rwanda">Rwanda</option>
-                <option value="Kenya">Kenya</option>
-                <option value="Uganda">Uganda</option>
-                <option value="Tanzania">Tanzania</option>
-                <option value="Burundi">Burundi</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Role
-              </label>
-              <select
-                required
-                value={formData.role}
-                onChange={(e) =>
-                  setFormData({ ...formData, role: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                <option value="Student">Student</option>
-                <option value="Admin">Admin</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Status
-              </label>
-              <select
-                required
-                value={formData.status}
-                onChange={(e) =>
-                  setFormData({ ...formData, status: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-end gap-6 pt-10 border-t border-slate-100">
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-5 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
+              className="px-8 py-4 text-slate-400 rounded-2xl text-[11px] font-bold uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95">
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50">
-              {loading ? "Saving..." : editingUser ? "Update User" : "Add User"}
+              className="px-12 py-4 bg-[#0F172A] text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest shadow-xl hover:bg-[#1E293B] transition-all disabled:opacity-50 active:scale-95">
+              {loading ? "Processing..." : editingUser ? "Commit Changes" : "Create Record"}
             </button>
           </div>
         </form>
       </Modal>
 
-      {/* Profile View Modal */}
+      {/* Profile Modal */}
       {selectedUser && (
         <Modal
           isOpen={isProfileModalOpen}
           onClose={() => setIsProfileModalOpen(false)}
           title="User Profile"
-          size="md">
-          <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
-                <span className="text-primary font-bold text-2xl">
-                  {selectedUser.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </span>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-slate-900">
-                  {selectedUser.name}
-                </h3>
-                <p className="text-slate-600">{selectedUser.email}</p>
-                <span
-                  className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${getRoleBadgeColor(selectedUser.role)}`}>
-                  {selectedUser.role}
-                </span>
-              </div>
-            </div>
+          size="md"
+          className="rounded-[3rem] shadow-2xl border-0">
+          <div className="space-y-10 p-10">
+             <div className="p-12 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white relative overflow-hidden shadow-2xl shadow-blue-500/20 group">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5" />
+                <div className="relative z-10 flex flex-col items-center text-center space-y-6">
+                   <img 
+                     src={`https://ui-avatars.com/api/?name=${selectedUser.name}&background=fff&color=2563eb`} 
+                     className="w-24 h-24 rounded-[2rem] border-4 border-white/20 shadow-2xl transition-transform duration-700 group-hover:scale-105" 
+                     alt={selectedUser.name}
+                   />
+                   <div>
+                      <h3 className="text-3xl font-serif tracking-tight antialiased">{selectedUser.name}</h3>
+                      <p className="text-white/60 text-[13px] lowercase mt-1 font-mono tracking-tight">{selectedUser.email}</p>
+                   </div>
+                   <span className="px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] bg-white/10 border border-white/20 backdrop-blur-md shadow-inner">
+                      {selectedUser.role} 
+                   </span>
+                </div>
+             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-slate-500 mb-1">Phone</p>
-                <p className="font-medium text-slate-900">
-                  {selectedUser.phone}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 mb-1">Country</p>
-                <p className="font-medium text-slate-900">
-                  {selectedUser.country}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 mb-1">Status</p>
-                <span
-                  className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(selectedUser.status)}`}>
-                  {selectedUser.status}
-                </span>
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 mb-1">Joined</p>
-                <p className="font-medium text-slate-900">
-                  {selectedUser.joined}
-                </p>
-              </div>
-            </div>
+             <div className="grid grid-cols-2 gap-8 bg-slate-50/50 p-10 rounded-[2.5rem] border border-slate-100 shadow-inner">
+                <div className="space-y-2">
+                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Phone Number</span>
+                   <p className="text-[15px] font-bold text-[#0F172A] tracking-tight">{selectedUser.phone}</p>
+                </div>
+                <div className="space-y-2">
+                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Nationality</span>
+                   <p className="text-[15px] font-bold text-[#0F172A] tracking-tight">{selectedUser.country}</p>
+                </div>
+                <div className="space-y-2">
+                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Current Status</span>
+                   <div className="flex items-center gap-3">
+                      <div className={`w-2.5 h-2.5 rounded-full ${selectedUser.status === 'Active' ? 'bg-emerald-500 animate-pulse shadow-[0_0_12px_rgba(16,185,129,0.5)]' : 'bg-slate-300'}`} />
+                      <p className={`text-[15px] font-bold ${selectedUser.status === 'Active' ? 'text-emerald-500' : 'text-slate-400'}`}>{selectedUser.status}</p>
+                   </div>
+                </div>
+                <div className="space-y-2">
+                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Member Since</span>
+                   <p className="text-[15px] font-bold text-[#0F172A] tracking-tight">{selectedUser.joined}</p>
+                </div>
+             </div>
+
+             <div className="pt-6 border-t border-slate-100 flex justify-end">
+                <button 
+                  onClick={() => setIsProfileModalOpen(false)} 
+                  className="px-10 py-4 bg-[#0F172A] text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest hover:bg-[#1E293B] transition-all active:scale-95 shadow-xl shadow-slate-900/10">
+                  Close Profile
+                </button>
+             </div>
           </div>
         </Modal>
       )}

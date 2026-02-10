@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Lock, Bell, Shield, UserCircle, Settings as SettingsIcon, ChevronRight, Smartphone } from 'lucide-react';
+import { User, Lock, Bell, Shield, UserCircle, Settings as SettingsIcon, ChevronRight, Smartphone, Mail, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../../context/AuthContext';
 
@@ -13,176 +13,150 @@ export default function AdminSettings() {
   });
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">Settings</h2>
-        <p className="text-slate-600">Manage your account and preferences</p>
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+      {/* Premium Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Account Configuration</h1>
+          <p className="text-slate-500 text-sm mt-1 flex items-center gap-2">
+            Manage your administrative profile and security protocols.
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            <span className="text-blue-600 font-bold uppercase tracking-wider text-[10px]">Active Session Verified</span>
+          </p>
+        </div>
       </div>
 
-      {/* Settings Sections */}
-      <div className="space-y-6">
+      {/* Grid Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 text-slate-900">
         
-        {/* Notifications */}
-        <div className="bg-white rounded-xl border border-slate-200">
-          <div className="p-6 border-b border-slate-200 flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-              <Bell size={20} className="text-blue-600" />
+        {/* Communication Control */}
+        <div className="bg-white rounded-[2.5rem] border border-slate-200/50 shadow-2xl shadow-slate-200/20 overflow-hidden flex flex-col">
+          <div className="p-10 border-b border-slate-100 flex items-center gap-6 bg-slate-50/30">
+            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-white transition-transform duration-500 hover:scale-105">
+              <Bell size={28} className="text-blue-600" />
             </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-slate-900">Notifications</h3>
-              <p className="text-sm text-slate-500">Manage how you receive notifications</p>
+            <div>
+              <h3 className="text-2xl font-serif text-[#0F172A] tracking-tight antialiased">Notifications</h3>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em]">Automated Alerts & Logic</p>
             </div>
           </div>
-          <div className="p-6 space-y-4">
-            {/* Email Notifications */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-slate-900">Email Notifications</p>
-                <p className="text-sm text-slate-500">Receive updates via email</p>
+          <div className="p-10 space-y-8 flex-1">
+            {[
+              { id: 'email', label: 'Email Correspondence', desc: 'Critical system and account updates', icon: Mail },
+              { id: 'push', label: 'Real-time Alerts', desc: 'Direct browser and OS notifications', icon: Smartphone },
+              { id: 'sms', label: 'Mobile Synchronization', desc: 'Direct tele-communication alerts', icon: Smartphone },
+              { id: 'marketing', label: 'Institutional Updates', desc: 'Educational news and developments', icon: Bell }
+            ].map((pref) => (
+              <div key={pref.id} className="flex items-center justify-between group">
+                <div className="flex items-center gap-5">
+                   <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:text-blue-600 transition-all duration-500 group-hover:bg-blue-50">
+                      <pref.icon size={20} />
+                   </div>
+                   <div>
+                     <p className="text-[15px] font-bold text-slate-700 group-hover:text-[#0F172A] transition-colors">{pref.label}</p>
+                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-70">{pref.desc}</p>
+                   </div>
+                </div>
+                <button
+                  onClick={() => setNotifications({...notifications, [pref.id]: !notifications[pref.id]})}
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-500 ${
+                    notifications[pref.id] ? 'bg-blue-600 shadow-lg' : 'bg-slate-200 shadow-inner'
+                  }`}
+                >
+                  <span className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-md transition-transform duration-500 ${
+                    notifications[pref.id] ? 'translate-x-7' : 'translate-x-1'
+                  }`} />
+                </button>
               </div>
-              <button
-                onClick={() => setNotifications({...notifications, email: !notifications.email})}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  notifications.email ? 'bg-blue-600' : 'bg-slate-300'
-                }`}
-              >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  notifications.email ? 'translate-x-6' : 'translate-x-1'
-                }`} />
-              </button>
-            </div>
-            
-            {/* Push Notifications */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-slate-900">Push Notifications</p>
-                <p className="text-sm text-slate-500">Receive push notifications in browser</p>
-              </div>
-              <button
-                onClick={() => setNotifications({...notifications, push: !notifications.push})}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  notifications.push ? 'bg-blue-600' : 'bg-slate-300'
-                }`}
-              >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  notifications.push ? 'translate-x-6' : 'translate-x-1'
-                }`} />
-              </button>
-            </div>
-            
-            {/* SMS Notifications */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-slate-900">SMS Notifications</p>
-                <p className="text-sm text-slate-500">Receive important updates via SMS</p>
-              </div>
-              <button
-                onClick={() => setNotifications({...notifications, sms: !notifications.sms})}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  notifications.sms ? 'bg-blue-600' : 'bg-slate-300'
-                }`}
-              >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  notifications.sms ? 'translate-x-6' : 'translate-x-1'
-                }`} />
-              </button>
-            </div>
-            
-            {/* Marketing Emails */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-slate-900">Marketing Emails</p>
-                <p className="text-sm text-slate-500">Receive news and promotional content</p>
-              </div>
-              <button
-                onClick={() => setNotifications({...notifications, marketing: !notifications.marketing})}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  notifications.marketing ? 'bg-blue-600' : 'bg-slate-300'
-                }`}
-              >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  notifications.marketing ? 'translate-x-6' : 'translate-x-1'
-                }`} />
-              </button>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Security */}
-        <div className="bg-white rounded-xl border border-slate-200">
-          <div className="p-6 border-b border-slate-200 flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
-              <Shield size={20} className="text-purple-600" />
+        <div className="space-y-10">
+          {/* Security Protocols */}
+          <div className="bg-white rounded-[2.5rem] border border-slate-200/50 shadow-2xl shadow-slate-200/20 overflow-hidden">
+            <div className="p-10 border-b border-slate-100 flex items-center gap-6 bg-slate-50/30">
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-white">
+                <Shield size={28} className="text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-serif text-[#0F172A] tracking-tight antialiased">Security</h3>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em]">Protection Metrics</p>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-slate-900">Security</h3>
-              <p className="text-sm text-slate-500">Manage your security preferences</p>
+            <div className="p-8 space-y-4">
+              {[
+                { label: 'Credential Update', desc: 'Modify access authentication', icon: Lock },
+                { label: 'Multi-Factor Verification', desc: 'Secondary security layering', icon: Shield },
+                { label: 'Authorization Logs', desc: 'Audit active system sessions', icon: SettingsIcon }
+              ].map((item, i) => (
+                <button key={i} className="w-full flex items-center justify-between p-6 rounded-[1.5rem] bg-slate-50/20 border border-transparent hover:border-blue-100 hover:bg-white hover:shadow-xl hover:shadow-blue-500/5 transition-all text-left group">
+                  <div className="flex items-center gap-5">
+                    <div className="w-12 h-12 rounded-2xl bg-white shadow-md flex items-center justify-center text-slate-300 group-hover:text-blue-600 transition-all duration-500 group-hover:rotate-6">
+                       <item.icon size={20} />
+                    </div>
+                    <div>
+                      <p className="text-[15px] font-bold text-slate-700 group-hover:text-[#0F172A] transition-colors">{item.label}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-1.5 opacity-70">{item.desc}</p>
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="text-slate-200 group-hover:text-blue-600 group-hover:translate-x-1.5 transition-all" />
+                </button>
+              ))}
             </div>
           </div>
-          <div className="p-6 space-y-4">
-            {/* Change Password */}
-            <button className="w-full flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-left">
-              <div>
-                <p className="font-medium text-slate-900">Change Password</p>
-                <p className="text-sm text-slate-500">Update your account password</p>
-              </div>
-              <ChevronRight size={20} className="text-slate-400" />
-            </button>
-            
-            {/* Two-Factor Authentication */}
-            <button className="w-full flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-left">
-              <div>
-                <p className="font-medium text-slate-900">Two-Factor Authentication</p>
-                <p className="text-sm text-slate-500">Add an extra layer of security</p>
-              </div>
-              <ChevronRight size={20} className="text-slate-400" />
-            </button>
-            
-            {/* Active Sessions */}
-            <button className="w-full flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-left">
-              <div>
-                <p className="font-medium text-slate-900">Active Sessions</p>
-                <p className="text-sm text-slate-500">Manage devices where you're logged in</p>
-              </div>
-              <ChevronRight size={20} className="text-slate-400" />
-            </button>
-          </div>
-        </div>
 
-        {/* Account */}
-        <div className="bg-white rounded-xl border border-slate-200">
-          <div className="p-6 border-b border-slate-200 flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-              <UserCircle size={20} className="text-blue-600" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-slate-900">Account</h3>
-              <p className="text-sm text-slate-500">Manage your account settings</p>
-            </div>
-          </div>
-          <div className="p-6 space-y-3">
-            {/* Signed in as */}
-            <div className="p-4 bg-slate-50 rounded-lg">
-              <p className="text-sm font-medium text-slate-500 mb-1">Signed in as</p>
-              <p className="font-semibold text-slate-900">{user?.email || 'Not signed in'}</p>
-            </div>
-            
-            <button className="w-full flex items-center justify-between p-4 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-left">
-              <div>
-                <p className="font-medium text-slate-900">Profile Settings</p>
-                <p className="text-sm text-slate-500">Update your personal information</p>
+          {/* Identity & Access */}
+          <div className="bg-white rounded-[2.5rem] border border-slate-200/50 shadow-2xl shadow-slate-200/20 overflow-hidden">
+            <div className="p-10 border-b border-slate-100 flex items-center gap-6 bg-slate-50/30">
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-white">
+                <UserCircle size={28} className="text-blue-600" />
               </div>
-              <ChevronRight size={20} className="text-slate-400" />
-            </button>
-            
-            <button className="w-full flex items-center justify-between p-4 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 transition-colors text-left">
               <div>
-                <p className="font-medium text-red-900">Delete Account</p>
-                <p className="text-sm text-red-600">Permanently delete your account and data</p>
+                <h3 className="text-2xl font-serif text-[#0F172A] tracking-tight antialiased">Identity</h3>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em]">Executive Credentials</p>
               </div>
-              <ChevronRight size={20} className="text-red-400" />
-            </button>
+            </div>
+            <div className="p-8 space-y-5">
+              <div className="p-8 bg-[#0F172A] rounded-[2rem] shadow-2xl flex items-center justify-between relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-1000">
+                   <Lock size={64} className="text-white" />
+                </div>
+                <div className="relative z-10">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] leading-none mb-2">Verified Identity</p>
+                  <p className="text-[17px] font-serif text-white antialiased">{user?.email || 'Unauthorized Entity'}</p>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center relative z-10 backdrop-blur-md">
+                   <Lock size={18} className="text-blue-400 shadow-[0_0_12px_rgba(96,165,250,0.5)]" />
+                </div>
+              </div>
+              
+              <button className="w-full flex items-center justify-between p-6 rounded-[1.5rem] bg-slate-50/20 border border-transparent hover:border-blue-100 hover:bg-white hover:shadow-xl hover:shadow-blue-500/5 transition-all text-left group">
+                <div className="flex items-center gap-5">
+                  <div className="w-12 h-12 rounded-2xl bg-white shadow-md flex items-center justify-center text-slate-300 group-hover:text-blue-600 transition-all duration-500">
+                     <User size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[15px] font-bold text-slate-700 group-hover:text-[#0F172A] transition-colors">Dossier Access</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-1.5 opacity-70">Modify administrative profile</p>
+                  </div>
+                </div>
+                <ChevronRight size={18} className="text-slate-200 group-hover:text-blue-600 group-hover:translate-x-1.5 transition-all" />
+              </button>
+              
+              <button className="w-full flex items-center justify-between p-6 rounded-[1.5rem] bg-rose-50/10 border border-transparent hover:border-rose-100 hover:bg-white hover:shadow-xl hover:shadow-rose-500/5 transition-all text-left group">
+                <div className="flex items-center gap-5">
+                  <div className="w-12 h-12 rounded-2xl bg-white shadow-md flex items-center justify-center text-rose-200 group-hover:text-rose-500 transition-all duration-500">
+                     <Trash2 size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[15px] font-bold text-rose-600">Decommission Registry</p>
+                    <p className="text-[10px] font-bold text-rose-300 uppercase tracking-widest leading-none mt-1.5 opacity-70">Permanent entity removal</p>
+                  </div>
+                </div>
+                <ChevronRight size={18} className="text-rose-200 group-hover:text-rose-500 group-hover:translate-x-1.5 transition-all" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

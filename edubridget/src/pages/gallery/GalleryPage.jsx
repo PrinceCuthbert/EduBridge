@@ -2,10 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, MapPin, GraduationCap } from "lucide-react";
 import OptimizedImage from "@/components/OptimizedImage";
+import { useTranslation } from "react-i18next";
 
 import { MOCK_MEDIA as galleryItems } from "@/data/mockData";
 
 export default function GalleryPage() {
+  const { t } = useTranslation();
   const [activeImage, setActiveImage] = useState(null);
   const modalRef = useRef(null);
 
@@ -38,11 +40,10 @@ export default function GalleryPage() {
       <div className="text-white py-16" style={{ backgroundColor: "#1e3a8a" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-white font-serif">
-            Success Stories
+            {t('gallery_page.hero_title')}
           </h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto">
-            See where our students are studying and hear about their journey
-            with EduBridge.
+            {t('gallery_page.hero_subtitle')}
           </p>
         </div>
       </div>
@@ -167,7 +168,7 @@ export default function GalleryPage() {
                           EduBridge
                         </p>
                         <p className="text-white/80 text-xs italic">
-                          Bridging Dreams
+                          {t('gallery_page.slogan')}
                         </p>
                       </div>
                     </div>
@@ -197,7 +198,7 @@ export default function GalleryPage() {
 
                   <div className="space-y-3">
                     <p className="text-xs text-slate-500 uppercase tracking-wide font-bold">
-                      Program
+                      {t('gallery_page.program_label')}
                     </p>
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl border border-primary/20">
                       <GraduationCap className="h-5 w-5" />

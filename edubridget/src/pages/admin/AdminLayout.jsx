@@ -17,15 +17,11 @@ import {
   DollarSign,
   BarChart3,
   PanelLeft,
+  Search,
+  ChevronDown,
+  MessageSquare,
 } from "lucide-react";
 
-/**
- * AdminLayout Component
- *
- * Provides the shell for the Admin Dashboard.
- * Includes a responsive sidebar navigation and a top header area.
- * Handles the "Power User" density requested by using a compact, data-focused layout.
- */
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -34,7 +30,6 @@ export default function AdminLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  // Navigation Items
   const navItems = [
     { label: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
     { label: "Manage Users", path: "/admin/users", icon: Users },
@@ -45,6 +40,7 @@ export default function AdminLayout() {
     { label: 'Branches', path: '/admin/branches', icon: Building2 },
     { label: 'Financial Reports', path: '/admin/finance', icon: DollarSign },
     { label: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
+    { label: 'Communications', path: '/admin/communications', icon: MessageSquare },
   ];
 
   const settingsItem = { label: 'Settings', path: '/admin/settings', icon: Settings };
@@ -55,11 +51,11 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
+    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden font-sans">
       {/* Mobile Sidebar Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 lg:hidden transition-all duration-300"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -67,58 +63,40 @@ export default function AdminLayout() {
       {/* Sidebar Navigation */}
       <aside
         className={`
-          fixed lg:static inset-y-0 left-0 z-30
-          flex flex-col bg-slate-900 text-slate-300
-          transition-all duration-300 ease-in-out
+          fixed lg:static inset-y-0 left-0 z-50
+          flex flex-col bg-[#0F172A] text-slate-400
+          transition-all duration-300 ease-in-out border-r border-white/5
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-          ${isCollapsed ? "lg:w-20" : "lg:w-64"}
-          w-64
+          ${isCollapsed ? "lg:w-[80px]" : "lg:w-[280px]"}
+          w-[280px]
         `}>
         {/* Logo Area */}
-        <div
-          className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between px-4"} h-16 border-b border-slate-800/50 transition-all`}>
-          <div
-            className={`flex items-center gap-3 ${isCollapsed ? "justify-center w-full" : ""}`}>
-            {!isCollapsed ? (
-              // Expanded State: Logo + Text + Toggle
-              <>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/20">
-                    <GraduationCap className="text-white w-5 h-5" />
-                  </div>
-                  <span className="font-bold text-white text-base tracking-wide whitespace-nowrap">
-                    EduBridge Admin
-                  </span>
-                </div>
-                <button
-                  onClick={() => setIsMobileOpen(false)}
-                  className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
-                  <X size={20} />
-                </button>
-                <button
-                  onClick={() => setIsCollapsed(!isCollapsed)}
-                  className="hidden lg:block p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
-                  <PanelLeft size={18} />
-                </button>
-              </>
-            ) : (
-              // Collapsed State: Just the Toggle Button (acting as expander) or Logo?
-              // Using Logo as expander is common, or keeping the button.
-              // Let's keep the Logo for identity, and maybe make it clickable or add the small icon?
-              // User said "move that icon beside the words".
-              // If I click the logo area when collapsed, it should expand.
-              <button
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20 hover:bg-blue-500 transition-colors"
-                title="Expand Sidebar">
-                <GraduationCap className="text-white w-6 h-6" />
-              </button>
+        <div className={`flex items-center h-20 px-6 border-b border-white/5`}>
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/20 ring-4 ring-blue-500/10">
+              <GraduationCap className="text-white w-6 h-6" />
+            </div>
+            {!isCollapsed && (
+              <div className="flex flex-col">
+                <span className="font-bold text-white text-lg tracking-tight leading-none">
+                  EduBridge
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mt-1">
+                  Dashboard
+                </span>
+              </div>
             )}
           </div>
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto modern-scrollbar">
+        <nav className="flex-1 px-4 py-8 space-y-1.5 overflow-y-auto modern-scrollbar scrollbar-thin scrollbar-thumb-slate-800">
+          {!isCollapsed && (
+            <div className="px-3 mb-4">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Main Menu</span>
+            </div>
+          )}
+          
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
@@ -128,205 +106,177 @@ export default function AdminLayout() {
                 key={item.path}
                 to={item.path}
                 className={`
-                  flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200
+                  flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group
                   ${
                     isActive
-                      ? "bg-primary text-white shadow-lg shadow-primary/20"
-                      : "hover:bg-slate-800 hover:text-white"
+                      ? "bg-blue-600 text-white shadow-xl shadow-blue-500/20 active-nav-shadow"
+                      : "hover:bg-white/5 hover:text-white"
                   }
                   ${isCollapsed ? "justify-center" : ""}
                 `}
                 title={isCollapsed ? item.label : ""}>
                 <Icon
                   size={20}
-                  className={`flex-shrink-0 ${isActive ? "text-white" : "text-slate-400"}`}
+                  className={`flex-shrink-0 transition-colors ${isActive ? "text-white" : "text-slate-500 group-hover:text-blue-400"}`}
                 />
                 {!isCollapsed && (
-                  <span className="font-medium text-sm whitespace-nowrap">
+                  <span className="font-semibold text-sm whitespace-nowrap tracking-wide">
                     {item.label}
                   </span>
+                )}
+                {isActive && !isCollapsed && (
+                   <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white]" />
                 )}
               </Link>
             );
           })}
-
-          {/* Settings at Bottom of Nav */}
-          <Link
-            to={settingsItem.path}
-            className={`
-              flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200
-              ${
-                location.pathname === settingsItem.path
-                  ? "bg-primary text-white shadow-lg shadow-primary/20"
-                  : "hover:bg-slate-800 hover:text-white"
-              }
-              ${isCollapsed ? "justify-center" : ""}
-            `}
-            title={isCollapsed ? settingsItem.label : ""}>
-            <settingsItem.icon
-              size={20}
-              className={`flex-shrink-0 ${location.pathname === settingsItem.path ? "text-white" : "text-slate-400"}`}
-            />
-            {!isCollapsed && (
-              <span className="font-medium text-sm whitespace-nowrap">
-                {settingsItem.label}
-              </span>
-            )}
-          </Link>
         </nav>
 
         {/* User Profile & Footer Actions */}
-        <div className="p-4 border-t border-slate-800 space-y-4">
-          {/* Collapse Toggle Removed from here */}
-
-          {/* User Info */}
+        <div className="p-4 bg-black/20 border-t border-white/5">
           {!isCollapsed ? (
-            <div className="flex items-center gap-3 px-2">
-              <img
-                src={user?.avatar || "https://ui-avatars.com/api/?name=Admin"}
-                alt="Admin"
-                className="w-10 h-10 rounded-full border-2 border-slate-700"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-white truncate">
-                  {user?.name}
-                </p>
-                <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+            <div className="bg-white/5 rounded-2xl p-4 mb-4">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <img
+                    src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.name || 'Admin'}&background=2563eb&color=fff`}
+                    alt="Admin"
+                    className="w-10 h-10 rounded-xl border border-white/10"
+                  />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-[#1e293b] rounded-full" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-white truncate">
+                    {user?.name || "Administrator"}
+                  </p>
+                  <p className="text-xs text-slate-500 truncate">{user?.email || "admin@edubridge.com"}</p>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="flex justify-center">
-              <img
-                src={user?.avatar || "https://ui-avatars.com/api/?name=Admin"}
-                alt="Admin"
-                className="w-8 h-8 rounded-full border-2 border-slate-700"
-              />
+            <div className="flex justify-center mb-4">
+               <div className="relative">
+                <img
+                  src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.name || 'Admin'}&background=2563eb&color=fff`}
+                  alt="Admin"
+                  className="w-10 h-10 rounded-xl border border-white/10"
+                />
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-[#1e293b] rounded-full" />
+              </div>
             </div>
           )}
 
-          {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className={`
-                flex items-center gap-3 w-full px-3 py-2 rounded-lg
-                hover:bg-red-500/10 hover:text-red-400 transition-colors
+          <div className="space-y-1">
+            <Link
+              to={settingsItem.path}
+              className={`
+                flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all
+                ${location.pathname === settingsItem.path ? "bg-white/10 text-white" : "hover:bg-white/5 hover:text-white"}
                 ${isCollapsed ? "justify-center" : ""}
               `}
-            title="Sign Out">
-            <LogOut size={20} className="flex-shrink-0" />
-            {!isCollapsed && (
-              <span className="font-medium text-sm">Sign Out</span>
-            )}
-          </button>
+              title={settingsItem.label}>
+              <Settings size={20} className={location.pathname === settingsItem.path ? "text-blue-400" : "text-slate-500"} />
+              {!isCollapsed && <span className="text-sm font-semibold">Settings</span>}
+            </Link>
+            
+            <button
+              onClick={handleLogout}
+              className={`
+                  flex items-center gap-3 w-full px-3 py-2.5 rounded-xl
+                  text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-all
+                  ${isCollapsed ? "justify-center" : ""}
+                `}
+              title="Sign Out">
+              <LogOut size={20} />
+              {!isCollapsed && <span className="text-sm font-semibold">Sign Out</span>}
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 lg:px-8">
-          <div className="flex items-center gap-4">
+        <header className="h-20 bg-white border-b border-slate-200/60 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-40">
+          <div className="flex items-center gap-6">
             <button
               onClick={() => setIsMobileOpen(!isMobileOpen)}
-              className="p-2 -ml-2 rounded-lg hover:bg-slate-100 text-slate-600 lg:hidden">
-              <Menu size={24} />
+              className="p-2.5 bg-slate-50 rounded-xl hover:bg-slate-100 text-slate-600 lg:hidden border border-slate-200">
+              <Menu size={20} />
             </button>
-            {/* <h1 className="text-xl font-bold text-slate-800 hidden sm:block">
-              {navItems.find((i) => i.path === location.pathname)?.label || settingsItem.path === location.pathname ? settingsItem.label : "Dashboard"}
-            </h1> */}
-          </div>
-
-          {/* Search Bar */}
-          <div className="flex-1 max-w-md mx-8 hidden md:block">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full px-4 py-2 pl-10 bg-slate-50 border-0 rounded-lg focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all text-sm"
-              />
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+            <button 
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="p-2.5 bg-slate-50 rounded-xl hover:bg-slate-100 text-slate-600 hidden lg:flex border border-slate-200 transition-all active:scale-95">
+              <PanelLeft size={20} className={isCollapsed ? "rotate-180" : ""} />
+            </button>
+            
+            <div className="hidden sm:flex flex-col">
+              <h2 className="text-slate-900 font-bold text-lg leading-tight">
+                {navItems.find((i) => i.path === location.pathname)?.label || "Dashboard"}
+              </h2>
+              <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
+                <span>Edubridge</span>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+    
+
+          <div className="flex items-center gap-3">
             {/* Notification bell*/}
-            <div className="flex items-center">
-              <button className="p-2 mr-4 text-slate-400 hover:text-primary transition-colors relative">
-                <Bell size={24} />
-                <span className="absolute top-1.5 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-              </button>
+            <button className="relative p-3 bg-slate-50 text-slate-500 hover:text-blue-600 hover:bg-slate-100 rounded-2xl border border-slate-200 transition-all active:scale-95">
+              <Bell size={20} />
+              <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse"></span>
+            </button>
 
-              {/* Profile Section */}
-              <div className="flex items-center pl-6 border-l border-slate-200 h-10">
-                <div className="relative">
-                  <button
-                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-4 focus:outline-none group">
-                    <div className="hidden text-right sm:block">
-                      <p className="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors">
-                        {user?.name || "Admin User"}
-                      </p>
-                      <p className="text-xs text-slate-500 font-medium">
-                        {user?.role || "Administrator"}
-                      </p>
-                    </div>
-
-                    <div className="w-10 h-10 rounded-full bg-primary text-white shadow-md shadow-primary/20 flex items-center justify-center overflow-hidden ring-4 ring-transparent group-hover:ring-primary/10 transition-all">
-                      {user?.avatar ? (
-                        <img
-                          src={user.avatar}
-                          alt={user.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="font-bold text-sm">
-                          {user?.name
-                            ? user.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")
-                                .substring(0, 2)
-                                .toUpperCase()
-                            : "AD"}
-                        </span>
-                      )}
-                    </div>
-                  </button>
-
-                  {isProfileOpen && (
-                    <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl border border-slate-100 py-2 animate-in fade-in slide-in-from-top-2 z-50">
-                      <div className="px-4 py-3 border-b border-slate-50 sm:hidden">
-                        <p className="text-sm font-bold text-slate-800">
-                          {user?.name || "Admin User"}
-                        </p>
-                        <p className="text-xs text-slate-500">{user?.email}</p>
-                      </div>
-
-                      <div className="p-1">
-                        <Link
-                          to="/admin/settings"
-                          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors"
-                          onClick={() => setIsProfileOpen(false)}>
-                          <Settings size={16} /> Profile Settings
-                        </Link>
-                        <button
-                          onClick={handleLogout}
-                          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors text-left">
-                          <LogOut size={16} /> Sign Out
-                        </button>
-                      </div>
-                    </div>
+            {/* Profile Dropdown */}
+            <div className="relative ml-2">
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center gap-3 p-1.5 pr-4 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-200 transition-all active:scale-95 group">
+                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-500/20 flex items-center justify-center overflow-hidden transition-all group-hover:scale-95">
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="font-bold text-sm tracking-tighter">
+                      {user?.name?.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2) || "AD"}
+                    </span>
                   )}
                 </div>
-              </div>
+                <div className="hidden lg:flex flex-col text-left">
+                  <span className="text-sm font-bold text-slate-700 leading-none mb-1 group-hover:text-blue-600 transition-colors">{user?.name || "Admin"}</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter leading-none">Super Admin</span>
+                </div>
+                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl shadow-slate-200/50 border border-slate-100 py-3 animate-in fade-in slide-in-from-top-4 z-50">
+                   <div className="px-5 py-3 border-b border-slate-50 mb-2">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Signed in as</p>
+                    <p className="text-sm font-bold text-slate-800 truncate">{user?.email || "admin@edubridge.com"}</p>
+                  </div>
+                  <div className="px-2 space-y-1">
+                    <Link
+                      to="/admin/settings"
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all"
+                      onClick={() => setIsProfileOpen(false)}>
+                      <Settings size={18} className="text-slate-400" /> Account Settings
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-all text-left">
+                      <LogOut size={18} /> Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </header>
 
         {/* Viewport for Routes */}
-        <main className="flex-1 overflow-y-auto modern-scrollbar-light p-4 lg:p-8">
+        <main className="flex-1 overflow-y-auto modern-scrollbar-light p-6 lg:p-10 bg-[#F8FAFC]">
           <Outlet />
         </main>
       </div>
