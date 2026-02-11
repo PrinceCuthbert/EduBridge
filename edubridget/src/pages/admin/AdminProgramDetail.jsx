@@ -64,7 +64,7 @@ export default function AdminProgramDetail() {
       }
     }
     
-    navigate('/admin/programs');
+    navigate('/admin/cms/scholarships');
   };
 
   const addDepartment = () => {
@@ -118,7 +118,7 @@ export default function AdminProgramDetail() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
           <button 
-            onClick={() => navigate('/admin/programs')}
+            onClick={() => navigate('/admin/cms/scholarships')}
             className="p-3 hover:bg-slate-50 rounded-2xl text-slate-400 hover:text-slate-900 transition-all active:scale-95 border border-transparent hover:border-slate-100"
           >
             <ArrowLeft size={22} />

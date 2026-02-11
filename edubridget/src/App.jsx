@@ -77,9 +77,7 @@ import PublicRoute from "./components/PublicRoute";
 // Admin Pages - Lazy Loaded
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
 const AdminOverview = lazy(() => import("./pages/admin/AdminOverview"));
-const ScholarshipManager = lazy(
-  () => import("./pages/admin/ScholarshipManager"),
-);
+
 const ApplicationReview = lazy(() => import("./pages/admin/ApplicationReview"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 import ContentManagement from "./pages/admin/ContentManagement";
@@ -144,7 +142,7 @@ function App() {
                     </PublicRoute>
                   }
                 />
-                <Route path="/aboutUsPage" element={<AboutUsPage />} />
+                <Route path="/aboutuspage" element={<AboutUsPage />} />
                 <Route path="/contactPage" element={<ContactPage />} />
 
                 {/* New Routes */}
@@ -217,7 +215,10 @@ function App() {
                 <Route path="users" element={<UserManagement />} />
                 <Route path="applications" element={<ApplicationReview />} />
                 <Route path="visa" element={<VisaCases />} />
-                <Route path="programs" element={<ScholarshipManager />} />
+                <Route
+                  path="programs"
+                  element={<Navigate to="/admin/cms/scholarships" replace />}
+                />
                 <Route path="programs/:id" element={<AdminProgramDetail />} />
                 <Route path="cms" element={<ContentManagement />}>
                   <Route

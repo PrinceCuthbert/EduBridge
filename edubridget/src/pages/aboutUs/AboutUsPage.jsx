@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGraduationCap,
@@ -7,11 +7,13 @@ import {
   faLightbulb,
   faUsers,
   faHeart,
-  faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 
+import InfiniteSlider from "../../components/InfiniteSlider";
+import TimelineItem from "../../components/TimelineItem";
+import { FeatureGrid } from "../../components/ui/card";
 // --- DATA MAPPING HELPER ---
 const iconMap = {
   graduation: faGraduationCap,
@@ -39,7 +41,9 @@ function AboutUsPage() {
   const teamMembers = t("about.team_members", { returnObjects: true });
 
   // Journey timeline data
-  const journeyMilestones = t("about.journey_milestones", { returnObjects: true });
+  const journeyMilestones = t("about.journey_milestones", {
+    returnObjects: true,
+  });
 
   return (
     <div className="min-h-screen bg-[#F9F9F9]">
@@ -195,11 +199,23 @@ function AboutUsPage() {
                   {t("about.ceo_message.dear")}
                 </p>
 
-                <p dangerouslySetInnerHTML={{ __html: t("about.ceo_message.p1") }} />
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: t("about.ceo_message.p1"),
+                  }}
+                />
 
-                <p dangerouslySetInnerHTML={{ __html: t("about.ceo_message.p2") }} />
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: t("about.ceo_message.p2"),
+                  }}
+                />
 
-                <p dangerouslySetInnerHTML={{ __html: t("about.ceo_message.p3") }} />
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: t("about.ceo_message.p3"),
+                  }}
+                />
 
                 <div className="pt-5 border-t border-slate-200">
                   <p className="font-semibold text-base md:text-lg text-[#1A237E]">
@@ -245,69 +261,70 @@ function AboutUsPage() {
           </motion.div>
 
           {/* 3×2 Grid - Uniform Card Sizes on Large Screens */}
-          <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-            {coreValues &&
-              coreValues.map((value, idx) => {
-                return (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: idx * 0.1 }}
-                    whileHover={{ y: -5, scale: 1.02 }}
-                    className="group relative overflow-hidden rounded-2xl md:rounded-[32px] p-6 md:p-7 lg:p-8 flex flex-col justify-between transition-all duration-300"
-                    style={{
-                      background: "rgba(255, 255, 255, 0.7)",
-                      backdropFilter: "blur(24px)",
-                      WebkitBackdropFilter: "blur(24px)",
-                      border: "1px solid rgba(255, 255, 255, 0.4)",
-                      boxShadow:
-                        "0 8px 32px 0 rgba(31, 38, 135, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1) inset",
-                    }}>
-                    {/* Enhanced glassmorphism overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <FeatureGrid
+            items={coreValues || []}
+            columns="grid-cols-1 md:grid-cols-3"
+            gap="gap-5 md:gap-6"
+            className="max-w-[1400px] mx-auto"
+            renderItem={(value, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                whileHover={{ y: -5, scale: 1.02 }}
+                className="group relative overflow-hidden rounded-2xl md:rounded-[32px] p-6 md:p-7 lg:p-8 flex flex-col justify-between transition-all duration-300"
+                style={{
+                  background: "rgba(255, 255, 255, 0.7)",
+                  backdropFilter: "blur(24px)",
+                  WebkitBackdropFilter: "blur(24px)",
+                  border: "1px solid rgba(255, 255, 255, 0.4)",
+                  boxShadow:
+                    "0 8px 32px 0 rgba(31, 38, 135, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1) inset",
+                }}>
+                {/* Enhanced glassmorphism overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                    <div className="relative z-10">
-                      <div
-                        className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 group-hover:bg-[#1A237E] group-hover:text-white ${
-                          value.color === "yellow"
-                            ? "bg-yellow-100 text-yellow-600"
-                            : value.color === "blue"
-                              ? "bg-blue-100 text-blue-600"
-                              : value.color === "green"
-                                ? "bg-green-100 text-green-600"
-                                : value.color === "purple"
-                                  ? "bg-purple-100 text-purple-600"
-                                  : value.color === "orange"
-                                    ? "bg-orange-100 text-orange-600"
-                                    : value.color === "pink"
-                                      ? "bg-pink-100 text-pink-600"
-                                      : "bg-indigo-100 text-indigo-600"
-                        }`}>
-                        <FontAwesomeIcon
-                          icon={iconMap[value.iconKey]}
-                          className="text-2xl"
-                        />
-                      </div>
-                      <h3
-                        className="text-xl md:text-2xl font-bold text-[#1A237E] mb-3 group-hover:text-yellow-600 transition-colors duration-300"
-                        style={{ fontFamily: "'Playfair Display', serif" }}>
-                        {value.title}
-                      </h3>
-                      <p
-                        className="text-slate-600 text-base md:text-lg leading-relaxed"
-                        style={{ fontFamily: "'Inter', sans-serif" }}>
-                        {value.description}
-                      </p>
-                    </div>
+                <div className="relative z-10">
+                  <div
+                    className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 group-hover:bg-[#1A237E] group-hover:text-white ${
+                      value.color === "yellow"
+                        ? "bg-yellow-100 text-yellow-600"
+                        : value.color === "blue"
+                          ? "bg-blue-100 text-blue-600"
+                          : value.color === "green"
+                            ? "bg-green-100 text-green-600"
+                            : value.color === "purple"
+                              ? "bg-purple-100 text-purple-600"
+                              : value.color === "orange"
+                                ? "bg-orange-100 text-orange-600"
+                                : value.color === "pink"
+                                  ? "bg-pink-100 text-pink-600"
+                                  : "bg-indigo-100 text-indigo-600"
+                    }`}>
+                    <FontAwesomeIcon
+                      icon={iconMap[value.iconKey]}
+                      className="text-2xl"
+                    />
+                  </div>
+                  <h3
+                    className="text-xl md:text-2xl font-bold text-[#1A237E] mb-3 group-hover:text-yellow-600 transition-colors duration-300"
+                    style={{ fontFamily: "'Playfair Display', serif" }}>
+                    {value.title}
+                  </h3>
+                  <p
+                    className="text-slate-600 text-base md:text-lg leading-relaxed"
+                    style={{ fontFamily: "'Inter', sans-serif" }}>
+                    {value.description}
+                  </p>
+                </div>
 
-                    {/* Decorative corner accent */}
-                    <div className="absolute -top-4 -right-4 w-24 h-24 bg-yellow-300/20 rounded-full blur-2xl group-hover:bg-yellow-400/30 transition-colors" />
-                  </motion.div>
-                );
-              })}
-          </div>
+                {/* Decorative corner accent */}
+                <div className="absolute -top-4 -right-4 w-24 h-24 bg-yellow-300/20 rounded-full blur-2xl group-hover:bg-yellow-400/30 transition-colors" />
+              </motion.div>
+            )}
+          />
         </div>
       </section>
 
@@ -373,323 +390,36 @@ function AboutUsPage() {
               {t("about.team_subtitle")}
             </p>
           </motion.div>
-
-          <InfiniteTeamSlider members={teamMembers} />
+          <InfiniteSlider
+            data={teamMembers}
+            autoPlaySpeed={3000}
+            itemsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+            renderItem={(member) => <TeamMemberCard member={member} />}
+          />
         </div>
       </section>
     </div>
   );
 }
 
-// Timeline Item Component with scroll-reveal animation
-const TimelineItem = ({ milestone, index, isLeft }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, x: 0 }}
-      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="relative">
-      {/* Mobile Layout - vertical with content on right */}
-      <div className="md:hidden flex items-start">
-        {/* Timeline node - left side */}
-        <div className="absolute left-6 -translate-x-1/2 z-20">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={isInView ? { scale: 1 } : { scale: 0 }}
-            transition={{ duration: 0.4, delay: index * 0.1 + 0.3 }}
-            className="w-5 h-5 rounded-full bg-yellow-500 border-4 border-white shadow-lg"
-          />
-        </div>
-
-        {/* Content card - right side */}
-        <div className="ml-16 flex-1">
-          <div className="bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-100">
-            <div className="flex items-center gap-3 mb-3">
-              <span className="inline-block px-3 py-1 bg-[#1A237E] text-white font-bold rounded-full text-xs">
-                {milestone.year}
-              </span>
-              <FontAwesomeIcon
-                icon={faCheckCircle}
-                className="text-yellow-500 text-lg"
-              />
-            </div>
-            <h3
-              className="text-base font-bold text-[#1A237E] mb-2"
-              style={{ fontFamily: "'Playfair Display', serif" }}>
-              {milestone.title}
-            </h3>
-            <p
-              className="text-slate-600 text-sm leading-relaxed"
-              style={{ fontFamily: "'Inter', sans-serif" }}>
-              {milestone.description}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop Layout - alternating left/right */}
-      <div className="hidden md:grid md:grid-cols-[1fr_auto_1fr] md:gap-0 items-center">
-        {/* Left side content for even indices (0, 2, 4) */}
-        {isLeft ? (
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
-            transition={{ duration: 0.6, delay: index * 0.1 }}
-            className="pr-8">
-            <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-slate-200 hover:border-[#1A237E]">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="inline-block px-3 py-1.5 bg-[#1A237E] text-white font-bold rounded-full text-sm">
-                  {milestone.year}
-                </span>
-                <FontAwesomeIcon
-                  icon={faCheckCircle}
-                  className="text-yellow-500 text-xl"
-                />
-              </div>
-              <h3
-                className="text-lg font-bold text-[#1A237E] mb-2"
-                style={{ fontFamily: "'Playfair Display', serif" }}>
-                {milestone.title}
-              </h3>
-              <p
-                className="text-slate-600 text-sm leading-relaxed"
-                style={{ fontFamily: "'Inter', sans-serif" }}>
-                {milestone.description}
-              </p>
-            </div>
-          </motion.div>
-        ) : (
-          <div></div>
-        )}
-
-        {/* Center node */}
-        <div className="relative z-20 flex-shrink-0 mx-4">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={isInView ? { scale: 1 } : { scale: 0 }}
-            transition={{ duration: 0.4, delay: index * 0.1 + 0.3 }}
-            className="w-5 h-5 rounded-full bg-yellow-500 border-4 border-white shadow-lg"
-          />
-        </div>
-
-        {/* Right side content for odd indices (1, 3, 5) */}
-        {!isLeft ? (
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
-            transition={{ duration: 0.6, delay: index * 0.1 }}
-            className="pl-8">
-            <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-slate-200 hover:border-[#1A237E]">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="inline-block px-3 py-1.5 bg-[#1A237E] text-white font-bold rounded-full text-sm">
-                  {milestone.year}
-                </span>
-                <FontAwesomeIcon
-                  icon={faCheckCircle}
-                  className="text-yellow-500 text-xl"
-                />
-              </div>
-              <h3
-                className="text-lg font-bold text-[#1A237E] mb-2"
-                style={{ fontFamily: "'Playfair Display', serif" }}>
-                {milestone.title}
-              </h3>
-              <p
-                className="text-slate-600 text-sm leading-relaxed"
-                style={{ fontFamily: "'Inter', sans-serif" }}>
-                {milestone.description}
-              </p>
-            </div>
-          </motion.div>
-        ) : (
-          <div></div>
-        )}
-      </div>
-    </motion.div>
-  );
-};
-
-// Infinite Team Slider - Optimized for true circular loop showing 3 members
-const InfiniteTeamSlider = ({ members }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [itemsPerPage, setItemsPerPage] = useState(3);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  useEffect(() => {
-    const updateSize = () => {
-      if (window.innerWidth < 640) setItemsPerPage(1);
-      else if (window.innerWidth < 1024) setItemsPerPage(2);
-      else setItemsPerPage(3);
-    };
-    updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
-
-  if (!members || members.length === 0) return null;
-
-  // Create infinite loop by triplicating the array
-  const extendedMembers = [...members, ...members, ...members];
-  const startOffset = members.length; // Start from the middle copy
-
-  const handleNext = () => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentIndex((prev) => prev + 1);
-  };
-
-  const handlePrev = () => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentIndex((prev) => prev - 1);
-  };
-
-  const handleTransitionEnd = () => {
-    setIsTransitioning(false);
-    // Reset to middle copy when reaching boundaries
-    if (currentIndex >= members.length + startOffset) {
-      setCurrentIndex(startOffset);
-    } else if (currentIndex < startOffset) {
-      setCurrentIndex(startOffset + members.length - 1);
-    }
-  };
-
-  // Auto-play
-  useEffect(() => {
-    if (!isPaused) {
-      const interval = setInterval(handleNext, 3500);
-      return () => clearInterval(interval);
-    }
-  }, [isPaused, currentIndex]);
-
-  // Initialize at start offset
-  useEffect(() => {
-    setCurrentIndex(startOffset);
-  }, [members.length]);
-
-  const translateValue = -(currentIndex * (100 / itemsPerPage));
-
-  return (
-    <div
-      className="relative max-w-7xl mx-auto px-12 md:px-16"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}>
-      {/* Navigation Buttons */}
-      <button
-        onClick={handlePrev}
-        aria-label="Previous members"
-        className="absolute -left-2 md:left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 bg-white rounded-full shadow-2xl border border-slate-200 flex items-center justify-center text-[#1A237E] hover:bg-[#1A237E] hover:text-white transition-all hover:scale-110 disabled:opacity-50"
-        disabled={isTransitioning}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round">
-          <path d="m15 18-6-6 6-6" />
-        </svg>
-      </button>
-
-      <div className="overflow-hidden py-6">
-        <div
-          className={`flex ${isTransitioning ? "transition-transform duration-500 ease-in-out" : ""}`}
-          style={{ transform: `translateX(${translateValue}%)` }}
-          onTransitionEnd={handleTransitionEnd}>
-          {extendedMembers.map((member, idx) => (
-            <div
-              key={`${member.name}-${idx}`}
-              className="flex-shrink-0 px-4"
-              style={{ width: `${100 / itemsPerPage}%` }}>
-              <motion.div
-                whileHover={{ y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="flex flex-col items-center text-center group">
-                {/* Image with soft glow effect */}
-                <div className="relative w-36 h-36 md:w-44 md:h-44 mb-4 md:mb-5">
-                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-purple-500 rounded-full opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-500" />
-                  <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white shadow-2xl">
-                    <img
-                      src={
-                        member.image ||
-                        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop"
-                      }
-                      alt={member.name}
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110"
-                    />
-                  </div>
-                </div>
-
-                <h3
-                  className="text-lg md:text-xl font-bold text-[#1A237E] mb-1"
-                  style={{ fontFamily: "'Playfair Display', serif" }}>
-                  {member.name}
-                </h3>
-                <p
-                  className="text-xs md:text-sm font-bold text-yellow-600 mb-2 uppercase tracking-wider"
-                  style={{ fontFamily: "'Inter', sans-serif" }}>
-                  {member.role}
-                </p>
-                <p
-                  className="text-xs md:text-sm text-slate-600 leading-relaxed max-w-[200px] md:max-w-[220px] mx-auto"
-                  style={{ fontFamily: "'Inter', sans-serif" }}>
-                  {member.description}
-                </p>
-              </motion.div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <button
-        onClick={handleNext}
-        aria-label="Next members"
-        className="absolute -right-2 md:right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 bg-white rounded-full shadow-2xl border border-slate-200 flex items-center justify-center text-[#1A237E] hover:bg-[#1A237E] hover:text-white transition-all hover:scale-110 disabled:opacity-50"
-        disabled={isTransitioning}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round">
-          <path d="m9 18 6-6-6-6" />
-        </svg>
-      </button>
-
-      {/* Indicator dots */}
-      <div className="flex justify-center gap-2 mt-8">
-        {members.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => {
-              if (!isTransitioning) {
-                setIsTransitioning(true);
-                setCurrentIndex(startOffset + idx);
-              }
-            }}
-            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-              (currentIndex - startOffset) % members.length === idx
-                ? "bg-[#1A237E] w-8"
-                : "bg-slate-300 hover:bg-slate-400"
-            }`}
-            aria-label={`Go to slide ${idx + 1}`}
-          />
-        ))}
-      </div>
+const TeamMemberCard = ({ member }) => (
+  <motion.div whileHover={{ y: -10 }} className="flex flex-col items-center">
+    <div className="relative w-36 h-36 rounded-full overflow-hidden border-4 border-white shadow-xl">
+      <img
+        src={member.image || "https://via.placeholder.com/150"}
+        alt={member.name}
+        className="w-full h-full object-cover"
+      />
     </div>
-  );
-};
+    <h3 className="mt-4 font-bold text-xl text-[#1A237E]">{member.name}</h3>
+    <p className="text-yellow-600 uppercase text-xs font-bold tracking-wider">
+      {member.role}
+    </p>
+    <p className="text-slate-600 text-sm mt-2 text-center max-w-[200px]">
+      {member.description}
+    </p>
+  </motion.div>
+);
+// Usage:
 
 export default AboutUsPage;

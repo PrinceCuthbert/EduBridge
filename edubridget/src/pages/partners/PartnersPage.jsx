@@ -8,11 +8,13 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
+
 import OptimizedImage from "@/components/OptimizedImage";
 import { BASE_URL } from "@/config/api";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+
+import Partners from "../../components/partners/Partners";
 
 // Custom Slider Component
 const UniversitySlider = ({ items, title }) => {
@@ -143,8 +145,8 @@ export default function PartnersPage() {
     fetchPartners();
   }, []);
 
-  const d2Universities = partners.filter(p => p.type === 'D-2');
-  const d4Universities = partners.filter(p => p.type === 'D-4-1');
+  const d2Universities = partners.filter((p) => p.type === "D-2");
+  const d4Universities = partners.filter((p) => p.type === "D-4-1");
 
   return (
     <div className="min-h-screen bg-white">
@@ -194,9 +196,9 @@ export default function PartnersPage() {
       <section className="pb-20">
         <div className="max-w-7xl mx-auto px-6">
           {loading ? (
-             <div className="flex justify-center p-12">
-               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-             </div>
+            <div className="flex justify-center p-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
           ) : (
             <>
               <UniversitySlider
@@ -207,6 +209,8 @@ export default function PartnersPage() {
                 items={d4Universities}
                 title={t("partners_page.sliders.d4_title")}
               />
+
+              {/* <Partners /> */}
             </>
           )}
         </div>

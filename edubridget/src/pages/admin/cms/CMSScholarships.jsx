@@ -1,15 +1,16 @@
-
-import React, { useState } from 'react';
-import { Search, Plus, Edit, Trash2, Award, DollarSign, Calendar, Globe } from 'lucide-react';
-import { toast } from 'sonner';
+import React from 'react';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 import Modal from '../../../components/Modal';
 import { MOCK_SCHOLARSHIPS } from '../../../data/mockData';
-import { useCMSManager } from '@/hooks/useCMSManager'; // Custom hook
+import { useCMSManager } from '@/hooks/useCMSManager'; 
+import AdminPageHeader from "../../../components/admin/AdminPageHeader";
+import AdminTable from "../../../components/admin/AdminTable";
+import AdminFilterBar from "../../../components/admin/AdminFilterBar";
 
 export default function CMSScholarships() {
   const {
     items: filteredScholarships,
-    handleSearch,
+    // handleSearch, // Not used directly with AdminFilterBar simple binding
     searchQuery,
     setSearchQuery,
     isModalOpen,
@@ -27,174 +28,193 @@ export default function CMSScholarships() {
     ['title', 'location']
   );
 
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-slate-900">Scholarships</h2>
-        <button 
-          onClick={handleAdd}
-          className="bg-primary text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-primary/90"
-        >
-          <Plus size={20} /> Add Scholarship
-        </button>
-      </div>
-
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-200">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-            <input 
-              type="text"
-              placeholder="Search scholarships..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary"
-            />
-          </div>
+  const columns = [
+    {
+      header: "Scholarship Details",
+      render: (item) => (
+        <div>
+          <div className="font-serif text-[15px] font-bold text-slate-900 mb-0.5">{item.title}</div>
+          <div className="text-xs text-slate-500 line-clamp-1 max-w-[200px]">{item.description}</div>
         </div>
+      )
+    },
+    {
+      header: "Amount",
+      render: (item) => (
+        <span className="text-emerald-600 font-bold text-sm bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
+          {item.amount}
+        </span>
+      )
+    },
+    {
+      header: "Deadline",
+      render: (item) => (
+        <span className="text-slate-600 font-medium text-sm">
+          {item.deadline}
+        </span>
+      )
+    },
+    {
+      header: "Location",
+      render: (item) => (
+        <span className="text-slate-700 font-bold text-sm">
+          {item.location}
+        </span>
+      )
+    },
+    {
+      header: "Actions",
+      className: "text-right",
+      render: (item) => (
+        <div className="flex justify-end gap-2">
+          <button 
+            onClick={() => handleEdit(item)} 
+            className="p-2 text-slate-400 hover:text-primary hover:bg-slate-50 rounded-xl transition-all"
+            title="Edit"
+          >
+            <Edit size={18} />
+          </button>
+          <button 
+            onClick={() => handleDelete(item.id, 'Scholarship')} 
+            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+            title="Delete"
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
+      )
+    }
+  ];
 
-        {/* Table section */}
-      <div className="bg-white rounded-[2rem] border border-slate-200/60 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="px-6 py-4 font-semibold text-slate-700">Scholarship</th>
-                <th className="px-6 py-4 font-semibold text-slate-700">Amount</th>
-                <th className="px-6 py-4 font-semibold text-slate-700">Deadline</th>
-                <th className="px-6 py-4 font-semibold text-slate-700">Location</th>
-                <th className="px-6 py-4 font-semibold text-slate-700 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredScholarships.map(item => (
-                <tr key={item.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-slate-900">{item.title}</div>
-                    <div className="text-sm text-slate-500 line-clamp-1">{item.description}</div>
-                  </td>
-                  <td className="px-6 py-4 text-emerald-600 font-medium">{item.amount}</td>
-                  <td className="px-6 py-4 text-slate-600">{item.deadline}</td>
-                  <td className="px-6 py-4 text-slate-600">{item.location}</td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-2">
-                       <button onClick={() => handleEdit(item)} className="p-2 text-slate-400 hover:text-primary rounded-lg hover:bg-slate-100">
-                        <Edit size={18} />
-                      </button>
-                      <button onClick={() => handleDelete(item.id, 'Scholarship')} className="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50">
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {filteredScholarships.length === 0 && (
-            <div className="p-8 text-center text-slate-500">
-              No scholarships found matching your search.
-            </div>
-          )}
-          </div>
-          </div>
-      </div>
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+      <AdminPageHeader 
+        title="Scholarships Management" 
+        subtitle="Manage scholarship opportunities and grant details."
+        count={filteredScholarships.length}
+        countLabel="Active Grants"
+        primaryAction={{
+          label: "Add Scholarship",
+          icon: Plus,
+          onClick: handleAdd
+        }}
+      />
+
+      <AdminFilterBar 
+        searchPlaceholder="Search scholarships by title or location..."
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
+
+      <AdminTable 
+        columns={columns}
+        data={filteredScholarships}
+        isLoading={false}
+      />
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingItem ? 'Edit Scholarship' : 'Add New Scholarship'}
+        size="lg"
+        className="rounded-[2.5rem]"
       >
-        <form onSubmit={(e) => handleSubmit(e, 'Scholarship')} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
-            <input 
-              type="text" 
-              required
-              value={formData.title}
-              onChange={e => setFormData({...formData, title: e.target.value})}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={(e) => handleSubmit(e, 'Scholarship')} className="space-y-6 p-6">
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Amount</label>
+              <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Title</label>
               <input 
                 type="text" 
                 required
-                value={formData.amount}
-                onChange={e => setFormData({...formData, amount: e.target.value})}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary"
+                value={formData.title}
+                onChange={e => setFormData({...formData, title: e.target.value})}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all font-serif text-slate-900"
+                placeholder="e.g. Global Excellence Award"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Deadline</label>
-              <input 
-                type="date"
-                value={formData.deadline}
-                onChange={e => setFormData({...formData, deadline: e.target.value})}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary"
-              />
+            
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Amount</label>
+                <input 
+                  type="text" 
+                  required
+                  value={formData.amount}
+                  onChange={e => setFormData({...formData, amount: e.target.value})}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all font-bold text-emerald-600"
+                  placeholder="$10,000"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Deadline</label>
+                <input 
+                  type="date"
+                  value={formData.deadline}
+                  onChange={e => setFormData({...formData, deadline: e.target.value})}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all"
+                />
+              </div>
             </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Location</label>
+                <input 
+                  type="text" 
+                  required
+                  value={formData.location}
+                  onChange={e => setFormData({...formData, location: e.target.value})}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all"
+                  placeholder="e.g. New York, USA"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Type</label>
+                <div className="relative">
+                  <select 
+                    value={formData.type}
+                    onChange={e => setFormData({...formData, type: e.target.value})}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all appearance-none"
+                  >
+                    <option value="Merit-based">Merit-based</option>
+                    <option value="Need-based">Need-based</option>
+                    <option value="Diversity">Diversity</option>
+                    <option value="Subject-specific">Subject-specific</option>
+                    <option value="Regional">Regional</option>
+                    <option value="Research">Research</option>
+                    <option value="Arts">Arts</option>
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
-              <input 
-                type="text" 
+              <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Description</label>
+              <textarea 
+                rows={3}
                 required
-                value={formData.location}
-                onChange={e => setFormData({...formData, location: e.target.value})}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary"
+                value={formData.description}
+                onChange={e => setFormData({...formData, description: e.target.value})}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all resize-none"
+                placeholder="Brief details about the scholarship..."
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Type</label>
-              <select 
-                value={formData.type}
-                onChange={e => setFormData({...formData, type: e.target.value})}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary"
-              >
-                <option value="Merit-based">Merit-based</option>
-                <option value="Need-based">Need-based</option>
-                <option value="Diversity">Diversity</option>
-                <option value="Subject-specific">Subject-specific</option>
-                <option value="Regional">Regional</option>
-                <option value="Research">Research</option>
-                <option value="Arts">Arts</option>
-              </select>
-            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-            <textarea 
-              rows={3}
-              required
-              value={formData.description}
-              onChange={e => setFormData({...formData, description: e.target.value})}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary resize-none"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Tags (comma separated)</label>
-            <input 
-              type="text" 
-              placeholder="Undergraduate, Computer Science"
-              value={formData.tags}
-              onChange={e => setFormData({...formData, tags: e.target.value})}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-primary"
-            />
-          </div>
-          <div className="flex justify-end gap-3 pt-4">
+
+          <div className="flex justify-end gap-4 pt-4 border-t border-slate-100">
             <button 
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg"
+              className="px-6 py-2.5 text-slate-500 hover:text-slate-700 font-bold text-sm transition-colors"
             >
               Cancel
             </button>
             <button 
               type="submit"
-              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
+              className="px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
             >
               {editingItem ? 'Update Scholarship' : 'Add Scholarship'}
             </button>

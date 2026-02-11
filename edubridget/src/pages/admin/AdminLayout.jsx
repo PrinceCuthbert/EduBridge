@@ -35,7 +35,7 @@ export default function AdminLayout() {
     { label: "Manage Users", path: "/admin/users", icon: Users },
     { label: "Applications", path: "/admin/applications", icon: FileText },
     { label: "Visa Cases", path: "/admin/visa", icon: Plane },
-    { label: "University Programs", path: "/admin/programs", icon: GraduationCap },
+
     { label: 'Content (CMS)', path: '/admin/cms', icon: ScrollText },
     { label: 'Branches', path: '/admin/branches', icon: Building2 },
     { label: 'Financial Reports', path: '/admin/finance', icon: DollarSign },

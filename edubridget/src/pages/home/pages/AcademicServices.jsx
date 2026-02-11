@@ -1,7 +1,16 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { BookOpen, GraduationCap, Globe, Award, Users, MapPin } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import {
+  BookOpen,
+  GraduationCap,
+  Globe,
+  Award,
+  Users,
+  MapPin,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
+
+import { FeatureGrid, FeatureCard } from "../../../components/ui/card";
 
 export default function AcademicServices() {
   const { t } = useTranslation();
@@ -12,7 +21,7 @@ export default function AcademicServices() {
     research: Globe,
     scholarship: Award,
     advisory: Users,
-    global: MapPin
+    global: MapPin,
   };
 
   const services = [
@@ -21,7 +30,7 @@ export default function AcademicServices() {
     { key: "research", icon: Globe },
     { key: "scholarship", icon: Award },
     { key: "advisory", icon: Users },
-    { key: "global", icon: MapPin }
+    { key: "global", icon: MapPin },
   ];
 
   return (
@@ -29,35 +38,29 @@ export default function AcademicServices() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-            {t('home_page.services.title')}
+            {t("home_page.services.title")}
           </h2>
           <p className="text-lg text-slate-600">
-            {t('home_page.services.subtitle')}
+            {t("home_page.services.subtitle")}
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => (
-            <motion.div
+        <FeatureGrid
+          items={services} // Corrected plural name
+          renderItem={(
+            service,
+            index, // Use () for implicit return
+          ) => (
+            <FeatureCard
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="group p-8 rounded-2xl shadow-soft hover:shadow-lift hover:-translate-y-2 transition-all duration-300 border border-slate-200"
-              style={{ backgroundColor: '#EDF2F7' }}
-            >
-              <div className="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/20 text-primary group-hover:rotate-12 group-hover:scale-110 transition-transform duration-300">
-                <service.icon className="h-8 w-8" />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-slate-800">
-                {t(`home_page.services.items.${service.key}.title`)}
-              </h3>
-              <p className="text-slate-700 leading-relaxed">
-                {t(`home_page.services.items.${service.key}.desc`)}
-              </p>
-            </motion.div>
-          ))}
-        </div>
+              // Use the key to fetch translations
+              title={t(`home_page.services.items.${service.key}.title`)}
+              description={t(`home_page.services.items.${service.key}.desc`)}
+              // Pass the Icon component directly
+              icon={<service.icon className="h-8 w-8 text-primary" />}
+            />
+          )}
+        />
       </div>
     </section>
   );

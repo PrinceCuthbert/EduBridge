@@ -67,8 +67,8 @@ const StudentDashboardLayout = lazy(
 export const routeConfig = {
   public: [
     { path: "/", element: LandingPage, protected: false },
-    { path: "/aboutUsPage", element: AboutUsPage },
-    { path: "/contactPage", element: ContactPage },
+    { path: "/aboutuspage", element: AboutUsPage },
+    { path: "/contactpage", element: ContactPage },
     { path: "/library", element: DigitalLibraryPage },
     { path: "/branches", element: BranchesPage },
     { path: "/study-abroad", element: StudyAbroadPage },

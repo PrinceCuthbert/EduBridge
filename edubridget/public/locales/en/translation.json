@@ -14,7 +14,7 @@
   "about": {
     "hero_title": "About TM EduBridge",
     "hero_subtitle": "Empowering Africa through knowledge, innovation, and accessible education",
-    
+
     "founder_title": "Founder's Message",
     "founder_subtitle": "A personal note from our visionary founder",
     "founder_name": "Adolphe NIYIGENA",
@@ -22,7 +22,7 @@
     "founder_greeting": "Dear Students, Parents, and Educators,",
     "founder_signoff_warm": "Warm regards,",
     "founder_closing": "Together, let's build a brighter future through education.",
-    
+
     "founder_message_paragraphs": [
       "Welcome to TM EduBridge Online Academy. My journey to establishing this platform began with a simple observation: across Africa, quality educational resources remain inaccessible to many talented students eager to learn and grow. After having personally benefited from the transformative power of education in my own life, I became passionate about creating a solution that could bridge this educational gap. I envisioned a platform where a student in a remote village in Rwanda could have the same quality educational experience as one in an urban center.",
       "TM EduBridge was born from this vision — a comprehensive online academy that brings together courses, materials, and resources tailored to the educational needs of African students. From high school materials organized by country and curriculum to specialized courses in Korean language, programming, and university subjects, our platform aims to be a one-stop educational solution. What began as a small initiative has grown into a vibrant learning community with students from across the continent. Our team of dedicated educators shares my passion for accessible education and works tirelessly to create engaging, relevant content that helps students excel.",
@@ -162,7 +162,7 @@
     "explore_title": "Explore",
     "explore": [
       { "name": "Company", "path": "/" },
-      { "name": "About Us", "path": "/aboutUsPage" },
+      { "name": "About Us", "path": "/aboutuspage" },
       { "name": "Our Branches", "path": "/branches" },
       { "name": "Partners", "path": "/partners" },
       { "name": "Gallery", "path": "/gallery" },
@@ -180,7 +180,11 @@
     "social_links": [
       { "iconKey": "facebook", "href": "#", "label": "Facebook" },
       { "iconKey": "twitter", "href": "#", "label": "Twitter" },
-      { "iconKey": "instagram", "href": "https://www.instagram.com/tmedubridge/", "label": "Instagram" },
+      {
+        "iconKey": "instagram",
+        "href": "https://www.instagram.com/tmedubridge/",
+        "label": "Instagram"
+      },
       { "iconKey": "linkedin", "href": "#", "label": "LinkedIn" }
     ],
     "contact_title": "Contact Us",
@@ -229,16 +233,47 @@
     },
     "regional_offices_title": "Regional Offices",
     "regional_offices": [
-      { "country": "Rwanda (HQ)", "phone": "+250 788 123 456", "address": "KG 123 St, Nyarugenge, Kigali, Rwanda", "hours": "Mon–Fri: 10AM–6PM, Sat: 10AM–5PM" },
-      { "country": "Uganda", "phone": "+256 772 123 456", "address": "Plot 45, Kampala Rd, Kampala, Uganda", "hours": "Mon–Fri: 10AM–6PM, Sat: 10AM–5PM" },
-      { "country": "Kenya", "phone": "+254 722 123 456", "address": "Moi Avenue, Nairobi, Kenya", "hours": "Mon–Fri: 10AM–6PM, Sat: 10AM–5PM" }
+      {
+        "country": "Rwanda (HQ)",
+        "phone": "+250 788 123 456",
+        "address": "KG 123 St, Nyarugenge, Kigali, Rwanda",
+        "hours": "Mon–Fri: 10AM–6PM, Sat: 10AM–5PM"
+      },
+      {
+        "country": "Uganda",
+        "phone": "+256 772 123 456",
+        "address": "Plot 45, Kampala Rd, Kampala, Uganda",
+        "hours": "Mon–Fri: 10AM–6PM, Sat: 10AM–5PM"
+      },
+      {
+        "country": "Kenya",
+        "phone": "+254 722 123 456",
+        "address": "Moi Avenue, Nairobi, Kenya",
+        "hours": "Mon–Fri: 10AM–6PM, Sat: 10AM–5PM"
+      }
     ],
     "follow_us": "Follow Us",
     "social_links": [
-       { "iconKey": "facebook", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-blue-50 hover:text-blue-600" },
-       { "iconKey": "twitter", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-sky-50 hover:text-sky-500" },
-       { "iconKey": "instagram", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-pink-50 hover:text-pink-600" },
-       { "iconKey": "linkedin", "href": "#", "colorClass": "text-slate-600 bg-slate-100 hover:bg-blue-100 hover:text-blue-700" }
+      {
+        "iconKey": "facebook",
+        "href": "#",
+        "colorClass": "text-slate-600 bg-slate-100 hover:bg-blue-50 hover:text-blue-600"
+      },
+      {
+        "iconKey": "twitter",
+        "href": "#",
+        "colorClass": "text-slate-600 bg-slate-100 hover:bg-sky-50 hover:text-sky-500"
+      },
+      {
+        "iconKey": "instagram",
+        "href": "#",
+        "colorClass": "text-slate-600 bg-slate-100 hover:bg-pink-50 hover:text-pink-600"
+      },
+      {
+        "iconKey": "linkedin",
+        "href": "#",
+        "colorClass": "text-slate-600 bg-slate-100 hover:bg-blue-100 hover:text-blue-700"
+      }
     ],
     "live_chat": {
       "title": "Live Chat",
@@ -434,24 +469,60 @@
     "title": "Why Choose TM EduBridge?",
     "subtitle": "We provide comprehensive education services tailored for East African students pursuing local and international opportunities.",
     "features": {
-      "expert": { "title": "Expert Instruction", "desc": "Learn from qualified instructors with years of teaching experience across East African curricula." },
-      "resources": { "title": "Comprehensive Resources", "desc": "Access our extensive digital library with ebooks, journals, and past papers." },
-      "live": { "title": "Live Classes", "desc": "Interactive online classes with real-time support and collaborative learning." },
-      "certs": { "title": "Certificates", "desc": "Earn recognized certificates upon course completion." },
-      "community": { "title": "Community Support", "desc": "Join a vibrant community of learners and professionals." },
-      "regional": { "title": "Regional Presence", "desc": "With offices across East Africa, we're close to you." }
+      "expert": {
+        "title": "Expert Instruction",
+        "desc": "Learn from qualified instructors with years of teaching experience across East African curricula."
+      },
+      "resources": {
+        "title": "Comprehensive Resources",
+        "desc": "Access our extensive digital library with ebooks, journals, and past papers."
+      },
+      "live": {
+        "title": "Live Classes",
+        "desc": "Interactive online classes with real-time support and collaborative learning."
+      },
+      "certs": {
+        "title": "Certificates",
+        "desc": "Earn recognized certificates upon course completion."
+      },
+      "community": {
+        "title": "Community Support",
+        "desc": "Join a vibrant community of learners and professionals."
+      },
+      "regional": {
+        "title": "Regional Presence",
+        "desc": "With offices across East Africa, we're close to you."
+      }
     }
   },
   "services": {
     "title": "Academic Services",
     "subtitle": "Discover our wide range of educational programs designed to help you succeed at every stage of your academic journey.",
     "items": {
-      "thesis": { "title": "Thesis Writing & Consulting", "desc": "Expert guidance for your academic research and thesis preparation." },
-      "proofreading": { "title": "Proofreading & Formatting", "desc": "Professional editing services to perfect your academic documents." },
-      "research": { "title": "Research Papers & Journals", "desc": "Access to academic journals and assistance with research papers." },
-      "scholarships": { "title": "Scholarships & Travel Support", "desc": "Complete application support for scholarships and international programs." },
-      "advisory": { "title": "Academic Advisory & Consulting", "desc": "One-on-one consultations for academic and career planning." },
-      "study_abroad": { "title": "Scholarship to Study Abroad", "desc": "Fully funded and partial scholarship opportunities worldwide." }
+      "thesis": {
+        "title": "Thesis Writing & Consulting",
+        "desc": "Expert guidance for your academic research and thesis preparation."
+      },
+      "proofreading": {
+        "title": "Proofreading & Formatting",
+        "desc": "Professional editing services to perfect your academic documents."
+      },
+      "research": {
+        "title": "Research Papers & Journals",
+        "desc": "Access to academic journals and assistance with research papers."
+      },
+      "scholarships": {
+        "title": "Scholarships & Travel Support",
+        "desc": "Complete application support for scholarships and international programs."
+      },
+      "advisory": {
+        "title": "Academic Advisory & Consulting",
+        "desc": "One-on-one consultations for academic and career planning."
+      },
+      "study_abroad": {
+        "title": "Scholarship to Study Abroad",
+        "desc": "Fully funded and partial scholarship opportunities worldwide."
+      }
     },
     "cta": "Learn More"
   },
@@ -459,10 +530,10 @@
     "hero_title": "Scholarships & Financial Aid",
     "hero_subtitle": "Find funding opportunities to support your educational journey abroad.",
     "stats": {
-        "awarded": "Scholarships Awarded",
-        "students_funded": "Students Funded",
-        "partners": "Partner Institutions",
-        "guidance": "Guidance Support"
+      "awarded": "Scholarships Awarded",
+      "students_funded": "Students Funded",
+      "partners": "Partner Institutions",
+      "guidance": "Guidance Support"
     },
     "loading": "Loading scholarships...",
     "view_details": "View Details",
@@ -520,10 +591,22 @@
       "title": "Application Process",
       "subtitle": "We guide you through every step of your study abroad journey",
       "steps": {
-        "consultation": { "title": "Consultation", "desc": "Free consultation to understand your goals" },
-        "search": { "title": "University Search", "desc": "Find the best match for your profile" },
-        "application": { "title": "Application", "desc": "Complete application support and document preparation" },
-        "visa": { "title": "Visa & Travel", "desc": "Visa guidance and pre-departure orientation" }
+        "consultation": {
+          "title": "Consultation",
+          "desc": "Free consultation to understand your goals"
+        },
+        "search": {
+          "title": "University Search",
+          "desc": "Find the best match for your profile"
+        },
+        "application": {
+          "title": "Application",
+          "desc": "Complete application support and document preparation"
+        },
+        "visa": {
+          "title": "Visa & Travel",
+          "desc": "Visa guidance and pre-departure orientation"
+        }
       }
     }
   },
@@ -606,17 +689,32 @@
       "consultation": {
         "title": "Student Visa Consultation",
         "duration": "45 min",
-        "features": ["Visa eligibility assessment", "Document checklist", "Application review", "Interview prep tips"]
+        "features": [
+          "Visa eligibility assessment",
+          "Document checklist",
+          "Application review",
+          "Interview prep tips"
+        ]
       },
       "full_support": {
         "title": "Full Application Support",
         "duration": "Full support",
-        "features": ["Complete document preparation", "Application submission", "Embassy coordination", "Visa interview coaching"]
+        "features": [
+          "Complete document preparation",
+          "Application submission",
+          "Embassy coordination",
+          "Visa interview coaching"
+        ]
       },
       "premium": {
         "title": "Premium Package",
         "duration": "End-to-end",
-        "features": ["Everything in Full Support", "University application help", "Scholarship assistance", "Pre-departure orientation"]
+        "features": [
+          "Everything in Full Support",
+          "University application help",
+          "Scholarship assistance",
+          "Pre-departure orientation"
+        ]
       }
     },
     "booking": {

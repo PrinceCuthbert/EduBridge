@@ -1,21 +1,19 @@
 import { useTranslation } from "react-i18next";
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+// import { Card, CardContent } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  MapPin,
-  DollarSign,
-  Plane,
-  ChevronLeft,
-  ChevronRight,
-  Loader2
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import OptimizedImage from "@/components/OptimizedImage";
 import { BASE_URL } from "../../config/api";
 import { toast } from "sonner";
 import { MOCK_PROGRAMS } from "../../data/mockData"; // Keep as fallback type or initial state shape reference if needed, but we will fetch
+import DestinationCard from "@/components/studyAbroad/DestinationCard";
+import ApplicationProcess from "@/components/studyAbroad/ApplicationProcess";
+
+import UniversityCard from "./UniversityCard";
 
 const DESTINATIONS = [
   {
@@ -92,52 +90,7 @@ const DESTINATIONS = [
 
 const LOADING_PROP = "lazy";
 
-const UniversityCard = React.memo(({ university }) => {
-  const navigate = useNavigate();
-
-  return (
-    <div
-      onClick={() => navigate(`/study-abroad/${university.id}`)}
-      className="flex-shrink-0 w-48 flex flex-col items-center group cursor-pointer p-2">
-      <div className="w-24 h-24 rounded-full bg-white border border-slate-100 flex items-center justify-center mb-4 overflow-hidden relative shadow-sm group-hover:shadow-md transition-all">
-        <OptimizedImage
-          src={
-            university.logo ||
-            `https://ui-avatars.com/api/?name=${university.visaType}&background=random&color=fff&size=128&font-size=0.33`
-          }
-          alt={university.universityName}
-          className="w-full h-full object-cover"
-          rounded={true}
-          showSkeleton={true}
-        />
-      </div>
-      <div className="text-center w-full">
-        <div className="text-[10px] text-slate-500 font-semibold mb-1 uppercase tracking-wider">
-          {university.visaType}
-        </div>
-        <h3 className="font-bold text-xs text-slate-900 mb-2 line-clamp-2 min-h-[32px] px-1 leading-tight">
-          {university.universityName}
-        </h3>
-
-        <div className="flex flex-col gap-1 items-center mt-1">
-          {university.tags?.map((tag, i) => (
-            <Badge
-              key={i}
-              variant="secondary"
-              className={`
-                  text-[10px] px-2 py-0.5 h-5
-                  ${tag === "BEST" ? "bg-emerald-500 text-white hover:bg-emerald-600" : ""}
-                  ${tag === "NEW" ? "bg-emerald-500 text-white hover:bg-emerald-600" : ""}
-                  ${tag === "ON SALE" ? "bg-rose-500 text-white hover:bg-rose-600" : ""}
-                `}>
-              {tag}
-            </Badge>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-});
+// The university study abroad page,  where we see the scroll list of a scholarships available, and each visa type per scholership.
 
 const UniversitySection = React.memo(
   ({ title, visaType, universities, subtitle, loading }) => {
@@ -154,25 +107,26 @@ const UniversitySection = React.memo(
     };
 
     if (loading) {
-       return (
-         <div className="mb-12">
-           <div className="flex items-center gap-3 mb-2">
-             <div className="h-6 w-32 bg-slate-200 animate-pulse rounded"></div>
-           </div>
-           <p className="h-4 w-64 bg-slate-100 animate-pulse rounded mb-6"></p>
-           <div className="flex gap-4">
-               {[1,2,3,4].map(i => (
-                  <div key={i} className="w-48 flex flex-col items-center">
-                      <div className="w-24 h-24 rounded-full bg-slate-200 animate-pulse mb-4"></div>
-                      <div className="h-4 w-32 bg-slate-200 animate-pulse rounded mb-2"></div>
-                  </div>
-               ))}
-           </div>
-         </div>
-       );
+      return (
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-6 w-32 bg-slate-200 animate-pulse rounded"></div>
+          </div>
+          <p className="h-4 w-64 bg-slate-100 animate-pulse rounded mb-6"></p>
+          <div className="flex gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="w-48 flex flex-col items-center">
+                <div className="w-24 h-24 rounded-full bg-slate-200 animate-pulse mb-4"></div>
+                <div className="h-4 w-32 bg-slate-200 animate-pulse rounded mb-2"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
     }
 
     return (
+      // Header of the visa types available.
       <div className="mb-12">
         <div className="flex items-center gap-3 mb-2">
           <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
@@ -208,9 +162,9 @@ const UniversitySection = React.memo(
               <UniversityCard key={i} university={uni} />
             ))}
             {universities.length === 0 && (
-                <div className="w-full text-center py-8 text-slate-500 text-sm">
-                    No programs available at the moment.
-                </div>
+              <div className="w-full text-center py-8 text-slate-500 text-sm">
+                No programs available at the moment.
+              </div>
             )}
           </div>
         </div>
@@ -231,9 +185,9 @@ export default function StudyAbroadPage() {
         setLoading(true);
         // FETCH DATA WHEN PAGE LOADS
         const res = await fetch(`${BASE_URL}/programs`);
-        
+
         if (!res.ok) {
-           throw new Error("Failed to fetch programs");
+          throw new Error("Failed to fetch programs");
         }
 
         const data = await res.json();
@@ -265,10 +219,10 @@ export default function StudyAbroadPage() {
       <div className="text-white py-16" style={{ backgroundColor: "#1e3a8a" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-white">
-            {t('study_abroad_page.hero_title')}
+            {t("study_abroad_page.hero_title")}
           </h1>
           <p className="text-xl text-white/90">
-            {t('study_abroad_page.hero_subtitle')}
+            {t("study_abroad_page.hero_subtitle")}
           </p>
         </div>
       </div>
@@ -278,8 +232,8 @@ export default function StudyAbroadPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <UniversitySection
             title="D-2"
-            visaType={t('study_abroad_page.universities.visa_label')}
-            subtitle={t('study_abroad_page.universities.d2_subtitle')}
+            visaType={t("study_abroad_page.universities.visa_label")}
+            subtitle={t("study_abroad_page.universities.d2_subtitle")}
             universities={d2Programs}
             loading={loading}
           />
@@ -288,8 +242,8 @@ export default function StudyAbroadPage() {
 
           <UniversitySection
             title="D-4"
-            visaType={t('study_abroad_page.universities.visa_label')}
-            subtitle={t('study_abroad_page.universities.d4_subtitle')}
+            visaType={t("study_abroad_page.universities.visa_label")}
+            subtitle={t("study_abroad_page.universities.d4_subtitle")}
             universities={d4Programs}
             loading={loading}
           />
@@ -301,115 +255,23 @@ export default function StudyAbroadPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4 text-slate-900">
-              {t('study_abroad_page.destinations.title')}
+              {t("study_abroad_page.destinations.title")}
             </h2>
             <p className="text-slate-600 max-w-2xl mx-auto">
-              {t('study_abroad_page.destinations.subtitle')}
+              {t("study_abroad_page.destinations.subtitle")}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {DESTINATIONS.map((destination, index) => (
-              <Card
-                key={index}
-                className="hover:shadow-xl transition-shadow border-slate-200 bg-white overflow-hidden group">
-                <div className="h-48 overflow-hidden relative">
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors z-10" />
-                  <img
-                    src={destination.image}
-                    alt={destination.name}
-                    loading={LOADING_PROP}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="text-2xl font-bold mb-2 text-slate-900">
-                    {destination.name}
-                  </h3>
-                  <p className="text-slate-600 text-sm mb-4">
-                    {destination.description}
-                  </p>
-
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-start">
-                      <DollarSign className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <div className="text-sm font-semibold text-slate-900">
-                          {t('study_abroad_page.destinations.tuition_fees')}
-                        </div>
-                        <div className="text-sm text-slate-600">
-                          {destination.tuition}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <MapPin className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <div className="text-sm font-semibold text-slate-900">
-                          {t('study_abroad_page.destinations.living_costs')}
-                        </div>
-                        <div className="text-sm text-slate-600">
-                          {destination.living}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-slate-100 pt-4 mb-4">
-                    <h4 className="text-sm font-semibold mb-2 text-slate-900">
-                      {t('study_abroad_page.destinations.key_features')}
-                    </h4>
-                    <ul className="space-y-1">
-                      {destination.features.map((feature, idx) => (
-                        <li
-                          key={idx}
-                          className="text-sm text-slate-600 flex items-start">
-                          <span className="text-primary mr-2">•</span>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <Button className="w-full bg-primary hover:bg-primary-dark">
-                    <Plane className="mr-2 h-4 w-4" /> {t('study_abroad_page.destinations.learn_more')}
-                  </Button>
-                </CardContent>
-              </Card>
+              <DestinationCard key={index} destination={destination} t={t} />
             ))}
           </div>
         </div>
       </section>
 
       {/* Application Process */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-slate-900">
-              {t('study_abroad_page.process.title')}
-            </h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">
-              {t('study_abroad_page.process.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {['consultation', 'search', 'application', 'visa'].map((stepKey, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-primary-gradient rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg">
-                  {index + 1}
-                </div>
-                <h3 className="font-semibold text-lg mb-2 text-slate-900">
-                  {t(`study_abroad_page.process.steps.${stepKey}.title`)}
-                </h3>
-                <p className="text-slate-600 text-sm">
-                  {t(`study_abroad_page.process.steps.${stepKey}.desc`)}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ApplicationProcess t={t} />
     </div>
   );
 }
