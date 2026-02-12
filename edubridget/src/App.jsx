@@ -96,6 +96,11 @@ const Communications = lazy(() => import("./pages/admin/Communications"));
 const StudentDashboardLayout = lazy(
   () => import("./pages/dashboard/StudentDashboardLayout"),
 );
+const MyApplications = lazy(() => import("./pages/dashboard/MyApplications"));
+const VisaSummary = lazy(() => import("./pages/dashboard/visa/VisaSummary"));
+const VisaConsultationRequest = lazy(
+  () => import("./pages/dashboard/visa/VisaConsultationRequest"),
+);
 
 const PublicLayout = () => (
   <>
@@ -193,6 +198,12 @@ function App() {
                   </ProtectedRoute>
                 }>
                 <Route index element={<Dashboard />} />
+                <Route path="applications" element={<MyApplications />} />
+                <Route path="visa-status">
+                  <Route index element={<Navigate to="summary" replace />} />
+                  <Route path="summary" element={<VisaSummary />} />
+                  <Route path="request" element={<VisaConsultationRequest />} />
+                </Route>
                 <Route
                   path="profile"
                   element={<div className="p-8">My Profile (Coming Soon)</div>}
