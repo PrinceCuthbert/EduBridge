@@ -13,7 +13,7 @@ export default function AdminTable({
       <div className="overflow-x-auto scrollbar-hover">
         <table className="w-full text-left border-collapse min-w-[1000px]">
           <thead>
-            <tr className="bg-slate-50/40 border-b border-slate-100 text-[10px] uppercase text-slate-400 font-bold tracking-[0.25em]">
+            <tr className="bg-slate-50/40 border-b border-slate-100 text-xs uppercase text-slate-400 font-bold tracking-[0.25em]">
               {columns.map((col, index) => (
                 <th key={index} className={`px-10 py-7 ${col.className || ''}`}>
                   {col.header}
@@ -53,7 +53,7 @@ export default function AdminTable({
                         <FileText size={40} className="text-slate-200" />
                       </div>
                       <h4 className="text-xl font-serif text-[#0F172A] mb-2 tracking-tight">No Records Found</h4>
-                      <p className="text-[13px] font-medium text-slate-400 mb-6 leading-relaxed antialiased">
+                      <p className="text-sm font-medium text-slate-400 mb-6 leading-relaxed antialiased">
                         The current registry contains no data matching your criteria.
                       </p>
                     </div>

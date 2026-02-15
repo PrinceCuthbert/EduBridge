@@ -218,7 +218,7 @@ export default function UserManagement() {
   // Table Columns Definition
   const columns = [
     {
-      header: "Entity Profile",
+      header: "User profile",
       render: (user) => (
         <div className="flex items-center gap-5">
           <img 
@@ -228,49 +228,49 @@ export default function UserManagement() {
           />
           <div>
               <p className="text-[17px] font-serif text-[#0F172A] group-hover:text-blue-600 transition-colors antialiased tracking-tight">{user.name}</p>
-              <p className="text-[10px] font-mono font-bold text-slate-400 tracking-wider mt-0.5 lowercase opacity-70">{user.email}</p>
+              <p className="text-xs font-mono font-bold text-slate-400 tracking-wider mt-0.5 lowercase opacity-70">{user.email}</p>
           </div>
         </div>
       )
     },
     {
-      header: "Classification",
+      header: "Type",
       className: "px-8",
       render: (user) => (
-        <span className={`px-3 py-1.5 rounded-xl text-[10px] font-bold tracking-widest uppercase border transition-all ${user.role === 'Admin' ? 'bg-indigo-50 text-indigo-600 border-indigo-100 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-100'}`}>
+        <span className={`px-3 py-1.5 rounded-xl text-xs font-bold tracking-widest uppercase border transition-all ${user.role === 'Admin' ? 'bg-indigo-50 text-indigo-600 border-indigo-100 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-100'}`}>
           {user.role}
         </span>
       )
     },
     {
-      header: "Communication Log",
+      header: "Contact",
       className: "px-8",
       render: (user) => (
-        <span className="text-[13px] font-bold text-slate-700 flex items-center gap-3">
+        <span className="text-sm font-bold text-slate-700 flex items-center gap-3">
           <Phone size={14} className="text-slate-300" />
           {user.phone}
         </span>
       )
     },
     {
-      header: "Regionality",
+      header: "Nationality",
       className: "px-8 text-center",
       render: (user) => (
-         <span className="text-[13px] font-bold text-[#0F172A] tracking-tight flex justify-center">{user.country}</span>
+         <span className="text-sm font-bold text-[#0F172A] tracking-tight flex justify-center">{user.country}</span>
       )
     },
     {
-      header: "Registry Status",
+      header: "Status",
       className: "px-8 text-center",
       render: (user) => (
         <div className="flex items-center justify-center gap-3">
           <div className={`w-2 h-2 rounded-full ${user.status === 'Active' ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-300'}`} />
-          <span className={`text-[10px] font-bold uppercase tracking-widest ${user.status === 'Active' ? 'text-emerald-600' : 'text-slate-400'}`}>{user.status}</span>
+          <span className={`text-xs font-bold uppercase tracking-widest ${user.status === 'Active' ? 'text-emerald-600' : 'text-slate-400'}`}>{user.status}</span>
         </div>
       )
     },
     {
-      header: "Operational Control",
+      header: "Control",
       className: "px-10 text-right pr-12",
       render: (user) => (
         <div className="flex items-center justify-end gap-3 pr-2">
@@ -295,7 +295,7 @@ export default function UserManagement() {
         subtitle="Manage student ecosystem and administrative authority."
         count={users.length}
         primaryAction={{
-          label: "Register New Entity",
+          label: "Add User",
           icon: Plus,
           onClick: handleAddUser,
           rotateIcon: true
@@ -312,14 +312,14 @@ export default function UserManagement() {
           <div className="flex items-center gap-2.5">
             <button 
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex-1 xl:flex-none flex items-center justify-center gap-3 px-6 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all ${showFilters ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+              className={`flex-1 xl:flex-none flex items-center justify-center gap-3 px-6 py-3 rounded-2xl text-sm font-medium uppercase tracking-widest transition-all ${showFilters ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
                 <Filter size={18} />
                 Parameters
                 {Object.values(filters).some(v => v !== "All") && <span className="w-2 h-2 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)]" />}
             </button>
             <button 
               onClick={() => handleExport('csv')}
-              className="flex-1 xl:flex-none flex items-center justify-center gap-3 px-7 py-3 bg-white border border-slate-200 rounded-2xl text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
+              className="flex-1 xl:flex-none flex items-center justify-center gap-3 px-7 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
                 <Download size={18} className="text-slate-300" />
                 Log Export
             </button>
@@ -331,7 +331,7 @@ export default function UserManagement() {
       {showFilters && (
         <div className="bg-slate-50/40 p-10 rounded-[2.5rem] border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 animate-in slide-in-from-top-6 duration-500 shadow-inner">
           <div className="space-y-3">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em] px-1">Functional Role</label>
+            <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.25em] px-1">Functional Role</label>
             <select
               value={filters.role}
               onChange={(e) => setFilters({ ...filters, role: e.target.value })}
@@ -342,7 +342,7 @@ export default function UserManagement() {
             </select>
           </div>
           <div className="space-y-3">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em] px-1">Registry Status</label>
+            <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.25em] px-1">Registry Status</label>
             <select
               value={filters.status}
               onChange={(e) => setFilters({ ...filters, status: e.target.value })}
@@ -353,7 +353,7 @@ export default function UserManagement() {
             </select>
           </div>
           <div className="space-y-3">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em] px-1">Regional Presence</label>
+            <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.25em] px-1">Regional Presence</label>
             <select
               value={filters.country}
               onChange={(e) => setFilters({ ...filters, country: e.target.value })}
@@ -365,7 +365,7 @@ export default function UserManagement() {
             </select>
           </div>
           <div className="md:col-span-3 pt-2 text-right">
-             <button onClick={clearFilters} className="text-[10px] font-bold text-blue-600 uppercase tracking-widest hover:underline px-2">Reset Global Parameters</button>
+             <button onClick={clearFilters} className="text-xs font-bold text-blue-600 uppercase tracking-widest hover:underline px-2">Reset Global Parameters</button>
           </div>
         </div>
       )}
@@ -380,67 +380,67 @@ export default function UserManagement() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingUser ? "Modify Entity Record" : "Entity Registration"}
+        title={editingUser ? "Edit User" : "Add User"}
         size="lg"
-        className="rounded-[2.5rem] shadow-2xl border-0">
-        <form onSubmit={handleSubmit} className="space-y-10 p-10">
-          <div className="space-y-8">
+        className="">
+        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 md:space-y-10">
+          <div className="space-y-6 sm:space-y-8">
             <div className="space-y-3">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Principal Legal Name</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Username</label>
               <input
                 type="text"
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-8 py-5 bg-slate-50/50 border border-slate-100 rounded-3xl text-[15px] focus:border-blue-500 focus:bg-white outline-none font-bold text-[#0F172A] transition-all shadow-sm hover:shadow-md"
+                className="w-full px-6 py-4 sm:px-8 sm:py-5 bg-slate-50/50 border border-slate-100 rounded-2xl sm:rounded-3xl text-base focus:border-blue-500 focus:bg-white outline-none font-medium text-[#0F172A] transition-all shadow-sm hover:shadow-md"
                 placeholder="Full Name"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                <div className="space-y-3">
-                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Correspondence Email</label>
+                 <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Email</label>
                  <input
                    type="email"
                    required
                    value={formData.email}
                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                   className="w-full px-8 py-5 bg-slate-50/50 border border-slate-100 rounded-3xl text-[15px] focus:border-blue-500 focus:bg-white outline-none font-bold text-[#0F172A] transition-all shadow-sm font-mono lowercase"
+                   className="w-full px-6 py-4 sm:px-8 sm:py-5 bg-slate-50/50 border border-slate-100 rounded-2xl sm:rounded-3xl text-base focus:border-blue-500 focus:bg-white outline-none font-medium text-[#0F172A] transition-all shadow-sm font-mono lowercase"
                    placeholder="Email Address"
                  />
                </div>
                <div className="space-y-3">
-                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Tele-Communication</label>
+                 <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Phone Number</label>
                  <input
                    type="tel"
                    required
                    value={formData.phone}
                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                   className="w-full px-8 py-5 bg-slate-50/50 border border-slate-100 rounded-3xl text-[15px] focus:border-blue-500 focus:bg-white outline-none font-bold text-[#0F172A] transition-all shadow-sm"
+                   className="w-full px-6 py-4 sm:px-8 sm:py-5 bg-slate-50/50 border border-slate-100 rounded-2xl sm:rounded-3xl text-base focus:border-blue-500 focus:bg-white outline-none font-medium text-[#0F172A] transition-all shadow-sm"
                    placeholder="Phone ID"
                  />
                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                <div className="space-y-3">
-                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] px-1">System Hierarchy</label>
+                 <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Role</label>
                  <select
                    required
                    value={formData.role}
                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                   className="w-full px-8 py-5 bg-slate-50/50 border border-slate-100 rounded-3xl text-[15px] focus:border-blue-500 focus:bg-white outline-none font-bold text-[#0F172A] transition-all shadow-sm appearance-none">
-                   <option value="Student">Student Dossier</option>
-                   <option value="Admin">Executive Control</option>
+                   className="w-full px-6 py-4 sm:px-8 sm:py-5 bg-slate-50/50 border border-slate-100 rounded-2xl sm:rounded-3xl text-base focus:border-blue-500 focus:bg-white outline-none font-medium text-[#0F172A] transition-all shadow-sm appearance-none">
+                   <option value="Student">Student</option>
+                   <option value="Admin">Admin</option>
                  </select>
                </div>
                <div className="space-y-3">
-                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Regional Origin</label>
+                 <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Nationality</label>
                  <select
                    required
                    value={formData.country}
                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                   className="w-full px-8 py-5 bg-slate-50/50 border border-slate-100 rounded-3xl text-[15px] focus:border-blue-500 focus:bg-white outline-none font-bold text-[#0F172A] transition-all shadow-sm appearance-none">
+                   className="w-full px-6 py-4 sm:px-8 sm:py-5 bg-slate-50/50 border border-slate-100 rounded-2xl sm:rounded-3xl text-base focus:border-blue-500 focus:bg-white outline-none font-medium text-[#0F172A] transition-all shadow-sm appearance-none">
                    <option value="">Select Region</option>
                    <option value="Rwanda">Rwanda Hub</option>
                    <option value="Kenya">Kenya Node</option>
@@ -451,14 +451,14 @@ export default function UserManagement() {
             </div>
 
             <div className="space-y-4">
-               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Engagement Status</label>
-               <div className="flex gap-4 p-2 bg-slate-50/50 border border-slate-100 rounded-3xl">
+               <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em] px-1">Status</label>
+               <div className="flex gap-3 sm:gap-4 p-2 bg-slate-50/50 border border-slate-100 rounded-2xl sm:rounded-3xl">
                   {['Active', 'Inactive'].map((status) => (
                     <button
                       key={status}
                       type="button"
                       onClick={() => setFormData({ ...formData, status })}
-                      className={`flex-1 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all ${formData.status === status ? 'bg-white text-blue-600 shadow-xl border border-blue-50' : 'text-slate-400 hover:text-slate-700'}`}>
+                      className={`flex-1 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-sm font-medium uppercase tracking-widest transition-all ${formData.status === status ? 'bg-white text-blue-600 shadow-xl border border-blue-50' : 'text-slate-400 hover:text-slate-700'}`}>
                        {status}
                     </button>
                   ))}
@@ -466,18 +466,18 @@ export default function UserManagement() {
             </div>
           </div>
 
-          <div className="flex justify-end gap-6 pt-10 border-t border-slate-100">
+          <div className="flex flex-col sm:flex-row justify-end gap-4 sm:gap-6 pt-6 sm:pt-8 md:pt-10 border-t border-slate-100">
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-8 py-4 text-slate-400 rounded-2xl text-[11px] font-bold uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95">
+              className="px-6 py-3 sm:px-8 sm:py-4 text-slate-400 rounded-xl sm:rounded-2xl text-sm font-medium uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 w-full sm:w-auto text-center">
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-12 py-4 bg-[#0F172A] text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest shadow-xl hover:bg-[#1E293B] transition-all disabled:opacity-50 active:scale-95">
-              {loading ? "Processing..." : editingUser ? "Commit Changes" : "Create Record"}
+              className="px-8 py-3 sm:px-12 sm:py-4 bg-[#0F172A] text-white rounded-xl sm:rounded-2xl text-sm font-medium uppercase tracking-widest shadow-xl hover:bg-[#1E293B] transition-all disabled:opacity-50 active:scale-95 w-full sm:w-auto text-center">
+              {loading ? "Processing..." : editingUser ? "Save Changes" : "Create User"}
             </button>
           </div>
         </form>
@@ -490,57 +490,58 @@ export default function UserManagement() {
           onClose={() => setIsProfileModalOpen(false)}
           title="User Profile"
           size="md"
-          className="rounded-[3rem] shadow-2xl border-0">
-          <div className="space-y-10 p-10">
-             <div className="p-12 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white relative overflow-hidden shadow-2xl shadow-blue-500/20 group">
+          className="">
+          <div className="space-y-6 sm:space-y-8 md:space-y-10">
+             <div className="p-8 sm:p-10 md:p-12 rounded-2xl sm:rounded-[2.5rem] bg-gradient-to-br from-blue-500/80 to-indigo-600/80 text-white relative overflow-hidden shadow-2xl shadow-blue-500/10 group">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5" />
                 <div className="relative z-10 flex flex-col items-center text-center space-y-6">
                    <img 
                      src={`https://ui-avatars.com/api/?name=${selectedUser.name}&background=fff&color=2563eb`} 
-                     className="w-24 h-24 rounded-[2rem] border-4 border-white/20 shadow-2xl transition-transform duration-700 group-hover:scale-105" 
+                     className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-white/20 shadow-2xl transition-transform duration-700 group-hover:scale-105" 
                      alt={selectedUser.name}
                    />
                    <div>
-                      <h3 className="text-3xl font-serif tracking-tight antialiased">{selectedUser.name}</h3>
-                      <p className="text-white/60 text-[13px] lowercase mt-1 font-mono tracking-tight">{selectedUser.email}</p>
+                      <h3 className="text-2xl sm:text-3xl font-medium tracking-tight">{selectedUser.name}</h3>
+                      <p className="text-white/70 text-sm lowercase mt-1.5 font-mono tracking-tight">{selectedUser.email}</p>
                    </div>
-                   <span className="px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] bg-white/10 border border-white/20 backdrop-blur-md shadow-inner">
+                   <span className="px-6 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-white/10 border border-white/20 backdrop-blur-sm shadow-inner">
                       {selectedUser.role} 
                    </span>
                 </div>
              </div>
 
-             <div className="grid grid-cols-2 gap-8 bg-slate-50/50 p-10 rounded-[2.5rem] border border-slate-100 shadow-inner">
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 bg-slate-50/50 p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-[2.5rem] border border-slate-100 shadow-inner">
                 <div className="space-y-2">
-                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Phone Number</span>
-                   <p className="text-[15px] font-bold text-[#0F172A] tracking-tight">{selectedUser.phone}</p>
+                   <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">Phone Number</span>
+                   <p className="text-base font-medium text-[#0F172A] tracking-tight">{selectedUser.phone}</p>
                 </div>
                 <div className="space-y-2">
-                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Nationality</span>
-                   <p className="text-[15px] font-bold text-[#0F172A] tracking-tight">{selectedUser.country}</p>
+                   <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">Nationality</span>
+                   <p className="text-base font-medium text-[#0F172A] tracking-tight">{selectedUser.country}</p>
                 </div>
                 <div className="space-y-2">
-                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Current Status</span>
+                   <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">Status</span>
                    <div className="flex items-center gap-3">
                       <div className={`w-2.5 h-2.5 rounded-full ${selectedUser.status === 'Active' ? 'bg-emerald-500 animate-pulse shadow-[0_0_12px_rgba(16,185,129,0.5)]' : 'bg-slate-300'}`} />
-                      <p className={`text-[15px] font-bold ${selectedUser.status === 'Active' ? 'text-emerald-500' : 'text-slate-400'}`}>{selectedUser.status}</p>
+                      <p className={`text-base font-medium ${selectedUser.status === 'Active' ? 'text-emerald-500' : 'text-slate-400'}`}>{selectedUser.status}</p>
                    </div>
                 </div>
                 <div className="space-y-2">
-                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Member Since</span>
-                   <p className="text-[15px] font-bold text-[#0F172A] tracking-tight">{selectedUser.joined}</p>
+                   <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">Joined</span>
+                   <p className="text-base font-medium text-[#0F172A] tracking-tight">{selectedUser.joined}</p>
                 </div>
              </div>
 
-             <div className="pt-6 border-t border-slate-100 flex justify-end">
+             <div className="pt-4 sm:pt-6 border-t border-slate-100 flex justify-end">
                 <button 
                   onClick={() => setIsProfileModalOpen(false)} 
-                  className="px-10 py-4 bg-[#0F172A] text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest hover:bg-[#1E293B] transition-all active:scale-95 shadow-xl shadow-slate-900/10">
-                  Close Profile
+                  className="px-8 py-3 sm:px-10 sm:py-4 bg-[#0F172A] text-white rounded-xl sm:rounded-2xl font-medium text-sm uppercase tracking-widest hover:bg-[#1E293B] transition-all active:scale-95 shadow-xl shadow-slate-900/10 w-full sm:w-auto text-center">
+                  Close
                 </button>
              </div>
           </div>
         </Modal>
+
       )}
     </div>
   );

@@ -120,7 +120,7 @@ export default function ApplicationReview() {
 
   const columns = [
     {
-      header: "Applicant Profile",
+      header: "Applicant",
       render: (app) => (
         <div className="flex items-center gap-5">
           <div className="relative">
@@ -133,7 +133,7 @@ export default function ApplicationReview() {
           </div>
           <div className="flex flex-col pt-0.5">
             <span className="font-serif text-[#0F172A] group-hover:text-blue-600 transition-colors text-[17px] antialiased tracking-tight">{app.studentName}</span>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mt-1 opacity-70">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.1em] mt-1 opacity-70">
                 Reference ID: {app.id}
             </span>
           </div>
@@ -141,18 +141,18 @@ export default function ApplicationReview() {
       )
     },
     {
-      header: "Program Pathway",
+      header: "Program",
       render: (app) => (
         <div className="flex flex-col">
           <span className="font-bold text-slate-700 text-sm tracking-tight group-hover:text-[#0F172A] transition-colors">{app.scholarship}</span>
-          <span className="text-[10px] font-mono font-bold text-blue-500/60 uppercase mt-1.5 tracking-wider">{app.email}</span>
+          {/* <span className="text-xs font-mono font-bold text-blue-500/60 uppercase mt-1.5 tracking-wider">{app.email}</span> */}
         </div>
       )
     },
     {
       header: "Filing Date",
       render: (app) => (
-        <div className="flex items-center gap-2.5 text-slate-500 font-bold text-[10px] uppercase tracking-[0.15em] opacity-80">
+        <div className="flex items-center gap-2.5 text-slate-500 font-bold text-xs uppercase tracking-[0.15em] opacity-80">
           <Calendar size={14} className="text-slate-300" />
           {app.date}
         </div>
@@ -164,7 +164,7 @@ export default function ApplicationReview() {
       render: (app) => (
         <div className="flex justify-center">
           <span
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-[0.15em] border transition-all duration-300 ${getStatusColor(app.status)} shadow-sm`}>
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-[0.15em] border transition-all duration-300 ${getStatusColor(app.status)} shadow-sm`}>
             <div className={`w-1.5 h-1.5 rounded-full ${app.status === 'Approved' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : (app.status === 'Needs Changes' ? 'bg-amber-500' : 'bg-blue-500')}`} />
             {app.status}
           </span>
@@ -178,7 +178,7 @@ export default function ApplicationReview() {
         <div className="flex items-center justify-end gap-3">
           <button
             onClick={() => setSelectedApp(app)}
-            className="px-6 py-3 bg-[#0F172A] text-white rounded-[1.25rem] font-bold text-[11px] uppercase tracking-widest hover:bg-[#1E293B] hover:shadow-lg transition-all active:scale-95 flex items-center gap-2.5 shadow-md group-hover:translate-x-[-4px]">
+            className="px-6 py-3 bg-[#0F172A] text-white rounded-[1.25rem] font-medium text-sm uppercase tracking-widest hover:bg-[#1E293B] hover:shadow-lg transition-all active:scale-95 flex items-center gap-2.5 shadow-md group-hover:translate-x-[-4px]">
             <Eye size={16} />
             Evaluate
           </button>
@@ -215,12 +215,12 @@ export default function ApplicationReview() {
                 <FileText size={40} className="text-slate-200" />
               </div>
               <h4 className="text-xl font-serif text-[#0F172A] mb-2 tracking-tight">Record Entry Absent</h4>
-              <p className="text-[13px] font-medium text-slate-400 mb-10 leading-relaxed antialiased">
+              <p className="text-sm font-medium text-slate-400 mb-10 leading-relaxed antialiased">
                 The current registry contains no scholarship dossiers matching your defined search parameters.
               </p>
               <button 
                 onClick={() => {setSearchTerm(""); setStatusFilter("All");}}
-                className="px-8 py-3.5 bg-[#0F172A] text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-xl hover:bg-[#1E293B] transition-all active:scale-95">
+                className="px-8 py-3.5 bg-[#0F172A] text-white rounded-2xl font-medium text-sm uppercase tracking-widest shadow-xl hover:bg-[#1E293B] transition-all active:scale-95">
                 Clear Search Filter
               </button>
             </div>

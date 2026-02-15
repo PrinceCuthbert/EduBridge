@@ -21,7 +21,7 @@ export default function AdminFilterBar({
           placeholder={searchPlaceholder}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full bg-transparent border-0 text-[#0F172A] text-[15px] focus:ring-0 block pl-16 py-4.5 transition-all placeholder:text-slate-300 font-medium"
+          className="w-full bg-transparent border-0 text-[#0F172A] text-sm focus:ring-0 block pl-16 py-4.5 transition-all placeholder:text-slate-300 font-medium"
         />
       </div>
 
@@ -35,7 +35,7 @@ export default function AdminFilterBar({
             <button
               key={option}
               onClick={() => onFilterChange(option)}
-              className={`px-5 py-2.5 rounded-xl text-[10px] whitespace-nowrap font-bold uppercase tracking-[0.15em] transition-all ${
+              className={`px-5 py-2.5 rounded-xl text-xs whitespace-nowrap font-bold uppercase tracking-[0.15em] transition-all ${
                 activeFilter === option
                   ? "bg-white text-[#0F172A] shadow-md border border-slate-100"
                   : "text-slate-400 hover:text-slate-600"

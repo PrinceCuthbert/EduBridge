@@ -101,6 +101,15 @@ const VisaSummary = lazy(() => import("./pages/dashboard/visa/VisaSummary"));
 const VisaConsultationRequest = lazy(
   () => import("./pages/dashboard/visa/VisaConsultationRequest"),
 );
+const VisaCaseDetails = lazy(
+  () => import("./pages/dashboard/visa/VisaCaseDetails"),
+);
+const VisaCaseResponse = lazy(
+  () => import("./pages/dashboard/visa/VisaCaseResponse"),
+);
+const UploadCaseDocuments = lazy(
+  () => import("./pages/dashboard/visa/UploadCaseDocuments"),
+);
 
 const PublicLayout = () => (
   <>
@@ -202,6 +211,9 @@ function App() {
                 <Route path="visa-status">
                   <Route index element={<Navigate to="summary" replace />} />
                   <Route path="summary" element={<VisaSummary />} />
+                  <Route path="summary/details/:id" element={<VisaCaseDetails />} />
+                  <Route path="summary/details/:id/upload" element={<UploadCaseDocuments />} />
+                  <Route path="summary/response/:id" element={<VisaCaseResponse />} />
                   <Route path="request" element={<VisaConsultationRequest />} />
                 </Route>
                 <Route

@@ -125,12 +125,12 @@ export default function AdminProgramDetail() {
           </button>
           <div>
             <h1 className="text-3xl font-serif text-[#0F172A] tracking-tight">{isNew ? 'New Program' : 'Edit Program'}</h1>
-            <p className="text-slate-500 text-sm mt-1 font-medium tracking-wide">{isNew ? 'Create a new university program' : 'Update university program details'}</p>
+            <p className="text-slate-500 text-sm font-medium mt-1 tracking-wide">{isNew ? 'Create a new university program' : 'Update university program details'}</p>
           </div>
         </div>
         <button 
           onClick={handleSubmit}
-          className="flex items-center gap-2.5 px-8 py-3.5 bg-[#0F172A] text-white rounded-[1.25rem] font-bold text-xs uppercase tracking-widest hover:bg-[#1E293B] shadow-xl hover:shadow-2xl hover:translate-y-[-2px] transition-all active:scale-95"
+          className="flex items-center gap-2.5 px-8 py-3.5 bg-[#0F172A] text-white rounded-[1.25rem] font-medium text-sm uppercase tracking-widest hover:bg-[#1E293B] shadow-xl hover:shadow-2xl hover:translate-y-[-2px] transition-all active:scale-95"
         >
           <Save size={18} />
           {isNew ? 'Create Program' : 'Save Changes'}
@@ -146,7 +146,7 @@ export default function AdminProgramDetail() {
           <AdminCard title="Basic Information">
              <div className="grid grid-cols-2 gap-8">
                <div className="col-span-2">
-                 <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">University Name</label>
+                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">University Name</label>
                  <input 
                    type="text" 
                    value={formData.universityName} 
@@ -156,7 +156,7 @@ export default function AdminProgramDetail() {
                  />
                </div>
                <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Visa Type</label>
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Visa Type</label>
                   <div className="relative">
                     <select 
                       value={formData.visaType}
@@ -172,7 +172,7 @@ export default function AdminProgramDetail() {
                   </div>
                </div>
                <div>
-                 <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Country</label>
+                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Country</label>
                  <input 
                    type="text" 
                    value={formData.country} 
@@ -182,7 +182,7 @@ export default function AdminProgramDetail() {
                  />
                </div>
                <div className="col-span-2">
-                 <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Description</label>
+                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Description</label>
                  <textarea 
                    rows="4"
                    value={formData.description} 
@@ -200,7 +200,7 @@ export default function AdminProgramDetail() {
             action={
               <button 
                 onClick={addTimelineStep} 
-                className="text-blue-600 hover:text-blue-700 text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 px-4 py-2 hover:bg-blue-50 rounded-xl transition-all"
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium uppercase tracking-widest flex items-center gap-2 px-4 py-2 hover:bg-blue-50 rounded-xl transition-all"
               >
                 <Plus size={14} /> Add Step
               </button>
@@ -228,7 +228,7 @@ export default function AdminProgramDetail() {
                            className="w-full px-5 py-3.5 border border-slate-200 rounded-[1.25rem] text-sm focus:border-blue-400 outline-none"
                          />
                        </div>
-                       <span className="text-slate-300 text-[10px] font-bold uppercase">to</span>
+                       <span className="text-slate-300 text-xs font-bold uppercase">to</span>
                        <div className="flex-1">
                          <DatePicker 
                            value={item.endDate}
@@ -268,7 +268,7 @@ export default function AdminProgramDetail() {
                />
                <button 
                  onClick={addDepartment} 
-                 className="px-8 py-4 bg-[#0F172A] text-white font-bold text-xs uppercase tracking-widest rounded-[1.5rem] hover:bg-[#1E293B] shadow-lg hover:translate-y-[-1px] transition-all active:scale-95"
+                 className="px-8 py-4 bg-[#0F172A] text-white font-medium text-sm uppercase tracking-widest rounded-[1.5rem] hover:bg-[#1E293B] shadow-lg hover:translate-y-[-1px] transition-all active:scale-95"
                >
                  Add
                </button>
@@ -298,7 +298,7 @@ export default function AdminProgramDetail() {
           <AdminCard title="Media">
              <div className="space-y-6">
                <div>
-                 <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Logo URL</label>
+                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Logo URL</label>
                  <input 
                    type="text" 
                    value={formData.logo}
@@ -314,7 +314,7 @@ export default function AdminProgramDetail() {
                </div>
                
                <div>
-                 <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Gallery Images</label>
+                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Gallery Images</label>
                  <div className="space-y-3">
                     {formData.images.map((img, idx) => (
                        <div key={idx} className="flex gap-2">
@@ -340,7 +340,7 @@ export default function AdminProgramDetail() {
                     ))}
                     <button 
                       onClick={() => setFormData({...formData, images: [...formData.images, '']})}
-                      className="text-[11px] font-bold uppercase tracking-widest text-blue-600 hover:text-blue-700 flex items-center gap-2 px-2 py-1"
+                      className="text-sm font-medium uppercase tracking-widest text-blue-600 hover:text-blue-700 flex items-center gap-2 px-2 py-1"
                     >
                       <Plus size={14} /> Add Image
                     </button>
@@ -353,7 +353,7 @@ export default function AdminProgramDetail() {
           <AdminCard title="Settings">
              <div className="space-y-6">
                <div>
-                 <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Tuition / Fee</label>
+                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Tuition / Fee</label>
                  <input 
                    type="text"
                    value={formData.tuition}
@@ -364,7 +364,7 @@ export default function AdminProgramDetail() {
                </div>
 
                <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Tags (Comma separated)</label>
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Tags (Comma separated)</label>
                   <input 
                      type="text" 
                      value={formData.tags.join(', ')}
@@ -375,7 +375,7 @@ export default function AdminProgramDetail() {
                </div>
 
                <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Status</label>
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5 ml-1">Status</label>
                   <div className="relative">
                     <select 
                        value={formData.status}

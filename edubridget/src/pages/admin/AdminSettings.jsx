@@ -21,7 +21,7 @@ export default function AdminSettings() {
           <p className="text-slate-500 text-sm mt-1 flex items-center gap-2">
             Manage your administrative profile and security protocols.
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-blue-600 font-bold uppercase tracking-wider text-[10px]">Active Session Verified</span>
+            <span className="text-blue-600 font-bold uppercase tracking-wider text-xs">Active Session Verified</span>
           </p>
         </div>
       </div>
@@ -37,7 +37,7 @@ export default function AdminSettings() {
             </div>
             <div>
               <h3 className="text-2xl font-serif text-[#0F172A] tracking-tight antialiased">Notifications</h3>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em]">Automated Alerts & Logic</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.25em]">Automated Alerts & Logic</p>
             </div>
           </div>
           <div className="p-10 space-y-8 flex-1">
@@ -53,8 +53,8 @@ export default function AdminSettings() {
                       <pref.icon size={20} />
                    </div>
                    <div>
-                     <p className="text-[15px] font-bold text-slate-700 group-hover:text-[#0F172A] transition-colors">{pref.label}</p>
-                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-70">{pref.desc}</p>
+                     <p className="text-sm font-medium text-slate-700 group-hover:text-[#0F172A] transition-colors">{pref.label}</p>
+                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest opacity-70">{pref.desc}</p>
                    </div>
                 </div>
                 <button
@@ -81,7 +81,7 @@ export default function AdminSettings() {
               </div>
               <div>
                 <h3 className="text-2xl font-serif text-[#0F172A] tracking-tight antialiased">Security</h3>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em]">Protection Metrics</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.25em]">Protection Metrics</p>
               </div>
             </div>
             <div className="p-8 space-y-4">
@@ -96,8 +96,8 @@ export default function AdminSettings() {
                        <item.icon size={20} />
                     </div>
                     <div>
-                      <p className="text-[15px] font-bold text-slate-700 group-hover:text-[#0F172A] transition-colors">{item.label}</p>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-1.5 opacity-70">{item.desc}</p>
+                      <p className="text-sm font-medium text-slate-700 group-hover:text-[#0F172A] transition-colors">{item.label}</p>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none mt-1.5 opacity-70">{item.desc}</p>
                     </div>
                   </div>
                   <ChevronRight size={18} className="text-slate-200 group-hover:text-blue-600 group-hover:translate-x-1.5 transition-all" />
@@ -114,7 +114,7 @@ export default function AdminSettings() {
               </div>
               <div>
                 <h3 className="text-2xl font-serif text-[#0F172A] tracking-tight antialiased">Identity</h3>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em]">Executive Credentials</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.25em]">Executive Credentials</p>
               </div>
             </div>
             <div className="p-8 space-y-5">
@@ -123,8 +123,8 @@ export default function AdminSettings() {
                    <Lock size={64} className="text-white" />
                 </div>
                 <div className="relative z-10">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] leading-none mb-2">Verified Identity</p>
-                  <p className="text-[17px] font-serif text-white antialiased">{user?.email || 'Unauthorized Entity'}</p>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em] leading-none mb-2">Verified Identity</p>
+                  <p className="text-sm font-medium text-white antialiased">{user?.email || 'Unauthorized Entity'}</p>
                 </div>
                 <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center relative z-10 backdrop-blur-md">
                    <Lock size={18} className="text-blue-400 shadow-[0_0_12px_rgba(96,165,250,0.5)]" />
@@ -137,8 +137,8 @@ export default function AdminSettings() {
                      <User size={20} />
                   </div>
                   <div>
-                    <p className="text-[15px] font-bold text-slate-700 group-hover:text-[#0F172A] transition-colors">Dossier Access</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-1.5 opacity-70">Modify administrative profile</p>
+                    <p className="text-sm font-medium text-slate-700 group-hover:text-[#0F172A] transition-colors">Dossier Access</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none mt-1.5 opacity-70">Modify administrative profile</p>
                   </div>
                 </div>
                 <ChevronRight size={18} className="text-slate-200 group-hover:text-blue-600 group-hover:translate-x-1.5 transition-all" />
@@ -150,8 +150,8 @@ export default function AdminSettings() {
                      <Trash2 size={20} />
                   </div>
                   <div>
-                    <p className="text-[15px] font-bold text-rose-600">Decommission Registry</p>
-                    <p className="text-[10px] font-bold text-rose-300 uppercase tracking-widest leading-none mt-1.5 opacity-70">Permanent entity removal</p>
+                    <p className="text-sm font-medium text-rose-600">Decommission Registry</p>
+                    <p className="text-xs font-bold text-rose-300 uppercase tracking-widest leading-none mt-1.5 opacity-70">Permanent entity removal</p>
                   </div>
                 </div>
                 <ChevronRight size={18} className="text-rose-200 group-hover:text-rose-500 group-hover:translate-x-1.5 transition-all" />

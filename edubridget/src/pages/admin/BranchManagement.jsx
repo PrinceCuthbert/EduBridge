@@ -241,7 +241,7 @@ export default function BranchManagement() {
             
             {/* Status Indicator */}
             <div className="absolute top-6 right-6">
-               <span className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border transition-all ${branch.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100'}`}>
+               <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest border transition-all ${branch.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100'}`}>
                   {branch.status}
                </span>
             </div>
@@ -267,13 +267,13 @@ export default function BranchManagement() {
                     <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
                        <Mail size={14} />
                     </div>
-                    <span className="text-[11px] font-bold lowercase tracking-tight font-mono">{branch.email}</span>
+                    <span className="text-sm font-medium lowercase tracking-tight font-mono">{branch.email}</span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-500 hover:text-slate-900 transition-colors cursor-default">
                     <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
                        <Phone size={14} />
                     </div>
-                    <span className="text-[11px] font-bold tracking-tight">{branch.phone}</span>
+                    <span className="text-sm font-medium tracking-tight">{branch.phone}</span>
                   </div>
                </div>
                <div className="space-y-4">
@@ -281,13 +281,13 @@ export default function BranchManagement() {
                     <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
                        <Clock size={14} />
                     </div>
-                    <span className="text-[11px] font-bold tracking-tight">{branch.hours}</span>
+                    <span className="text-sm font-medium tracking-tight">{branch.hours}</span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-500 hover:text-slate-900 transition-colors cursor-default">
                     <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
                        <Users size={14} />
                     </div>
-                    <span className="text-[10px] font-bold mr-1 uppercase tracking-widest leading-none pt-0.5">{branch.staff} Team Members</span>
+                    <span className="text-xs font-bold mr-1 uppercase tracking-widest leading-none pt-0.5">{branch.staff} Team Members</span>
                   </div>
                </div>
             </div>
@@ -301,7 +301,7 @@ export default function BranchManagement() {
                   alt={branch.managerName}
                 />
                 <div>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Lead Manager</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Lead Manager</p>
                   <p className="text-sm font-bold text-slate-900 tracking-tight">
                     {branch.managerName}
                   </p>
@@ -336,7 +336,7 @@ export default function BranchManagement() {
         <form onSubmit={handleSubmit} className="space-y-8 p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Branch Identity</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Branch Identity</label>
               <input
                 type="text"
                 required
@@ -347,7 +347,7 @@ export default function BranchManagement() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Regional Location</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Regional Location</label>
               <input
                 type="text"
                 required
@@ -359,7 +359,7 @@ export default function BranchManagement() {
             </div>
 
             <div className="md:col-span-2 space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Detailed Physical Address</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Detailed Physical Address</label>
               <input
                 type="text"
                 required
@@ -371,7 +371,7 @@ export default function BranchManagement() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Hotline Contact</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Hotline Contact</label>
               <input
                 type="tel"
                 required
@@ -382,7 +382,7 @@ export default function BranchManagement() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Operational Email</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Operational Email</label>
               <input
                 type="email"
                 required
@@ -394,7 +394,7 @@ export default function BranchManagement() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Opening Hours</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Opening Hours</label>
               <input
                 type="text"
                 required
@@ -406,7 +406,7 @@ export default function BranchManagement() {
             </div>
 
             <div className="space-y-2">
-               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Assigned Personnel</label>
+               <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Assigned Personnel</label>
                <input
                  type="number"
                  required
@@ -418,7 +418,7 @@ export default function BranchManagement() {
                />
             </div>
             <div className="space-y-2">
-               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Current Status</label>
+               <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Current Status</label>
                <select
                  required
                  value={formData.status}
@@ -431,7 +431,7 @@ export default function BranchManagement() {
             </div>
 
             <div className="md:col-span-2 space-y-2">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Assigned Branch Manager</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Assigned Branch Manager</label>
               <input
                 type="text"
                 required
@@ -447,12 +447,12 @@ export default function BranchManagement() {
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-8 py-4 border border-slate-200 text-slate-400 rounded-2xl text-xs font-bold hover:bg-slate-50 hover:text-slate-900 transition-all">
+              className="px-8 py-4 border border-slate-200 text-slate-400 rounded-2xl text-sm font-medium hover:bg-slate-50 hover:text-slate-900 transition-all">
               Cancel
             </button>
             <button
               type="submit"
-              className="px-10 py-4 bg-slate-900 text-white rounded-2xl text-xs font-bold shadow-xl hover:bg-blue-600 transition-all active:scale-95">
+              className="px-10 py-4 bg-slate-900 text-white rounded-2xl text-sm font-medium shadow-xl hover:bg-blue-600 transition-all active:scale-95">
               {editingBranch ? "Save Changes" : "Register Branch"}
             </button>
           </div>

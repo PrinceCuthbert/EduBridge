@@ -1,143 +1,246 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   FileText, 
   CheckCircle, 
   Clock, 
   AlertCircle,
-  Download,
-  Calendar,
+  Upload,
+  XCircle,
   MapPin,
-  MoreHorizontal
+  Eye,
+  Plus
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { toast } from 'sonner';
+import { getCurrentUserConsultations, getCountryFlag } from '@/data/mockVisaData';
 
 export default function VisaSummary() {
-  const [activeTab, setActiveTab] = useState('details');
+  // Navigation hook for programmatic routing
+  const navigate = useNavigate();
+  
+  // State management
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const documents = [
-    { name: "Passport Scan.pdf", status: "Verified", date: "2024-01-10" },
-    { name: "Admission Letter.pdf", status: "Verified", date: "2024-01-12" },
-    { name: "Bank Statement.pdf", status: "Received", date: "2024-01-15" },
-    { name: "Medical Report.pdf", status: "Pending", date: "-" },
-  ];
+  // Fetch consultation requests filtered by current user
+  // In production, the API would handle this filtering server-side
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        setLoading(true);
+        // Simulating API call - in production: fetch('/api/my-consultation-requests')
+        // The API would automatically filter by the authenticated user's ID
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        
+        // Get only the current user's consultations
+        const userConsultations = getCurrentUserConsultations();
+        setRequests(userConsultations);
+      } catch (error) {
+        toast.error("Failed to load consultation data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRequests();
+  }, []);
 
+  // Helper function: Get status icon
   const getStatusIcon = (status) => {
-    switch(status) {
-      case 'Verified': return <CheckCircle size={16} className="text-green-600" />;
-      case 'Received': return <Clock size={16} className="text-orange-600" />;
-      default: return <AlertCircle size={16} className="text-slate-400" />;
+    switch (status) {
+      case "New": return <Clock size={14} className="text-blue-500" />;
+      case "In Progress": return <AlertCircle size={14} className="text-yellow-500" />;
+      case "Pending Documents": return <Upload size={14} className="text-orange-500" />;
+      case "Approved": return <CheckCircle size={14} className="text-green-500" />;
+      case "Rejected": return <XCircle size={14} className="text-red-500" />;
+      default: return <AlertCircle size={14} className="text-gray-400" />;
     }
   };
 
-  const getStatusBadge = (status) => {
-    switch(status) {
-      case 'Verified': return <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-0">Verified</Badge>;
-      case 'Received': return <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-200 border-0">Received</Badge>;
-      default: return <Badge variant="outline" className="text-slate-500">Pending</Badge>;
+  // Helper function: Get status color
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "New": return "bg-blue-50 text-blue-700 border-blue-100";
+      case "In Progress": return "bg-yellow-50 text-yellow-700 border-yellow-100";
+      case "Pending Documents": return "bg-orange-50 text-orange-700 border-orange-100";
+      case "Approved": return "bg-emerald-50 text-emerald-700 border-emerald-100";
+      case "Rejected": return "bg-red-50 text-red-700 border-red-100";
+      default: return "bg-slate-50 text-slate-700 border-slate-100";
     }
   };
+
+  // Handle row click - Navigate to detail page with case ID
+  const handleRowClick = (caseId) => {
+    navigate(`/dashboard/visa-status/summary/details/${caseId}`);
+  };
+
+  // Handle view button click (same as row click, but more explicit)
+  const handleViewClick = (e, caseId) => {
+    e.stopPropagation(); // Prevent row click from also firing
+    navigate(`/dashboard/visa-status/summary/details/${caseId}`);
+  };
+
+  // Calculate summary stats from the filtered user data
+  const totalRequests = requests.length;
+  const latestDestination = requests.length > 0 ? requests[0].destination : "N/A";
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">Visa Case Status</h1>
-        <Button variant="outline" className="gap-2">
-            <Download size={16} /> Download Summary
-        </Button>
+    <div className="space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto pb-12">
+      
+      {/* Header Section */}
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">My Visa Consultations</h1>
+        <p className="text-slate-500 text-lg">Track your consultation requests, documents, and consultant feedback.</p>
       </div>
 
-      {/* Case Summary Card */}
-      <Card className="border-slate-200 shadow-sm overflow-hidden">
-        <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
-            <h2 className="font-bold text-slate-700">Visa Case Summary</h2>
+      {/* Summary Cards - Calculated from user's filtered data */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Card 1: Total Requests */}
+        <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                <FileText size={28} />
+              </div>
+            </div>
+            <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">My Requests</p>
+            <p className="text-4xl font-bold text-slate-900 mt-2">{totalRequests}</p>
+            <p className="text-xs text-slate-400 mt-2">Total consultation requests</p>
+          </CardContent>
+        </Card>
+
+        {/* Card 2: Latest Destination */}
+        <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                <MapPin size={28} />
+              </div>
+              <Badge variant="secondary" className="bg-slate-100 text-slate-600">Most Recent</Badge>
+            </div>
+            <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">Latest Destination</p>
+            <p className="text-4xl font-bold text-slate-900 mt-2">{latestDestination}</p>
+            <p className="text-xs text-slate-400 mt-2">Your most recent request</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Consultation Requests Table */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-bold text-slate-800">My Consultation Requests</h3>
+          <Button asChild>
+            <a href="/dashboard/visa-status/request" className="gap-2">
+              <Plus size={16} />
+              New Request
+            </a>
+          </Button>
         </div>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Destination</p>
-                <p className="font-bold text-slate-800 text-lg">Canada</p>
-            </div>
-            <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Visa Type</p>
-                <p className="font-bold text-slate-800 text-lg">Study Visa</p>
-            </div>
-            <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Current Status</p>
-                <Badge className="bg-yellow-100 text-yellow-800 border-0 hover:bg-yellow-200">In Progress</Badge>
-            </div>
-            <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Consultation Fee</p>
-                <Badge className="bg-green-100 text-green-800 border-0 hover:bg-green-200">Paid</Badge>
-            </div>
+
+        {loading ? (
+          <div className="py-20 text-center">
+            <Clock size={48} className="mx-auto text-slate-300 animate-spin" />
+            <p className="text-slate-400 mt-4">Loading your consultations...</p>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Tabs */}
-      <div className="border-b border-slate-200">
-        <div className="flex gap-8">
-            <button 
-                onClick={() => setActiveTab('details')}
-                className={`pb-3 text-sm font-bold border-b-2 transition-colors ${activeTab === 'details' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
-            >
-                Case Details & Documents
-            </button>
-            <button 
-                onClick={() => setActiveTab('timeline')}
-                className={`pb-3 text-sm font-bold border-b-2 transition-colors ${activeTab === 'timeline' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
-            >
-                Admin Messages & Timeline
-            </button>
-        </div>
-      </div>
-
-      {activeTab === 'details' ? (
-        <div className="space-y-6">
-            {/* Appointment Details */}
-            <div className="bg-white rounded-xl border border-dashed border-slate-300 p-6 flex flex-col md:flex-row items-start md:items-center gap-6">
-                <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                    <Calendar size={24} />
-                </div>
-                <div className="flex-1 space-y-1">
-                    <h3 className="font-bold text-slate-800">Appointment: 2024-02-15 (Online)</h3>
-                    <div className="flex flex-wrap text-sm text-slate-500 gap-4">
-                        <span className="flex items-center gap-1"><Clock size={14} /> 10:00 AM PST</span>
-                        <span className="flex items-center gap-1"><MapPin size={14} /> Video Call Link</span>
-                    </div>
-                </div>
-                <Button variant="outline" size="sm">Reschedule</Button>
-            </div>
-
-            {/* Documents List */}
-            <div>
-                <h3 className="font-bold text-slate-800 mb-4">Submitted Documents (3)</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {documents.map((doc, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-blue-200 transition-colors group">
-                           <div className="flex items-center gap-3">
-                               <div className="p-2 bg-slate-50 text-slate-500 rounded-lg group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
-                                   <FileText size={20} />
-                               </div>
-                               <span className="font-medium text-slate-700 text-sm">{doc.name}</span>
-                           </div>
-                           <div className="flex items-center gap-3">
-                               {getStatusBadge(doc.status)}
-                               <button className="text-slate-300 hover:text-slate-600">
-                                   <MoreHorizontal size={16} />
-                               </button>
-                           </div>
+        ) : requests.length > 0 ? (
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-50 border-b border-slate-100">
+                  <tr>
+                    {/* Updated headers - removed "Client Name" since this is the user's own dashboard */}
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Destination</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Visa Requested</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Date Booked</th>
+                    <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fee</th>
+                    <th className="px-6 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider">Details</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {requests.map((request) => (
+                    <tr 
+                      key={request.id} 
+                      onClick={() => handleRowClick(request.id)}
+                      className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
+                    >
+                      {/* Destination - with flag emoji */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{getCountryFlag(request.countryCode)}</span>
+                          <span className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                            {request.destination}
+                          </span>
                         </div>
-                    ))}
-                </div>
+                      </td>
+                      
+                      {/* Visa Requested */}
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-bold text-slate-700">{request.visaType}</span>
+                      </td>
+                      
+                      {/* Date Booked - combined format: "2024-02-15 • Online" */}
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-slate-700">{request.dateBooked}</span>
+                          <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tight">
+                            {request.meetingType} Meeting
+                          </span>
+                        </div>
+                      </td>
+                      
+                      {/* Fee */}
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-bold text-emerald-600">{request.fee}</span>
+                      </td>
+                      
+                      {/* Status */}
+                      <td className="px-6 py-4">
+                        <div className="flex justify-center">
+                          <span className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all ${getStatusColor(request.status)}`}>
+                            {getStatusIcon(request.status)}
+                            {request.status}
+                          </span>
+                        </div>
+                      </td>
+                      
+                      {/* Details - Eye icon for viewing */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={(e) => handleViewClick(e, request.id)}
+                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-sm rounded-lg transition-all"
+                            title="View Details"
+                          >
+                            <Eye size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-        </div>
-      ) : (
-          <div className="py-12 text-center text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-              <p>Timeline & Messages feature coming soon.</p>
           </div>
-      )}
+        ) : (
+          // Empty State
+          <div className="py-20 text-center bg-slate-50 rounded-xl border border-dashed border-slate-300">
+            <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 mb-4">
+              <FileText size={32} className="text-slate-400" />
+            </div>
+            <h3 className="text-lg font-medium text-slate-900">No Consultation Requests Yet</h3>
+            <p className="text-slate-500 max-w-sm mx-auto mt-2">You haven't requested any consultations yet. Start by submitting a new request.</p>
+            <Button asChild className="mt-6">
+              <a href="/dashboard/visa-status/request">
+                <Plus size={16} className="mr-2" />
+                Request New Consultation
+              </a>
+            </Button>
+          </div>
+        )}
+      </div>
 
     </div>
   );

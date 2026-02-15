@@ -15,7 +15,7 @@ export default function AdminStatsGrid({ stats }) {
                 <Icon size={24} />
               </div>
               {stat.trend && (
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity">
                   {stat.trend}
                 </span>
               )}
@@ -25,7 +25,7 @@ export default function AdminStatsGrid({ stats }) {
               {stat.value}
             </h3>
             
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest relative z-10 pl-0.5">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest relative z-10 pl-0.5">
               {stat.label}
             </p>
 

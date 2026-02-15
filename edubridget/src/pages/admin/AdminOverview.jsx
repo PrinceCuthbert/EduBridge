@@ -56,11 +56,11 @@ const MOCK_STATS = [
 
 const QUICK_ACTIONS_CONFIG = [
   {
-    label: "Manage Programs",
-    desc: "Update university courses",
+    label: "Manage Applications",
+    desc: "View applicants",
     icon: Award,
     color: "emerald",
-    path: "/admin/programs",
+    path: "/admin/applications",
   },
   {
     label: "Manage Branches",
@@ -145,7 +145,7 @@ export default function AdminOverview() {
         {/* Quick Actions */}
         <div className="xl:col-span-1 flex flex-col gap-5">
           <div className="px-1">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Quick Actions</h3>
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Quick Actions</h3>
           </div>
           <div className="grid grid-cols-1 gap-4">
             {quickActions.map((action, index) => {
@@ -160,7 +160,7 @@ export default function AdminOverview() {
                     <Icon size={20} />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                    <span className="text-sm font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
                       {action.label}
                     </span>
                     <span className="text-xs text-slate-400 mt-0.5 font-medium">
@@ -179,8 +179,8 @@ export default function AdminOverview() {
           {/* Applications */}
           <section className="space-y-4">
             <div className="flex items-center justify-between px-1">
-               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">New Applications</h3>
-               <Link to="/admin/applications" className="text-xs font-bold text-blue-600 hover:underline">View All</Link>
+               <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">New Applications</h3>
+               <Link to="/admin/applications" className="text-sm font-medium text-blue-600 hover:underline">View All</Link>
             </div>
             
             <div className="bg-white rounded-[2rem] border border-slate-200/60 shadow-sm overflow-hidden">
@@ -192,7 +192,7 @@ export default function AdminOverview() {
                 <p className="text-xs text-slate-400 max-w-[240px] leading-relaxed mb-6">
                   Check back later for new student applications.
                 </p>
-                <button className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-all">
+                <button className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-medium hover:bg-slate-800 transition-all">
                   Refresh List
                 </button>
               </div>

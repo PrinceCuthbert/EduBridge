@@ -81,7 +81,7 @@ export default function AdminLayout() {
                 <span className="font-bold text-white text-lg tracking-tight leading-none">
                   EduBridge
                 </span>
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mt-1">
+                <span className="text-xs uppercase tracking-[0.2em] font-bold text-slate-500 mt-1">
                   Dashboard
                 </span>
               </div>
@@ -93,7 +93,7 @@ export default function AdminLayout() {
         <nav className="flex-1 px-4 py-8 space-y-1.5 overflow-y-auto modern-scrollbar scrollbar-thin scrollbar-thumb-slate-800">
           {!isCollapsed && (
             <div className="px-3 mb-4">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Main Menu</span>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Main Menu</span>
             </div>
           )}
           
@@ -120,7 +120,7 @@ export default function AdminLayout() {
                   className={`flex-shrink-0 transition-colors ${isActive ? "text-white" : "text-slate-500 group-hover:text-blue-400"}`}
                 />
                 {!isCollapsed && (
-                  <span className="font-semibold text-sm whitespace-nowrap tracking-wide">
+                  <span className="font-medium text-sm whitespace-nowrap tracking-wide">
                     {item.label}
                   </span>
                 )}
@@ -176,7 +176,7 @@ export default function AdminLayout() {
               `}
               title={settingsItem.label}>
               <Settings size={20} className={location.pathname === settingsItem.path ? "text-blue-400" : "text-slate-500"} />
-              {!isCollapsed && <span className="text-sm font-semibold">Settings</span>}
+              {!isCollapsed && <span className="text-sm font-medium">Settings</span>}
             </Link>
             
             <button
@@ -188,7 +188,7 @@ export default function AdminLayout() {
                 `}
               title="Sign Out">
               <LogOut size={20} />
-              {!isCollapsed && <span className="text-sm font-semibold">Sign Out</span>}
+              {!isCollapsed && <span className="text-sm font-medium">Sign Out</span>}
             </button>
           </div>
         </div>
@@ -245,7 +245,7 @@ export default function AdminLayout() {
                 </div>
                 <div className="hidden lg:flex flex-col text-left">
                   <span className="text-sm font-bold text-slate-700 leading-none mb-1 group-hover:text-blue-600 transition-colors">{user?.name || "Admin"}</span>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter leading-none">Super Admin</span>
+                  <span className="text-xs font-medium text-slate-400 uppercase tracking-tighter leading-none">Super Admin</span>
                 </div>
                 <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`} />
               </button>
@@ -259,13 +259,13 @@ export default function AdminLayout() {
                   <div className="px-2 space-y-1">
                     <Link
                       to="/admin/settings"
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all"
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all"
                       onClick={() => setIsProfileOpen(false)}>
                       <Settings size={18} className="text-slate-400" /> Account Settings
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition-all text-left">
+                      className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all text-left">
                       <LogOut size={18} /> Sign Out
                     </button>
                   </div>
