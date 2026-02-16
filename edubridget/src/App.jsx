@@ -1,65 +1,25 @@
 import React, { useEffect, Suspense, lazy } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-  Navigate,
-  Outlet,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
 import "aos/dist/aos.css";
 import AOS from "aos";
 
-// Components
-import Header from "./components/Header";
-import Footer from "./pages/footer/footer";
-import WhatsAppButton from "./components/WhatsAppButton";
 import LoadingSpinner from "./components/LoadingSpinner";
+import WhatsAppButton from "./components/WhatsAppButton"; // Wait, WhatsAppButton is in PublicLayout?
+// WhatsAppButton was in PublicLayout in my new code. So I can remove it from here?
+// But it was also in App.jsx line 128 (PublicLayout definition).
+// So if PublicRoutes uses PublicLayout, WhatsAppButton is there.
+// Does Admin need WhatsAppButton? Probably not.
+// Does Student need it? Probably not.
+// So removing from App.jsx is correct.
 
-// Lazy Load Pages for Performance
-const LandingPage = lazy(() => import("./pages/home/LandingPage"));
+import usePageLanguage from "./hooks/usePageLanguage";
+import { AuthProvider } from "./context/AuthContext";
 
-// Legacy Pages
-const AboutUsPage = lazy(() => import("./pages/aboutUs/AboutUsPage"));
-const ContactPage = lazy(() => import("./pages/contact/contactPage"));
-const Signin = lazy(() => import("./pages/auth/SignInPage"));
-const Signup = lazy(() => import("./pages/auth/SignUpPage"));
-
-// New Pages
-const BlogDetailsPage = lazy(() => import("./pages/blog/BlogDetailsPage"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-
-// New Pages
-const DigitalLibraryPage = lazy(
-  () => import("./pages/library/DigitalLibraryPage"),
-);
-const BranchesPage = lazy(() => import("./pages/branches/BranchesPage"));
-const StudyAbroadPage = lazy(
-  () => import("./pages/study-abroad/StudyAbroadPage"),
-);
-const ProgramDetail = lazy(() => import("./pages/study-abroad/ProgramDetail"));
-const AdminProgramDetail = lazy(
-  () => import("./pages/admin/AdminProgramDetail"),
-);
-const UniversityProgramDetails = lazy(
-  () => import("./pages/admin/UniversityProgramDetails"),
-);
-const VisaConsultationPage = lazy(
-  () => import("./pages/visa/VisaConsultationPage"),
-);
-const ScholarshipsPage = lazy(
-  () => import("./pages/scholarships/ScholarshipsPage"),
-);
-const GalleryPage = lazy(() => import("./pages/gallery/GalleryPage"));
-const PartnersPage = lazy(() => import("./pages/partners/PartnersPage"));
-const BlogPage = lazy(() => import("./pages/blog/BlogPage"));
-
-// Placeholder Pages
-const CoursesPage = lazy(() => import("./pages/coursesPage/coursesPage"));
-const MembershipPage = lazy(() => import("./pages/membership/MembershipPage"));
-const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
-const ComingSoonPage = lazy(() => import("./pages/ComingSoonPage"));
+// Lazy Load Route Handlers
+const PublicRoutes = lazy(() => import("./routes/PublicRoutes"));
+const StudentRoutes = lazy(() => import("./routes/StudentRoutes"));
+const AdminRoutes = lazy(() => import("./routes/AdminRoutes"));
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -70,64 +30,6 @@ const ScrollToTop = () => {
 
   return null;
 };
-
-import usePageLanguage from "./hooks/usePageLanguage";
-
-import { AuthProvider } from "./context/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
-import PublicRoute from "./components/PublicRoute";
-
-// Admin Pages - Lazy Loaded
-const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
-const AdminOverview = lazy(() => import("./pages/admin/AdminOverview"));
-
-const ApplicationReview = lazy(() => import("./pages/admin/ApplicationReview"));
-const ApplicationDetail = lazy(() => import("./pages/admin/ApplicationDetail"));
-const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
-import ContentManagement from "./pages/admin/ContentManagement";
-import CMSScholarships from "./pages/admin/cms/CMSScholarships";
-import CMSLibrary from "./pages/admin/cms/CMSLibrary";
-import CMSPosts from "./pages/admin/cms/CMSPosts";
-import CMSMedia from "./pages/admin/cms/CMSMedia";
-const BranchManagement = lazy(() => import("./pages/admin/BranchManagement"));
-const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
-const FinancialReports = lazy(() => import("./pages/admin/FinancialReports"));
-const Analytics = lazy(() => import("./pages/admin/Analytics"));
-const VisaCases = lazy(() => import("./pages/admin/VisaCases"));
-const Communications = lazy(() => import("./pages/admin/Communications"));
-const UniversityPrograms = lazy(() => import("./pages/admin/UniversityPrograms"));
-
-// Dashboard Layout - Lazy Loaded
-const StudentDashboardLayout = lazy(
-  () => import("./pages/dashboard/StudentDashboardLayout"),
-);
-const MyApplications = lazy(() => import("./pages/dashboard/MyApplications"));
-const VisaSummary = lazy(() => import("./pages/dashboard/visa/VisaSummary"));
-const VisaConsultationRequest = lazy(
-  () => import("./pages/dashboard/visa/VisaConsultationRequest"),
-);
-const VisaCaseDetails = lazy(
-  () => import("./pages/dashboard/visa/VisaCaseDetails"),
-);
-const VisaCaseResponse = lazy(
-  () => import("./pages/dashboard/visa/VisaCaseResponse"),
-);
-const UploadCaseDocuments = lazy(
-  () => import("./pages/dashboard/visa/UploadCaseDocuments"),
-);
-
-const PublicLayout = () => (
-  <>
-    <Suspense fallback={<div className="h-16 bg-white shadow-sm" />}>
-      <Header />
-    </Suspense>
-    <main className="flex-grow">
-      <Outlet />
-    </main>
-    <Footer />
-    <WhatsAppButton />
-  </>
-);
 
 function App() {
   usePageLanguage();
@@ -151,124 +53,14 @@ function App() {
         <div className="flex flex-col min-h-screen">
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
-              {/* Public Routes - Wrapped in PublicLayout */}
-              <Route element={<PublicLayout />}>
-                <Route
-                  path="/"
-                  element={
-                    <PublicRoute>
-                      <LandingPage />
-                    </PublicRoute>
-                  }
-                />
-                <Route path="/aboutuspage" element={<AboutUsPage />} />
-                <Route path="/contactPage" element={<ContactPage />} />
-
-                {/* New Routes */}
-                <Route path="/library" element={<DigitalLibraryPage />} />
-                <Route path="/branches" element={<BranchesPage />} />
-                <Route path="/study-abroad" element={<StudyAbroadPage />} />
-                <Route path="/study-abroad/:id" element={<ProgramDetail />} />
-                <Route
-                  path="/visa-consultation"
-                  element={<VisaConsultationPage />}
-                />
-                <Route path="/scholarships" element={<ScholarshipsPage />} />
-                <Route path="/gallery" element={<GalleryPage />} />
-                <Route path="/partners" element={<PartnersPage />} />
-                <Route path="/blogs" element={<BlogPage />} />
-                <Route path="/blogs/:id" element={<BlogDetailsPage />} />
-
-                {/* Existing/Placeholder Routes */}
-                <Route path="/coursesPage" element={<CoursesPage />} />
-                <Route path="/membershipPage" element={<MembershipPage />} />
-                <Route path="/coming-soon" element={<ComingSoonPage />} />
-
-                {/* Auth Routes */}
-                <Route
-                  path="/signin"
-                  element={
-                    <PublicRoute>
-                      <Signin />
-                    </PublicRoute>
-                  }
-                />
-                <Route
-                  path="/signup"
-                  element={
-                    <PublicRoute>
-                      <Signup />
-                    </PublicRoute>
-                  }
-                />
-              </Route>
-
-              {/* Protected Student Dashboard */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute allowedRoles={["student"]}>
-                    <StudentDashboardLayout />
-                  </ProtectedRoute>
-                }>
-                <Route index element={<Dashboard />} />
-                <Route path="applications" element={<MyApplications />} />
-                <Route path="visa-status">
-                  <Route index element={<Navigate to="summary" replace />} />
-                  <Route path="summary" element={<VisaSummary />} />
-                  <Route path="summary/details/:id" element={<VisaCaseDetails />} />
-                  <Route path="summary/details/:id/upload" element={<UploadCaseDocuments />} />
-                  <Route path="summary/response/:id" element={<VisaCaseResponse />} />
-                  <Route path="request" element={<VisaConsultationRequest />} />
-                </Route>
-                <Route path="programs" element={<UniversityPrograms isReadOnly={true} />} />
-                <Route path="programs/:id" element={<UniversityProgramDetails backPath="/dashboard/programs" />} />
-                <Route
-                  path="profile"
-                  element={<div className="p-8">My Profile (Coming Soon)</div>}
-                />
-              </Route>
-
-              {/* Admin Routes */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
-                    <AdminLayout />
-                  </ProtectedRoute>
-                }>
-                <Route
-                  index
-                  element={<Navigate to="/admin/dashboard" replace />}
-                />
-                <Route path="dashboard" element={<AdminOverview />} />
-                <Route path="users" element={<UserManagement />} />
-                <Route path="applications" element={<ApplicationReview />} />
-                <Route path="applications/:id" element={<ApplicationDetail />} />
-                <Route path="visa" element={<VisaCases />} />
-                <Route path="programs" element={<UniversityPrograms />} />
-
-                <Route path="programs/:id" element={<AdminProgramDetail />} />
-                <Route path="programs/view/:id" element={<UniversityProgramDetails />} />
-                <Route path="cms" element={<ContentManagement />}>
-                  <Route
-                    index
-                    element={<Navigate to="scholarships" replace />}
-                  />
-                  <Route path="scholarships" element={<CMSScholarships />} />
-                  <Route path="library" element={<CMSLibrary />} />
-                  <Route path="posts" element={<CMSPosts />} />
-                  <Route path="media" element={<CMSMedia />} />
-                </Route>
-                <Route path="branches" element={<BranchManagement />} />
-                <Route path="finance" element={<FinancialReports />} />
-                <Route path="analytics" element={<Analytics />} />
-                <Route path="communications" element={<Communications />} />
-                <Route path="settings" element={<AdminSettings />} />
-              </Route>
-
-              {/* 404 Catch-All Route */}
-              <Route path="*" element={<NotFound />} />
+              {/* Admin Section */}
+              <Route path="/admin/*" element={<AdminRoutes />} />
+              
+              {/* Student Dashboard Section */}
+              <Route path="/dashboard/*" element={<StudentRoutes />} />
+              
+              {/* Public Section (Catch-all) */}
+              <Route path="/*" element={<PublicRoutes />} />
             </Routes>
           </Suspense>
         </div>

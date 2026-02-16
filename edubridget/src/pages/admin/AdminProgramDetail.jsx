@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, Plus, Trash2, XCircle, Globe, DollarSign, Image as ImageIcon } from 'lucide-react';
-import { toast } from 'sonner';
-import { MOCK_PROGRAMS } from '../../data/mockData';
+import { usePrograms, useProgram } from '../../hooks/usePrograms';
 import DatePicker from '../../components/ui/DatePicker';
 import AdminCard from '../../components/admin/AdminCard';
 
 export default function AdminProgramDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const isNew = id === 'new';
+
+  // Use hooks for data fetching and saving
+  const { program: fetchedProgram, loading: fetchLoading } = useProgram(isNew ? null : id);
+  const { addProgram, updateProgram, loading: saveLoading } = usePrograms(false);
+
   const [formData, setFormData] = useState({
     universityName: '',
     visaType: 'D-2',
@@ -27,45 +31,30 @@ export default function AdminProgramDetail() {
 
   const [departmentInput, setDepartmentInput] = useState('');
 
-  const isNew = id === 'new';
-
   // Common styles for inputs to ensure consistency
   const inputClassName = "w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400";
   const labelClassName = "block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1.5 ml-1";
 
+  // Populate data when fetched
   useEffect(() => {
-    if (isNew) {
-      setLoading(false);
-      return;
+    if (fetchedProgram) {
+      setFormData(fetchedProgram);
     }
+  }, [fetchedProgram]);
 
-    // Simulate Fetch
-    setTimeout(() => {
-      const program = MOCK_PROGRAMS.find(p => p.id === parseInt(id));
-      if (program) {
-        setFormData(program);
-      }
-      setLoading(false);
-    }, 500);
-  }, [id, isNew]);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    let success = false;
     
     if (isNew) {
-      const newId = Math.max(...MOCK_PROGRAMS.map(p => p.id), 0) + 1;
-      const newProgram = { ...formData, id: newId };
-      MOCK_PROGRAMS.push(newProgram);
-      toast.success('Program created successfully');
+      success = await addProgram(formData);
     } else {
-      const index = MOCK_PROGRAMS.findIndex(p => p.id === parseInt(id));
-      if (index !== -1) {
-        MOCK_PROGRAMS[index] = { ...MOCK_PROGRAMS[index], ...formData };
-        toast.success('Program updated successfully');
-      }
+      success = await updateProgram(Number(id), formData);
     }
     
-    navigate('/admin/programs');
+    if (success) {
+      navigate('/admin/programs');
+    }
   };
 
   const addDepartment = () => {
@@ -95,6 +84,7 @@ export default function AdminProgramDetail() {
     const start = field === 'startDate' ? value : newTimeline[index].startDate;
     const end = field === 'endDate' ? value : newTimeline[index].endDate;
     
+    // Automatically construct display string if both dates present (or one)
     if (start || end) {
        newTimeline[index].date = `${start || ''} ~ ${end || ''}`;
     }
@@ -108,7 +98,13 @@ export default function AdminProgramDetail() {
     setFormData({ ...formData, timeline: newTimeline });
   };
 
-  if (loading) return <div className="p-12 text-center text-slate-500 text-sm">Loading details...</div>;
+  if (fetchLoading && !isNew) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12 animate-in fade-in duration-500">
@@ -129,9 +125,14 @@ export default function AdminProgramDetail() {
         </div>
         <button 
           onClick={handleSubmit}
-          className="flex items-center justify-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-lg font-medium text-sm hover:bg-slate-800 transition-all shadow-sm active:scale-95"
+          disabled={saveLoading}
+          className="flex items-center justify-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-lg font-medium text-sm hover:bg-slate-800 transition-all shadow-sm active:scale-95 disabled:opacity-70 disabled:pointer-events-none"
         >
-          <Save size={16} />
+          {saveLoading ? (
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            <Save size={16} />
+          )}
           <span>{isNew ? 'Create Program' : 'Save Changes'}</span>
         </button>
       </div>
@@ -152,6 +153,7 @@ export default function AdminProgramDetail() {
                    onChange={(e) => setFormData({...formData, universityName: e.target.value})}
                    className={inputClassName}
                    placeholder="Enter official university name..."
+                   required
                  />
                </div>
                

@@ -160,7 +160,7 @@ export default function StudentDashboardLayout() {
         <div className="flex-1 py-6 px-4 overflow-y-auto space-y-1 scrollbar-hide">
           {navItems.map((item) => (
             <NavItem 
-                key={item.path} 
+                key={item.label} 
                 item={item} 
                 location={location}
                 expandedItems={expandedItems}

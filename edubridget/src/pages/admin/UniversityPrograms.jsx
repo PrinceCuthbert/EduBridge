@@ -11,11 +11,13 @@ import AdminTable from '../../components/admin/AdminTable';
 
 
 
+import { usePrograms } from '../../hooks/usePrograms';
+
 export default function UniversityPrograms({ isReadOnly = false }) {
   const navigate = useNavigate();
-  // ... existing state ...
-  const [programs, setPrograms] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Use custom hook for data management
+  const { programs, loading, deleteProgram } = usePrograms();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     status: 'All',
@@ -23,26 +25,7 @@ export default function UniversityPrograms({ isReadOnly = false }) {
     country: 'All'
   });
 
-  // Fetch programs on mount
-  useEffect(() => {
-    fetchPrograms();
-  }, []);
-
-  const fetchPrograms = async () => {
-    setLoading(true);
-    try {
-      // Mock data
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setPrograms(MOCK_PROGRAMS);
-    } catch (error) {
-      toast.error('Failed to load programs');
-      console.error('Fetch programs error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Calculate stats - Using Set to count unique occurrences
+  // Calculate stats - using hook data
   const stats = [
     {
       label: 'Total Programs',
@@ -62,7 +45,6 @@ export default function UniversityPrograms({ isReadOnly = false }) {
     },
     {
       label: 'Partner Countries',
-      // We map to get country names, then use Set to count unique ones
       value: new Set(programs.map(p => p.country)).size,
       icon: MapPin,
       trend: 'Stable',
@@ -106,13 +88,11 @@ export default function UniversityPrograms({ isReadOnly = false }) {
       render: (program) => (
         <div className="flex items-center gap-3">
           <div className="flex-1">
-            {/* Standardized: font-medium text-sm text-slate-900 */}
             <div className="font-medium text-sm text-slate-900">{program.universityName}</div>
             <div className="flex flex-wrap gap-1.5 mt-1.5">
               {program.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  /* Standardized: font-medium (not bold), smaller text */
                   className={`px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded ${
                     tag === 'BEST' ? 'bg-yellow-100 text-yellow-700' :
                     tag === 'NEW' ? 'bg-green-100 text-green-700' :
@@ -170,8 +150,6 @@ export default function UniversityPrograms({ isReadOnly = false }) {
       accessor: 'actions',
       render: (program) => (
         <div className="flex items-center justify-end gap-2">
-
-          {/* Is readonly is true for student user so that they can' edit the program detais. only view button will be visible */}
           <button
             onClick={() => navigate(isReadOnly ? `/dashboard/programs/${program.id}` : `/admin/programs/view/${program.id}`)}
             className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
@@ -180,7 +158,6 @@ export default function UniversityPrograms({ isReadOnly = false }) {
             <Eye size={16} />
           </button>
           
-          {/* Is readonly is true for student user so that they can' edit the program detais. only view button will be visible */}
           {!isReadOnly && (
             <>
               <button
@@ -210,17 +187,8 @@ export default function UniversityPrograms({ isReadOnly = false }) {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this program?')) {
-      return;
-    }
-
-    try {
-      setPrograms(programs.filter(p => p.id !== id));
-      toast.success('Program deleted successfully');
-    } catch (error) {
-      toast.error('Failed to delete program');
-      console.error('Delete error:', error);
-    }
+    // Hook handles confirmation and toast
+    await deleteProgram(id);
   };
 
   const clearFilters = () => {
@@ -246,10 +214,12 @@ export default function UniversityPrograms({ isReadOnly = false }) {
     <div className="space-y-6">
       <AdminPageHeader 
         title="University Programs"
-        description={isReadOnly ? "View available university programs" : "Manage Study Abroad programs (D-2, D-4)"}
-        actionLabel={isReadOnly ? null : "Add Program"}
-        actionIcon={isReadOnly ? null : Plus}
-        onAction={isReadOnly ? undefined : () => navigate('/admin/programs/new')}
+        subtitle={isReadOnly ? "View available university programs" : "Manage Study Abroad programs (D-2, D-4)"}
+        primaryAction={isReadOnly ? undefined : {
+          label: "Add Program",
+          icon: Plus,
+          onClick: () => navigate('/admin/programs/new')
+        }}
       />
 
       <AdminStatsGrid stats={stats} />
