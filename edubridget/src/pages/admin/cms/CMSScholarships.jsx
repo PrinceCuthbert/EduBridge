@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, GraduationCap, MapPin, Calendar, DollarSign } from 'lucide-react';
 import Modal from '../../../components/Modal';
 import { MOCK_SCHOLARSHIPS } from '../../../data/mockData';
 import { useCMSManager } from '@/hooks/useCMSManager'; 
@@ -10,7 +10,6 @@ import AdminFilterBar from "../../../components/admin/AdminFilterBar";
 export default function CMSScholarships() {
   const {
     items: filteredScholarships,
-    // handleSearch, // Not used directly with AdminFilterBar simple binding
     searchQuery,
     setSearchQuery,
     isModalOpen,
@@ -30,18 +29,23 @@ export default function CMSScholarships() {
 
   const columns = [
     {
-      header: "Scholarship Details",
+      header: "Scholarship",
       render: (item) => (
-        <div>
-          <div className="font-serif text-[15px] font-bold text-slate-900 mb-0.5">{item.title}</div>
-          <div className="text-xs text-slate-500 line-clamp-1 max-w-[200px]">{item.description}</div>
+        <div className="flex items-center gap-3">
+        
+           <div>
+              {/* CHANGED: font-serif -> font-sans, text-[15px] -> text-sm */}
+              <div className="text-sm font-medium text-slate-900 mb-0.5 line-clamp-1">{item.title}</div>
+              <div className="text-xs text-slate-500 line-clamp-1 max-w-[250px]">{item.description}</div>
+           </div>
         </div>
       )
     },
     {
       header: "Amount",
       render: (item) => (
-        <span className="text-emerald-600 font-bold text-sm bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
+        // CHANGED: rounded-lg -> rounded-full, simplified colors
+        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
           {item.amount}
         </span>
       )
@@ -49,16 +53,18 @@ export default function CMSScholarships() {
     {
       header: "Deadline",
       render: (item) => (
-        <span className="text-slate-600 font-medium text-sm">
-          {item.deadline}
+        <span className="text-slate-500 font-medium text-sm flex items-center gap-2">
+           <Calendar size={14} className="text-slate-400" />
+           {item.deadline}
         </span>
       )
     },
     {
       header: "Location",
       render: (item) => (
-        <span className="text-slate-700 font-bold text-sm">
-          {item.location}
+        <span className="text-slate-700 font-medium text-sm flex items-center gap-2">
+           <MapPin size={14} className="text-slate-400" />
+           {item.location}
         </span>
       )
     },
@@ -69,17 +75,17 @@ export default function CMSScholarships() {
         <div className="flex justify-end gap-2">
           <button 
             onClick={() => handleEdit(item)} 
-            className="p-2 text-slate-400 hover:text-primary hover:bg-slate-50 rounded-xl transition-all"
+            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
             title="Edit"
           >
-            <Edit size={18} />
+            <Edit size={16} />
           </button>
           <button 
             onClick={() => handleDelete(item.id, 'Scholarship')} 
-            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             title="Delete"
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} />
           </button>
         </div>
       )
@@ -87,12 +93,11 @@ export default function CMSScholarships() {
   ];
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <AdminPageHeader 
-        title="Scholarships Management" 
-        subtitle="Manage scholarship opportunities and grant details."
+        title="Scholarships" 
+        subtitle="Manage grants and opportunities"
         count={filteredScholarships.length}
-        countLabel="Active Grants"
         primaryAction={{
           label: "Add Scholarship",
           icon: Plus,
@@ -101,7 +106,7 @@ export default function CMSScholarships() {
       />
 
       <AdminFilterBar 
-        searchPlaceholder="Search scholarships by title or location..."
+        searchPlaceholder="Search by title or location..."
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
@@ -117,64 +122,78 @@ export default function CMSScholarships() {
         onClose={() => setIsModalOpen(false)}
         title={editingItem ? 'Edit Scholarship' : 'Add New Scholarship'}
         size="lg"
-        className="rounded-[2.5rem]"
       >
-        <form onSubmit={(e) => handleSubmit(e, 'Scholarship')} className="space-y-6 p-6">
+        <form onSubmit={(e) => handleSubmit(e, 'Scholarship')} className="space-y-6">
           <div className="space-y-4">
-            <div>
-              <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Title</label>
+            {/* Title Input */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Title</label>
               <input 
                 type="text" 
                 required
                 value={formData.title}
                 onChange={e => setFormData({...formData, title: e.target.value})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all font-serif text-slate-900"
+                // CHANGED: Standard input styles (py-2.5, px-3, rounded-lg)
+                className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 placeholder:text-slate-400"
                 placeholder="e.g. Global Excellence Award"
               />
             </div>
             
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Amount</label>
-                <input 
-                  type="text" 
-                  required
-                  value={formData.amount}
-                  onChange={e => setFormData({...formData, amount: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all font-bold text-emerald-600"
-                  placeholder="$10,000"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Amount Input */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Amount</label>
+                <div className="relative">
+                   <DollarSign size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                   <input 
+                     type="text" 
+                     required
+                     value={formData.amount}
+                     onChange={e => setFormData({...formData, amount: e.target.value})}
+                     className="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 font-medium"
+                     placeholder="10,000"
+                   />
+                </div>
               </div>
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Deadline</label>
-                <input 
-                  type="date"
-                  value={formData.deadline}
-                  onChange={e => setFormData({...formData, deadline: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all"
-                />
+              {/* Deadline Input */}
+               <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Deadline</label>
+                <div className="relative">
+                   <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                   <input 
+                     type="date"
+                     value={formData.deadline}
+                     onChange={e => setFormData({...formData, deadline: e.target.value})}
+                     className="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900"
+                   />
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Location</label>
-                <input 
-                  type="text" 
-                  required
-                  value={formData.location}
-                  onChange={e => setFormData({...formData, location: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all"
-                  placeholder="e.g. New York, USA"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Location Input */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Location</label>
+                <div className="relative">
+                   <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                   <input 
+                     type="text" 
+                     required
+                     value={formData.location}
+                     onChange={e => setFormData({...formData, location: e.target.value})}
+                     className="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900"
+                     placeholder="e.g. New York, USA"
+                   />
+                </div>
               </div>
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Type</label>
+              {/* Type Select */}
+               <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Type</label>
                 <div className="relative">
                   <select 
                     value={formData.type}
                     onChange={e => setFormData({...formData, type: e.target.value})}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all appearance-none"
+                    className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none text-slate-900"
                   >
                     <option value="Merit-based">Merit-based</option>
                     <option value="Need-based">Need-based</option>
@@ -191,30 +210,31 @@ export default function CMSScholarships() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Description</label>
+            {/* Description Textarea */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Description</label>
               <textarea 
                 rows={3}
                 required
                 value={formData.description}
                 onChange={e => setFormData({...formData, description: e.target.value})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all resize-none"
+                className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none text-slate-900"
                 placeholder="Brief details about the scholarship..."
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-4 pt-4 border-t border-slate-100">
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
             <button 
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-6 py-2.5 text-slate-500 hover:text-slate-700 font-bold text-sm transition-colors"
+              className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
             >
               Cancel
             </button>
             <button 
               type="submit"
-              className="px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
+              className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm"
             >
               {editingItem ? 'Update Scholarship' : 'Add Scholarship'}
             </button>

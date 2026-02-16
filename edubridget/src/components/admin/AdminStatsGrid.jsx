@@ -2,35 +2,45 @@ import React from "react";
 
 export default function AdminStatsGrid({ stats }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    // CHANGED: gap-8 -> gap-6
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
           <div
             key={index}
-            className="bg-white p-8 rounded-[2rem] border border-slate-200/50 shadow-xl shadow-slate-200/20 group hover:border-blue-100/50 hover:shadow-blue-500/5 transition-all duration-500 relative overflow-hidden"
+            // CHANGED: rounded-[2rem] -> rounded-xl
+            // CHANGED: p-8 -> p-6
+            // CHANGED: Shadow and border styles to be cleaner/lighter
+            className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden"
           >
-            <div className="flex items-start justify-between mb-6 relative z-10">
-              <div className={`w-14 h-14 rounded-2xl ${stat.bg || 'bg-slate-50'} ${stat.color || 'text-slate-600'} flex items-center justify-center shadow-sm transition-transform group-hover:scale-110 duration-500 border border-black/5`}>
-                <Icon size={24} />
+            <div className="flex items-start justify-between mb-4">
+              {/* CHANGED: w-14 h-14 -> w-10 h-10 (Standard Icon Box) */}
+              {/* CHANGED: rounded-2xl -> rounded-lg */}
+              <div className={`w-10 h-10 rounded-lg ${stat.bg || 'bg-slate-50'} ${stat.color || 'text-slate-600'} flex items-center justify-center border border-black/5`}>
+                <Icon size={20} />
               </div>
+              
               {stat.trend && (
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity">
+                // CHANGED: Removed uppercase, tracking-[0.2em]
+                // ADDED: font-medium, rounded-full pill shape
+                <span className="px-2 py-1 rounded-full bg-slate-100 text-xs font-medium text-slate-600">
                   {stat.trend}
                 </span>
               )}
             </div>
             
-            <h3 className="text-3xl font-serif text-[#0F172A] mb-1.5 tracking-tight antialiased relative z-10">
-              {stat.value}
-            </h3>
-            
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest relative z-10 pl-0.5">
-              {stat.label}
-            </p>
-
-            {/* Subtle background decoration */}
-            <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-slate-50 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 blur-2xl" />
+            <div className="space-y-1">
+                {/* CHANGED: text-3xl font-serif -> text-2xl font-bold font-sans */}
+                <h3 className="text-2xl font-bold text-slate-900 tracking-tight">
+                  {stat.value}
+                </h3>
+                
+                {/* CHANGED: Removed uppercase, tracking-widest */}
+                <p className="text-sm font-medium text-slate-500">
+                  {stat.label}
+                </p>
+            </div>
           </div>
         );
       })}

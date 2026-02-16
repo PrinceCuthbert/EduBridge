@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Edit, Trash2, Upload, Link } from 'lucide-react';
+import { Plus, Edit, Trash2, Upload, Link, CheckCircle, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import Modal from '../../../components/Modal';
 import { MOCK_LIBRARY_RESOURCES } from '../../../data/mockData';
@@ -31,7 +31,7 @@ export default function CMSLibrary() {
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-       // Mock upload
+       // Mock upload logic
       const fakeUrl = URL.createObjectURL(file);
       setFormData({ ...formData, fileUrl: fakeUrl });
       toast.success('File uploaded successfully');
@@ -40,18 +40,26 @@ export default function CMSLibrary() {
 
   const columns = [
     {
-      header: "Resource Details",
+      header: "Resource",
       render: (item) => (
-        <div>
-          <div className="font-serif text-[15px] font-bold text-slate-900 mb-0.5">{item.title}</div>
-          <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">{item.category}</div>
+        <div className="flex items-center gap-3">
+           <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-100">
+              <FileText size={20} className="text-slate-400" />
+           </div>
+           <div>
+              {/* CHANGED: Removed font-serif, text-[15px]. Added text-sm font-medium */}
+              <div className="text-sm font-medium text-slate-900">{item.title}</div>
+              {/* CHANGED: Removed uppercase tracking-wider. Added text-xs text-slate-500 */}
+              <div className="text-xs text-slate-500">{item.category}</div>
+           </div>
         </div>
       )
     },
     {
       header: "Type",
       render: (item) => (
-        <span className="bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider border border-slate-200">
+        // CHANGED: Rounded-lg -> rounded-full pill shape. Removed uppercase.
+        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
           {item.type}
         </span>
       )
@@ -59,7 +67,7 @@ export default function CMSLibrary() {
     {
       header: "Author",
       render: (item) => (
-        <span className="text-slate-700 font-bold text-sm">
+        <span className="text-sm text-slate-700">
           {item.author}
         </span>
       )
@@ -67,7 +75,7 @@ export default function CMSLibrary() {
     {
       header: "Year",
       render: (item) => (
-        <span className="text-slate-500 font-medium font-mono text-xs">
+        <span className="text-sm text-slate-500 font-medium">
           {item.year}
         </span>
       )
@@ -79,17 +87,17 @@ export default function CMSLibrary() {
         <div className="flex justify-end gap-2">
           <button 
             onClick={() => handleEdit(item)} 
-            className="p-2 text-slate-400 hover:text-primary hover:bg-slate-50 rounded-xl transition-all"
+            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
             title="Edit"
           >
-            <Edit size={18} />
+            <Edit size={16} />
           </button>
           <button 
             onClick={() => handleDelete(item.id, 'Resource')} 
-            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             title="Delete"
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} />
           </button>
         </div>
       )
@@ -97,12 +105,11 @@ export default function CMSLibrary() {
   ];
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <AdminPageHeader 
         title="Digital Library" 
-        subtitle="Manage educational resources, e-books, and journals."
+        subtitle="Manage educational resources and e-books"
         count={filteredResources.length}
-        countLabel="Resources"
         primaryAction={{
           label: "Add Resource",
           icon: Plus,
@@ -111,7 +118,7 @@ export default function CMSLibrary() {
       />
 
       <AdminFilterBar 
-        searchPlaceholder="Search resources by title or category..."
+        searchPlaceholder="Search by title or category..."
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
@@ -127,30 +134,31 @@ export default function CMSLibrary() {
         onClose={() => setIsModalOpen(false)}
         title={editingItem ? 'Edit Resource' : 'Add New Resource'}
         size="lg"
-        className="rounded-[2.5rem]"
       >
-        <form onSubmit={(e) => handleSubmit(e, 'Resource')} className="space-y-6 p-6">
+        <form onSubmit={(e) => handleSubmit(e, 'Resource')} className="space-y-6">
           <div className="space-y-4">
-            <div>
-              <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Title</label>
+            {/* Title Input */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Title</label>
               <input 
                 type="text" 
                 required
                 value={formData.title}
                 onChange={e => setFormData({...formData, title: e.target.value})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all font-serif text-slate-900"
+                className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 placeholder:text-slate-400"
                 placeholder="Resource Title"
               />
             </div>
             
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Type</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Type Select */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Type</label>
                  <div className="relative">
                   <select 
                     value={formData.type}
                     onChange={e => setFormData({...formData, type: e.target.value})}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all appearance-none"
+                    className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none text-slate-900"
                   >
                     <option value="E-book">E-book</option>
                     <option value="Journal">Journal</option>
@@ -163,95 +171,106 @@ export default function CMSLibrary() {
                   </div>
                  </div>
               </div>
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Category</label>
+
+              {/* Category Input */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Category</label>
                 <input 
                   type="text" 
                   required
                   placeholder="e.g. Mathematics"
                   value={formData.category}
                   onChange={e => setFormData({...formData, category: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all"
+                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900"
                 />
               </div>
             </div>
 
-             {/* Conditional Input based on Type */}
-             {formData.type === 'E-book' ? (
-               <div>
-                 <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1 flex items-center gap-2">
-                   <Link size={14} /> Link to Book (URL)
-                 </label>
-                 <input 
-                   type="url"
-                   placeholder="https://example.com/book.pdf"
-                   value={formData.link}
-                   onChange={e => setFormData({...formData, link: e.target.value})}
-                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all text-blue-600 underline"
-                 />
-               </div>
-            ) : (
-               <div>
-                 <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1 flex items-center gap-2">
-                   <Upload size={14} /> Upload File
-                 </label>
-                 <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:bg-slate-50 transition-colors relative cursor-pointer group">
+            {/* Conditional Input based on Type */}
+            {formData.type === 'E-book' ? (
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                  Link to Book (URL)
+                </label>
+                <div className="relative">
+                   <Link size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                    <input 
-                     type="file" 
-                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                     onChange={handleFileUpload}
+                     type="url"
+                     placeholder="https://example.com/book.pdf"
+                     value={formData.link}
+                     onChange={e => setFormData({...formData, link: e.target.value})}
+                     className="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-blue-600 underline"
                    />
-                   <div className="space-y-2 pointer-events-none">
-                      <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                        <Upload className="h-6 w-6 text-slate-400 group-hover:text-primary transition-colors" />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Upload File</label>
+                <div className="border border-dashed border-slate-300 rounded-lg p-6 text-center hover:bg-slate-50 transition-colors relative cursor-pointer group">
+                  <input 
+                    type="file" 
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    onChange={handleFileUpload}
+                  />
+                  <div className="space-y-3 pointer-events-none flex flex-col items-center">
+                    <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Upload size={20} className="text-blue-500" />
+                    </div>
+                    <div className="space-y-1">
+                       <p className="text-sm font-medium text-slate-700">Click to upload file</p>
+                       <p className="text-xs text-slate-500">PDF, DOCX up to 10MB</p>
+                    </div>
+                    {formData.fileUrl && (
+                      <div className="flex items-center gap-2 px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs font-medium">
+                         <CheckCircle size={12} /> File selected
                       </div>
-                      <p className="text-sm text-slate-600 font-bold">Click or drag file to upload</p>
-                      {formData.fileUrl && (
-                        <p className="text-xs text-emerald-600 mt-2 font-bold bg-emerald-50 py-1 px-2 rounded-lg inline-block">File selected</p>
-                      )}
-                   </div>
-                 </div>
-               </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
 
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Author</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Author Input */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Author</label>
                 <input 
                   type="text" 
                   required
                   value={formData.author}
                   onChange={e => setFormData({...formData, author: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all"
+                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900"
                 />
               </div>
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Year</label>
+              {/* Year Input */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Year</label>
                 <input 
                   type="number" 
                   required
                   value={formData.year}
                   onChange={e => setFormData({...formData, year: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all"
+                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900"
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex justify-end gap-4 pt-4 border-t border-slate-100">
+          {/* Footer Actions */}
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
             <button 
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-6 py-2.5 text-slate-500 hover:text-slate-700 font-bold text-sm transition-colors"
+              className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
             >
               Cancel
             </button>
             <button 
               type="submit"
-              className="px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
+              className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm"
             >
               {editingItem ? 'Update Resource' : 'Add Resource'}
-            </button>
+            </button>   
           </div>
         </form>
       </Modal>

@@ -31,24 +31,31 @@ export default function CMSPosts() {
     {
       header: "Post Details",
       render: (item) => (
-        <div>
-          <div className="font-serif text-[15px] font-bold text-slate-900 mb-0.5">{item.title}</div>
-          <div className="text-xs text-slate-500 font-medium line-clamp-1 max-w-[250px]">{item.excerpt}</div>
+        <div className="flex items-center gap-3">
+           <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-100 flex-shrink-0">
+              <FileText size={20} className="text-slate-400" />
+           </div>
+           <div>
+              {/* CHANGED: font-serif -> font-sans, text-[15px] -> text-sm */}
+              <div className="text-sm font-medium text-slate-900 mb-0.5 line-clamp-1">{item.title}</div>
+              <div className="text-xs text-slate-500 line-clamp-1 max-w-[300px]">{item.excerpt}</div>
+           </div>
         </div>
       )
     },
     {
       header: "Category",
       render: (item) => (
-        <span className="bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider border border-slate-200">
+        // CHANGED: rounded-lg -> rounded-full pill shape. Removed uppercase.
+        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
           {item.category}
         </span>
       )
     },
     {
-      header: "Published Date",
+      header: "Date",
       render: (item) => (
-        <span className="text-slate-500 font-medium text-xs flex items-center gap-2">
+        <span className="text-slate-500 font-medium text-sm flex items-center gap-2">
            <Calendar size={14} className="text-slate-400" />
            {item.date}
         </span>
@@ -61,17 +68,17 @@ export default function CMSPosts() {
         <div className="flex justify-end gap-2">
           <button 
             onClick={() => handleEdit(item)} 
-            className="p-2 text-slate-400 hover:text-primary hover:bg-slate-50 rounded-xl transition-all"
+            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
             title="Edit"
           >
-            <Edit size={18} />
+            <Edit size={16} />
           </button>
           <button 
             onClick={() => handleDelete(item.id, 'Post')} 
-            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             title="Delete"
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} />
           </button>
         </div>
       )
@@ -79,14 +86,13 @@ export default function CMSPosts() {
   ];
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <AdminPageHeader 
         title="Blog & News" 
-        subtitle="Manage articles, updates, and announcements."
+        subtitle="Manage articles and announcements"
         count={filteredPosts.length}
-        countLabel="Published Posts"
         primaryAction={{
-          label: "Create New Post",
+          label: "Create Post",
           icon: Plus,
           onClick: handleAdd
         }}
@@ -109,30 +115,32 @@ export default function CMSPosts() {
         onClose={() => setIsModalOpen(false)}
         title={editingItem ? 'Edit Post' : 'Create New Post'}
         size="lg"
-        className="rounded-[2.5rem]"
       >
-        <form onSubmit={(e) => handleSubmit(e, 'Post')} className="space-y-6 p-6">
+        <form onSubmit={(e) => handleSubmit(e, 'Post')} className="space-y-6">
           <div className="space-y-4">
-            <div>
-              <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Title</label>
+            {/* Title Input */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Title</label>
               <input 
                 type="text" 
                 required
                 value={formData.title}
                 onChange={e => setFormData({...formData, title: e.target.value})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all font-serif text-slate-900"
+                // CHANGED: Standard input styles
+                className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 placeholder:text-slate-400"
                 placeholder="Article Headline"
               />
             </div>
             
-            <div className="grid grid-cols-2 gap-6">
-               <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Category</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Category Select */}
+               <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Category</label>
                 <div className="relative">
                   <select 
                     value={formData.category}
                     onChange={e => setFormData({...formData, category: e.target.value})}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all appearance-none"
+                    className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none text-slate-900"
                   >
                     <option value="News">News</option>
                     <option value="Events">Events</option>
@@ -144,57 +152,63 @@ export default function CMSPosts() {
                   </div>
                 </div>
               </div>
-               <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Date</label>
+
+               {/* Date Input */}
+               <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Date</label>
                 <input 
                   type="date" 
                   required
                   value={formData.date}
                   onChange={e => setFormData({...formData, date: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all"
+                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Excerpt</label>
+            {/* Excerpt Textarea */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Excerpt</label>
               <textarea 
                 rows={2}
                 required
                 value={formData.excerpt}
                 onChange={e => setFormData({...formData, excerpt: e.target.value})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all resize-none"
+                className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none text-slate-900"
                 placeholder="Brief summary for listing..."
               />
             </div>
 
-            <div>
-              <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Content (Markdown)</label>
+            {/* Content Textarea */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center">
+                 <label className="text-sm font-medium text-slate-700">Content</label>
+                 <span className="text-xs text-slate-400 font-medium">Markdown Supported</span>
+              </div>
               <textarea 
                 rows={8}
                 required
                 value={formData.content}
                 onChange={e => setFormData({...formData, content: e.target.value})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all resize-none font-mono text-sm leading-relaxed"
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none font-mono text-slate-800 leading-relaxed"
                 placeholder="# Write your article here..."
               />
-               <p className="text-[10px] text-slate-400 mt-2 font-medium uppercase tracking-wider text-right">Markdown Supported</p>
             </div>
           </div>
 
-          <div className="flex justify-end gap-4 pt-4 border-t border-slate-100">
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
             <button 
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-6 py-2.5 text-slate-500 hover:text-slate-700 font-bold text-sm transition-colors"
+              className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
             >
               Cancel
             </button>
             <button 
               type="submit"
-              className="px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
+              className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm"
             >
-              {editingItem ? 'Publish Post' : 'Save Draft'}
+              {editingItem ? 'Update Post' : 'Publish Post'}
             </button>
           </div>
         </form>

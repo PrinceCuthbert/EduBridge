@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEye,
@@ -8,178 +9,103 @@ import {
   faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
+
 import { toast } from "sonner";
-// TODO: Uncomment when axios is installed
-// import { authAPI } from '../../api/services';
+
+import { validateSignUpForm } from "../utils/validation";
+
+
+const initialFormState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phoneNumber: "",
+  country: "",
+  password: "",
+  confirmPassword: "",
+  agreeToTerms: false,
+};
 
 function SignUpPage() {
   const navigate = useNavigate();
+  const { signUp,loginWithGoogle } = useAuth();
 
-  const initialFormState = {
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    country: "",
-    password: "",
-    confirmPassword: "",
-    agreeToTerms: false,
-  };
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState(initialFormState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Password validation helper
-  const validatePassword = (password) => {
-    const hasMinLength = password.length >= 8;
-    const hasNumber = /\d/.test(password);
-    const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-    if (!hasMinLength) return "Password must be at least 8 characters";
-    if (!hasNumber) return "Password must contain at least one number";
-    if (!hasSymbol) return "Password must contain at least one symbol";
-    return null;
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Validate password match
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match!");
-      toast.error("Passwords do not match");
-      return;
-    }
+    const validationError = validateSignUpForm(formData);
 
-    // Validate password strength
-    const passwordError = validatePassword(formData.password);
-    if (passwordError) {
-      setError(passwordError);
-      toast.error(passwordError);
-      return;
-    }
-
-    // Validate terms agreement
-    if (!formData.agreeToTerms) {
-      setError("Please agree to the Terms of Service and Privacy Policy");
-      toast.error("Please accept the terms");
+    if (validationError) {
+      setError(validationError);
+      toast.error(validationError);
       return;
     }
 
     setLoading(true);
 
+    const registrationData = {
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
+      email: formData.email.trim().toLowerCase(),
+      phoneNumber: formData.phoneNumber.trim(),
+      country: formData.country,
+      password: formData.password,
+    };
+
     try {
-      // Prepare data for backend - remove client-only fields
-      const registrationData = {
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        email: formData.email.trim().toLowerCase(),
-        phoneNumber: formData.phoneNumber.trim(),
-        country: formData.country,
-        password: formData.password,
-        // Don't send confirmPassword or agreeToTerms to backend
-      };
+      await signUp(registrationData);
 
-      // TODO: Replace with actual API call when backend is ready
-      // const response = await authAPI.register(registrationData);
-      // localStorage.setItem('token', response.token);
-      // localStorage.setItem('user', JSON.stringify(response.user));
+      toast.success("Account created successfully! Welcome to EduBridge.");
 
-      // Simulating API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Development-only logging with password protection
-      if (import.meta.env.DEV) {
-        console.log("📝 Registration data prepared for backend:", {
-          ...registrationData,
-          password: "***REDACTED***",
-        });
-      }
-
-      toast.success("Account created successfully! Please sign in.");
-
-      // Reset form
       setFormData(initialFormState);
+      navigate("/dashboard", { replace: true });
 
-      // Navigate to sign in
-      navigate("/signin");
     } catch (err) {
-      console.error("Registration error:", err);
-
-      // Handle specific error responses from backend
       const errorMessage =
         err.response?.data?.message ||
         err.message ||
         "Failed to create account";
+
       setError(errorMessage);
       toast.error(errorMessage);
+
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
+ const handleGoogleSuccess = async (credentialResponse) => {
+  try {
+    const user = await loginWithGoogle(credentialResponse.credential);
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    try {
-      // Decode Google JWT token to get user info
-      const decoded = jwtDecode(credentialResponse.credential);
+    toast.success(`Welcome, ${user.name}!`);
 
-      if (import.meta.env.DEV) {
-        console.log("📝 Google user data:", {
-          email: decoded.email,
-          name: decoded.name,
-          picture: decoded.picture,
-        });
-      }
+    navigate(
+      user.role === "admin"
+        ? "/admin/dashboard"
+        : "/dashboard",
+      { replace: true }
+    );
+  } catch (err) {
+    toast.error(err.message);
+  }
+};
 
-      // TODO: Send to your backend API to create account
-      // const response = await authAPI.googleSignUp({
-      //   token: credentialResponse.credential,
-      // });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Store user data immediately and redirect to dashboard
-      // Check if email is in admin emails list from environment
-      const adminEmails =
-        import.meta.env.VITE_ADMIN_EMAILS?.split(",").map((e) => e.trim()) ||
-        [];
-      const isAdmin = adminEmails.includes(decoded.email);
-
-      const newUser = {
-        id: decoded.sub || `google_${Date.now()}`,
-        email: decoded.email,
-        name: decoded.name,
-        avatar: decoded.picture,
-        role: isAdmin ? "admin" : "student",
-      };
-
-      localStorage.setItem("edubridge_user", JSON.stringify(newUser));
-
-      toast.success(`Welcome, ${decoded.name}! Account created successfully.`);
-
-      // Redirect based on role
-      window.location.href = isAdmin ? "/admin/dashboard" : "/dashboard";
-    } catch (err) {
-      if (import.meta.env.DEV) {
-        console.error("Google Sign-Up Error:", err);
-      }
-      toast.error("Failed to sign up with Google. Please try again.");
-    }
-  };
 
   const handleGoogleError = () => {
     toast.error("Google Sign-Up was cancelled or failed");

@@ -1,11 +1,8 @@
-
 import React from 'react';
-import { NavLink, Outlet, useLocation, Navigate } from 'react-router-dom';
-import { Award, BookOpen, FileText, Image, LayoutGrid } from 'lucide-react';
+import { NavLink, Outlet } from 'react-router-dom';
+import { Award, BookOpen, FileText, Image } from 'lucide-react';
 
 export default function ContentManagement() {
-  const location = useLocation();
-
   const tabs = [
     { name: 'Scholarships', path: 'scholarships', icon: Award },
     { name: 'Library', path: 'library', icon: BookOpen },
@@ -14,11 +11,13 @@ export default function ContentManagement() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Content Management System</h1>
-        <p className="text-slate-500 text-sm">Manage website content, resources, and media from a single dashboard.</p>
+    // ADDED: Animation to match other pages
+    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+      
+      {/* Header - Visually matched to AdminPageHeader */}
+      <div className="space-y-1">
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Content Management System</h1>
+        <p className="text-slate-500">Manage website content, resources, and media from a single dashboard.</p>
       </div>
 
       {/* Navigation */}
@@ -29,9 +28,12 @@ export default function ContentManagement() {
               key={tab.name}
               to={tab.path}
               className={({ isActive }) =>
-                `flex items-center gap-2 py-4 px-1 border-b-2 text-sm font-medium transition-colors ${
+                // CHANGED: border-primary -> border-blue-600
+                // CHANGED: text-primary -> text-blue-600
+                // ADDED: transition-all for smoother hover effects
+                `flex items-center gap-2 py-4 px-1 border-b-2 text-sm font-medium transition-all ${
                   isActive
-                    ? 'border-primary text-primary'
+                    ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
                 }`
               }

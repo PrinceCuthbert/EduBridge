@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Eye, Calendar, FileText } from "lucide-react";
 import { toast } from "sonner";
-import ReviewModal from "./ReviewModal";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import AdminFilterBar from "../../components/admin/AdminFilterBar";
 import AdminTable from "../../components/admin/AdminTable";
 
-// Mock applications data - Replace with API calls
+// Mock applications data
 const MOCK_APPLICATIONS = [
   {
     id: "APP-2024-001",
@@ -15,9 +15,7 @@ const MOCK_APPLICATIONS = [
     date: "2024-02-01",
     status: "Pending",
     email: "alice@example.com",
-    phone: "+250 788 123 456",
-    gpa: "3.8",
-    documents: ["Passport.pdf", "Transcripts.pdf", "CV.pdf"],
+    documents: ["Passport.pdf"],
   },
   {
     id: "APP-2024-002",
@@ -26,9 +24,7 @@ const MOCK_APPLICATIONS = [
     date: "2024-01-28",
     status: "Reviewing",
     email: "david@example.com",
-    phone: "+250 788 654 321",
-    gpa: "3.5",
-    documents: ["Passport.pdf", "CV.pdf"],
+    documents: ["Passport.pdf"],
   },
   {
     id: "APP-2024-003",
@@ -37,8 +33,6 @@ const MOCK_APPLICATIONS = [
     date: "2024-01-25",
     status: "Needs Changes",
     email: "sarah@example.com",
-    phone: "+250 788 987 654",
-    gpa: "3.9",
     documents: ["Passport.pdf"],
   },
   {
@@ -48,21 +42,14 @@ const MOCK_APPLICATIONS = [
     date: "2024-02-02",
     status: "Approved",
     email: "john@example.com",
-    phone: "+250 788 111 222",
-    gpa: "4.0",
-    documents: [
-      "Passport.pdf",
-      "Transcripts.pdf",
-      "CV.pdf",
-      "Recommendation.pdf",
-    ],
+    documents: ["Passport.pdf"],
   },
 ];
 
 export default function ApplicationReview() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [selectedApp, setSelectedApp] = useState(null);
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -94,47 +81,39 @@ export default function ApplicationReview() {
   const getStatusColor = (status) => {
     switch (status) {
       case "Approved":
-        return "bg-emerald-50 text-emerald-600 border-emerald-100";
+        return "bg-emerald-50 text-emerald-700 border-emerald-200";
       case "Needs Changes":
-        return "bg-amber-50 text-amber-600 border-amber-100";
+        return "bg-amber-50 text-amber-700 border-amber-200";
       case "Reviewing":
-        return "bg-blue-50 text-blue-600 border-blue-100";
+        return "bg-blue-50 text-blue-700 border-blue-200";
       case "Rejected":
-        return "bg-red-50 text-red-600 border-red-100";
+        return "bg-red-50 text-red-700 border-red-200";
       default:
-        return "bg-slate-50 text-slate-500 border-slate-100"; // Pending
+        return "bg-slate-50 text-slate-600 border-slate-200";
     }
-  };
-
-  const handleSaveReview = (e, newStatus, feedback) => {
-    if (e) e.preventDefault();
-    const updatedApps = applications.map((app) =>
-      app.id === selectedApp.id
-        ? { ...selectedApp, status: newStatus }
-        : app,
-    );
-    setApplications(updatedApps);
-    setSelectedApp(null);
-    toast.success(`Application status updated to ${newStatus}`);
   };
 
   const columns = [
     {
       header: "Applicant",
       render: (app) => (
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3">
           <div className="relative">
             <img 
               src={`https://ui-avatars.com/api/?name=${app.studentName}&background=f1f5f9&color=6366f1`} 
               alt={app.studentName}
-              className="w-12 h-12 rounded-2xl border border-white shadow-sm ring-1 ring-slate-100 transition-transform group-hover:scale-110 duration-500"
+              className="w-10 h-10 rounded-full border border-slate-200"
             />
-            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${app.status === 'Approved' ? 'bg-emerald-500' : 'bg-blue-400'}`} />
           </div>
-          <div className="flex flex-col pt-0.5">
-            <span className="font-serif text-[#0F172A] group-hover:text-blue-600 transition-colors text-[17px] antialiased tracking-tight">{app.studentName}</span>
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.1em] mt-1 opacity-70">
-                Reference ID: {app.id}
+          <div className="flex flex-col">
+            {/* REMOVED: font-serif, text-[17px], tracking-tight */}
+            {/* ADDED: text-sm, font-medium */}
+            <span className="text-sm font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
+              {app.studentName}
+            </span>
+            {/* REMOVED: uppercase, tracking-[0.1em] */}
+            <span className="text-xs text-slate-500">
+              {app.id}
             </span>
           </div>
         </div>
@@ -144,43 +123,49 @@ export default function ApplicationReview() {
       header: "Program",
       render: (app) => (
         <div className="flex flex-col">
-          <span className="font-bold text-slate-700 text-sm tracking-tight group-hover:text-[#0F172A] transition-colors">{app.scholarship}</span>
-          {/* <span className="text-xs font-mono font-bold text-blue-500/60 uppercase mt-1.5 tracking-wider">{app.email}</span> */}
+          {/* REMOVED: tracking-tight, font-bold */}
+          <span className="text-sm text-slate-700 font-medium">
+            {app.scholarship}
+          </span>
         </div>
       )
     },
     {
       header: "Filing Date",
       render: (app) => (
-        <div className="flex items-center gap-2.5 text-slate-500 font-bold text-xs uppercase tracking-[0.15em] opacity-80">
-          <Calendar size={14} className="text-slate-300" />
+        // REMOVED: uppercase, tracking-[0.15em]
+        <div className="flex items-center gap-2 text-sm text-slate-500">
+          <Calendar size={14} className="text-slate-400" />
           {app.date}
         </div>
       )
     },
     {
-      header: "Status Registry",
+      header: "Status",
       className: "text-center",
       render: (app) => (
         <div className="flex justify-center">
-          <span
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-[0.15em] border transition-all duration-300 ${getStatusColor(app.status)} shadow-sm`}>
-            <div className={`w-1.5 h-1.5 rounded-full ${app.status === 'Approved' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : (app.status === 'Needs Changes' ? 'bg-amber-500' : 'bg-blue-500')}`} />
+          {/* REMOVED: uppercase, tracking-[0.15em] */}
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusColor(app.status)}`}>
+            <div className={`w-1.5 h-1.5 rounded-full ${app.status === 'Approved' ? 'bg-emerald-500' : (app.status === 'Needs Changes' ? 'bg-amber-500' : 'bg-blue-500')}`} />
             {app.status}
           </span>
         </div>
       )
     },
     {
-      header: "Action Control",
-      className: "justify-end pr-12 text-right",
+      header: "Actions",
+      className: "justify-end pr-8 text-right",
       render: (app) => (
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center justify-end gap-2">
           <button
-            onClick={() => setSelectedApp(app)}
-            className="px-6 py-3 bg-[#0F172A] text-white rounded-[1.25rem] font-medium text-sm uppercase tracking-widest hover:bg-[#1E293B] hover:shadow-lg transition-all active:scale-95 flex items-center gap-2.5 shadow-md group-hover:translate-x-[-4px]">
-            <Eye size={16} />
-            Evaluate
+            onClick={() => navigate(`/admin/applications/${app.id}`)}
+            // REMOVED: uppercase, tracking-widest, bg-[#0F172A], rounded-[1.25rem]
+            // ADDED: text-sm, font-medium, rounded-lg, bg-slate-900
+            className="px-4 py-2 bg-slate-900 text-white rounded-lg font-medium text-sm hover:bg-slate-800 transition-colors active:scale-95 flex items-center gap-2"
+          >
+            <Eye size={14} />
+            View
           </button>
         </div>
       )
@@ -188,17 +173,17 @@ export default function ApplicationReview() {
   ];
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <AdminPageHeader 
         title="Application Review" 
-        subtitle="Track, review, and qualify student applications."
+        subtitle="Track and review student applications"
         count={filteredApps.length}
       />
 
       <AdminFilterBar 
         searchQuery={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="Query by Record ID, Applicant Name, or Institutional Program..."
+        searchPlaceholder="Search by name, ID or program..."
         filterOptions={["All", "Pending", "Reviewing", "Needs Changes", "Approved"]}
         activeFilter={statusFilter}
         onFilterChange={setStatusFilter}
@@ -210,33 +195,24 @@ export default function ApplicationReview() {
         isLoading={loading}
         emptyState={
           !loading && (
-             <div className="flex flex-col items-center max-w-sm mx-auto">
-              <div className="w-24 h-24 bg-slate-50/50 rounded-[2.5rem] flex items-center justify-center mb-8 border border-slate-100">
-                <FileText size={40} className="text-slate-200" />
+             <div className="flex flex-col items-center max-w-sm mx-auto py-12">
+              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
+                <FileText size={32} className="text-slate-300" />
               </div>
-              <h4 className="text-xl font-serif text-[#0F172A] mb-2 tracking-tight">Record Entry Absent</h4>
-              <p className="text-sm font-medium text-slate-400 mb-10 leading-relaxed antialiased">
-                The current registry contains no scholarship dossiers matching your defined search parameters.
+              <h4 className="text-lg font-medium text-slate-900 mb-1">No applications found</h4>
+              <p className="text-sm text-slate-500 mb-6 text-center">
+                We couldn't find any applications matching your search criteria.
               </p>
               <button 
                 onClick={() => {setSearchTerm(""); setStatusFilter("All");}}
-                className="px-8 py-3.5 bg-[#0F172A] text-white rounded-2xl font-medium text-sm uppercase tracking-widest shadow-xl hover:bg-[#1E293B] transition-all active:scale-95">
-                Clear Search Filter
+                className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg font-medium text-sm hover:bg-slate-50 transition-colors"
+              >
+                Clear filters
               </button>
             </div>
           )
         }
       />
-
-      {/* Review Modal */}
-      {selectedApp && (
-        <ReviewModal
-          key={selectedApp.id}
-          application={selectedApp}
-          onClose={() => setSelectedApp(null)}
-          onSave={handleSaveReview}
-        />
-      )}
     </div>
   );
 }

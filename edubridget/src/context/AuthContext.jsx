@@ -1,118 +1,121 @@
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { jwtDecode } from "jwt-decode";
+import { processGoogleUser } from "../services/googleAuth";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-
-// Create the context
 const AuthContext = createContext(null);
 
-/**
- * AuthProvider Component
- * 
- * Manages the global authentication state of the application.
- * It checks for existing sessions on mount and provides login/logout methods
- * to the rest of the app via the useAuth hook.
- */
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize auth state from localStorage on mount
   useEffect(() => {
-    const initAuth = async () => {
-      try {
-        const storedUser = localStorage.getItem('edubridge_user');
-        if (storedUser) {
+    const initAuth = () => {
+      const storedUser = localStorage.getItem("edubridge_user");
+      if (storedUser) {
+        try {
           setUser(JSON.parse(storedUser));
+        } catch (error) {
+          console.error("Failed to parse user data:", error);
+          localStorage.removeItem("edubridge_user");
         }
-      } catch (error) {
-        console.error("Failed to parse user from local storage", error);
-        localStorage.removeItem('edubridge_user');
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
-
     initAuth();
   }, []);
 
-  /**
-   * Mock Login Function
-   * 
-   * Simulates an API call with a timeout.
-   * Checks credentials against hardcoded dummy users for demonstration purposes.
-   * 
-   * @param {Object} credentials - { email, password }
-   * @returns {Promise} - Resolves with user object or rejects with error message
-   */
-  const login = async ({ email, password }) => {
-    // Simulate network delay
+  // OPTIMIZATION: Wrap functions in useCallback so they don't recreate on every render
+  const login = useCallback(async ({ email, password }) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Dummy Admin Credentials
+    let loggedInUser = null;
+
     if (email === 'admin@edubridge.africa' && password === 'admin123') {
-      const adminUser = {
+      loggedInUser = {
         id: 'admin_01',
         name: 'Admin User',
         email: email,
         role: 'admin',
         avatar: 'https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff'
       };
-      localStorage.setItem('edubridge_user', JSON.stringify(adminUser));
-      setUser(adminUser);
-      return adminUser;
-    }
-
-    // Dummy Student Credentials
-    if (email === 'student@test.com' && password === 'student123') {
-      const studentUser = {
+    } else if (email === 'student@test.com' && password === 'student123') {
+      loggedInUser = {
         id: 'student_01',
         name: 'John Doe',
         email: email,
         role: 'student',
         avatar: 'https://ui-avatars.com/api/?name=John+Doe&background=random'
       };
-      localStorage.setItem('edubridge_user', JSON.stringify(studentUser));
-      setUser(studentUser);
-      return studentUser;
     }
 
-    // Invalid Credentials
+    if (loggedInUser) {
+      localStorage.setItem('edubridge_user', JSON.stringify(loggedInUser));
+      setUser(loggedInUser);
+      return loggedInUser;
+    }
+
     throw new Error('Invalid email or password');
-  };
+  }, []); // Empty dependency array means this function never changes
 
-  /**
-   * Logout Function
-   * 
-   * Clears user state and removes data from localStorage.
-   */
-  const logout = () => {
+  const loginWithGoogle = useCallback(async (credential) => {
+    try {
+      const decoded = jwtDecode(credential);
+      const adminEmails = import.meta.env.VITE_ADMIN_EMAILS?.split(",").map((e) => e.trim()) || [];
+      const newUser = processGoogleUser(decoded, adminEmails);
+
+      localStorage.setItem("edubridge_user", JSON.stringify(newUser));
+      setUser(newUser);
+      return newUser;
+    } catch (err) {
+      throw new Error("Google authentication failed");
+    }
+  }, []);
+
+  const signUp = useCallback(async (userData) => {
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const newUser = {
+      id: `user_${Date.now()}`,
+      name: `${userData.firstName} ${userData.lastName}`,
+      email: userData.email,
+      role: 'student',
+      avatar: `https://ui-avatars.com/api/?name=${userData.firstName}+${userData.lastName}&background=random`
+    };
+
+    localStorage.setItem('edubridge_user', JSON.stringify(newUser));
+    setUser(newUser);
+    return newUser;
+  }, []);
+
+  const logout = useCallback(() => {
     localStorage.removeItem('edubridge_user');
+    localStorage.removeItem('token');
     setUser(null);
-    // Optional: Redirect to login page logic handles this via ProtectedRoute state change or manually in UI
-  };
+  }, []);
 
-  /**
-   * Update Profile Function
-   * Allows updating the current user's details without re-logging
-   */
-  const updateProfile = (updates) => {
+  const updateProfile = useCallback((updates) => {
     setUser(prev => {
+      if (!prev) return null; // Safety check
       const updated = { ...prev, ...updates };
       localStorage.setItem('edubridge_user', JSON.stringify(updated));
       return updated;
     });
-  };
+  }, []);
 
-  // Values exposed to consumers
-  const value = {
+  // OPTIMIZATION: Memoize the value object
+  // This object will only reference a new location in memory if [user, loading] changes.
+  const value = useMemo(() => ({
     user,
     loading,
     login,
+    loginWithGoogle,
+    signUp,
     logout,
     updateProfile,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
     isStudent: user?.role === 'student'
-  };
+  }), [user, loading, login, loginWithGoogle, signUp, logout, updateProfile]);
 
   return (
     <AuthContext.Provider value={value}>
@@ -121,12 +124,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-/**
- * useAuth Hook
- * 
- * Custom hook to easily consume the AuthContext.
- * Throws an error if used outside of AuthProvider to ensure proper usage.
- */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

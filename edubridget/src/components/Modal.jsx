@@ -12,29 +12,40 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md', c
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto modern-scrollbar-light">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
+      {/* CHANGED: bg-[#0F172A]/80 -> bg-slate-900/50 (Cleaner standard dark overlay) */}
       <div 
-        className="fixed inset-0 bg-[#0F172A]/80 backdrop-blur-sm transition-all duration-300"
+        className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
       
-      {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-3 sm:p-4 md:p-6">
-        <div className={`relative w-full ${sizeClasses[size]} bg-white rounded-2xl sm:rounded-[2rem] shadow-2xl transform transition-all animate-in zoom-in-95 fade-in duration-300 ${className}`}>
+      {/* Modal Positioning */}
+      <div className="flex min-h-full items-center justify-center p-4">
+        {/* Modal Panel */}
+        {/* CHANGED: rounded-[2rem] -> rounded-xl */}
+        {/* CHANGED: shadow-2xl -> shadow-xl */}
+        <div className={`relative w-full ${sizeClasses[size]} bg-white rounded-xl shadow-xl transform transition-all animate-in zoom-in-95 fade-in duration-200 ${className}`}>
+          
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 sm:px-8 sm:py-6 md:px-10 md:py-8 border-b border-slate-100">
-            <h2 className="text-base sm:text-lg md:text-xl font-medium text-[#0F172A] tracking-tight">{title}</h2>
+          {/* CHANGED: Reduced padding (py-4) and simplified border */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            {/* CHANGED: font-medium -> font-semibold, text-[#0F172A] -> text-slate-900 */}
+            <h2 className="text-lg font-semibold text-slate-900 tracking-tight">
+              {title}
+            </h2>
             <button
               onClick={onClose}
-              className="p-2 sm:p-2.5 hover:bg-slate-50 rounded-xl transition-all active:scale-95 group"
+              // CHANGED: rounded-xl -> rounded-lg
+              className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-lg transition-colors"
             >
-              <X size={20} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
+              <X size={20} />
             </button>
           </div>
           
           {/* Content */}
-          <div className="px-4 py-5 sm:px-6 sm:py-6 md:px-8 md:py-8">
+          {/* CHANGED: Standardized padding to p-6 */}
+          <div className="p-6">
             {children}
           </div>
         </div>

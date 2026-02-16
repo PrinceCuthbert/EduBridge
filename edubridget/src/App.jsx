@@ -79,6 +79,7 @@ const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
 const AdminOverview = lazy(() => import("./pages/admin/AdminOverview"));
 
 const ApplicationReview = lazy(() => import("./pages/admin/ApplicationReview"));
+const ApplicationDetail = lazy(() => import("./pages/admin/ApplicationDetail"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 import ContentManagement from "./pages/admin/ContentManagement";
 import CMSScholarships from "./pages/admin/cms/CMSScholarships";
@@ -237,6 +238,7 @@ function App() {
                 <Route path="dashboard" element={<AdminOverview />} />
                 <Route path="users" element={<UserManagement />} />
                 <Route path="applications" element={<ApplicationReview />} />
+                <Route path="applications/:id" element={<ApplicationDetail />} />
                 <Route path="visa" element={<VisaCases />} />
                 <Route
                   path="programs"

@@ -37,92 +37,93 @@ export default function CMSMedia() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <AdminPageHeader 
         title="Success Stories" 
-        subtitle="Manage student testimonies and gallery media."
+        subtitle="Manage student testimonies and gallery media"
         count={filteredMedia.length}
-        countLabel="Stories"
         primaryAction={{
-          label: "Add New Story",
+          label: "Add Story",
           icon: Plus,
           onClick: handleAdd
         }}
       />
 
       <AdminFilterBar 
-        searchPlaceholder="Search stories by student or country..."
+        searchPlaceholder="Search by student or country..."
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredMedia.map(item => (
-          <div key={item.id} className="group relative bg-white rounded-[2rem] border border-slate-200 overflow-hidden hover:shadow-2xl hover:translate-y-[-5px] transition-all duration-500">
-             <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden">
+          // CHANGED: rounded-[2rem] -> rounded-xl, simplified shadows/hovers
+          <div key={item.id} className="group relative bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300">
+             
+             {/* Image Section */}
+             <div className="aspect-video bg-slate-100 relative overflow-hidden">
                {item.image ? (
-                 <img src={item.image} alt={item.studentName} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                 <img src={item.image} alt={item.studentName} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                ) : (
                  <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-50">
-                   <ImageIcon size={48} />
+                   <ImageIcon size={40} />
                  </div>
                )}
                
                {/* Overlay Actions */}
-               <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4 backdrop-blur-sm">
+               <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2 backdrop-blur-[2px]">
                   <button 
                     onClick={() => handleEdit(item)} 
-                    className="p-3 bg-white text-slate-900 rounded-2xl hover:bg-primary hover:text-white transition-all shadow-lg transform hover:scale-110"
-                    title="Edit Story"
+                    className="p-2 bg-white text-slate-700 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors shadow-sm"
+                    title="Edit"
                   >
-                    <Edit size={20} />
+                    <Edit size={18} />
                   </button>
                   <button 
                     onClick={() => handleDelete(item.id, 'Story')} 
-                    className="p-3 bg-white text-red-600 rounded-2xl hover:bg-red-500 hover:text-white transition-all shadow-lg transform hover:scale-110"
-                    title="Delete Story"
+                    className="p-2 bg-white text-slate-700 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm"
+                    title="Delete"
                   >
-                    <Trash2 size={20} />
+                    <Trash2 size={18} />
                   </button>
                </div>
                
-               {/* Badge */}
-               <div className="absolute top-4 right-4">
-                  <span className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider text-slate-900 shadow-lg">
+               {/* Country Badge */}
+               <div className="absolute top-3 right-3">
+                  <span className="bg-white/95 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-800 shadow-sm border border-slate-100/50">
                     {item.country}
                   </span>
                </div>
              </div>
              
-             <div className="p-6 relative">
-                {/* Connector Line */}
-                <div className="absolute -top-6 left-8 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-slate-50 z-10">
-                   <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                </div>
-                
-               <div className="pt-2">
-                 <h3 className="font-serif text-xl font-bold text-slate-900 mb-1">{item.studentName}</h3>
-                 <p className="text-xs font-bold text-primary uppercase tracking-wider mb-4">{item.university}</p>
-                 
-                 <div className="bg-slate-50 rounded-2xl p-4 mb-4 border border-slate-100">
-                    <p className="text-sm text-slate-600 italic leading-relaxed text-center">"{item.testimony}"</p>
-                 </div>
-                 
-                 <div className="flex items-center justify-between border-t border-slate-100 pt-4">
-                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Program</span>
-                   <span className="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg">{item.program}</span>
-                 </div>
+             {/* Content Section */}
+             <div className="p-5">
+               <div className="mb-3">
+                 {/* CHANGED: font-serif -> font-sans, text-xl -> text-lg */}
+                 <h3 className="text-lg font-bold text-slate-900 leading-tight">{item.studentName}</h3>
+                 <p className="text-xs text-blue-600 font-medium mt-1">{item.university}</p>
+               </div>
+               
+               {/* Testimony Bubble */}
+               {/* CHANGED: rounded-2xl -> rounded-lg, simplified styles */}
+               <div className="bg-slate-50 rounded-lg p-3 mb-3 border border-slate-100">
+                  <p className="text-sm text-slate-600 italic line-clamp-3">"{item.testimony}"</p>
+               </div>
+               
+               <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                 <span className="text-xs font-medium text-slate-500">Program</span>
+                 <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-1 rounded-md">{item.program}</span>
                </div>
              </div>
           </div>
         ))}
         {filteredMedia.length === 0 && (
-           <div className="col-span-full py-20 text-center">
-             <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-               <ImageIcon size={40} className="text-slate-300" />
+           <div className="col-span-full py-16 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 shadow-sm">
+               <ImageIcon size={32} className="text-slate-300" />
              </div>
-             <h3 className="text-lg font-serif text-slate-900 mb-2">No Stories Found</h3>
-             <p className="text-slate-500 text-sm">Add a new success story to get started.</p>
+             <h3 className="text-base font-semibold text-slate-900">No stories found</h3>
+             <p className="text-sm text-slate-500 mt-1">Add a new success story to get started.</p>
            </div>
         )}
       </div>
@@ -130,74 +131,75 @@ export default function CMSMedia() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingItem ? 'Edit Success Story' : 'New Success Story'}
+        title={editingItem ? 'Edit Story' : 'New Success Story'}
         size="lg"
-        className="rounded-[2.5rem]"
       >
-        <form onSubmit={(e) => handleSubmit(e, 'Story')} className="space-y-6 p-6">
+        <form onSubmit={(e) => handleSubmit(e, 'Story')} className="space-y-6">
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Student Name</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Student Name</label>
                 <input 
                   type="text" 
                   required
                   value={formData.studentName}
                   onChange={e => setFormData({...formData, studentName: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all font-serif text-slate-900"
+                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900"
                   placeholder="Full Name"
                 />
               </div>
-               <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Country</label>
+               <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Country</label>
                 <input 
                   type="text" 
                   required
                   value={formData.country}
                   onChange={e => setFormData({...formData, country: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all"
+                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900"
                   placeholder="e.g. Canada"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">University</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">University</label>
                 <input 
                   type="text" 
                   required
                   value={formData.university}
                   onChange={e => setFormData({...formData, university: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all"
+                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900"
                   placeholder="University Name"
                 />
               </div>
-               <div>
-                <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Program</label>
+               <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Program</label>
                 <input 
                   type="text" 
                   required
                   value={formData.program}
                   onChange={e => setFormData({...formData, program: e.target.value})}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all"
+                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900"
                   placeholder="e.g. Computer Science"
                 />
               </div>
             </div>
 
-            <div>
-               <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Student Photo</label>
-               <div className="flex gap-6 items-start p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                  <div className="relative w-28 h-28 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex-shrink-0 group cursor-pointer">
+            <div className="space-y-1.5">
+               <label className="text-sm font-medium text-slate-700">Student Photo</label>
+               {/* CHANGED: Standardized upload box */}
+               <div className="flex gap-4 items-start p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                  {/* Preview Box */}
+                  <div className="relative w-24 h-24 bg-white rounded-lg overflow-hidden border border-slate-200 flex-shrink-0 group cursor-pointer">
                     {formData.image ? (
                       <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-slate-300">
-                        <ImageIcon size={32} />
+                        <ImageIcon size={24} />
                       </div>
                     )}
-                    <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white text-xs font-bold">
+                    <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white text-xs font-medium">
                        Change
                        <input 
                          type="file" 
@@ -207,45 +209,45 @@ export default function CMSMedia() {
                        />
                     </label>
                   </div>
-                  <div className="flex-1 space-y-3">
-                     <p className="text-sm text-slate-600 font-medium">Upload a high-quality photo of the student.</p>
-                     <div className="relative">
-                       <input 
-                         type="text" 
-                         placeholder="Paste image URL here..."
-                         value={formData.image}
-                         onChange={e => setFormData({...formData, image: e.target.value})}
-                         className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary transition-all"
-                       />
-                     </div>
+                  
+                  {/* URL Input */}
+                  <div className="flex-1 space-y-2">
+                     <p className="text-sm text-slate-600">Upload a photo or paste a URL.</p>
+                     <input 
+                       type="text" 
+                       placeholder="https://example.com/image.jpg"
+                       value={formData.image}
+                       onChange={e => setFormData({...formData, image: e.target.value})}
+                       className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:border-blue-500 outline-none"
+                     />
                   </div>
                </div>
             </div>
 
-            <div>
-              <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1.5 px-1">Testimony</label>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Testimony</label>
               <textarea 
                 rows={3}
                 required
                 value={formData.testimony}
                 onChange={e => setFormData({...formData, testimony: e.target.value})}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:bg-white transition-all resize-none italic"
-                placeholder="The student's experience..."
+                className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 resize-none"
+                placeholder="Share the student's experience..."
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-4 pt-4 border-t border-slate-100">
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
             <button 
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-6 py-2.5 text-slate-500 hover:text-slate-700 font-bold text-sm transition-colors"
+              className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
             >
               Cancel
             </button>
             <button 
               type="submit"
-              className="px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
+              className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm"
             >
               {editingItem ? 'Update Story' : 'Publish Story'}
             </button>
