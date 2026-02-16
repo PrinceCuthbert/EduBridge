@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEye,
@@ -12,7 +12,7 @@ import { GoogleLogin } from "@react-oauth/google";
 
 import { toast } from "sonner";
 
-import { validateSignUpForm } from "../utils/validation";
+import { validateSignUpForm } from "../../utils/validation";
 
 
 const initialFormState = {
@@ -23,7 +23,6 @@ const initialFormState = {
   country: "",
   password: "",
   confirmPassword: "",
-  agreeToTerms: false,
 };
 
 function SignUpPage() {
@@ -326,39 +325,6 @@ function SignUpPage() {
                       </button>
                     </div>
                   </div>
-                </div>
-
-                <p className="text-xs text-slate-500">
-                  Password must be at least 8 characters with a number and
-                  symbol
-                </p>
-
-                {/* Terms */}
-                <div className="flex items-start">
-                  <input
-                    id="agreeToTerms"
-                    name="agreeToTerms"
-                    type="checkbox"
-                    checked={formData.agreeToTerms}
-                    onChange={handleChange}
-                    className="mt-0.5 h-4 w-4 text-[#1A237E] focus:ring-[#1A237E] border-gray-300 rounded"
-                  />
-                  <label
-                    htmlFor="agreeToTerms"
-                    className="ml-2 block text-sm text-slate-700">
-                    I agree to EduBridge's{" "}
-                    <Link
-                      to="/terms"
-                      className="text-[#1A237E] hover:underline font-semibold">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link
-                      to="/privacy"
-                      className="text-[#1A237E] hover:underline font-semibold">
-                      Privacy Policy
-                    </Link>
-                  </label>
                 </div>
 
                 {/* Submit Button */}

@@ -30,10 +30,14 @@ export default function ProgramDetail() {
     const fetchProgram = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${BASE_URL}/programs/${id}`);
-        if (!res.ok) throw new Error("Program not found");
-        const data = await res.json();
-        setProgram(data);
+        // Simulate network delay
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        
+        // Find program in mock data
+        const foundProgram = MOCK_PROGRAMS.find(p => p.id === parseInt(id));
+        
+        if (!foundProgram) throw new Error("Program not found");
+        setProgram(foundProgram);
       } catch (error) {
         console.error("Error fetching program:", error);
         toast.error("Failed to load program details");

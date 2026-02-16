@@ -12,29 +12,24 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { getConsultationById, getCountryFlag } from '@/data/mockVisaData';
 
 export default function UploadCaseDocuments() {
-  // Extract case ID from URL parameters
   const { id } = useParams();
   const navigate = useNavigate();
   
-  // State management
   const [caseData, setCaseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
-  // Fetch case data to verify access
   useEffect(() => {
     const fetchCaseData = async () => {
       try {
         setLoading(true);
         await new Promise((resolve) => setTimeout(resolve, 400));
         
-        // Get the specific case (with security check)
         const foundCase = getConsultationById(id);
         
         if (!foundCase) {
@@ -55,11 +50,9 @@ export default function UploadCaseDocuments() {
     fetchCaseData();
   }, [id, navigate]);
 
-  // Handle file selection
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     
-    // Validate file types (only PDF, JPG, PNG)
     const validFiles = files.filter(file => {
       const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
       if (!validTypes.includes(file.type)) {
@@ -67,7 +60,6 @@ export default function UploadCaseDocuments() {
         return false;
       }
       
-      // Validate file size (max 10MB)
       const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {
         toast.error(`${file.name} is too large. Maximum file size is 10MB.`);
@@ -80,12 +72,10 @@ export default function UploadCaseDocuments() {
     setSelectedFiles(prevFiles => [...prevFiles, ...validFiles]);
   };
 
-  // Remove a file from the selection
   const removeFile = (index) => {
     setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
   };
 
-  // Format file size
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -94,7 +84,6 @@ export default function UploadCaseDocuments() {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -105,16 +94,8 @@ export default function UploadCaseDocuments() {
     
     try {
       setUploading(true);
-      
-      // Simulating file upload - in production, this would upload to server/cloud storage
       await new Promise((resolve) => setTimeout(resolve, 2000));
       
-      // In production, you would:
-      // 1. Upload files to cloud storage (e.g., Cloudinary, AWS S3)
-      // 2. Send document metadata to API
-      // 3. Associate documents with the case ID
-      
-      // For now, we'll simulate success
       const uploadedCount = selectedFiles.length;
       
       toast.success(
@@ -124,7 +105,6 @@ export default function UploadCaseDocuments() {
         }
       );
       
-      // Redirect back to case details page
       navigate(`/dashboard/visa-status/summary/details/${id}`);
       
     } catch (error) {
@@ -139,8 +119,8 @@ export default function UploadCaseDocuments() {
   if (loading) {
     return (
       <div className="py-20 text-center">
-        <Upload size={48} className="mx-auto text-slate-300 animate-pulse" />
-        <p className="text-slate-400 mt-4">Loading upload form...</p>
+        <Upload size={32} className="mx-auto text-slate-300 animate-pulse" />
+        <p className="text-slate-400 text-sm mt-3">Loading upload form...</p>
       </div>
     );
   }
@@ -150,41 +130,40 @@ export default function UploadCaseDocuments() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl mx-auto pb-12">
+    <div className="space-y-6 animate-in fade-in duration-500 max-w-4xl mx-auto pb-12">
       
       {/* Back Button */}
       <div>
-        <Button
-          variant="outline"
+        <button
           onClick={() => navigate(`/dashboard/visa-status/summary/details/${id}`)}
-          className="gap-2 border-slate-300"
+          className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft size={16} />
           Back to Case Details
-        </Button>
+        </button>
       </div>
 
       {/* Header Section */}
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Upload Documents</h1>
-        <p className="text-slate-500 text-lg">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-serif text-slate-900 tracking-tight">Upload Documents</h1>
+        <p className="text-slate-500 text-sm">
           Submit required documents for {caseData.destination} {caseData.visaType} (Case #{caseData.id})
         </p>
       </div>
 
       {/* Case Info Card */}
-      <Card className="border-blue-200 bg-blue-50/50">
-        <CardContent className="p-6">
+      <Card className="border-blue-100 bg-blue-50/30 rounded-xl shadow-none">
+        <CardContent className="p-5">
           <div className="flex items-center gap-4">
-            <div className="text-4xl">{getCountryFlag(caseData.countryCode)}</div>
+            <div className="text-3xl">{getCountryFlag(caseData.countryCode)}</div>
             <div>
-              <h3 className="font-bold text-slate-900 text-lg">{caseData.destination} - {caseData.visaType}</h3>
-              <p className="text-sm text-slate-600 mt-1">
+              <h3 className="font-bold text-slate-900 text-base">{caseData.destination} - {caseData.visaType}</h3>
+              <p className="text-xs text-slate-600 mt-0.5">
                 Appointment: {caseData.dateBooked} at {caseData.appointmentTime}
               </p>
             </div>
             <div className="ml-auto">
-              <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+              <Badge className="bg-blue-100 text-blue-700 border-blue-200 font-medium">
                 {caseData.status}
               </Badge>
             </div>
@@ -194,20 +173,20 @@ export default function UploadCaseDocuments() {
 
       {/* Upload Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card>
+        <Card className="rounded-xl border-slate-200 shadow-sm">
           <CardContent className="p-6">
             <div className="space-y-6">
               
               {/* File Upload Area */}
               <div>
-                <Label htmlFor="documents" className="text-base font-semibold">
+                <Label htmlFor="documents" className="text-sm font-semibold text-slate-900">
                   Select Documents
                 </Label>
-                <p className="text-sm text-slate-500 mb-3">
+                <p className="text-xs text-slate-500 mb-3 mt-1">
                   Upload PDF, JPG, or PNG files (max 10MB each)
                 </p>
                 
-                <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50/50 transition-all cursor-pointer">
+                <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-slate-50 transition-all cursor-pointer group">
                   <input
                     type="file"
                     id="documents"
@@ -216,12 +195,14 @@ export default function UploadCaseDocuments() {
                     onChange={handleFileSelect}
                     className="hidden"
                   />
-                  <label htmlFor="documents" className="cursor-pointer">
-                    <Upload size={48} className="mx-auto text-slate-400 mb-4" />
-                    <p className="text-slate-700 font-medium mb-1">
+                  <label htmlFor="documents" className="cursor-pointer block">
+                    <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors text-slate-400">
+                       <Upload size={24} />
+                    </div>
+                    <p className="text-slate-900 font-medium text-sm mb-1">
                       Click to upload or drag and drop
                     </p>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-xs text-slate-400">
                       PDF, JPG, PNG up to 10MB
                     </p>
                   </label>
@@ -230,48 +211,46 @@ export default function UploadCaseDocuments() {
 
               {/* Selected Files List */}
               {selectedFiles.length > 0 && (
-                <div className="space-y-3">
+                <div className="space-y-3 pt-2">
                   <div className="flex items-center justify-between">
-                    <Label className="text-base font-semibold">
+                    <Label className="text-sm font-semibold text-slate-900">
                       Selected Files ({selectedFiles.length})
                     </Label>
-                    <Button
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="sm"
                       onClick={() => setSelectedFiles([])}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="text-xs font-medium text-red-600 hover:text-red-700 hover:underline"
                     >
                       Clear All
-                    </Button>
+                    </button>
                   </div>
                   
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                  <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                     {selectedFiles.map((file, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200"
+                        className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200 shadow-sm"
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <FileText size={20} className="text-blue-600 flex-shrink-0" />
+                          <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                             <FileText size={16} />
+                          </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-sm font-medium text-slate-900 truncate">
                               {file.name}
                             </p>
-                            <p className="text-xs text-slate-500">
+                            <p className="text-[10px] text-slate-500">
                               {formatFileSize(file.size)}
                             </p>
                           </div>
                         </div>
-                        <Button
+                        <button
                           type="button"
-                          variant="ghost"
-                          size="icon"
                           onClick={() => removeFile(index)}
-                          className="text-slate-400 hover:text-red-600 hover:bg-red-50 flex-shrink-0"
+                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-2"
                         >
                           <X size={16} />
-                        </Button>
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -279,18 +258,18 @@ export default function UploadCaseDocuments() {
               )}
 
               {/* Instructions */}
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
                 <div className="flex gap-3">
-                  <AlertCircle size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-amber-900 text-sm mb-1">
+                    <h4 className="font-semibold text-amber-900 text-xs uppercase tracking-wider mb-1">
                       Important Guidelines
                     </h4>
-                    <ul className="text-sm text-amber-800 space-y-1">
-                      <li>• Ensure all documents are clear and legible</li>
-                      <li>• Files should be in color for passports and photos</li>
-                      <li>• All text must be readable without zooming</li>
-                      <li>• Do not upload password-protected files</li>
+                    <ul className="text-xs text-amber-800 space-y-1 list-disc list-inside">
+                      <li>Ensure all documents are clear and legible</li>
+                      <li>Files should be in color for passports and photos</li>
+                      <li>All text must be readable without zooming</li>
+                      <li>Do not upload password-protected files</li>
                     </ul>
                   </div>
                 </div>
@@ -301,12 +280,13 @@ export default function UploadCaseDocuments() {
         </Card>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-end gap-3 pt-2">
           <Button
             type="button"
             variant="outline"
             onClick={() => navigate(`/dashboard/visa-status/summary/details/${id}`)}
             disabled={uploading}
+            className="text-slate-600 border-slate-200 hover:bg-slate-50"
           >
             Cancel
           </Button>
@@ -314,17 +294,17 @@ export default function UploadCaseDocuments() {
           <Button
             type="submit"
             disabled={uploading || selectedFiles.length === 0}
-            className="gap-2 min-w-[200px]"
+            className="gap-2 min-w-[140px] bg-slate-900 hover:bg-slate-800 text-white"
           >
             {uploading ? (
               <>
-                <Upload size={16} className="animate-spin" />
+                <Upload size={14} className="animate-spin" />
                 Uploading...
               </>
             ) : (
               <>
-                <CheckCircle size={16} />
-                Upload {selectedFiles.length > 0 && `${selectedFiles.length} File${selectedFiles.length > 1 ? 's' : ''}`}
+                <CheckCircle size={14} />
+                Upload Files
               </>
             )}
           </Button>

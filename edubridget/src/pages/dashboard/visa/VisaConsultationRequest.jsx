@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   User, 
   Mail, 
@@ -6,20 +7,21 @@ import {
   MapPin, 
   Calendar, 
   FileText, 
-  ChevronRight,
-  CheckCircle,
-  HelpCircle
+  ChevronDown,
+  Video,
+  ArrowLeft,
+  Globe
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-// import { Select } from '@/components/ui/select'; // Assuming this exists or using standard for now
-import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 export default function VisaConsultationRequest() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
       clientName: '',
       email: '',
       phone: '',
+      countryOfOrigin: '',
       destination: '',
       visaType: '',
       appointmentDate: '',
@@ -32,6 +34,7 @@ export default function VisaConsultationRequest() {
     { value: 'USA', label: 'USA' },
     { value: 'UK', label: 'United Kingdom' },
     { value: 'Australia', label: 'Australia' },
+    { value: 'South Korea', label: 'South Korea' },
   ];
 
   const visaTypes = [
@@ -41,7 +44,6 @@ export default function VisaConsultationRequest() {
   ];
 
   const appointmentTypes = [
-    { value: 'Select Appointment Type', label: 'Select Appointment Type' },
     { value: 'Phone Call', label: 'Phone Call' },
     { value: 'Video Call', label: 'Video Call' },
     { value: 'In Person', label: 'In Person' },
@@ -51,168 +53,222 @@ export default function VisaConsultationRequest() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Mock submission logic
+    toast.success("Request submitted successfully!");
+    navigate('/dashboard/visa-status/summary');
+  };
+
+  // Standard input styles for consistency
+  const inputClassName = "w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400";
+  const selectClassName = "w-full pl-10 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all appearance-none cursor-pointer";
+  const labelClassName = "block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1.5 ml-1";
+  const iconClassName = "absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400";
+
   return (
-    <div className="max-w-3xl mx-auto space-y-8 animate-in slide-in-from-bottom-5 duration-500">
+    <div className="max-w-3xl mx-auto space-y-6 animate-in slide-in-from-bottom-4 duration-500 pb-12">
       
       {/* Header */}
-      <div className="flex items-center gap-4 mb-2">
-         <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-            <FileText size={24} />
-         </div>
+      <div className="flex items-center gap-4">
+         <button 
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-700 transition-all"
+         >
+            <ArrowLeft size={20} />
+         </button>
          <div>
-            <h1 className="text-2xl font-bold text-slate-800">Visa Consultation Request</h1>
-            <p className="text-slate-500 text-sm">Please fill out the form below to request a visa consultation.</p>
+            <h1 className="text-2xl font-serif text-slate-900 tracking-tight">Request Consultation</h1>
+            <p className="text-slate-500 text-sm">Schedule a session with our visa experts.</p>
          </div>
       </div>
 
       {/* Form Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
-        <form className="space-y-6">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* Client Name */}
-            <div className="space-y-2">
-              <Label htmlFor="clientName">Client Name</Label>
+            <div className="space-y-1">
+              <label htmlFor="clientName" className={labelClassName}>Full Name</label>
               <div className="relative">
-                <User size={18} className="absolute left-3 top-2.5 text-slate-400" />
-                <Input 
+                <User size={16} className={iconClassName} />
+                <input 
                    id="clientName" 
                    name="clientName" 
+                   value={formData.clientName}
+                   onChange={handleChange}
                    placeholder="John Doe" 
-                   className="pl-10 bg-slate-50 border-slate-200 focus:bg-white transition-colors"
+                   className={inputClassName}
+                   required
                 />
               </div>
             </div>
 
             {/* Email */}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+            <div className="space-y-1">
+              <label htmlFor="email" className={labelClassName}>Email Address</label>
               <div className="relative">
-                <Mail size={18} className="absolute left-3 top-2.5 text-slate-400" />
-                <Input 
+                <Mail size={16} className={iconClassName} />
+                <input 
                    id="email" 
                    name="email" 
                    type="email" 
-                   placeholder="john.doe@example.com" 
-                   className="pl-10 bg-slate-50 border-slate-200 focus:bg-white transition-colors"
+                   value={formData.email}
+                   onChange={handleChange}
+                   placeholder="john@example.com" 
+                   className={inputClassName}
+                   required
                 />
               </div>
             </div>
 
             {/* Phone */}
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+            <div className="space-y-1">
+              <label htmlFor="phone" className={labelClassName}>Phone Number</label>
               <div className="relative">
-                <Phone size={18} className="absolute left-3 top-2.5 text-slate-400" />
-                <Input 
+                <Phone size={16} className={iconClassName} />
+                <input 
                    id="phone" 
                    name="phone" 
                    type="tel" 
+                   value={formData.phone}
+                   onChange={handleChange}
                    placeholder="+1 (555) 000-0000" 
-                   className="pl-10 bg-slate-50 border-slate-200 focus:bg-white transition-colors"
+                   className={inputClassName}
+                />
+              </div>
+            </div>
+
+            {/* Country of Origin */}
+            <div className="space-y-1">
+              <label htmlFor="countryOfOrigin" className={labelClassName}>Country of Origin</label>
+              <div className="relative">
+                <Globe size={16} className={iconClassName} />
+                <input 
+                   id="countryOfOrigin" 
+                   name="countryOfOrigin" 
+                   value={formData.countryOfOrigin}
+                   onChange={handleChange}
+                   placeholder="e.g. Nigeria" 
+                   className={inputClassName}
+                   required
                 />
               </div>
             </div>
 
             {/* Destination Country */}
-            <div className="space-y-2">
-              <Label htmlFor="destination">Destination Country</Label>
+            <div className="space-y-1">
+              <label htmlFor="destination" className={labelClassName}>Destination</label>
               <div className="relative">
-                <MapPin size={18} className="absolute left-3 top-2.5 text-slate-400 z-10" />
-                <select 
+                <MapPin size={16} className={iconClassName} />
+                <input 
                    id="destination" 
                    name="destination" 
-                   className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:bg-white h-10 appearance-none"
-                >
-                   <option value="" disabled selected>Select Country</option>
-                   {countries.map((country) => (
-                     <option key={country.value} value={country.value}>
-                       {country.label}
-                     </option>
-                   ))}
-                </select>
-                <div className="absolute right-3 top-3 pointer-events-none text-slate-400">
-                    <ChevronRight size={14} className="rotate-90" />
-                </div>
+                   value={formData.destination}
+                   onChange={handleChange}
+                   placeholder="e.g. Canada" 
+                   className={inputClassName}
+                   required
+                />
               </div>
             </div>
 
              {/* Visa Type */}
-             <div className="space-y-2">
-              <Label htmlFor="visaType">Visa Type</Label>
+             <div className="space-y-1">
+              <label htmlFor="visaType" className={labelClassName}>Visa Type</label>
               <div className="relative">
-                <FileText size={18} className="absolute left-3 top-2.5 text-slate-400 z-10" />
+                <FileText size={16} className={iconClassName} />
                 <select 
                    id="visaType" 
                    name="visaType" 
-                   className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:bg-white h-10 appearance-none"
+                   value={formData.visaType}
+                   onChange={handleChange}
+                   className={selectClassName}
+                   required
                 >
-                   <option value="" disabled selected>Select Visa Type</option>
+                   <option value="" disabled>Select Visa Type</option>
                    {visaTypes.map((visaType) => (
                      <option key={visaType.value} value={visaType.value}>
                        {visaType.label}
                      </option>
                    ))}
                 </select>
-                <div className="absolute right-3 top-3 pointer-events-none text-slate-400">
-                    <ChevronRight size={14} className="rotate-90" />
-                </div>
+                <ChevronDown size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" />
               </div>
             </div>
 
              {/* Appointment Date */}
-             <div className="space-y-2">
-              <Label htmlFor="appointmentDate">Appointment Date</Label>
+             <div className="space-y-1">
+              <label htmlFor="appointmentDate" className={labelClassName}>Preferred Date</label>
               <div className="relative">
-                <Calendar size={18} className="absolute left-3 top-2.5 text-slate-400" />
-                <Input 
+                <Calendar size={16} className={iconClassName} />
+                <input 
                    id="appointmentDate" 
                    name="appointmentDate" 
                    type="date"
-                   className="pl-10 bg-slate-50 border-slate-200 focus:bg-white transition-colors"
+                   value={formData.appointmentDate}
+                   onChange={handleChange}
+                   className={inputClassName}
+                   required
                 />
               </div>
             </div>
              
              {/* Appointment Type */}
-             <div className="space-y-2">
-              <Label htmlFor="appointmentType">Appointment Type</Label>
+             <div className="space-y-1 md:col-span-2">
+              <label htmlFor="appointmentType" className={labelClassName}>Meeting Format</label>
               <div className="relative">
+                <Video size={16} className={iconClassName} />
                 <select 
                    id="appointmentType" 
                    name="appointmentType" 
-                   className="w-full pl-4 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:bg-white h-10 appearance-none"
+                   value={formData.appointmentType}
+                   onChange={handleChange}
+                   className={selectClassName}
                 >
-                   {appointmentTypes.map((appointmentType) => (
-                     <option key={appointmentType.value} value={appointmentType.value}>
-                       {appointmentType.label}
+                   {appointmentTypes.map((type) => (
+                     <option key={type.value} value={type.value}>
+                       {type.label}
                      </option>
                    ))}
                 </select>
-                 <div className="absolute right-3 top-3 pointer-events-none text-slate-400">
-                    <ChevronRight size={14} className="rotate-90" />
-                </div>
+                 <ChevronDown size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" />
               </div>
             </div>
           </div>
 
           {/* Notes */}
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes / Specific Requests</Label>
+          <div className="space-y-1">
+            <label htmlFor="notes" className={labelClassName}>Specific Questions / Notes</label>
             <textarea 
                 id="notes" 
                 name="notes" 
+                value={formData.notes}
+                onChange={handleChange}
                 rows={4}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:bg-white transition-colors"
-                placeholder="Add any additional notes or specific questions..."
+                className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400 resize-none"
+                placeholder="Describe your current situation or specific questions..."
             />
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-4 pt-4 border-t border-slate-100">
-             <Button variant="outline" type="button" className="w-32">Cancel</Button>
-             <Button type="submit" className="w-40 bg-slate-900 hover:bg-slate-800">Submit Request</Button>
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+             <Button 
+                variant="outline" 
+                type="button" 
+                onClick={() => navigate(-1)}
+                className="px-6 py-2.5 h-auto text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900 rounded-lg text-sm font-medium"
+             >
+                Cancel
+             </Button>
+             <Button 
+                type="submit" 
+                className="px-6 py-2.5 h-auto bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-sm font-medium shadow-sm"
+             >
+                Submit Request
+             </Button>
           </div>
 
         </form>

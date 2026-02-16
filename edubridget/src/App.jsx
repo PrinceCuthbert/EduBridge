@@ -42,6 +42,9 @@ const ProgramDetail = lazy(() => import("./pages/study-abroad/ProgramDetail"));
 const AdminProgramDetail = lazy(
   () => import("./pages/admin/AdminProgramDetail"),
 );
+const UniversityProgramDetails = lazy(
+  () => import("./pages/admin/UniversityProgramDetails"),
+);
 const VisaConsultationPage = lazy(
   () => import("./pages/visa/VisaConsultationPage"),
 );
@@ -92,6 +95,7 @@ const FinancialReports = lazy(() => import("./pages/admin/FinancialReports"));
 const Analytics = lazy(() => import("./pages/admin/Analytics"));
 const VisaCases = lazy(() => import("./pages/admin/VisaCases"));
 const Communications = lazy(() => import("./pages/admin/Communications"));
+const UniversityPrograms = lazy(() => import("./pages/admin/UniversityPrograms"));
 
 // Dashboard Layout - Lazy Loaded
 const StudentDashboardLayout = lazy(
@@ -217,6 +221,8 @@ function App() {
                   <Route path="summary/response/:id" element={<VisaCaseResponse />} />
                   <Route path="request" element={<VisaConsultationRequest />} />
                 </Route>
+                <Route path="programs" element={<UniversityPrograms isReadOnly={true} />} />
+                <Route path="programs/:id" element={<UniversityProgramDetails backPath="/dashboard/programs" />} />
                 <Route
                   path="profile"
                   element={<div className="p-8">My Profile (Coming Soon)</div>}
@@ -240,11 +246,10 @@ function App() {
                 <Route path="applications" element={<ApplicationReview />} />
                 <Route path="applications/:id" element={<ApplicationDetail />} />
                 <Route path="visa" element={<VisaCases />} />
-                <Route
-                  path="programs"
-                  element={<Navigate to="/admin/cms/scholarships" replace />}
-                />
+                <Route path="programs" element={<UniversityPrograms />} />
+
                 <Route path="programs/:id" element={<AdminProgramDetail />} />
+                <Route path="programs/view/:id" element={<UniversityProgramDetails />} />
                 <Route path="cms" element={<ContentManagement />}>
                   <Route
                     index

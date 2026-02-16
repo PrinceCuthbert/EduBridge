@@ -14,12 +14,5 @@ export const validateSignUpForm = (formData) => {
   const passwordError = validatePassword(formData.password);
   if (passwordError) return passwordError;
 
-  if (!formData.agreeToTerms)
-    return "Please accept the terms";
-
   return null;
 };
-
-
-
-
