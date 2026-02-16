@@ -15,6 +15,7 @@ import {
   MessageSquare,
   GraduationCap,
   ChevronDown,
+  PanelLeft
 } from 'lucide-react';
 
 export default function StudentDashboardLayout() {
@@ -22,10 +23,16 @@ export default function StudentDashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [expandedItems, setExpandedItems] = useState({});
 
   const toggleExpand = (path, currentState) => {
-    setExpandedItems(prev => ({ ...prev, [path]: !currentState }));
+    if (isSidebarCollapsed) {
+        setIsSidebarCollapsed(false);
+        setExpandedItems(prev => ({ ...prev, [path]: true }));
+    } else {
+        setExpandedItems(prev => ({ ...prev, [path]: !currentState }));
+    }
   };
 
   const handleLogout = () => {
@@ -51,14 +58,14 @@ export default function StudentDashboardLayout() {
     { label: "Profile Settings", path: "/NotFound", icon: User },
   ];
 
-  const NavItem = ({ item, location, expandedItems, toggleExpand, setIsMobileOpen }) => {
+  const NavItem = ({ item, location, expandedItems, toggleExpand, setIsMobileOpen, isSidebarCollapsed }) => {
     const isActive = location.pathname === item.path || (item.path !== '/dashboard' && location.pathname.startsWith(item.path));
     const hasSubItems = item.subItems && item.subItems.length > 0;
     
-    // Auto-expand if active, unless explicitly toggled by user
-    const isExpanded = expandedItems[item.path] !== undefined 
+    // Auto-expand if active, unless explicitly toggled by user (only when not collapsed)
+    const isExpanded = !isSidebarCollapsed && (expandedItems[item.path] !== undefined 
       ? expandedItems[item.path] 
-      : isActive;
+      : isActive);
 
     if (hasSubItems) {
       return (
@@ -66,19 +73,20 @@ export default function StudentDashboardLayout() {
           <button
             onClick={() => toggleExpand(item.path, isExpanded)}
             className={`
-              w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 group
+              w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'justify-between px-3'} py-2.5 rounded-xl transition-all duration-200 group
               ${isActive ? "text-white bg-white/10" : "text-slate-400 hover:bg-white/5 hover:text-white"}
             `}
+            title={isSidebarCollapsed ? item.label : undefined}
           >
-            <div className="flex items-center gap-3">
+            <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
               <item.icon size={18} className={isActive ? "text-blue-400" : "text-slate-400 group-hover:text-white transition-colors"} />
-              <span className="font-medium text-sm">{item.label}</span>
+              {!isSidebarCollapsed && <span className="font-medium text-sm">{item.label}</span>}
             </div>
-            <ChevronDown size={14} className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+            {!isSidebarCollapsed && <ChevronDown size={14} className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />}
           </button>
           
-          {/* Sub-items */}
-          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? "max-h-40 opacity-100 mt-1" : "max-h-0 opacity-0"}`}>
+          {/* Sub-items - only visible if not collapsed and expanded */}
+          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded && !isSidebarCollapsed ? "max-h-40 opacity-100 mt-1" : "max-h-0 opacity-0"}`}>
             <div className="pl-9 pr-2 space-y-1">
               {item.subItems.map((subItem) => {
                  const isSubActive = location.pathname === subItem.path;
@@ -107,15 +115,16 @@ export default function StudentDashboardLayout() {
         to={item.path}
         onClick={() => setIsMobileOpen(false)}
         className={`
-          flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group mb-1
+          flex items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-3'} py-2.5 rounded-xl transition-all duration-200 group mb-1
           ${isActive 
             ? "bg-blue-600 text-white shadow-md shadow-blue-900/20" 
             : "text-slate-400 hover:bg-white/5 hover:text-white"
           }
         `}
+        title={isSidebarCollapsed ? item.label : undefined}
       >
         <item.icon size={18} className={isActive ? "text-white" : "text-slate-400 group-hover:text-white transition-colors"} />
-        <span className="font-medium text-sm">{item.label}</span>
+        {!isSidebarCollapsed && <span className="font-medium text-sm">{item.label}</span>}
       </Link>
     );
   };
@@ -134,22 +143,21 @@ export default function StudentDashboardLayout() {
       <aside 
         className={`
           fixed lg:static inset-y-0 left-0 z-50
-          w-[260px] bg-[#0F172A] text-slate-300
+          bg-[#0F172A] text-slate-300
           flex flex-col border-r border-slate-800
-          transition-transform duration-300 ease-in-out
-          ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          transition-all duration-300 ease-in-out
+          ${isMobileOpen ? "translate-x-0 w-[260px]" : "-translate-x-full lg:translate-x-0"}
+          ${!isMobileOpen && isSidebarCollapsed ? "lg:w-[70px]" : "lg:w-[260px]"}
         `}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-slate-800/50">
-           <div className="w-7 h-7 bg-white rounded-lg mr-3 flex items-center justify-center">
-             <div className="w-3.5 h-3.5 bg-[#0F172A] rounded-sm" />
-           </div>
-           <span className="text-white font-bold text-base tracking-tight">EduBridge Student</span>
+        <div className={`h-16 flex items-center ${isSidebarCollapsed ? 'justify-center px-2' : 'px-6'} border-b border-slate-800/50 transition-all`}>
+           <GraduationCap size={28} className="text-white shrink-0" />
+           <span className={`text-white font-bold text-base tracking-tight ml-3 transition-opacity duration-200 ${isSidebarCollapsed ? "opacity-0 w-0 hidden" : "opacity-100"}`}>EduBridge Student</span>
         </div>
 
         {/* Navigation */}
-        <div className="flex-1 py-6 px-4 overflow-y-auto space-y-1">
+        <div className="flex-1 py-6 px-4 overflow-y-auto space-y-1 scrollbar-hide">
           {navItems.map((item) => (
             <NavItem 
                 key={item.path} 
@@ -158,30 +166,34 @@ export default function StudentDashboardLayout() {
                 expandedItems={expandedItems}
                 toggleExpand={toggleExpand}
                 setIsMobileOpen={setIsMobileOpen}
+                isSidebarCollapsed={isSidebarCollapsed}
             />
           ))}
         </div>
 
         {/* User Profile & Logout (Bottom Sidebar) */}
         <div className="p-4 border-t border-slate-800/50 bg-[#0F172A]">
-          <div className="flex items-center gap-3 px-2 py-2 mb-2">
+          <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'} px-2 py-2 mb-2`}>
               <img 
                 src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.name || 'Student'}&background=random`} 
                 alt="User" 
-                className="w-8 h-8 rounded-full border border-slate-600"
+                className="w-8 h-8 rounded-full border border-slate-600 shrink-0"
               />
-              <div className="overflow-hidden">
-                <p className="text-sm font-medium text-white truncate">{user?.name || 'Alex Johnson'}</p>
-                <p className="text-xs text-slate-500 truncate">{user?.email || 'alex@edubridge.com'}</p>
-              </div>
+              {!isSidebarCollapsed && (
+                <div className="overflow-hidden transition-all duration-200">
+                    <p className="text-sm font-medium text-white truncate">{user?.name || 'Alex Johnson'}</p>
+                    <p className="text-xs text-slate-500 truncate">{user?.email || 'alex@edubridge.com'}</p>
+                </div>
+              )}
           </div>
           
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg w-full transition-colors text-sm font-medium"
+            className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg w-full transition-colors text-sm font-medium`}
+            title={isSidebarCollapsed ? "Sign Out" : undefined}
           >
             <LogOut size={16} />
-            Sign Out
+            {!isSidebarCollapsed && <span>Sign Out</span>}
           </button>
         </div>
       </aside>
@@ -196,6 +208,14 @@ export default function StudentDashboardLayout() {
               className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg"
             >
               <Menu size={20} />
+            </button>
+            
+            <button 
+                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                className="hidden lg:block p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
+                title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            >
+                <PanelLeft size={20} />
             </button>
             
             {/* Search Bar */}
