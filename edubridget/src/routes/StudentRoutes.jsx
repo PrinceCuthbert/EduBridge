@@ -12,7 +12,9 @@ const VisaCaseDetails = lazy(() => import("../pages/dashboard/visa/VisaCaseDetai
 const VisaCaseResponse = lazy(() => import("../pages/dashboard/visa/VisaCaseResponse"));
 const UploadCaseDocuments = lazy(() => import("../pages/dashboard/visa/UploadCaseDocuments"));
 const UniversityPrograms = lazy(() => import("../pages/admin/UniversityPrograms"));
+
 const UniversityProgramDetails = lazy(() => import("../pages/admin/UniversityProgramDetails"));
+const ApplicationSubmission = lazy(() => import("../pages/dashboard/applications/ApplicationSubmission"));
 
 export default function StudentRoutes() {
   return (
@@ -24,6 +26,8 @@ export default function StudentRoutes() {
       }>
         <Route index element={<Dashboard />} />
         <Route path="applications" element={<MyApplications />} />
+        <Route path="applications/submit" element={<ApplicationSubmission />} />
+        <Route path="applications/submit/:programId" element={<ApplicationSubmission />} />
         
         {/* Visa Section */}
         <Route path="visa-status">

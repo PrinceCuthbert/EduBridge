@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Plus, Trash2, XCircle, Globe, DollarSign, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Save, Plus, Trash2, XCircle, Globe, DollarSign, Image as ImageIcon, Upload, FileText } from 'lucide-react';
 import { usePrograms, useProgram } from '../../hooks/usePrograms';
 import DatePicker from '../../components/ui/DatePicker';
 import AdminCard from '../../components/admin/AdminCard';
@@ -26,7 +26,9 @@ export default function AdminProgramDetail() {
     departments: [],
     timeline: [],
     requiredDocuments: [],
-    status: 'Active'
+    status: 'Active',
+    applicationLink: '',
+    applicationFile: null,
   });
 
   const [departmentInput, setDepartmentInput] = useState('');
@@ -423,6 +425,89 @@ export default function AdminProgramDetail() {
              </div>
           </AdminCard>
 
+
+                {/* Application Form */}
+          <AdminCard title="Application Form">
+            <div className="space-y-4">
+    
+    {/* Google Form Link */}
+             <div>
+               <label className={labelClassName}>Google Form Link</label>
+               <div className="relative">
+                 <input
+                   type="url"
+                   value={formData.applicationLink || ''}
+                   onChange={(e) => setFormData({ ...formData, applicationLink: e.target.value })}
+                    className={`${inputClassName} pl-10`}
+                    placeholder="https://forms.google.com/..."
+                 />
+                 <Globe size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+               </div>
+               {formData.applicationLink && (
+                 <a
+                    href={formData.applicationLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1.5 inline-flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 transition-colors"
+                 >
+                   <Globe size={11} /> Preview link ↗
+                 </a>        
+               )}
+             </div>
+
+    {/* Divider */}
+             <div className="relative flex items-center gap-3">
+               <div className="flex-1 h-px bg-slate-100" />
+               <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">or</span>
+               <div className="flex-1 h-px bg-slate-100" />
+             </div>
+
+    {/* File Upload */}
+             <div>
+               <label className={labelClassName}>Upload Application Form</label>
+
+               {formData.applicationFile ? (
+        // Uploaded file preview
+                 <div className="flex items-center gap-3 px-3 py-2.5 bg-blue-50 border border-blue-100 rounded-xl">
+                   <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                     <FileText size={15} className="text-blue-600" />
+                   </div>
+                   <div className="flex-1 min-w-0">
+                     <p className="text-sm font-medium text-slate-700 truncate">{formData.applicationFile.name}</p>
+                     <p className="text-xs text-slate-400">{(formData.applicationFile.size / 1024).toFixed(1)} KB</p>
+                   </div>
+                   <button
+                     onClick={() => setFormData({ ...formData, applicationFile: null })}
+                     className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                     title="Remove file"
+                   >
+                     <Trash2 size={14} /> 
+                   </button>
+                 </div>
+               ) : (
+        // Drop zone
+                 <label className="flex flex-col items-center gap-2 px-4 py-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:border-blue-300 hover:bg-blue-50/40 transition-all group">
+                   <div className="w-9 h-9 bg-white border border-slate-200 rounded-lg flex items-center justify-center group-hover:border-blue-200 transition-colors shadow-sm">
+                     <Upload size={16} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
+                   </div>
+                   <div className="text-center">
+                     <p className="text-sm font-medium text-slate-600 group-hover:text-blue-600 transition-colors">Click to upload</p>
+                     <p className="text-xs text-slate-400 mt-0.5">PDF, DOC, DOCX — max 10MB</p>
+                   </div>
+                   <input
+                     type="file"
+                     accept=".pdf,.doc,.docx"
+                     className="hidden"
+                     onChange={(e) => {
+                       const file = e.target.files?.[0];
+                         if (file) setFormData({ ...formData, applicationFile: file });
+                     }}
+                   />
+                 </label>
+               )}
+             </div>
+             </div>
+           </AdminCard>
         </div>
       </div>
     </div>

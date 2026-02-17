@@ -4,12 +4,44 @@ import { useProgram } from "../../hooks/usePrograms";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { ProgramDepartments, ProgramTimeline, ProgramRequirements } from "../../components/program/ProgramSections";
+import { ProgramDepartments, ProgramTimeline, ProgramRequirements, ProgramApplication } from "../../components/program/ProgramSections";
 
 export default function UniversityProgramDetails({ backPath = "/admin/programs" }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const { program, loading, error } = useProgram(id);
+
+  const handleApply = (type, payload) => {
+     if (type === 'link') {
+       window.open(payload, '_blank');
+     } else if (type === 'file') {
+       const link = document.createElement('a');
+       // If it's a URL string (e.g. from DB)
+       if (typeof payload === 'string') {
+          link.href = payload;
+          link.download = payload.split('/').pop();
+       } else if (payload instanceof File || payload instanceof Blob) {
+          // If it's a File object (e.g. newly uploaded in preview)
+          link.href = URL.createObjectURL(payload);
+          link.download = payload.name;
+       } else {
+          console.error("Unknown payload type", payload);
+          return;
+       }
+       
+       document.body.appendChild(link);
+       link.click();
+       document.body.removeChild(link);
+     } else if (type === 'submit') {
+          // payload here is the applicationFile object from the button click
+          navigate(`/dashboard/applications/submit/${id}`, { 
+            state: { 
+               programId: id,
+               prefilledFile: payload // Pass file metadata 
+            } 
+          });
+      }
+  };
 
   if (loading) {
     return (
@@ -82,6 +114,12 @@ export default function UniversityProgramDetails({ backPath = "/admin/programs" 
             <ProgramDepartments departments={program.departments} />
             <ProgramTimeline timeline={program.timeline} />
             <ProgramRequirements documents={program.requiredDocuments} />
+
+            <ProgramApplication 
+               applicationLink={program.applicationLink} 
+               applicationFile={program.applicationFile}
+               onApply={handleApply}
+            />
         </div>
       </div>
     </div>

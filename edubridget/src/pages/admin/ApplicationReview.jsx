@@ -5,67 +5,16 @@ import { toast } from "sonner";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import AdminFilterBar from "../../components/admin/AdminFilterBar";
 import AdminTable from "../../components/admin/AdminTable";
-
-// Mock applications data
-const MOCK_APPLICATIONS = [
-  {
-    id: "APP-2024-001",
-    studentName: "Alice Mutesi",
-    scholarship: "Global Excellence Scholarship",
-    date: "2024-02-01",
-    status: "Pending",
-    email: "alice@example.com",
-    documents: ["Passport.pdf"],
-  },
-  {
-    id: "APP-2024-002",
-    studentName: "David Kwizera",
-    scholarship: "DAAD Master Studies",
-    date: "2024-01-28",
-    status: "Reviewing",
-    email: "david@example.com",
-    documents: ["Passport.pdf"],
-  },
-  {
-    id: "APP-2024-003",
-    studentName: "Sarah Uwase",
-    scholarship: "Fullbright Program",
-    date: "2024-01-25",
-    status: "Needs Changes",
-    email: "sarah@example.com",
-    documents: ["Passport.pdf"],
-  },
-  {
-    id: "APP-2024-004",
-    studentName: "John Doe",
-    scholarship: "Global Excellence Scholarship",
-    date: "2024-02-02",
-    status: "Approved",
-    email: "john@example.com",
-    documents: ["Passport.pdf"],
-  },
-];
+import { useApplications } from "../../hooks/useApplications";
 
 export default function ApplicationReview() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
+  const { applications, loading, fetchApplications } = useApplications();
 
   useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        setLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        setApplications(MOCK_APPLICATIONS);
-      } catch (error) {
-        toast.error("Failed to load applications");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchApplications();
   }, []);
 

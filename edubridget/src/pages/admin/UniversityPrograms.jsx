@@ -89,7 +89,7 @@ export default function UniversityPrograms({ isReadOnly = false }) {
         <div className="flex items-center gap-3">
           <div className="flex-1">
             <div className="font-medium text-sm text-slate-900">{program.universityName}</div>
-            <div className="flex flex-wrap gap-1.5 mt-1.5">
+            {/* <div className="flex flex-wrap gap-1.5 mt-1.5">
               {program.tags.map((tag, idx) => (
                 <span
                   key={idx}
@@ -103,7 +103,7 @@ export default function UniversityPrograms({ isReadOnly = false }) {
                   {tag}
                 </span>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
       )

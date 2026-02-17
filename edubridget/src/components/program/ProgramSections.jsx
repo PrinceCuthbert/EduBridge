@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Download, ExternalLink, FileText } from 'lucide-react'; // Added icons
 
 export function ProgramDepartments({ departments }) {
   if (!departments || departments.length === 0) return null;
@@ -80,3 +80,63 @@ export function ProgramRequirements({ documents }) {
     </section>
   );
 }
+
+export function ProgramApplication({ applicationLink, applicationFile, onApply }) {
+  if (!applicationLink && !applicationFile) return null;
+
+  return (
+    <section className="bg-blue-50/50 rounded-xl border border-blue-100 p-6">
+      <h3 className="text-lg font-bold text-slate-900 mb-2">
+        Application Method
+      </h3>
+      <p className="text-slate-600 text-sm mb-4">
+        Please review the application requirements above before proceeding.
+      </p>
+
+      <div className="flex flex-col sm:flex-row gap-4">
+        {applicationLink && (
+          <button
+            onClick={() => onApply('link', applicationLink)}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm active:scale-95"
+          >
+            <ExternalLink size={18} />
+            <span>Apply Online</span>
+          </button>
+        )}
+
+        {applicationFile && (
+          <>
+            <button
+              onClick={() => onApply('file', applicationFile)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-medium rounded-lg transition-colors shadow-sm active:scale-95"
+            >
+              <Download size={18} className="text-blue-600" />
+              <span>Download Application Form</span>
+            </button>
+            
+            <button
+              onClick={() => onApply('submit', applicationFile)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors shadow-sm active:scale-95"
+            >
+              <FileText size={18} />
+              <span>Submit Documents</span>
+            </button>
+          </>
+        )}
+      </div>
+      
+      {applicationFile && (
+         <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+            <FileText size={14} />
+            <span>
+               File available: {applicationFile.name || 'Application Form'} 
+               {applicationFile.size ? ` (${(applicationFile.size / 1024).toFixed(1)} KB)` : ''}
+            </span>
+         </div>
+      )}
+    </section>
+  );
+}
+
+
+

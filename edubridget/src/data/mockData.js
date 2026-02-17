@@ -51,12 +51,14 @@ export const MOCK_PROGRAMS = [
       "Certificate of high school qualification",
     ],
     status: "Active",
+    applicationLink: "https://docs.google.com/forms",
   },
   {
     id: 2,
     universityName: "Tongmyong University",
     visaType: "D-4",
     tags: ["NEW", "ON SALE"],
+    applicationFile: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     country: "South Korea",
     description:
       "Leading university in Busan with strong industry connections and practical training programs.",
@@ -71,6 +73,13 @@ export const MOCK_PROGRAMS = [
       { step: "Application Period", date: "Aug 01 - Aug 31" },
       { step: "Interview", date: "Sep 15" },
       { step: "Result Announcement", date: "Sep 30" },
+    ],
+    requiredDocuments: [
+      "Completed Application Form",
+      "Passport Copy",
+      "Academic Transcripts",
+      "Bank Statement ($20,000+)",
+      "Study Plan"
     ],
     status: "Active",
     images: [],
@@ -482,5 +491,64 @@ export const MOCK_PARTNERS = [
     logo: "https://ui-avatars.com/api/?name=Kwang+Woon&background=0d9488&color=fff&size=128&bold=true",
     badge: "NEW",
     type: "D-4-1",
+  },
+];
+
+export const MOCK_APPLICATIONS = [
+  {
+    id: "APP-2024-001",
+    studentName: "Alice Mutesi",
+    scholarship: "Global Excellence Scholarship",
+    programId: "1", 
+    date: "2024-02-01",
+    status: "Pending",
+    email: "alice@example.com",
+    documents: ["Passport.pdf", "Transcript.pdf"],
+    firstName: "Alice",
+    lastName: "Mutesi",
+    description: "I am highly motivated to study...",
+    paperTitle: "Impact of AI in Education"
+  },
+  {
+    id: "APP-2024-002",
+    studentName: "David Kwizera",
+    scholarship: "DAAD Master Studies",
+    programId: "2",
+    date: "2024-01-28",
+    status: "Reviewing",
+    email: "david@example.com",
+    documents: ["Passport.pdf"],
+    firstName: "David",
+    lastName: "Kwizera",
+    description: "Seeking to expand my knowledge in...",
+    paperTitle: "Sustainable Energy Solutions"
+  },
+  {
+    id: "APP-2024-003", 
+    studentName: "Sarah Uwase",
+    scholarship: "Fullbright Program",
+    programId: "3",
+    date: "2024-01-25",
+    status: "Needs Changes",
+    email: "sarah@example.com",
+    documents: ["Passport.pdf"],
+    firstName: "Sarah",
+    lastName: "Uwase",
+    description: "Passionate about public health...",
+    paperTitle: "Community Health Initiatives"
+  },
+  {
+    id: "APP-2024-004",
+    studentName: "John Doe",
+    scholarship: "Global Excellence Scholarship",
+    programId: "1",
+    date: "2024-02-02",
+    status: "Approved",
+    email: "john@example.com",
+    documents: ["Passport.pdf"],
+    firstName: "John",
+    lastName: "Doe",
+    description: "Experienced researcher...",
+    paperTitle: "Advanced Machine Learning"
   },
 ];

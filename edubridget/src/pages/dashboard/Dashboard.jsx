@@ -12,7 +12,7 @@ export default function Dashboard() {
 
   const quickActions = [
     { label: "Manage Profile", icon: User, path: "/dashboard/profile" },
-    { label: "Submit New Application", icon: PlusCircle, path: "/study-abroad" },
+    { label: "Submit New Application", icon: PlusCircle, path: "/dashboard/applications/submit" },
     { label: "Browse Library", icon: BookOpen, path: "/library" },
     { label: "Track Visa Application", icon: Plane, path: "/dashboard/visa-status" },
   ];

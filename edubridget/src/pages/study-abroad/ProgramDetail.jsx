@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useProgram } from "../../hooks/usePrograms";
+import { useAuth } from "../../context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -12,19 +13,81 @@ import {
   Plus
 } from "lucide-react";
 import { toast } from "sonner";
-import { ProgramDepartments, ProgramTimeline, ProgramRequirements } from "../../components/program/ProgramSections";
+import { ProgramDepartments, ProgramTimeline, ProgramRequirements, ProgramApplication } from "../../components/program/ProgramSections";
 
 export default function ProgramDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { program, loading, error } = useProgram(id);
+  const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState("details");
   const [quantity, setQuantity] = useState(1);
 
-  const handleApply = async () => {
+  /* 
+    Unified apply handler
+    - type: 'link' | 'file' | 'default'
+    - payload: URL string or File object
+  */
+  const handleApply = async (type = 'default', payload = null) => {
+    // 1. Check Authentication FIRST
+    if (!isAuthenticated) {
+      toast.error("Please login to continue with your application");
+      navigate("/signin", { state: { from: location } });
+      return;
+    }
+
+    // 2. Helper to handle download/navigation
+    const performAction = () => {
+      if (type === 'link' || (type === 'default' && program.applicationLink)) {
+        const url = type === 'link' ? payload : program.applicationLink;
+        window.open(url, '_blank', 'noopener,noreferrer');
+        toast.success("Opening application form...");
+        return;
+      }
+
+      if (type === 'file' || (type === 'default' && program.applicationFile)) {
+        const file = type === 'file' ? payload : program.applicationFile;
+        // Handle file download logic
+        const link = document.createElement('a');
+        if (typeof file === 'string') {
+           link.href = file;
+           link.download = file.split('/').pop();
+        } else if (file instanceof File || file instanceof Blob) {
+           link.href = URL.createObjectURL(file);
+           link.download = file.name;
+        } else {
+           console.error("Unknown file type", file);
+           toast.error("Error accessing file");
+           return;
+        }
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success("Downloading application form...");
+        return;
+      }
+
+      if (type === 'submit') {
+          navigate(`/dashboard/applications/submit/${id}`, { 
+             state: { 
+                 programId: id,
+                 prefilledFile: payload // Pass file metadata 
+             } 
+          });
+          return;
+      }
+
+      // 3. Fallback / Default application flow (Mock)
+      // Only runs if type is 'default' and no link/file exists
+      simulateDefaultApplication();
+    };
+
+    performAction();
+  };
+
+  const simulateDefaultApplication = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem("edubridge-user"));
-      // ... Simulate fetch ...
       await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success("Application started successfully! (Demo)");
       navigate("/dashboard");
@@ -32,6 +95,7 @@ export default function ProgramDetail() {
       toast.error(error.message || "Failed to apply");
     }
   };
+
 
   if (loading) {
     return (
@@ -137,6 +201,12 @@ export default function ProgramDetail() {
                     <ProgramDepartments departments={program.departments} />
                     <ProgramTimeline timeline={program.timeline} />
                     <ProgramRequirements documents={program.requiredDocuments} />
+
+                    <ProgramApplication 
+                       applicationLink={program.applicationLink} 
+                       applicationFile={program.applicationFile}
+                       onApply={handleApply}
+                    />
                   </>
                 ) : (
                   <div className="text-center py-12 text-slate-500">
@@ -188,7 +258,7 @@ export default function ProgramDetail() {
 
                 <div className="space-y-3">
                   <Button
-                    onClick={handleApply}
+                    onClick={() => handleApply('default')}
                     className="w-full bg-emerald-600 hover:bg-emerald-700 h-11 text-base shadow-sm">
                     Apply Now
                   </Button>
