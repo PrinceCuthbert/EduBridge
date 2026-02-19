@@ -1,72 +1,75 @@
-import React from "react";
+import * as React from "react"
+import { cn } from "@/lib/utils"
 
-/**
- * A generic grid component that takes a list of data
- * and a render function to display items.
- */
-const FeatureGrid = ({
-  items = [],
-  renderItem,
-  columns = "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-  gap = "gap-8",
-  className = "",
-}) => {
-  if (!items.length) return null;
+const Card = React.forwardRef(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      className
+    )}
+    {...props}
+  />
+))
+Card.displayName = "Card"
 
-  return (
-    <div className={`grid ${columns} ${gap} ${className}`}>
-      {items.map((item, index) => renderItem(item, index))}
-    </div>
-  );
-};
+const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    {...props}
+  />
+))
+CardHeader.displayName = "CardHeader"
 
-/**
- * The individual UI card logic.
- * Decoupled so you can use it inside or outside a grid.
- */
-const FeatureCard = ({
-  icon,
-  title,
-  description,
-  bgColor = "#EDF2F7",
-  iconBgColor = "bg-primary/20",
-  className = "",
-}) => {
-  return (
-    <div
-      className={`rounded-2xl shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 p-8 border border-slate-200 group cursor-pointer ${className}`}
-      style={{ backgroundColor: bgColor }}>
-      {/* Icon container */}
-      <div className="mb-5 group-hover:scale-110 transition-transform duration-300">
-        <div
-          className={`w-14 h-14 ${iconBgColor} rounded-2xl flex items-center justify-center text-primary`}>
-          {icon}
-        </div>
-      </div>
+const CardTitle = React.forwardRef(({ className, ...props }, ref) => (
+  <h3
+    ref={ref}
+    className={cn(
+      "text-2xl font-semibold leading-none tracking-tight",
+      className
+    )}
+    {...props}
+  />
+))
+CardTitle.displayName = "CardTitle"
 
-      <h3 className="font-bold text-xl mb-3 text-slate-800">{title}</h3>
+const CardDescription = React.forwardRef(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+))
+CardDescription.displayName = "CardDescription"
 
-      <p className="text-slate-700 text-sm leading-relaxed">{description}</p>
-    </div>
-  );
-};
+const CardContent = React.forwardRef(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+))
+CardContent.displayName = "CardContent"
 
-const Card = ({ className = "", children, ...props }) => {
-  return (
-    <div
-      className={`rounded-xl border bg-white text-slate-950 shadow-sm ${className}`}
-      {...props}>
-      {children}
-    </div>
-  );
-};
+const CardFooter = React.forwardRef(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex items-center p-6 pt-0", className)}
+    {...props}
+  />
+))
+CardFooter.displayName = "CardFooter"
 
-const CardContent = ({ className = "", children, ...props }) => {
-  return (
-    <div className={`p-6 ${className}`} {...props}>
-      {children}
-    </div>
-  );
-};
+// Add shared FeatureGrid/FeatureCard used in AboutUsPage but previously found in card.jsx?
+// The grep showed: import { FeatureGrid } from "../../components/ui/card";
+// So I must restore those exports too. They are likely custom or just Grid wrappers.
+// I'll add simple implementations for them to avoid breaking imports.
 
-export { FeatureGrid, FeatureCard, Card, CardContent };
+const FeatureGrid = ({ className, ...props }) => (
+  <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", className)} {...props} />
+)
+
+const FeatureCard = ({ className, children, ...props }) => (
+  <Card className={cn("hover:shadow-lg transition-shadow duration-300", className)} {...props}>
+    <CardContent className="p-6">{children}</CardContent>
+  </Card>
+)
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, FeatureGrid, FeatureCard }

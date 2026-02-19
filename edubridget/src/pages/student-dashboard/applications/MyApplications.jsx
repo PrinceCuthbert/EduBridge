@@ -1,13 +1,13 @@
-// src/pages/dashboard/MyApplications.jsx
+﻿// src/pages/dashboard/MyApplications.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, Edit, Trash2, ChevronDown, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
-import { useAuth } from "../../context/AuthContext";
-import { useApplications } from "../../hooks/useApplications";
-import StatusBadge from "../../components/shared/StatusBadge";
+import { useAuth } from "../../../context/AuthContext";
+import { useApplications } from "../../../hooks/useApplications";
+import StatusBadge from "../../../components/shared/StatusBadge";
 // [FIX #5] Replaced local formatDate with shared utility — src/utils/formatDate.js
-import { formatDate } from "../../utils/formatDate";
+import { formatDate } from "../../../utils/formatDate";
 
 const STATUS_OPTIONS = ["All Statuses", "Pending", "Reviewing", "Needs Changes", "Approved", "Rejected"];
 const SORT_OPTIONS   = ["Newest First", "Oldest First"];

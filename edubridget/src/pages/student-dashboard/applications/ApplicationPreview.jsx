@@ -1,12 +1,14 @@
-// src/pages/dashboard/ApplicationDetail.jsx
+﻿// src/pages/dashboard/ApplicationPreview.jsx
 // Student read-only view of a single application
+
+
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, FileText, Download, Mail, Phone, Calendar } from "lucide-react";
-import { getApplicationById } from "../../services/applicationService";
-import StatusBadge from "../../components/shared/StatusBadge";
+import { getApplicationById } from "../../../services/applicationService";
+import StatusBadge from "../../../components/shared/StatusBadge";
 
-export default function ApplicationDetail() {
+export default function ApplicationPreview() {
   const { id } = useParams();
   const navigate = useNavigate();
   const app = getApplicationById(id);

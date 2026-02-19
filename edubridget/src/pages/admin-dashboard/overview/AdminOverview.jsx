@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import {
   Users,
   FileText,
@@ -12,47 +12,14 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import AdminPageHeader from "../../components/admin/AdminPageHeader";
-import AdminStatsGrid from "../../components/admin/AdminStatsGrid";
+import AdminPageHeader from "../../../components/admin/AdminPageHeader";
+import AdminStatsGrid from "../../../components/admin/AdminStatsGrid";
 
-const MOCK_STATS = [
-  {
-    label: "Total Students",
-    value: "1,284",
-    change: "+12.5%",
-    trend: "12% increase",
-    icon: Users,
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-  },
-  {
-    label: "New Applications",
-    value: "42",
-    change: "+3.2%",
-    trend: "3% increase",
-    icon: FileText,
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-  },
-  {
-    label: "Visa Consultations",
-    value: "156",
-    change: "+8.4%",
-    trend: "8% increase",
-    icon: Plane,
-    color: "text-indigo-600",
-    bg: "bg-indigo-50",
-  },
-  {
-    label: "Total Programs",
-    value: "84",
-    change: "0%",
-    trend: "Stable",
-    icon: Award,
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
-  },
-];
+import { MOCK_OVERVIEW_STATS } from "../../../data/adminMockData";
+
+// Resolve icon references (stored as strings in data layer → actual components here)
+const ICON_MAP = { Users, FileText, Plane, Award };
+const MOCK_STATS = MOCK_OVERVIEW_STATS.map(s => ({ ...s, icon: ICON_MAP[s.icon] ?? Users }));
 
 const QUICK_ACTIONS_CONFIG = [
   {

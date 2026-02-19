@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,8 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileCheck, MapPin, CheckCircle, Phone, Mail } from "lucide-react";
-import AOS from "aos";
-import "aos/dist/aos.css";
+
 
 const VisaConsultationPage = () => {
   const { t } = useTranslation();
@@ -71,12 +70,6 @@ const VisaConsultationPage = () => {
     "Other",
   ];
 
-  useEffect(() => {
-    AOS.init({
-      duration: 800,
-      once: true,
-    });
-  }, []);
 
   const [formData, setFormData] = useState({
     name: "",

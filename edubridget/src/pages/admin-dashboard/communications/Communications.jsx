@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Send, Mail, MessageSquare, Bell, Users, Search, X } from 'lucide-react';
 // TODO: Uncomment when axios is installed
-// import { communicationAPI, userAPI } from '../../api/services';
-import { useAsyncAction, usePaginatedFetch, useDebounce } from '../../hooks/useApi';
+// import { communicationAPI, userAPI } from '../../../api/services';
+import { useAsyncAction, usePaginatedFetch, useDebounce } from '../../../hooks/useApi';
 import { toast } from 'sonner';
-import Modal from '../../components/Modal';
+import Modal from '../../../components/Modal';
 
 export default function Communications() {
   const [activeTab, setActiveTab] = useState('bulk');

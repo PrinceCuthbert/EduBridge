@@ -30,6 +30,10 @@ export default function ProgramDetail() {
     - payload: URL string or File object
   */
   const handleApply = async (type = 'default', payload = null) => {
+
+    // We must check before because the uesr can see this page even before being authenticated too at /study-abroad/{id}
+
+
     // 1. Check Authentication FIRST
     if (!isAuthenticated) {
       toast.error("Please login to continue with your application");
@@ -202,11 +206,13 @@ export default function ProgramDetail() {
                     <ProgramTimeline timeline={program.timeline} />
                     <ProgramRequirements documents={program.requiredDocuments} />
 
-                    <ProgramApplication 
+                    {/* Removed this because we are now we are not in the dashboard for application submission */}
+
+                    {/* <ProgramApplication 
                        applicationLink={program.applicationLink} 
                        applicationFile={program.applicationFile}
                        onApply={handleApply}
-                    />
+                    /> */}
                   </>
                 ) : (
                   <div className="text-center py-12 text-slate-500">

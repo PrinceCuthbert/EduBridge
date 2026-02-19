@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import OptimizedImage from "../OptimizedImage";
 
 function Slider({
   partners,
@@ -64,12 +63,16 @@ function Slider({
               key={index}
               style={{ width: `${imageWidth}px`, marginRight: `${gap}px` }}
               className="h-[133px] flex-shrink-0 flex items-center justify-center bg-white rounded-full p-5 shadow-md transition-transform duration-300 hover:scale-110 hover:shadow-xl cursor-pointer">
-              <OptimizedImage
+          
+              <img
                 src={partner.logo}
-                alt={`${partner.name} Logo`}
+                alt={partner.name}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.name)}&size=200&background=1e3a8a&color=fff&bold=true&rounded=true`;
+                }}
                 className="max-w-full max-h-full object-contain hover:grayscale transition-all"
-                rounded={true}
-                showSkeleton={true}
+                  loading="lazy"
               />
             </div>
           ))}

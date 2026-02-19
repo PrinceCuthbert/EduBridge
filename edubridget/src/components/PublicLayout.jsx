@@ -4,7 +4,9 @@ import Header from './Header';
 import Footer from '../pages/footer/footer';
 import WhatsAppButton from './WhatsAppButton';
 
-export default function PublicLayout() {
+export default function
+  
+  PublicLayout() {
   return (
     <>
       <Suspense fallback={<div className="h-16 bg-white shadow-sm" />}>

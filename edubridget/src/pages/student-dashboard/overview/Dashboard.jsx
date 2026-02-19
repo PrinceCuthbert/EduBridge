@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { FileText, Plane, BookOpen, Globe, User, PlusCircle, ArrowRight, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -12,8 +12,8 @@ export default function Dashboard() {
 
   const quickActions = [
     { label: "Manage Profile", icon: User, path: "/dashboard/profile" },
-    { label: "Submit New Application", icon: PlusCircle, path: "/dashboard/applications/submit" },
-    { label: "Browse Library", icon: BookOpen, path: "/library" },
+    { label: "Submit New Application", icon: PlusCircle, path: "/dashboard/programs" },
+    { label: "Browse Library", icon: BookOpen, path: "/dashboard/library" },
     { label: "Track Visa Application", icon: Plane, path: "/dashboard/visa-status" },
   ];
 

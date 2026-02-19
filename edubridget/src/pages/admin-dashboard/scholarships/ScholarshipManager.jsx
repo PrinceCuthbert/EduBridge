@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Plus, Edit, Trash2, FileText, Globe, Calendar, CheckCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { MOCK_SCHOLARSHIPS } from '../../data/mockData';
-import AdminPageHeader from "../../components/admin/AdminPageHeader";
-import AdminStatsGrid from "../../components/admin/AdminStatsGrid";
-import AdminFilterBar from "../../components/admin/AdminFilterBar";
-import AdminTable from "../../components/admin/AdminTable";
+import { MOCK_SCHOLARSHIPS } from '../../../data/mockData';
+import AdminPageHeader from "../../../components/admin/AdminPageHeader";
+import AdminStatsGrid from "../../../components/admin/AdminStatsGrid";
+import AdminFilterBar from "../../../components/admin/AdminFilterBar";
+import AdminTable from "../../../components/admin/AdminTable";
 
 export default function ScholarshipManager() {
   const navigate = useNavigate();

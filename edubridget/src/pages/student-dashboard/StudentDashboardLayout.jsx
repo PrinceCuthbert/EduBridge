@@ -69,8 +69,8 @@ export default function StudentDashboardLayout() {
       ]
     },
     { label: "University Programs", path: "/dashboard/programs", icon: GraduationCap },
-    { label: "Library", path: "/NotFound", icon: BookOpen },
-    { label: "Study Resources", path: "/NotFound", icon: Globe },
+    { label: "Library", path: "/dashboard/library", icon: BookOpen },
+    { label: "Study Resources", path: "/dashboard/study-resources", icon: Globe },
     { label: "Profile Settings", path: "/dashboard/profile", icon: User },
   ];
 

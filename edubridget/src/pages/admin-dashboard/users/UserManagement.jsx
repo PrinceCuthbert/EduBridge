@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import {
   Plus,
   Users,
@@ -15,55 +15,13 @@ import {
   Calendar
 } from "lucide-react";
 import { toast } from "sonner";
-import Modal from "../../components/Modal";
-import AdminPageHeader from "../../components/admin/AdminPageHeader";
-import AdminStatsGrid from "../../components/admin/AdminStatsGrid";
-import AdminFilterBar from "../../components/admin/AdminFilterBar";
-import AdminTable from "../../components/admin/AdminTable";
+import Modal from "../../../components/Modal";
+import AdminPageHeader from "../../../components/admin/AdminPageHeader";
+import AdminStatsGrid from "../../../components/admin/AdminStatsGrid";
+import AdminFilterBar from "../../../components/admin/AdminFilterBar";
+import AdminTable from "../../../components/admin/AdminTable";
 
-// Mock data
-const MOCK_USERS = [
-  {
-    id: 1,
-    name: "Alice Mutesi",
-    email: "alice@example.com",
-    role: "Student",
-    phone: "+250 788 123 456",
-    country: "Rwanda",
-    status: "Active",
-    joined: "2024-01-15",
-  },
-  {
-    id: 2,
-    name: "David Kwizera",
-    email: "david@example.com",
-    role: "Admin",
-    phone: "+250 788 654 321",
-    country: "Rwanda",
-    status: "Active",
-    joined: "2024-01-10",
-  },
-  {
-    id: 3,
-    name: "Sarah Uwase",
-    email: "sarah@example.com",
-    role: "Student",
-    phone: "+250 788 987 654",
-    country: "Uganda",
-    status: "Inactive",
-    joined: "2024-01-20",
-  },
-  {
-    id: 4, 
-    name: "John Doe",
-    email: "john@example.com",
-    role: "Student",
-    phone: "+250 788 111 222",
-    country: "Kenya",
-    status: "Active",
-    joined: "2024-02-01",
-  }
-];
+import { MOCK_USERS } from "../../../data/adminMockData";
 
 export default function UserManagement() {
   const [loading, setLoading] = useState(false);

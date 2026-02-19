@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { DollarSign, FileText, Users, TrendingDown, Download, Filter } from 'lucide-react';
-import AdminPageHeader from "../../components/admin/AdminPageHeader";
-import AdminStatsGrid from "../../components/admin/AdminStatsGrid";
-import AdminCard from "../../components/admin/AdminCard";
-import AdminTable from "../../components/admin/AdminTable";
-import AdminFilterBar from "../../components/admin/AdminFilterBar";
+import AdminPageHeader from "../../../components/admin/AdminPageHeader";
+import AdminStatsGrid from "../../../components/admin/AdminStatsGrid";
+import AdminCard from "../../../components/admin/AdminCard";
+import AdminTable from "../../../components/admin/AdminTable";
+import AdminFilterBar from "../../../components/admin/AdminFilterBar";
 
 export default function FinancialReports() {
   const [timeRange, setTimeRange] = useState("This Month");

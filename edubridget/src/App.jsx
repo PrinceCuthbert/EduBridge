@@ -5,9 +5,8 @@ import "aos/dist/aos.css";
 import AOS from "aos";
 
 import LoadingSpinner from "./components/LoadingSpinner";
-import WhatsAppButton from "./components/WhatsAppButton"; // Wait, WhatsAppButton is in PublicLayout?
-
-
+import WhatsAppButton from "./components/WhatsAppButton";
+import ErrorBoundary from "./components/ErrorBoundary";
 import usePageLanguage from "./hooks/usePageLanguage";
 import { AuthProvider } from "./context/AuthContext";
 
@@ -31,7 +30,7 @@ function App() {
 
   useEffect(() => {
     AOS.init({
-      duration: 1000,
+      duration: 600,
       once: true,
     });
   }, []);
@@ -46,18 +45,21 @@ function App() {
           toastOptions={{ style: { zIndex: 9999 } }}
         />
         <div className="flex flex-col min-h-screen">
-          <Suspense fallback={<LoadingSpinner />}>
-            <Routes>
-              {/* Admin Section */}
-              <Route path="/admin/*" element={<AdminRoutes />} />
-              
-              {/* Student Dashboard Section */}
-              <Route path="/dashboard/*" element={<StudentRoutes />} />
-              
-              {/* Public Section (Catch-all) */}
-              <Route path="/*" element={<PublicRoutes />} />
-            </Routes>
-          </Suspense>
+          {/* ErrorBoundary catches chunk load failures from lazy routes */}
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
+                {/* Admin Section */}
+                <Route path="/admin/*" element={<AdminRoutes />} />
+
+                {/* Student Dashboard Section */}
+                <Route path="/dashboard/*" element={<StudentRoutes />} />
+
+                {/* Public Section (Catch-all) */}
+                <Route path="/*" element={<PublicRoutes />} />
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </Router>
     </AuthProvider>

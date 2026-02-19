@@ -1,10 +1,10 @@
-// src/pages/dashboard/ApplicationSubmitForm.jsx
+﻿// src/pages/dashboard/ApplicationSubmitForm.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { usePrograms } from "../../hooks/usePrograms";
-import { useApplications } from "../../hooks/useApplications";
-import { getApplicationById } from "../../services/applicationService";
-import { useAuth } from "../../context/AuthContext";
+import { usePrograms } from "../../../hooks/usePrograms";
+import { useApplications } from "../../../hooks/useApplications";
+import { getApplicationById } from "../../../services/applicationService";
+import { useAuth } from "../../../context/AuthContext";
 import { Upload, X, FileText, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 

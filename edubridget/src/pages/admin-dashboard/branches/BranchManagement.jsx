@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import {
   Plus,
   Building,
@@ -11,62 +11,12 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
-import Modal from "../../components/Modal";
-import AdminPageHeader from "../../components/admin/AdminPageHeader";
-import AdminStatsGrid from "../../components/admin/AdminStatsGrid";
-import AdminFilterBar from "../../components/admin/AdminFilterBar";
+import Modal from "../../../components/Modal";
+import AdminPageHeader from "../../../components/admin/AdminPageHeader";
+import AdminStatsGrid from "../../../components/admin/AdminStatsGrid";
+import AdminFilterBar from "../../../components/admin/AdminFilterBar";
 
-// Mock data
-const MOCK_BRANCHES = [
-  {
-    id: 1,
-    name: "EduBridge Rwanda HQ",
-    location: "Kigali, Rwanda",
-    address: "KG 123 Street, Nyarugenge District",
-    phone: "+250 788 123 456",
-    email: "rwanda@edubridge.com",
-    hours: "Mon-Fri: 8AM-6PM, Sat: 8AM-1PM",
-    staff: 12,
-    managerName: "Jean Claude Niyonzima",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "EduBridge Kenya",
-    location: "Nairobi, Kenya",
-    address: "Westlands Business Park, Tower A",
-    phone: "+254 700 123 456",
-    email: "kenya@edubridge.com",
-    hours: "Mon-Fri: 8AM-6PM",
-    staff: 8,
-    managerName: "Sarah Wanjiku",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "EduBridge Uganda",
-    location: "Kampala, Uganda",
-    address: "Plot 24, Nakasero Road",
-    phone: "+256 772 123 456",
-    email: "uganda@edubridge.com",
-    hours: "Mon-Fri: 8:30AM-5:30PM",
-    staff: 6,
-    managerName: "David Ochieng",
-    status: "Active",
-  },
-  {
-    id: 4,
-    name: "EduBridge Tanzania",
-    location: "Dar es Salaam, Tanzania",
-    address: "Posta Road, CBD",
-    phone: "+255 755 123 456",
-    email: "tanzania@edubridge.com",
-    hours: "Opening Q2 2024",
-    staff: 2,
-    managerName: "Amina Hassan",
-    status: "Coming Soon",
-  },
-];
+import { MOCK_BRANCHES } from "../../../data/adminMockData";
 
 export default function BranchManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);

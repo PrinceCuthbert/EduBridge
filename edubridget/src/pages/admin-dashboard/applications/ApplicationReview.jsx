@@ -1,15 +1,21 @@
-// src/pages/admin/ApplicationReview.jsx
+﻿// src/pages/admin/ApplicationReview.jsx
 // Admin list view — shows ALL applications from all students.
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText } from "lucide-react";
-import AdminPageHeader from "../../components/admin/AdminPageHeader";
-import AdminFilterBar  from "../../components/admin/AdminFilterBar";
-import AdminTable      from "../../components/admin/AdminTable";
-import StatusBadge     from "../../components/shared/StatusBadge";
-import { useApplications } from "../../hooks/useApplications";
+import AdminPageHeader from "../../../components/admin/AdminPageHeader";
+import AdminFilterBar  from "../../../components/admin/AdminFilterBar";
+import AdminTable      from "../../../components/admin/AdminTable";
+import StatusBadge     from "../../../components/shared/StatusBadge";
+import { useApplications } from "../../../hooks/useApplications";
 // [FIX #5] Replaced local formatDate with shared utility — src/utils/formatDate.js
-import { formatDate } from "../../utils/formatDate";
+import { formatDate } from "../../../utils/formatDate";
+
+
+// table where all data of the applications are rendered
+// table where all data of the applications are rendered
+// table where all data of the applications are rendered
+// table where all data of the applications are rendered
 
 const TAB_OPTIONS = ["All", "Pending", "Reviewing", "Needs Changes", "Approved", "Rejected"];
 

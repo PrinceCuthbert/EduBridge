@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { TrendingUp, Users, FileText, DollarSign, Download, Calendar, BarChart3 } from 'lucide-react';
 // TODO: Uncomment when axios is installed
-// import { analyticsAPI } from '../../api/services';
-import { useFetch } from '../../hooks/useApi';
+// import { analyticsAPI } from '../../../api/services';
+import { useFetch } from '../../../hooks/useApi';
 import { toast } from 'sonner';
 
 export default function Analytics() {

@@ -1,4 +1,4 @@
-// src/pages/admin/AdminApplicationReview.jsx
+﻿// src/pages/admin/AdminApplicationReview.jsx
 // Admin detail — review a single application and update its status.
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -7,12 +7,16 @@ import {
   GraduationCap, AlertCircle, CheckCircle, XCircle, Clock, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
-import AdminCard   from "../../components/admin/AdminCard";
-import StatusBadge, { STATUS_CONFIG } from "../../components/shared/StatusBadge";
-import { getApplicationById }    from "../../services/applicationService";
-import { useApplications }        from "../../hooks/useApplications";
+import AdminCard   from "../../../components/admin/AdminCard";
+import StatusBadge, { STATUS_CONFIG } from "../../../components/shared/StatusBadge";
+import { getApplicationById }    from "../../../services/applicationService";
+import { useApplications }        from "../../../hooks/useApplications";
 // [FIX #5] Uses formatDateLong (full month) from shared utility — src/utils/formatDate.js
-import { formatDateLong } from "../../utils/formatDate";
+import { formatDateLong } from "../../../utils/formatDate";
+
+
+// The review page is where the admin can review the applications of the students
+// and update the status of the applications
 
 const STATUSES = ["Pending", "Reviewing", "Needs Changes", "Approved", "Rejected"];
 

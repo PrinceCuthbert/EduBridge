@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+﻿import React, { useState, useEffect, useMemo } from "react";
 import {
   Plus,
   Clock,
@@ -22,75 +22,13 @@ import {
   Search,
 } from "lucide-react";
 import { toast } from "sonner";
-import Modal from "../../components/Modal";
-import AdminPageHeader from "../../components/admin/AdminPageHeader";
-import AdminStatsGrid from "../../components/admin/AdminStatsGrid";
-import AdminFilterBar from "../../components/admin/AdminFilterBar";
-import AdminTable from "../../components/admin/AdminTable";
+import Modal from "../../../components/Modal";
+import AdminPageHeader from "../../../components/admin/AdminPageHeader";
+import AdminStatsGrid from "../../../components/admin/AdminStatsGrid";
+import AdminFilterBar from "../../../components/admin/AdminFilterBar";
+import AdminTable from "../../../components/admin/AdminTable";
 
-// Mock data
-const MOCK_CASES = [
-  {
-    id: 1,
-    clientName: "John Kariuki",
-    email: "john.k@email.com",
-    phone: "+254 700 123 456",
-    country: "Canada",
-    visaType: "Study Visa",
-    appointmentDate: "2024-02-15",
-    appointmentType: "Online",
-    consultationFee: "$150",
-    status: "In Progress",
-    documents: ["Passport", "Admission Letter", "Bank Statement"],
-    notes: "All documents submitted",
-    createdAt: "2024-02-01",
-  },
-  {
-    id: 2,
-    clientName: "Sarah Wanjiku",
-    email: "sarah.w@email.com",
-    phone: "+254 722 456 789",
-    country: "UK",
-    visaType: "Work Visa",
-    appointmentDate: "2024-02-18",
-    appointmentType: "Offline",
-    consultationFee: "$200",
-    status: "Approved",
-    documents: ["Passport", "Job Offer", "Police Clearance"],
-    notes: "Visa approved",
-    createdAt: "2024-01-25",
-  },
-  {
-    id: 3,
-    clientName: "David Omondi",
-    email: "david.o@email.com",
-    phone: "+254 711 987 654",
-    country: "USA",
-    visaType: "General Visit",
-    appointmentDate: "2024-02-20",
-    appointmentType: "Online",
-    consultationFee: "$100",
-    status: "Pending Documents",
-    documents: ["Passport"],
-    notes: "Missing bank statement",
-    createdAt: "2024-02-05",
-  },
-  {
-    id: 4,
-    clientName: "Grace Mutua",
-    email: "grace.m@email.com",
-    phone: "+254 733 456 789",
-    country: "USA",
-    visaType: "Business Visa",
-    appointmentDate: "2024-02-12",
-    appointmentType: "Offline",
-    consultationFee: "$250",
-    status: "Rejected",
-    documents: ["Passport", "Business License", "Tax Returns"],
-    notes: "Resubmission recommended",
-    createdAt: "2024-01-20",
-  },
-];
+import { MOCK_VISA_CASES as MOCK_CASES } from "../../../data/adminMockData";
 
 export default function VisaCases() {
   const [isModalOpen, setIsModalOpen] = useState(false);

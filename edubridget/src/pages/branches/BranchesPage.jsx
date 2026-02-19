@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Phone, Mail, Clock, User, ChevronRight, Building2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import InteractiveMap from "@/components/InteractiveMap";
+const InteractiveMap = lazy(() => import("@/components/InteractiveMap"));
 import { branches } from "@/data/branches";
 import { useTranslation } from "react-i18next";
 
@@ -94,14 +94,20 @@ const BranchesPage = () => {
             </div>
 
             {/* Interactive Leaflet Map - Landscape on mobile */}
-            <div className="max-w-5xl mx-auto">
-              <InteractiveMap 
-                branches={branches}
-                selectedBranch={selectedBranch}
-                onMarkerClick={setSelectedBranch}
-                className="h-[400px] md:h-[500px] lg:h-[550px]"
-              />
-            </div>
+           <div className="max-w-5xl mx-auto">
+             <Suspense fallback={
+               <div className="h-[400px] md:h-[500px] bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center">
+                  <span className="text-slate-400 text-sm">Loading map...</span>
+               </div>
+             }>
+               <InteractiveMap 
+                 branches={branches}
+                 selectedBranch={selectedBranch}
+                 onMarkerClick={setSelectedBranch}
+                 className="h-[400px] md:h-[500px] lg:h-[550px]"
+               />
+             </Suspense>
+</div>    
           </div>
         </section>
 
