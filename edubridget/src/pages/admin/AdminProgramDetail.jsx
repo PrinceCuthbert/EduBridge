@@ -310,7 +310,7 @@ export default function AdminProgramDetail() {
         <div className="space-y-6">
 
           {/* Media */}
-          <AdminCard title="Media">
+          <AdminCard title="School Logo">
              <div className="space-y-4">
                <div>
                  <label className={labelClassName}>Logo URL</label>
@@ -377,11 +377,11 @@ export default function AdminProgramDetail() {
              </div>
           </AdminCard>
           
-          {/* Settings */}
-          <AdminCard title="Settings">
+          {/* Fees */}
+          <AdminCard title="Fees">
              <div className="space-y-4">
                <div>
-                 <label className={labelClassName}>Tuition / Fee</label>
+                 <label className={labelClassName}>Tuition Fee</label>
                  <div className="relative">
                     <input 
                         type="text"
@@ -389,8 +389,8 @@ export default function AdminProgramDetail() {
                         onChange={(e) => setFormData({...formData, tuition: e.target.value})}
                         className={`${inputClassName} pl-10`}
                         placeholder="e.g. $8,000/year" 
-                    />
-                    <DollarSign size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    />  
+                    {/* <DollarSign size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" /> */}
                  </div>
                </div>
 

@@ -1,136 +1,231 @@
-import React, { useState } from 'react';
-import { Eye, MoreHorizontal, ChevronDown, Clock } from 'lucide-react';
+// src/pages/dashboard/MyApplications.jsx
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Eye, Edit, Trash2, ChevronDown, GraduationCap } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "../../context/AuthContext";
+import { useApplications } from "../../hooks/useApplications";
+import StatusBadge from "../../components/shared/StatusBadge";
+// [FIX #5] Replaced local formatDate with shared utility — src/utils/formatDate.js
+import { formatDate } from "../../utils/formatDate";
+
+const STATUS_OPTIONS = ["All Statuses", "Pending", "Reviewing", "Needs Changes", "Approved", "Rejected"];
+const SORT_OPTIONS   = ["Newest First", "Oldest First"];
+
+// ── Skeleton row ─────────────────────────────────────────────────────────────
+const SkeletonRow = () => (
+  <tr className="animate-pulse">
+    {[...Array(4)].map((_, i) => (
+      <td key={i} className="px-6 py-4">
+        <div className="h-4 bg-slate-100 rounded w-3/4" />
+      </td>
+    ))}
+  </tr>
+);
 
 export default function MyApplications() {
+  const navigate      = useNavigate();
+  const { user }      = useAuth();
   const [filterStatus, setFilterStatus] = useState("All Statuses");
-  const [sortOrder, setSortOrder] = useState("Newest First");
+  const [sortOrder,    setSortOrder]    = useState("Newest First");
 
-  // Mock Data
-  const applications = [
-    {
-      id: "CAM001234",
-      university: "University of Cambridge",
-      program: "MPhil in Advanced Computer Science",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Coat_of_Arms_of_the_University_of_Cambridge.svg/1200px-Coat_of_Arms_of_the_University_of_Cambridge.svg.png",
-      date: "2023-01-15",
-      status: "Accepted",
-      statusColor: "bg-green-50 text-green-700 border-green-100",
-    },
-    {
-      id: "OXF005678",
-      university: "University of Oxford",
-      program: "MSc in Financial Economics",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Coat_of_arms_of_the_University_of_Oxford.svg/1200px-Coat_of_arms_of_the_University_of_Oxford.svg.png",
-      date: "2023-02-20",
-      status: "Under Review",
-      statusColor: "bg-orange-50 text-orange-700 border-orange-100",
-    },
-    {
-      id: "LSE009012",
-      university: "London School of Economics",
-      program: "MSc in International Relations",
-      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/4/42/LSE_Coat_of_Arms.svg/1200px-LSE_Coat_of_Arms.svg.png",
-      date: "2023-03-10",
-      status: "Under Review",
-      statusColor: "bg-orange-50 text-orange-700 border-orange-100",
-    },
-    {
-      id: "IMP003456",
-      university: "Imperial College London",
-      program: "MEng Aeronautical Engineering",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Shield_of_Imperial_College_London.svg/1200px-Shield_of_Imperial_College_London.svg.png",
-      date: "2023-04-01",
-      status: "Declined",
-      statusColor: "bg-red-50 text-red-700 border-red-100",
-    },
-    {
-      id: "UCL007890",
-      university: "University College London",
-      program: "BSc Computer Science",
-      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d1/University_College_London_coat_of_arms.svg/1200px-University_College_London_coat_of_arms.svg.png",
-      date: "2023-04-25",
-      status: "Under Review",
-      statusColor: "bg-orange-50 text-orange-700 border-orange-100",
-    },
-  ];
+  const {
+    applications,
+    loading,
+    fetchApplications,
+    deleteApplication,
+  } = useApplications(user?.id);
+
+  // [FIX #1] Manual fetch removed — useApplications auto-fetches on mount now.
+
+  // ── Filter & sort ──────────────────────────────────────────────────────────
+  const displayed = [...applications]
+    .filter((app) =>
+      filterStatus === "All Statuses" ? true : app.status === filterStatus
+    )
+    .sort((a, b) => {
+      const diff = new Date(b.submissionDate) - new Date(a.submissionDate);
+      return sortOrder === "Newest First" ? diff : -diff;
+    });
+
+  // ── Delete with toast confirm ──────────────────────────────────────────────
+  const handleDelete = (app) => {
+    toast.warning(`Delete application for ${app.universityName}?`, {
+      description: "This action cannot be undone.",
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          await deleteApplication(app.id);
+          toast.success("Application deleted.");
+        },
+      },
+      cancel: {
+        label: "Cancel",
+        onClick: () => {},
+      },
+      duration: 8000,
+    });
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
+      {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-serif text-slate-900 tracking-tight">My Applications</h1>
-        
-        <div className="flex items-center gap-3">
-           {/* Status Filter */}
-           <div className="relative">
-             <button className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">
-               <span>{filterStatus}</span>
-               <ChevronDown size={14} className="text-slate-400" />
-             </button>
-           </div>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">My Applications</h1>
 
-           {/* Sort Order */}
-           <div className="relative">
-             <button className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">
-               <span>{sortOrder}</span>
-               <ChevronDown size={14} className="text-slate-400" />
-             </button>
-           </div>
+        <div className="flex items-center gap-3">
+          {/* Status filter */}
+          <div className="relative">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="appearance-none pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              {STATUS_OPTIONS.map((s) => (
+                <option key={s}>{s}</option>
+              ))}
+            </select>
+            <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          </div>
+
+          {/* Sort */}
+          <div className="relative">
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="appearance-none pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              {SORT_OPTIONS.map((s) => (
+                <option key={s}>{s}</option>
+              ))}
+            </select>
+            <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          </div>
         </div>
       </div>
 
-      {/* Applications Table Card */}
+      {/* Table card */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50/50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">University & Program</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Application ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Submission Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  University &amp; Program
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  Submission Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
+
             <tbody className="divide-y divide-slate-100">
-              {applications.map((app) => (
-                <tr key={app.id} className="hover:bg-slate-50/50 transition-colors group">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 p-1.5 flex items-center justify-center shrink-0">
-                        <img src={app.logo} alt={app.university} className="w-full h-full object-contain" />
+              {/* Loading skeleton */}
+              {loading && [...Array(3)].map((_, i) => <SkeletonRow key={i} />)}
+
+              {/* Empty state */}
+              {!loading && displayed.length === 0 && (
+                <tr>
+                  <td colSpan={4}>
+                    <div className="flex flex-col items-center py-16 gap-4">
+                      <div className="w-14 h-14 bg-slate-100 rounded-full flex items-center justify-center">
+                        <GraduationCap size={28} className="text-slate-400" />
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-900">{app.university}</p>
-                        <p className="text-xs text-slate-500 mt-0.5">{app.program}</p>
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-slate-700">
+                          {filterStatus === "All Statuses"
+                            ? "No applications yet"
+                            : `No "${filterStatus}" applications`}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {filterStatus === "All Statuses"
+                            ? "Browse programs and submit your first application."
+                            : "Try a different status filter."}
+                        </p>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-1 rounded">{app.id}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-slate-500 text-sm">
-                      <Clock size={14} className="text-slate-400" />
-                      <span className="text-xs">{app.date}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${app.statusColor}`}>
-                      {app.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                        <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="View Details">
-                            <Eye size={16} />
+                      {filterStatus === "All Statuses" && (
+                        <button
+                          onClick={() => navigate("/dashboard/programs")}
+                          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                          Browse Programs
                         </button>
-                        <button className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors">
-                            <MoreHorizontal size={16} />
-                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
-              ))}
+              )}
+
+              {/* Rows */}
+              {!loading &&
+                displayed.map((app) => (
+                  <tr
+                    key={app.id}
+                    className="hover:bg-slate-50/50 transition-colors group"
+                  >
+                    {/* University & Program */}
+                    <td className="px-6 py-4">
+                      <p className="text-sm font-medium text-slate-900">
+                        {app.universityName}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {app.programName}
+                      </p>
+                    </td>
+
+                    {/* Date */}
+                    <td className="px-6 py-4">
+                      <span className="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-1 rounded">
+                        {formatDate(app.submissionDate)}
+                      </span>
+                    </td>
+
+                    {/* Status */}
+                    <td className="px-6 py-4">
+                      <StatusBadge status={app.status} />
+                    </td>
+
+                    {/* Actions */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-center gap-2">
+                        {/* View */}
+                        <button
+                          onClick={() => navigate(`/dashboard/applications/${app.id}`)}
+                          className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
+                          title="View Details"
+                        >
+                          <Eye size={16} />
+                        </button>
+
+                        {/* Edit */}
+                        <button
+                          onClick={() =>
+                            navigate(`/dashboard/applications/edit/${app.id}?edit=true`)
+                          }
+                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                          title="Edit Application"
+                        >
+                          <Edit size={16} />
+                        </button>
+
+                        {/* Delete */}
+                        <button
+                          onClick={() => handleDelete(app)}
+                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="Delete Application"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

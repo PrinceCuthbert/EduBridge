@@ -85,7 +85,7 @@ export default function Dashboard() {
               <h4 className="text-slate-900 font-medium text-sm mb-1">No applications yet</h4>
               <p className="text-slate-500 text-xs max-w-xs leading-relaxed">Applications will appear here once you start applying to university programs.</p>
               
-              <Link to="/study-abroad" className="mt-4 px-4 py-2 bg-slate-900 text-white text-xs font-medium rounded-lg hover:bg-slate-800 transition-colors">
+              <Link to="/dashboard/programs" className="mt-4 px-4 py-2 bg-slate-900 text-white text-xs font-medium rounded-lg hover:bg-slate-800 transition-colors">
                 Start Application
               </Link>
             </div>

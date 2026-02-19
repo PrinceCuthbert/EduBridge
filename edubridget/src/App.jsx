@@ -6,12 +6,7 @@ import AOS from "aos";
 
 import LoadingSpinner from "./components/LoadingSpinner";
 import WhatsAppButton from "./components/WhatsAppButton"; // Wait, WhatsAppButton is in PublicLayout?
-// WhatsAppButton was in PublicLayout in my new code. So I can remove it from here?
-// But it was also in App.jsx line 128 (PublicLayout definition).
-// So if PublicRoutes uses PublicLayout, WhatsAppButton is there.
-// Does Admin need WhatsAppButton? Probably not.
-// Does Student need it? Probably not.
-// So removing from App.jsx is correct.
+
 
 import usePageLanguage from "./hooks/usePageLanguage";
 import { AuthProvider } from "./context/AuthContext";

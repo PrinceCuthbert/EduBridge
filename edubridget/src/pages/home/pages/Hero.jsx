@@ -34,7 +34,11 @@ const Hero = () => {
 
   return (
     <>
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden min-h-[90vh] flex items-center">
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden min-h-[90vh] flex items-center "
+
+
+
+      >
         {/* Video Background */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <video
@@ -54,7 +58,7 @@ const Hero = () => {
 
           {/* Fallback gradient background if video fails */}
           <div
-            className="absolute inset-0 bg-primary-gradient opacity-90"
+            className="absolute inset-0 bg-primary-gradient opacity-65"
             style={{ mixBlendMode: "multiply" }}
           />
         </div>
@@ -68,14 +72,14 @@ const Hero = () => {
             {/* Content side */}
             <div className="flex-1 text-center lg:text-left">
               {/* Live Badge with improved styling */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white backdrop-blur-md rounded-full text-sm font-semibold mb-6 border border-white/20">
+              {/* <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white backdrop-blur-md rounded-full text-sm font-semibold mb-6 border border-white/20">
                 <span className="relative flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
                 </span>
                 <span className="text-accent font-bold">● {t('home_page.hero.live_label')}</span>
                 <span>{t('home_page.hero.live_text', { count: '2,400' })}</span>
-              </div>
+              </div> */}
 
               {/* Heading with updated micro-copy */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 font-serif">
@@ -139,13 +143,16 @@ const Hero = () => {
             </div>
 
             {/* Image side with glassmorphic card */}
-            <div className="flex-1 relative w-full max-w-2xl">
+            <div className="flex-1 relative w-full max-w-2xl "
+
+
+            >
               <div className="relative z-10 group">
                 {/* Glow effect */}
                 <div className="absolute -inset-6 bg-gradient-to-r from-accent/30 via-primary/20 to-secondary/30 rounded-[3rem] blur-2xl opacity-60 group-hover:opacity-80 transition-opacity" />
 
                 {/* Main image container */}
-                <div className="relative bg-white/10 p-4 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-md border border-white/20">
+                <div className="relative bg-white/10 p-4 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md border border-white/20">
                   <img
                     src="/Students.png"
                     alt="Students celebrating graduation"
@@ -154,7 +161,7 @@ const Hero = () => {
                 </div>
 
                 {/* Floating certified badge */}
-                <div className="absolute -top-6 -right-6 bg-white/95 backdrop-blur-sm p-4 rounded-2xl shadow-lift animate-bounce-gentle hover:scale-105 transition-transform cursor-default">
+                {/* <div className="absolute -top-6 -right-6 bg-white/95 backdrop-blur-sm p-4 rounded-2xl shadow-lift animate-bounce-gentle hover:scale-105 transition-transform cursor-default">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center text-secondary">
                       <svg
@@ -179,7 +186,7 @@ const Hero = () => {
                       </p>
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Success rate badge */}
                 <div className="absolute -bottom-8 -left-8 bg-gradient-to-br from-accent to-accent-light p-6 rounded-2xl shadow-lift hover:scale-105 transition-transform cursor-default">
@@ -191,6 +198,20 @@ const Hero = () => {
               </div>
             </div>
           </div>
+        </div>
+        <div className="absolute -bottom-1 left-0 w-full overflow-hidden leading-[0] z-20">
+          <svg
+            data-name="Layer 1"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1200 120"
+            preserveAspectRatio="none"
+            className="relative block w-full h-[50px] sm:h-[80px] lg:h-[120px] fill-surface rotate-180"
+          >
+            <path
+              d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+              className="fill-surface"
+            ></path>
+          </svg>s
         </div>
       </section>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { 
@@ -15,7 +15,8 @@ import {
   MessageSquare,
   GraduationCap,
   ChevronDown,
-  PanelLeft
+  PanelLeft,
+  Settings
 } from 'lucide-react';
 
 export default function StudentDashboardLayout() {
@@ -24,7 +25,22 @@ export default function StudentDashboardLayout() {
   const navigate = useNavigate();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState({});
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   const toggleExpand = (path, currentState) => {
     if (isSidebarCollapsed) {
@@ -55,7 +71,7 @@ export default function StudentDashboardLayout() {
     { label: "University Programs", path: "/dashboard/programs", icon: GraduationCap },
     { label: "Library", path: "/NotFound", icon: BookOpen },
     { label: "Study Resources", path: "/NotFound", icon: Globe },
-    { label: "Profile Settings", path: "/NotFound", icon: User },
+    { label: "Profile Settings", path: "/dashboard/profile", icon: User },
   ];
 
   const NavItem = ({ item, location, expandedItems, toggleExpand, setIsMobileOpen, isSidebarCollapsed }) => {
@@ -219,32 +235,61 @@ export default function StudentDashboardLayout() {
             </button>
             
             {/* Search Bar */}
-            <div className="hidden sm:flex items-center max-w-sm w-full relative">
-               <Search className="absolute left-3 text-slate-400" size={16} />
-               <input 
-                 type="text" 
-                 placeholder="Search..." 
-                 className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
-               />
-            </div>
+          
           </div>
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-2">
-            <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative">
+            {/* <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-colors relative">
                <Bell size={18} />
                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-            <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-colors">
+            </button> */}
+            {/* <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-colors">
                <MessageSquare size={18} />
-            </button>
-            <div className="w-px h-6 bg-slate-200 mx-2"></div>
-            <div className="flex items-center gap-2 cursor-pointer p-1 hover:bg-slate-50 rounded-lg transition-colors">
-               <img 
-                 src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.name || 'Student'}`} 
-                 alt="Profile" 
-                 className="w-8 h-8 rounded-full border border-slate-200"
-               />
+            </button> */}
+            {/* <div className="w-px h-6 bg-slate-200 mx-2"></div> */}
+            {/* Profile Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center gap-3 pl-1 pr-2 py-1 hover:bg-slate-50 rounded-lg border border-transparent hover:border-slate-200 transition-all group">
+                <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center overflow-hidden">
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="font-bold text-xs">
+                      {(user?.name || "ST").split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2)}
+                    </span>
+                  )}
+                </div>
+                <div className="hidden md:flex flex-col text-left">
+                  <span className="text-sm font-semibold text-slate-700 leading-none mb-0.5">{user?.name || "Student"}</span>
+                  <span className="text-xs font-medium text-slate-500 leading-none text-right">Student Account</span>
+                </div>
+                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 py-2 animate-in fade-in zoom-in-95 duration-100 z-50">
+                   <div className="px-4 py-2 border-b border-slate-100 mb-1">
+                    <p className="text-sm font-semibold text-slate-900 truncate">{user?.name || "Student"}</p>
+                    <p className="text-xs text-slate-500 truncate">{user?.email || "student@edubridge.com"}</p>
+                  </div>
+                  <div className="px-1 space-y-0.5">
+                    <Link
+                      to="/dashboard/profile"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                      onClick={() => setIsProfileOpen(false)}>
+                      <Settings size={16} /> Account Settings
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors text-left">
+                      <LogOut size={16} /> Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </header>

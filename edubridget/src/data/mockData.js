@@ -89,6 +89,7 @@ export const MOCK_PROGRAMS = [
     universityName: "Seoul Women's University",
     visaType: "D-2",
     tags: ["BEST"],
+    applicationFile: null,
     country: "South Korea",
     description:
       "Prestigious women's university in Seoul focusing on leadership and innovation.",
@@ -100,7 +101,15 @@ export const MOCK_PROGRAMS = [
       { step: "Document Review", date: "Oct 25 - Nov 05" },
       { step: "Final Result", date: "Nov 20" },
     ],
+    requiredDocuments: [
+      "Completed Application Form",
+      "Passport Copy",
+      "Academic Transcripts",
+      "Bank Statement ($20,000+)",
+      "Study Plan"
+    ],
     status: "Active",
+     applicationLink: null,
     images: [],
   },
 ];
@@ -552,3 +561,52 @@ export const MOCK_APPLICATIONS = [
     paperTitle: "Advanced Machine Learning"
   },
 ];
+
+
+export  const applications = [
+    {
+      id: "CAM001234",
+      university: "University of Cambridge",
+      program: "MPhil in Advanced Computer Science",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Coat_of_Arms_of_the_University_of_Cambridge.svg/1200px-Coat_of_Arms_of_the_University_of_Cambridge.svg.png",
+      date: "2023-01-15",
+      status: "Accepted",
+      statusColor: "bg-green-50 text-green-700 border-green-100",
+    },
+    {
+      id: "OXF005678",
+      university: "University of Oxford",
+      program: "MSc in Financial Economics",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Coat_of_arms_of_the_University_of_Oxford.svg/1200px-Coat_of_arms_of_the_University_of_Oxford.svg.png",
+      date: "2023-02-20",
+      status: "Under Review",
+      statusColor: "bg-orange-50 text-orange-700 border-orange-100",
+    },
+    {
+      id: "LSE009012",
+      university: "London School of Economics",
+      program: "MSc in International Relations",
+      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/4/42/LSE_Coat_of_Arms.svg/1200px-LSE_Coat_of_Arms.svg.png",
+      date: "2023-03-10",
+      status: "Under Review",
+      statusColor: "bg-orange-50 text-orange-700 border-orange-100",
+    },
+    {
+      id: "IMP003456",
+      university: "Imperial College London",
+      program: "MEng Aeronautical Engineering",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Shield_of_Imperial_College_London.svg/1200px-Shield_of_Imperial_College_London.svg.png",
+      date: "2023-04-01",
+      status: "Declined",
+      statusColor: "bg-red-50 text-red-700 border-red-100",
+    },
+    {
+      id: "UCL007890",
+      university: "University College London",
+      program: "BSc Computer Science",
+      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d1/University_College_London_coat_of_arms.svg/1200px-University_College_London_coat_of_arms.svg.png",
+      date: "2023-04-25",
+      status: "Under Review",
+      statusColor: "bg-orange-50 text-orange-700 border-orange-100",
+    },
+  ];

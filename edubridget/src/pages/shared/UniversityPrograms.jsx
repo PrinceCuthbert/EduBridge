@@ -17,6 +17,7 @@ export default function UniversityPrograms({ isReadOnly = false }) {
   const navigate = useNavigate();
   // Use custom hook for data management
   const { programs, loading, deleteProgram } = usePrograms();
+
   
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
@@ -24,6 +25,59 @@ export default function UniversityPrograms({ isReadOnly = false }) {
     visaType: 'All',
     country: 'All'
   });
+
+  // UseEffect to handle fetching the programs in database implement later
+
+  
+  // useEffect(
+  //   function () {
+  //     // callback?.();
+
+  //     const controller = new AbortController();
+
+  //     async function fetchedPrograms() {
+  //       try {
+  //         setIsLoading(true);
+  //         setError("");
+
+  //         const res = await fetch(
+  //           // `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+  //           // the local fetch api
+  //           { signal: controller.signal }
+  //         );
+
+  //         if (!res.ok)
+  //           throw new Error("Something went wrong with fetching University Programs");
+
+  //         const data = await res.json();
+  //         if (data.Response === "False") throw new Error("Program not found not found");
+
+  //         setPrograms(data.Search);
+  //         setError("");
+  //       } catch (err) {
+  //         if (err.name !== "AbortError") {
+  //           console.log(err.message);
+  //           setError(err.message);
+  //         }
+  //       } finally {
+  //         setIsLoading(false);
+  //       }
+  //     }
+
+  //     if (query.length < 3) {
+  //       setMovies([]);
+  //       setError("");
+  //       return;
+  //     }
+
+  //     fetchMovies();
+
+  //     return function () {
+  //       controller.abort();
+  //     };
+  //   },
+  //   [query]
+  // );
 
   // Calculate stats - using hook data
   const stats = [
@@ -89,21 +143,6 @@ export default function UniversityPrograms({ isReadOnly = false }) {
         <div className="flex items-center gap-3">
           <div className="flex-1">
             <div className="font-medium text-sm text-slate-900">{program.universityName}</div>
-            {/* <div className="flex flex-wrap gap-1.5 mt-1.5">
-              {program.tags.map((tag, idx) => (
-                <span
-                  key={idx}
-                  className={`px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded ${
-                    tag === 'BEST' ? 'bg-yellow-100 text-yellow-700' :
-                    tag === 'NEW' ? 'bg-green-100 text-green-700' :
-                    tag === 'ON SALE' ? 'bg-blue-100 text-blue-700' :
-                    'bg-slate-100 text-slate-700'
-                  }`}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div> */}
           </div>
         </div>
       )
