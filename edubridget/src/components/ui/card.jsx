@@ -62,13 +62,31 @@ CardFooter.displayName = "CardFooter"
 // So I must restore those exports too. They are likely custom or just Grid wrappers.
 // I'll add simple implementations for them to avoid breaking imports.
 
-const FeatureGrid = ({ className, ...props }) => (
-  <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", className)} {...props} />
-)
+const FeatureGrid = ({ items, renderItem, className, ...props }) => {
+  if (!items || !items.length) return null;
+  return (
+    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", className)} {...props}>
+      {items.map((item, index) => renderItem(item, index))}
+    </div>
+  )
+}
 
-const FeatureCard = ({ className, children, ...props }) => (
-  <Card className={cn("hover:shadow-lg transition-shadow duration-300", className)} {...props}>
-    <CardContent className="p-6">{children}</CardContent>
+const FeatureCard = ({ className, icon, title, description, children, bgColor, iconBgColor, ...props }) => (
+  <Card 
+    className={cn("hover:shadow-lg transition-shadow duration-300 h-full", className)} 
+    style={bgColor ? { backgroundColor: bgColor } : undefined}
+    {...props}
+  >
+    <CardContent className="p-6 flex flex-col h-full">
+      {icon && (
+        <div className={cn("mb-4 inline-flex p-3 rounded-lg bg-primary/10 w-fit", iconBgColor && `bg-[${iconBgColor}]`)}>
+          {icon}
+        </div>
+      )}
+      <h3 className="text-xl font-bold mb-2 text-slate-900">{title}</h3>
+      <p className="text-slate-600 flex-grow">{description}</p>
+      {children}
+    </CardContent>
   </Card>
 )
 
