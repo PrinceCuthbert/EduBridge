@@ -1,8 +1,6 @@
 import * as React from "react"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 // Since I don't have the original code, and DatePicker usually relies on "date-fns" and "react-day-picker",
 // I will create a simple HTML date input wrapper for now to verify functionality. 
