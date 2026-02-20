@@ -8,16 +8,17 @@ import { useApplications } from "../../../hooks/useApplications";
 import StatusBadge from "../../../components/shared/StatusBadge";
 // [FIX #5] Replaced local formatDate with shared utility — src/utils/formatDate.js
 import { formatDate } from "../../../utils/formatDate";
+import { Skeleton } from "../../../components/ui/Skeleton";
 
 const STATUS_OPTIONS = ["All Statuses", "Pending", "Reviewing", "Needs Changes", "Approved", "Rejected"];
 const SORT_OPTIONS   = ["Newest First", "Oldest First"];
 
 // ── Skeleton row ─────────────────────────────────────────────────────────────
 const SkeletonRow = () => (
-  <tr className="animate-pulse">
+  <tr>
     {[...Array(4)].map((_, i) => (
       <td key={i} className="px-6 py-4">
-        <div className="h-4 bg-slate-100 rounded w-3/4" />
+        <Skeleton className="h-4 w-3/4" />
       </td>
     ))}
   </tr>

@@ -31,6 +31,8 @@ export default defineConfig({
     ],
   },
   workbox: {
+    // Increase limit to 6MB to allow large assets like headshot.png (5.3MB)
+    maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
     // Cache JS/CSS chunks (hashed = safe to cache forever)
     globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg,webp,woff2}'],
     // Cache API/data calls for 1 hour with stale-while-revalidate

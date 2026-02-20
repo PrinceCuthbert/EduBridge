@@ -157,8 +157,11 @@ export default function ApplicationSubmitForm() {
 
       navigate("/dashboard/applications");
     } catch (err) {
-      toast.error("Something went wrong. Please try again.");
-      console.error(err);
+     const msg = err?.response?.status === 422
+    ? "Please check your form fields."
+    : "Network error. Please try again.";
+  toast.error(msg);
+  console.error(err);
     } finally {
       setSubmitting(false);
     }
@@ -300,7 +303,9 @@ export default function ApplicationSubmitForm() {
           <div>
             <label className={labelCls}>Phone Number</label>
             <input
-              type="tel" placeholder="e.g. +254 712 345 678"
+            type="tel"
+  pattern="^\+?[0-9\s\-]{7,15}$"
+  placeholder="e.g. +254 712 345 678"
               value={form.phone} onChange={set("phone")}
               className={inputCls}
             />

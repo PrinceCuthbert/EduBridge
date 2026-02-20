@@ -15,8 +15,8 @@ import Modal from "../../../components/Modal";
 import AdminPageHeader from "../../../components/admin/AdminPageHeader";
 import AdminStatsGrid from "../../../components/admin/AdminStatsGrid";
 import AdminFilterBar from "../../../components/admin/AdminFilterBar";
-
-import { MOCK_BRANCHES } from "../../../data/adminMockData";
+import { useBranches } from "../../../hooks/useBranches";
+import { Skeleton } from "../../../components/ui/Skeleton";
 
 export default function BranchManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,23 +34,7 @@ export default function BranchManagement() {
     status: "Active",
   });
 
-  const [branches, setBranches] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchBranches = async () => {
-      try {
-        setLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        setBranches(MOCK_BRANCHES);
-      } catch (error) {
-        toast.error("Failed to load branches");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBranches();
-  }, []);
+  const { branches, loading, createBranch, updateBranch, deleteBranch } = useBranches();
 
   const stats = [
     {
@@ -89,28 +73,35 @@ export default function BranchManagement() {
   };
 
   const handleDeleteBranch = (branchId, branchName) => {
-    toast(`Delete ${branchName}?`, {
+    toast.warning(`Delete ${branchName}?`, {
       action: {
         label: "Delete",
-        onClick: () => {
-          setBranches(branches.filter((b) => b.id !== branchId));
-          toast.success("Branch removed");
+        onClick: async () => {
+          try {
+            await deleteBranch(branchId);
+            toast.success("Branch removed");
+          } catch (error) {
+            toast.error("Failed to delete branch");
+          }
         },
       },
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingBranch) {
-      setBranches(branches.map((b) => b.id === editingBranch.id ? { ...b, ...formData } : b));
-      toast.success("Branch updated successfully");
-    } else {
-      const newBranch = { id: Math.max(...branches.map((b) => b.id), 0) + 1, ...formData };
-      setBranches([...branches, newBranch]);
-      toast.success("Branch registered successfully");
+    try {
+      if (editingBranch) {
+        await updateBranch(editingBranch.id, formData);
+        toast.success("Branch updated successfully");
+      } else {
+        await createBranch(formData);
+        toast.success("Branch registered successfully");
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      toast.error("Failed to save branch configuration");
     }
-    setIsModalOpen(false);
   };
 
   const filteredBranches = branches.filter(b => 
@@ -143,7 +134,7 @@ export default function BranchManagement() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {loading ? (
            [...Array(4)].map((_, i) => (
-             <div key={i} className="bg-white p-6 rounded-xl border border-slate-200 animate-pulse h-[280px]" />
+             <Skeleton key={i} className="bg-white p-6 rounded-xl border border-slate-200 h-[280px]" />
            ))
         ) : filteredBranches.map((branch) => (
           // CHANGED: rounded-3xl -> rounded-xl, simplified border/shadow
@@ -249,8 +240,9 @@ export default function BranchManagement() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Branch Name</label>
+              <label htmlFor="branch-name" className="text-sm font-medium text-slate-700">Branch Name</label>
               <input
+                id="branch-name"
                 type="text" required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -259,8 +251,9 @@ export default function BranchManagement() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Location</label>
+              <label htmlFor="branch-location" className="text-sm font-medium text-slate-700">Location</label>
               <input
+                id="branch-location"
                 type="text" required
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
@@ -270,8 +263,9 @@ export default function BranchManagement() {
             </div>
 
             <div className="md:col-span-2 space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Address</label>
+              <label htmlFor="branch-address" className="text-sm font-medium text-slate-700">Address</label>
               <input
+                id="branch-address"
                 type="text" required
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -281,8 +275,9 @@ export default function BranchManagement() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Phone</label>
+              <label htmlFor="branch-phone" className="text-sm font-medium text-slate-700">Phone</label>
               <input
+                id="branch-phone"
                 type="tel" required
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -290,8 +285,9 @@ export default function BranchManagement() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Email</label>
+              <label htmlFor="branch-email" className="text-sm font-medium text-slate-700">Email</label>
               <input
+                id="branch-email"
                 type="email" required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -300,8 +296,9 @@ export default function BranchManagement() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Hours</label>
+              <label htmlFor="branch-hours" className="text-sm font-medium text-slate-700">Hours</label>
               <input
+                id="branch-hours"
                 type="text" required
                 value={formData.hours}
                 onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
@@ -311,8 +308,9 @@ export default function BranchManagement() {
             </div>
 
             <div className="space-y-1.5">
-               <label className="text-sm font-medium text-slate-700">Staff Count</label>
+               <label htmlFor="branch-staff" className="text-sm font-medium text-slate-700">Staff Count</label>
                <input
+                 id="branch-staff"
                  type="number" required min="0"
                  value={formData.staff}
                  onChange={(e) => setFormData({ ...formData, staff: parseInt(e.target.value) || 0 })}
@@ -321,8 +319,9 @@ export default function BranchManagement() {
             </div>
             
             <div className="space-y-1.5">
-               <label className="text-sm font-medium text-slate-700">Status</label>
+               <label htmlFor="branch-status" className="text-sm font-medium text-slate-700">Status</label>
                <select
+                 id="branch-status"
                  required
                  value={formData.status}
                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
@@ -334,8 +333,9 @@ export default function BranchManagement() {
             </div>
 
             <div className="md:col-span-2 space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Branch Manager</label>
+              <label htmlFor="branch-manager" className="text-sm font-medium text-slate-700">Branch Manager</label>
               <input
+                id="branch-manager"
                 type="text" required
                 value={formData.managerName}
                 onChange={(e) => setFormData({ ...formData, managerName: e.target.value })}

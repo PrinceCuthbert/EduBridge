@@ -6,9 +6,11 @@ const STORAGE_KEY = "edubridge_applications";
 const generateId = () =>
   `APP-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-// ── Read ────────────────────────────────────────────────────────────────────
+// Simulate network latency
+const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const getApplications = () => {
+// Internal synchronous read
+const _getApps = () => {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
   } catch {
@@ -16,19 +18,31 @@ export const getApplications = () => {
   }
 };
 
-export const getApplicationsByUserId = (userId) =>
-  getApplications().filter((app) => app.userId === userId);
+const _saveApps = (apps) =>
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
 
-export const getApplicationById = (id) =>
-  getApplications().find((app) => app.id === id) || null;
+// ── Read ────────────────────────────────────────────────────────────────────
+
+export const getApplications = async () => {
+  await delay();
+  return _getApps();
+};
+
+export const getApplicationsByUserId = async (userId) => {
+  await delay();
+  return _getApps().filter((app) => app.userId === userId);
+};
+
+export const getApplicationById = async (id) => {
+  await delay();
+  return _getApps().find((app) => app.id === id) || null;
+};
 
 // ── Write ────────────────────────────────────────────────────────────────────
 
-const saveApplications = (apps) =>
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
-
-export const createApplication = (data) => {
-  const apps = getApplications();
+export const createApplication = async (data) => {
+  await delay();
+  const apps = _getApps();
   const newApp = {
     ...data,
     id: generateId(),
@@ -36,35 +50,38 @@ export const createApplication = (data) => {
     submissionDate: new Date().toISOString().split("T")[0],
   };
   apps.push(newApp);
-  saveApplications(apps);
+  _saveApps(apps);
   return newApp;
 };
 
 /** Student-editable update — status can never be changed through this function. */
-export const updateApplication = (id, data) => {
-  const apps = getApplications();
+export const updateApplication = async (id, data) => {
+  await delay();
+  const apps = _getApps();
   const idx = apps.findIndex((app) => app.id === id);
   if (idx === -1) throw new Error("Application not found");
 
   const { status, ...safeData } = data; // strip status intentionally
   apps[idx] = { ...apps[idx], ...safeData };
-  saveApplications(apps);
+  _saveApps(apps);
   return apps[idx];
 };
 
 /** Admin-only status update. */
-export const updateApplicationStatus = (id, status) => {
-  const apps = getApplications();
+export const updateApplicationStatus = async (id, status) => {
+  await delay();
+  const apps = _getApps();
   const idx = apps.findIndex((app) => app.id === id);
   if (idx === -1) throw new Error("Application not found");
 
   apps[idx].status = status;
-  saveApplications(apps);
+  _saveApps(apps);
   return apps[idx];
 };
 
-export const deleteApplication = (id) => {
-  const apps = getApplications().filter((app) => app.id !== id);
-  saveApplications(apps);
+export const deleteApplication = async (id) => {
+  await delay();
+  const apps = _getApps().filter((app) => app.id !== id);
+  _saveApps(apps);
   return true;
 };
