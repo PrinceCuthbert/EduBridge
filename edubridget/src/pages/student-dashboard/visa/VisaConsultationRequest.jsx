@@ -53,12 +53,32 @@ export default function VisaConsultationRequest() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   // Mock submission logic
+  //   toast.success("Request submitted successfully!");
+  //   navigate('/dashboard/visa-status/summary');
+  // };
+
   const handleSubmit = (e) => {
-    e.preventDefault();
-    // Mock submission logic
-    toast.success("Request submitted successfully!");
-    navigate('/dashboard/visa-status/summary');
+  e.preventDefault();
+
+  // temporary fee logic (later backend)
+  const consultationFee =
+    formData.visaType === "Student" ? 150 :
+    formData.visaType === "Work" ? 200 :
+    100;
+
+  const requestPayload = {
+    ...formData,
+    fee: consultationFee,
+    paymentStatus: "pending"
   };
+
+  navigate("/dashboard/visa-status/payment", {
+    state: requestPayload
+  });
+};
 
   // Standard input styles for consistency
   const inputClassName = "w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400";

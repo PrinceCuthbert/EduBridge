@@ -1,116 +1,163 @@
 export const MOCK_PROGRAMS = [
+  // --- Program 1 ---
   {
     id: 1,
     universityName: "Daegu Arts University",
     visaType: "D-2",
     tags: ["ON SALE", "BEST"],
     country: "South Korea",
+    location: "Chilgok County, Daegu",
     description:
       "Daegu Arts University (DGAU), located in Chilgok County near Daegu, South Korea, is a private institution specialized in fine arts, design, and practical art education. It focuses on fostering creative professionals through industry-tailored curricula and student-oriented support programs.",
-    tuition: "$100.00", // Application fee or tuition placeholder
     logo: "https://ui-avatars.com/api/?name=Daegu+Arts&background=E11D48&color=fff&size=128",
     images: [
       "https://placehold.co/600x400/1e40af/ffffff/png?text=Daegu+Arts+University&font=roboto",
       "https://placehold.co/600x400/2563eb/ffffff/png?text=Campus+View&font=roboto",
     ],
+    // Structured departments: each row = one program track
     departments: [
-      "Arts Therapy",
-      "Piano Pedagogy",
-      "Fashion Design",
-      "Practical Dance",
-      "Jazz & Commercial Music",
-      "Digital Animation",
-      "Security Service & Management",
-      "Music & Performing Arts",
-      "Visual Communication Design",
-      "Social Sports",
-      "Beauty Arts",
-      "Photography & Related Media",
-      "Contemporary Christian Music",
-      "Architecture Interior Design",
+      { language: "English", degree: "B.A.", major: "Arts Therapy",               duration: "4 years / 8 semesters", credits: "140 credits", languageRequirement: "TOEFL / IELTS" },
+      { language: "English", degree: "B.A.", major: "Fashion Design",             duration: "4 years / 8 semesters", credits: "140 credits", languageRequirement: "TOEFL / IELTS" },
+      { language: "English", degree: "B.A.", major: "Digital Animation",          duration: "4 years / 8 semesters", credits: "140 credits", languageRequirement: "TOEFL / IELTS" },
+      { language: "Korean",  degree: "B.A.", major: "Piano Pedagogy",             duration: "4 years / 8 semesters", credits: "140 credits", languageRequirement: "TOPIK Level 3+" },
+      { language: "Korean",  degree: "B.A.", major: "Jazz & Commercial Music",    duration: "4 years / 8 semesters", credits: "140 credits", languageRequirement: "TOPIK Level 3+" },
+      { language: "Korean",  degree: "B.A.", major: "Visual Communication Design",duration: "4 years / 8 semesters", credits: "140 credits", languageRequirement: "TOPIK Level 3+" },
     ],
+    // Structured timeline: each row = one application stage
     timeline: [
-      { step: "Document reception", date: "01th~23th of December" },
-      { step: "Application reception", date: "24th~30th of December" },
-      { step: "Announcement of admitted applicants", date: "12th of January" },
-      {
-        step: "Issue of admission certificate",
-        date: "12th of January ~ 28th of Feb.",
-      },
-      { step: "Registration", date: "29st of January ~2st of February" },
+      { stage: "Stage 1",    registrationStart: "2025-12-01", registrationEnd: "2025-12-23", examDate: "2025-12-26", resultDate: "2026-01-12" },
+      { stage: "Stage 2",    registrationStart: "2025-12-24", registrationEnd: "2025-12-30", examDate: "2026-01-05", resultDate: "2026-01-12" },
+      { stage: "Registration", registrationStart: "2026-01-29", registrationEnd: "2026-02-02", examDate: "—",        resultDate: "—" },
     ],
+    // Tuition fees per degree level
+    tuitionFees: [
+      { level: "Bachelor's", item: "Entrance Fee (one-time)",    amount: "300,000 KRW" },
+      { level: "Bachelor's", item: "Tuition (per semester)",     amount: "2,500,000 KRW" },
+    ],
+    // Categorized required documents
     requiredDocuments: [
-      "Application (prescribed form)",
-      "Photograph (3cm x 4cm) 2",
-      "Resume (prescribed form)",
-      "References (one Korean and one of same country)",
-      "Certificate of high school graduation",
-      "School records at third countries",
-      "Pledge for expense payment",
-      "School records for all courses",
-      "Certificate of high school qualification",
+      {
+        category: "All Applicants",
+        items: [
+          "Application (prescribed form)",
+          "Photograph (3cm x 4cm) — 2 copies",
+          "Resume (prescribed form)",
+          "Copy of Passport",
+          "Certificate of High School Graduation",
+          "Official Academic Transcripts (all years)",
+          "Pledge for Expense Payment",
+        ],
+      },
+      {
+        category: "References",
+        items: [
+          "Letter of Reference (one from Korea, one from home country)",
+        ],
+      },
     ],
     status: "Active",
     applicationLink: "https://docs.google.com/forms",
+    applicationFile: null,
   },
+
+  // --- Program 2 ---
   {
     id: 2,
     universityName: "Tongmyong University",
     visaType: "D-4",
     tags: ["NEW", "ON SALE"],
-    applicationFile: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     country: "South Korea",
+    location: "Busan",
     description:
       "Leading university in Busan with strong industry connections and practical training programs.",
-    tuition: "$150.00",
     logo: "https://ui-avatars.com/api/?name=Tongmyong&background=2563EB&color=fff&size=128",
+    images: [],
     departments: [
-      "Korean Language",
-      "International Studies",
-      "Business Administration",
+      { language: "Korean",  degree: "Certificate", major: "Korean Language",         duration: "1 year / 2 semesters",  credits: "60 credits",  languageRequirement: "None (beginner welcome)" },
+      { language: "English", degree: "B.A.",        major: "International Studies",    duration: "4 years / 8 semesters", credits: "130 credits", languageRequirement: "TOEFL 80+ / IELTS 6.0+" },
+      { language: "English", degree: "B.B.A.",      major: "Business Administration",  duration: "4 years / 8 semesters", credits: "130 credits", languageRequirement: "TOEFL 80+ / IELTS 6.0+" },
     ],
     timeline: [
-      { step: "Application Period", date: "Aug 01 - Aug 31" },
-      { step: "Interview", date: "Sep 15" },
-      { step: "Result Announcement", date: "Sep 30" },
+      { stage: "Stage 1", registrationStart: "2025-08-01", registrationEnd: "2025-08-31", examDate: "2025-09-10", resultDate: "2025-09-15" },
+      { stage: "Stage 2", registrationStart: "2025-09-01", registrationEnd: "2025-09-20", examDate: "2025-09-28", resultDate: "2025-09-30" },
+    ],
+    tuitionFees: [
+      { level: "Certificate", item: "Entrance Fee (one-time)",  amount: "200,000 KRW" },
+      { level: "Certificate", item: "Tuition (per semester)",   amount: "1,800,000 KRW" },
+      { level: "Bachelor's",  item: "Entrance Fee (one-time)",  amount: "300,000 KRW" },
+      { level: "Bachelor's",  item: "Tuition (per semester)",   amount: "2,200,000 KRW" },
     ],
     requiredDocuments: [
-      "Completed Application Form",
-      "Passport Copy",
-      "Academic Transcripts",
-      "Bank Statement ($20,000+)",
-      "Study Plan"
+      {
+        category: "All Applicants",
+        items: [
+          "Completed Application Form",
+          "Copy of Passport",
+          "Official Academic Transcripts",
+          "Bank Balance Certificate (USD 20,000+)",
+          "Study Plan",
+        ],
+      },
+      {
+        category: "English Track",
+        items: ["TOEFL / IELTS Score Certificate"],
+      },
     ],
     status: "Active",
-    images: [],
+    applicationFile: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    applicationLink: null,
   },
+
+  // --- Program 3 ---
   {
     id: 3,
     universityName: "Seoul Women's University",
     visaType: "D-2",
     tags: ["BEST"],
-    applicationFile: null,
     country: "South Korea",
+    location: "Nowon-gu, Seoul",
     description:
       "Prestigious women's university in Seoul focusing on leadership and innovation.",
-    tuition: "$120.00",
     logo: "https://ui-avatars.com/api/?name=SWU&background=D946EF&color=fff&size=128",
-    departments: ["Computer Science", "Digital Media", "Information Security"],
+    images: [],
+    departments: [
+      { language: "English", degree: "B.Sc.", major: "Computer Science",    duration: "4 years / 8 semesters", credits: "135 credits", languageRequirement: "TOEFL 85+ / IELTS 6.5+" },
+      { language: "English", degree: "B.A.",  major: "Digital Media",       duration: "4 years / 8 semesters", credits: "130 credits", languageRequirement: "TOEFL 80+ / IELTS 6.0+" },
+      { language: "Korean",  degree: "B.Sc.", major: "Information Security", duration: "4 years / 8 semesters", credits: "135 credits", languageRequirement: "TOPIK Level 4+" },
+    ],
     timeline: [
-      { step: "Application", date: "Oct 01 - Oct 20" },
-      { step: "Document Review", date: "Oct 25 - Nov 05" },
-      { step: "Final Result", date: "Nov 20" },
+      { stage: "Stage 1", registrationStart: "2025-10-01", registrationEnd: "2025-10-20", examDate: "2025-10-27", resultDate: "2025-11-05" },
+      { stage: "Stage 2", registrationStart: "2025-10-25", registrationEnd: "2025-11-05", examDate: "2025-11-15", resultDate: "2025-11-20" },
+    ],
+    tuitionFees: [
+      { level: "Bachelor's", item: "Entrance Fee (one-time)",  amount: "400,000 KRW" },
+      { level: "Bachelor's", item: "Tuition (per semester)",   amount: "2,800,000 KRW" },
+      { level: "Master's",   item: "Entrance Fee (one-time)",  amount: "500,000 KRW" },
+      { level: "Master's",   item: "Tuition (per semester)",   amount: "3,200,000 KRW" },
     ],
     requiredDocuments: [
-      "Completed Application Form",
-      "Passport Copy",
-      "Academic Transcripts",
-      "Bank Statement ($20,000+)",
-      "Study Plan"
+      {
+        category: "All Applicants",
+        items: [
+          "Completed Application Form",
+          "Copy of Passport",
+          "Official Academic Transcripts",
+          "Bank Balance Certificate (USD 20,000+)",
+          "Study Plan / Personal Statement",
+        ],
+      },
+      {
+        category: "English Track",
+        items: ["TOEFL / IELTS Score Certificate"],
+      },
+      {
+        category: "Korean Track",
+        items: ["TOPIK Certificate (Level 4 minimum)"],
+      },
     ],
     status: "Active",
-     applicationLink: null,
-    images: [],
+    applicationLink: null,
+    applicationFile: null,
   },
 ];
 

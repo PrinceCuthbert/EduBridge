@@ -24,12 +24,13 @@ const ApplicationSubmitForm   = lazy(() => import("../pages/student-dashboard/ap
 const ApplicationPreview      = lazy(() => import("../pages/student-dashboard/applications/ApplicationPreview"));
 const VisaSummary             = lazy(() => import("../pages/student-dashboard/visa/VisaSummary"));
 const VisaConsultationRequest = lazy(() => import("../pages/student-dashboard/visa/VisaConsultationRequest"));
+const VisaPaymentPage         = lazy(() => import("../pages/student-dashboard/visa/VisaPaymentPage"));
 const VisaCaseDetails         = lazy(() => import("../pages/student-dashboard/visa/VisaCaseDetails"));
 const VisaCaseResponse        = lazy(() => import("../pages/student-dashboard/visa/VisaCaseResponse"));
 const UploadCaseDocuments     = lazy(() => import("../pages/student-dashboard/visa/UploadCaseDocuments"));
 const UniversityPrograms      = lazy(() => import("../pages/shared/UniversityPrograms"));
 const ProfileSettings         = lazy(() => import("../pages/shared/ProfileSettings"));
-const UniversityProgramDetails = lazy(() => import("../pages/shared/UniversityProgramDetails"));
+const UniversityProgramDetailsPreview = lazy(() => import("../pages/shared/UniversityProgramDetailsPreview"));
 
 export default function StudentRoutes() {
   return (
@@ -55,11 +56,12 @@ export default function StudentRoutes() {
           <Route path="summary/details/:id/upload" element={<UploadCaseDocuments />} />
           <Route path="summary/response/:id" element={<VisaCaseResponse />} />
           <Route path="request" element={<VisaConsultationRequest />} />
+          <Route  path="payment" element={<VisaPaymentPage />}></Route>
         </Route>
 
         {/* Programs */}
         <Route path="programs" element={<UniversityPrograms isReadOnly={true} />} />
-        <Route path="programs/:id" element={<UniversityProgramDetails backPath="/dashboard/programs" />} />
+        <Route path="programs/:id" element={<UniversityProgramDetailsPreview backPath="/dashboard/programs" />} />
 
         {/* Profile */}
         <Route path="profile" element={<ProfileSettings />} />

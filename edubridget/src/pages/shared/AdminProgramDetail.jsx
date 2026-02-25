@@ -19,85 +19,142 @@ export default function AdminProgramDetail() {
     visaType: 'D-2',
     tags: [],
     country: '',
+    location: '',
     description: '',
-    tuition: '',
     logo: '',
     images: [],
+    // Structured: { language, degree, major, duration, credits, languageRequirement }
     departments: [],
+    // Structured: { stage, registrationStart, registrationEnd, examDate, resultDate }
     timeline: [],
+    // New: { level, item, amount }
+    tuitionFees: [],
+    // Categorized: [{ category, items: [] }]
     requiredDocuments: [],
     status: 'Active',
     applicationLink: '',
     applicationFile: null,
   });
 
-  const [departmentInput, setDepartmentInput] = useState('');
-
   // Common styles for inputs to ensure consistency
   const inputClassName = "w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400";
   const labelClassName = "block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1.5 ml-1";
 
-  // Populate data when fetched
+  // Populate form when editing — safely merge with defaults so new
+  // structured fields never end up as `undefined` even if the stored
+  // program predates the current schema.
   useEffect(() => {
-    if (fetchedProgram) {
-      setFormData(fetchedProgram);
-    }
+    if (!fetchedProgram) return;
+    setFormData({
+      universityName:    fetchedProgram.universityName    ?? '',
+      visaType:          fetchedProgram.visaType          ?? 'D-2',
+      country:           fetchedProgram.country           ?? '',
+      location:          fetchedProgram.location          ?? '',
+      description:       fetchedProgram.description       ?? '',
+      logo:              fetchedProgram.logo              ?? '',
+      images:            Array.isArray(fetchedProgram.images)            ? fetchedProgram.images            : [],
+      tags:              Array.isArray(fetchedProgram.tags)              ? fetchedProgram.tags              : [],
+      departments:       Array.isArray(fetchedProgram.departments)       ? fetchedProgram.departments       : [],
+      timeline:          Array.isArray(fetchedProgram.timeline)          ? fetchedProgram.timeline          : [],
+      tuitionFees:       Array.isArray(fetchedProgram.tuitionFees)       ? fetchedProgram.tuitionFees       : [],
+      requiredDocuments: Array.isArray(fetchedProgram.requiredDocuments) ? fetchedProgram.requiredDocuments : [],
+      status:            fetchedProgram.status            ?? 'Active',
+      applicationLink:   fetchedProgram.applicationLink  ?? '',
+      applicationFile:   fetchedProgram.applicationFile  ?? null,
+    });
   }, [fetchedProgram]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let success = false;
-    
+
     if (isNew) {
-      success = await addProgram(formData);
+      const created = await addProgram(formData);
+      if (created) navigate('/admin/programs');
     } else {
-      success = await updateProgram(Number(id), formData);
-    }
-    
-    if (success) {
-      navigate('/admin/programs');
+      const ok = await updateProgram(Number(id), formData);
+      if (ok) navigate('/admin/programs');
     }
   };
 
+  // ── Departments CRUD ─────────────────────────────────────────────────────
   const addDepartment = () => {
-    if (departmentInput.trim()) {
-      setFormData({ ...formData, departments: [...formData.departments, departmentInput.trim()] });
-      setDepartmentInput('');
-    }
+    setFormData(prev => ({
+      ...prev,
+      departments: [...prev.departments, { language: 'English', degree: '', major: '', duration: '', credits: '', languageRequirement: '' }],
+    }));
   };
-
+  const updateDepartment = (index, field, value) => {
+    const updated = [...formData.departments];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData({ ...formData, departments: updated });
+  };
   const removeDepartment = (index) => {
-    const newDepts = [...formData.departments];
-    newDepts.splice(index, 1);
-    setFormData({ ...formData, departments: newDepts });
+    setFormData({ ...formData, departments: formData.departments.filter((_, i) => i !== index) });
   };
 
+  // ── Timeline CRUD ─────────────────────────────────────────────────────────
   const addTimelineStep = () => {
-    setFormData({
-      ...formData,
-      timeline: [...formData.timeline, { step: '', startDate: '', endDate: '', date: '' }]
-    });
+    setFormData(prev => ({
+      ...prev,
+      timeline: [...prev.timeline, { stage: '', registrationStart: '', registrationEnd: '', examDate: '', resultDate: '' }],
+    }));
   };
-
   const updateTimeline = (index, field, value) => {
-    const newTimeline = [...formData.timeline];
-    newTimeline[index][field] = value;
-    
-    const start = field === 'startDate' ? value : newTimeline[index].startDate;
-    const end = field === 'endDate' ? value : newTimeline[index].endDate;
-    
-    // Automatically construct display string if both dates present (or one)
-    if (start || end) {
-       newTimeline[index].date = `${start || ''} ~ ${end || ''}`;
-    }
-
-    setFormData({ ...formData, timeline: newTimeline });
+    const updated = [...formData.timeline];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData({ ...formData, timeline: updated });
+  };
+  const removeTimeline = (index) => {
+    setFormData({ ...formData, timeline: formData.timeline.filter((_, i) => i !== index) });
   };
 
-  const removeTimeline = (index) => {
-    const newTimeline = [...formData.timeline];
-    newTimeline.splice(index, 1);
-    setFormData({ ...formData, timeline: newTimeline });
+  // ── Tuition Fees CRUD ─────────────────────────────────────────────────────
+  const addTuitionFee = () => {
+    setFormData(prev => ({
+      ...prev,
+      tuitionFees: [...(prev.tuitionFees || []), { level: "Bachelor's", item: '', amount: '' }],
+    }));
+  };
+  const updateTuitionFee = (index, field, value) => {
+    const updated = [...(formData.tuitionFees || [])];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData({ ...formData, tuitionFees: updated });
+  };
+  const removeTuitionFee = (index) => {
+    setFormData({ ...formData, tuitionFees: (formData.tuitionFees || []).filter((_, i) => i !== index) });
+  };
+
+  // ── Required Documents CRUD ───────────────────────────────────────────────
+  const addDocCategory = () => {
+    setFormData(prev => ({
+      ...prev,
+      requiredDocuments: [...prev.requiredDocuments, { category: '', items: [''] }],
+    }));
+  };
+  const updateDocCategory = (catIdx, value) => {
+    const updated = [...formData.requiredDocuments];
+    updated[catIdx] = { ...updated[catIdx], category: value };
+    setFormData({ ...formData, requiredDocuments: updated });
+  };
+  const removeDocCategory = (catIdx) => {
+    setFormData({ ...formData, requiredDocuments: formData.requiredDocuments.filter((_, i) => i !== catIdx) });
+  };
+  const addDocItem = (catIdx) => {
+    const updated = [...formData.requiredDocuments];
+    updated[catIdx] = { ...updated[catIdx], items: [...updated[catIdx].items, ''] };
+    setFormData({ ...formData, requiredDocuments: updated });
+  };
+  const updateDocItem = (catIdx, itemIdx, value) => {
+    const updated = [...formData.requiredDocuments];
+    const items = [...updated[catIdx].items];
+    items[itemIdx] = value;
+    updated[catIdx] = { ...updated[catIdx], items };
+    setFormData({ ...formData, requiredDocuments: updated });
+  };
+  const removeDocItem = (catIdx, itemIdx) => {
+    const updated = [...formData.requiredDocuments];
+    updated[catIdx] = { ...updated[catIdx], items: updated[catIdx].items.filter((_, i) => i !== itemIdx) };
+    setFormData({ ...formData, requiredDocuments: updated });
   };
 
   if (fetchLoading && !isNew) {
@@ -149,20 +206,20 @@ export default function AdminProgramDetail() {
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="col-span-1 md:col-span-2">
                  <label className={labelClassName}>University Name</label>
-                 <input 
-                   type="text" 
-                   value={formData.universityName} 
+                 <input
+                   type="text"
+                   value={formData.universityName}
                    onChange={(e) => setFormData({...formData, universityName: e.target.value})}
                    className={inputClassName}
                    placeholder="Enter official university name..."
                    required
                  />
                </div>
-               
+
                <div>
                   <label className={labelClassName}>Visa Type</label>
                   <div className="relative">
-                    <select 
+                    <select
                       value={formData.visaType}
                       onChange={(e) => setFormData({...formData, visaType: e.target.value})}
                       className={`${inputClassName} appearance-none cursor-pointer`}
@@ -175,26 +232,37 @@ export default function AdminProgramDetail() {
                     </div>
                   </div>
                </div>
-               
+
                <div>
                  <label className={labelClassName}>Country</label>
                  <div className="relative">
-                    <input 
-                        type="text" 
-                        value={formData.country} 
+                    <input
+                        type="text"
+                        value={formData.country}
                         onChange={(e) => setFormData({...formData, country: e.target.value})}
                         className={`${inputClassName} pl-10`}
-                        placeholder="Target country..."
+                        placeholder="e.g. South Korea"
                     />
                     <Globe size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                  </div>
                </div>
-               
+
+               <div className="col-span-1 md:col-span-2">
+                 <label className={labelClassName}>Location / City</label>
+                 <input
+                   type="text"
+                   value={formData.location || ''}
+                   onChange={(e) => setFormData({...formData, location: e.target.value})}
+                   className={inputClassName}
+                   placeholder="e.g. Nowon-gu, Seoul"
+                 />
+               </div>
+
                <div className="col-span-1 md:col-span-2">
                  <label className={labelClassName}>Description</label>
-                 <textarea 
+                 <textarea
                    rows="4"
-                   value={formData.description} 
+                   value={formData.description}
                    onChange={(e) => setFormData({...formData, description: e.target.value})}
                    className={`${inputClassName} resize-none`}
                    placeholder="Detailed academic program description..."
@@ -203,105 +271,211 @@ export default function AdminProgramDetail() {
              </div>
           </AdminCard>
 
-          {/* Timeline & Steps */}
-          <AdminCard 
-            title="Application Timeline"
+          {/* ── Application Schedule & Timeline ──────────────────────── */}
+          <AdminCard
+            title="Application Schedule & Timeline"
             action={
-              <button 
-                onClick={addTimelineStep} 
+              <button
+                onClick={addTimelineStep}
                 className="text-blue-600 hover:text-blue-700 text-xs font-medium uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 hover:bg-blue-50 rounded-lg transition-all"
               >
-                <Plus size={14} /> Add Step
+                <Plus size={14} /> Add Stage
               </button>
             }
           >
-             <div className="space-y-3">
-               {formData.timeline.map((item, idx) => (
-                 <div key={idx} className="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-100 flex flex-col xl:flex-row gap-3 items-start xl:items-center">
-                   
-                   <div className="flex-1 w-full xl:w-auto">
-                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block xl:hidden">Step Name</span>
-                     <input 
-                       type="text" 
-                       placeholder="e.g. Document Reception"
-                       value={item.step}
-                       onChange={(e) => updateTimeline(idx, 'step', e.target.value)}
-                       className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 focus:ring-0 outline-none"
-                     />
-                   </div>
-                   
-                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full xl:w-auto">
-                     <div className="w-full sm:w-auto">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block xl:hidden">Start</span>
-                        <DatePicker 
-                            value={item.startDate}
-                            onChange={(date) => updateTimeline(idx, 'startDate', date)}
-                            placeholder="Start Date"
-                            className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none"
-                        />
-                     </div>
-                     <span className="hidden sm:inline text-slate-400 text-xs px-1">to</span>
-                     <div className="w-full sm:w-auto">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block xl:hidden">End</span>
-                        <DatePicker 
-                            value={item.endDate}
-                            onChange={(date) => updateTimeline(idx, 'endDate', date)}
-                            placeholder="End Date"
-                            className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none"
-                        />
-                     </div>
-                   </div>
-
-                   <button 
-                     onClick={() => removeTimeline(idx)} 
-                     className="self-end xl:self-center p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                     title="Remove Step"
-                   >
-                     <Trash2 size={16} />
-                   </button>
-                 </div>
-               ))}
-               
-               {formData.timeline.length === 0 && (
-                 <div className="py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                    <p className="text-slate-400 font-medium text-sm">No timeline steps configured.</p>
-                 </div>
-               )}
-             </div>
+            <div className="space-y-3">
+              {formData.timeline.map((item, idx) => (
+                <div key={idx} className="bg-slate-50 rounded-xl border border-slate-100 p-3 space-y-3">
+                  {/* Row 1: Stage name + delete */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Stage</span>
+                      <input
+                        type="text"
+                        placeholder="e.g. Stage 1"
+                        value={item.stage}
+                        onChange={(e) => updateTimeline(idx, 'stage', e.target.value)}
+                        className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none"
+                      />
+                    </div>
+                    <button onClick={() => removeTimeline(idx)} className="mt-5 self-end p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Remove">
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                  {/* Row 2: Registration range */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Registration Start</span>
+                      <DatePicker value={item.registrationStart} onChange={(d) => updateTimeline(idx, 'registrationStart', d)} placeholder="Start date" className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Registration End</span>
+                      <DatePicker value={item.registrationEnd} onChange={(d) => updateTimeline(idx, 'registrationEnd', d)} placeholder="End date" className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none" />
+                    </div>
+                  </div>
+                  {/* Row 3: Exam + Result */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Exam / Review Date</span>
+                      <DatePicker value={item.examDate} onChange={(d) => updateTimeline(idx, 'examDate', d)} placeholder="Exam date" className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Result Announcement</span>
+                      <DatePicker value={item.resultDate} onChange={(d) => updateTimeline(idx, 'resultDate', d)} placeholder="Result date" className="w-full bg-white px-3 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {formData.timeline.length === 0 && (
+                <div className="py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                  <p className="text-slate-400 font-medium text-sm">No stages added yet. Click "Add Stage" to begin.</p>
+                </div>
+              )}
+            </div>
           </AdminCard>
 
-          {/* Departments */}
-          <AdminCard title="Departments & Majors">
-             <div className="flex flex-col sm:flex-row gap-3 mb-4">
-               <input 
-                 type="text" 
-                 value={departmentInput}
-                 onChange={(e) => setDepartmentInput(e.target.value)}
-                 onKeyDown={(e) => e.key === 'Enter' && addDepartment()}
-                 placeholder="Add department..."
-                 className={inputClassName}
-               />
-               <button 
-                 onClick={addDepartment} 
-                 className="px-6 py-2.5 bg-slate-900 text-white font-medium text-sm rounded-xl hover:bg-slate-800 transition-all shrink-0"
-               >
-                 Add
-               </button>
-             </div>
+          {/* ── Departments & Majors ──────────────────────────────────── */}
+          <AdminCard
+            title="Departments & Majors"
+            action={
+              <button
+                onClick={addDepartment}
+                className="text-blue-600 hover:text-blue-700 text-xs font-medium uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 hover:bg-blue-50 rounded-lg transition-all"
+              >
+                <Plus size={14} /> Add Row
+              </button>
+            }
+          >
+            <div className="space-y-3">
+              {formData.departments.map((dept, idx) => (
+                <div key={idx} className="bg-slate-50 rounded-xl border border-slate-100 p-3 space-y-2">
+                  {/* Row 1: Language + Degree + Major + delete */}
+                  <div className="grid grid-cols-[110px_90px_1fr_36px] gap-2 items-end">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Language</span>
+                      <select
+                        value={dept.language}
+                        onChange={(e) => updateDepartment(idx, 'language', e.target.value)}
+                        className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none"
+                      >
+                        <option>English</option>
+                        <option>Korean</option>
+                        <option>French</option>
+                        <option>Japanese</option>
+                        <option>Chinese</option>
+                      </select>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Degree</span>
+                      <input type="text" placeholder="B.A." value={dept.degree} onChange={(e) => updateDepartment(idx, 'degree', e.target.value)} className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Major / Program</span>
+                      <input type="text" placeholder="e.g. Computer Science" value={dept.major} onChange={(e) => updateDepartment(idx, 'major', e.target.value)} className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none" />
+                    </div>
+                    <button onClick={() => removeDepartment(idx)} className="self-end p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Remove">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                  {/* Row 2: Duration + Lang. Requirement */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Duration — Credits</span>
+                      <input type="text" placeholder="4 yrs / 8 sem — 140 cr"
+                        value={`${dept.duration}${dept.credits ? ' — ' + dept.credits : ''}`}
+                        onChange={(e) => {
+                          const parts = e.target.value.split(' — ');
+                          updateDepartment(idx, 'duration', parts[0] || '');
+                          updateDepartment(idx, 'credits', parts[1] || '');
+                        }}
+                        className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Language Requirement</span>
+                      <input type="text" placeholder="e.g. TOEFL / IELTS" value={dept.languageRequirement} onChange={(e) => updateDepartment(idx, 'languageRequirement', e.target.value)} className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {formData.departments.length === 0 && (
+                <div className="py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                  <p className="text-slate-400 font-medium text-sm">No department rows yet. Click "Add Row" to begin.</p>
+                </div>
+              )}
+            </div>
+          </AdminCard>
 
-             <div className="flex flex-wrap gap-2">
-                {formData.departments.map((dept, idx) => (
-                   <span key={idx} className="pl-3 pr-2 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium flex items-center gap-2">
-                      {dept}
-                      <button onClick={() => removeDepartment(idx)} className="text-slate-400 hover:text-red-500 transition-colors">
-                        <XCircle size={14} className="fill-current"/>
-                      </button>
-                   </span>
-                ))}
-                {formData.departments.length === 0 && (
-                  <span className="text-slate-400 text-sm italic">No departments listed yet.</span>
-                )}
-             </div>
+          {/* ── Required Documents ──────────────────────────────────────── */}
+          <AdminCard
+            title="Required Documents"
+            action={
+              <button
+                onClick={addDocCategory}
+                className="text-blue-600 hover:text-blue-700 text-xs font-medium uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 hover:bg-blue-50 rounded-lg transition-all"
+              >
+                <Plus size={14} /> Add Category
+              </button>
+            }
+          >
+            <div className="space-y-4">
+              {formData.requiredDocuments.map((cat, catIdx) => (
+                <div key={catIdx} className="border border-slate-200 rounded-xl overflow-hidden">
+                  {/* Category title row */}
+                  <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 border-b border-slate-200">
+                    <input
+                      type="text"
+                      placeholder="Category name, e.g. All Applicants"
+                      value={cat.category}
+                      onChange={(e) => updateDocCategory(catIdx, e.target.value)}
+                      className="flex-1 bg-transparent text-sm font-semibold text-slate-700 outline-none placeholder:text-slate-400"
+                    />
+                    <button
+                      onClick={() => removeDocCategory(catIdx)}
+                      className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Remove category"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                  {/* Items */}
+                  <ul className="divide-y divide-slate-50 px-3 py-2 space-y-1">
+                    {(cat.items || []).map((item, itemIdx) => (
+                      <li key={itemIdx} className="flex items-center gap-2 py-1">
+                        <span className="text-emerald-500 shrink-0">•</span>
+                        <input
+                          type="text"
+                          placeholder="e.g. Copy of Passport"
+                          value={item}
+                          onChange={(e) => updateDocItem(catIdx, itemIdx, e.target.value)}
+                          className="flex-1 text-sm text-slate-700 bg-transparent outline-none placeholder:text-slate-400"
+                        />
+                        <button
+                          onClick={() => removeDocItem(catIdx, itemIdx)}
+                          className="p-1 text-slate-300 hover:text-red-500 transition-colors"
+                          title="Remove item"
+                        >
+                          <XCircle size={13} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="px-3 pb-3">
+                    <button
+                      onClick={() => addDocItem(catIdx)}
+                      className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium"
+                    >
+                      <Plus size={12} /> Add item
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {formData.requiredDocuments.length === 0 && (
+                <div className="py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                  <p className="text-slate-400 font-medium text-sm">No document categories yet. Click "Add Category" to begin.</p>
+                </div>
+              )}
+            </div>
           </AdminCard>
 
         </div>
@@ -309,120 +483,150 @@ export default function AdminProgramDetail() {
         {/* Right Column: Sidebar */}
         <div className="space-y-6">
 
-          {/* Media */}
+          {/* School Logo */}
           <AdminCard title="School Logo">
-             <div className="space-y-4">
-               <div>
-                 <label className={labelClassName}>Logo URL</label>
-                 <input 
-                   type="text" 
-                   value={formData.logo}
-                   onChange={(e) => setFormData({...formData, logo: e.target.value})}
-                   className={inputClassName}
-                   placeholder="https://..."
-                 />
-                 {formData.logo && (
-                   <div className="mt-3 w-20 h-20 bg-white border border-slate-200 rounded-lg p-2 flex items-center justify-center overflow-hidden">
-                     <img src={formData.logo} alt="Logo" className="w-full h-full object-contain" />
-                   </div>
-                 )}
-               </div>
-               
-               <div className="border-t border-slate-100 pt-4">
-                 <div className="flex items-center justify-between mb-2">
-                    <label className={labelClassName.replace('mb-1.5', 'mb-0')}>Gallery Images (URLs)</label>
-                    <button 
-                      onClick={() => setFormData({...formData, images: [...formData.images, '']})}
-                      className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
-                    >
-                      <Plus size={12} /> Add Image
-                    </button>
-                 </div>
-                 
-                 <div className="space-y-2">
-                    {formData.images.map((img, idx) => (
-                       <div key={idx} className="flex gap-2">
-                          <div className="relative flex-1">
-                            <input 
-                                type="text"
-                                value={img}
-                                onChange={(e) => {
-                                    const newImages = [...formData.images];
-                                    newImages[idx] = e.target.value;
-                                    setFormData({...formData, images: newImages});
-                                }}
-                                className={`${inputClassName} pl-8`}
-                                placeholder="Image URL..."
-                            />
-                            <ImageIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                          </div>
-                          <button 
-                             onClick={() => {
-                                const newImages = formData.images.filter((_, i) => i !== idx);
-                                setFormData({...formData, images: newImages});
-                             }}
-                             className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
-                          >
-                             <Trash2 size={16}/>
-                          </button>
-                       </div>
-                    ))}
-                    {formData.images.length === 0 && (
-                        <div className="text-center py-4 bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                             <span className="text-xs text-slate-400">No gallery images</span>
-                        </div>
-                    )}
-                 </div>
-               </div>
-             </div>
+            <div className="flex items-center gap-4">
+              {/* Preview / initials fallback */}
+              <div className="w-20 h-20 rounded-2xl border border-slate-200 bg-white shadow-sm flex items-center justify-center overflow-hidden shrink-0">
+                {formData.logo ? (
+                  <img
+                    src={formData.logo}
+                    alt="Logo"
+                    className="w-full h-full object-contain"
+                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                  />
+                ) : null}
+                <div
+                  style={{ display: formData.logo ? 'none' : 'flex' }}
+                  className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 items-center justify-center"
+                >
+                  <span className="text-white text-2xl font-bold select-none">
+                    {(formData.universityName || 'U')
+                      .split(' ').filter(Boolean).slice(0, 2)
+                      .map(w => w[0].toUpperCase()).join('')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Upload + remove */}
+              <div className="flex-1 space-y-2">
+                <label className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-dashed border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors text-sm text-slate-500 hover:text-blue-600">
+                  <ImageIcon size={15} />
+                  <span className="font-medium">{formData.logo ? 'Change logo…' : 'Upload logo…'}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = () => setFormData(prev => ({ ...prev, logo: reader.result }));
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                </label>
+                {formData.logo && (
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, logo: '' }))}
+                    className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 transition-colors"
+                  >
+                    <XCircle size={12} /> Remove logo
+                  </button>
+                )}
+              </div>
+            </div>
           </AdminCard>
           
-          {/* Fees */}
-          <AdminCard title="Fees">
-             <div className="space-y-4">
-               <div>
-                 <label className={labelClassName}>Tuition Fee</label>
-                 <div className="relative">
-                    <input 
-                        type="text"
-                        value={formData.tuition}
-                        onChange={(e) => setFormData({...formData, tuition: e.target.value})}
-                        className={`${inputClassName} pl-10`}
-                        placeholder="e.g. $8,000/year" 
-                    />  
-                    {/* <DollarSign size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" /> */}
-                 </div>
-               </div>
+          {/* ── Tuition Fees ─────────────────────────────────────────── */}
+          <AdminCard
+            title="Tuition Fees"
+            action={
+              <button
+                onClick={addTuitionFee}
+                className="text-blue-600 hover:text-blue-700 text-xs font-medium uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 hover:bg-blue-50 rounded-lg transition-all"
+              >
+                <Plus size={14} /> Add Row
+              </button>
+            }
+          >
+            {formData.tuitionFees?.length > 0 && (
+              <div className="hidden sm:grid grid-cols-[160px_1fr_160px_40px] gap-2 mb-2 px-1">
+                {['Level', 'Item', 'Amount', ''].map(h => (
+                  <span key={h} className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{h}</span>
+                ))}
+              </div>
+            )}
+            <div className="space-y-2">
+              {(formData.tuitionFees || []).map((fee, idx) => (
+                <div key={idx} className="bg-slate-50 rounded-xl border border-slate-100 p-3 space-y-2">
+                  {/* Level + Item */}
+                  <div className="grid grid-cols-[100px_1fr] gap-2">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Level</span>
+                      <select
+                        value={fee.level}
+                        onChange={(e) => updateTuitionFee(idx, 'level', e.target.value)}
+                        className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none"
+                      >
+                        {["Bachelor's", "Master's", "Ph.D", "Th.D", "Th.M", "M.Div", "Certificate"].map(l => <option key={l}>{l}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Fee Item</span>
+                      <input type="text" placeholder="e.g. Entrance Fee" value={fee.item} onChange={(e) => updateTuitionFee(idx, 'item', e.target.value)} className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none" />
+                    </div>
+                  </div>
+                  {/* Amount + delete */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Amount</span>
+                      <input type="text" placeholder="e.g. 2,500,000 KRW" value={fee.amount} onChange={(e) => updateTuitionFee(idx, 'amount', e.target.value)} className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none" />
+                    </div>
+                    <button onClick={() => removeTuitionFee(idx)} className="mt-5 self-end p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {(!formData.tuitionFees || formData.tuitionFees.length === 0) && (
+                <div className="py-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                  <p className="text-slate-400 font-medium text-sm">No fee rows yet. Click "Add Row".</p>
+                </div>
+              )}
+            </div>
 
-               <div>
-                  <label className={labelClassName}>Tags (Comma separated)</label>
-                  <input 
-                     type="text" 
-                     value={formData.tags.join(', ')}
-                     onChange={(e) => setFormData({...formData, tags: e.target.value.split(',').map(t => t.trim())})}
-                     className={inputClassName}
-                     placeholder="Comma separated..."
-                  />
-               </div>
-
-               <div>
-                 <label className={labelClassName}>Status</label>
-                 <div className="relative">
-                   <select 
-                      value={formData.status}
-                      onChange={(e) => setFormData({...formData, status: e.target.value})}
-                      className={`${inputClassName} appearance-none cursor-pointer`}
-                   >
-                      <option value="Active">Active</option>
-                      <option value="Draft">Draft</option>
-                      <option value="Archived">Archived</option>
-                   </select>
-                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 4.5L6 8L9.5 4.5"/></svg>
-                   </div>
-                 </div>
-               </div>
-             </div>
+            {/* Tags & Status still here in sidebar? Move them */}
+            <div className="border-t border-slate-100 pt-4 mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                 <label className={labelClassName}>Tags (comma separated)</label>
+                 <input
+                    type="text"
+                    value={(formData.tags || []).join(', ')}
+                    onChange={(e) => setFormData({...formData, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean)})}
+                    className={inputClassName}
+                    placeholder="e.g. ON SALE, BEST, NEW"
+                 />
+              </div>
+              <div>
+                <label className={labelClassName}>Status</label>
+                <div className="relative">
+                  <select
+                     value={formData.status}
+                     onChange={(e) => setFormData({...formData, status: e.target.value})}
+                     className={`${inputClassName} appearance-none cursor-pointer`}
+                  >
+                     <option value="Active">Active</option>
+                     <option value="Draft">Draft</option>
+                     <option value="Archived">Archived</option>
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                     <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 4.5L6 8L9.5 4.5"/></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
           </AdminCard>
 
 

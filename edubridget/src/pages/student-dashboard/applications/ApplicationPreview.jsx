@@ -5,13 +5,13 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, FileText, Download, Mail, Phone, Calendar } from "lucide-react";
-import { getApplicationById } from "../../../services/applicationService";
+import { getApplicationByIdSync } from "../../../services/applicationService";
 import StatusBadge from "../../../components/shared/StatusBadge";
 
 export default function ApplicationPreview() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const app = getApplicationById(id);
+  const app = getApplicationByIdSync(id);
 
   if (!app) {
     return (

@@ -22,7 +22,7 @@ const Communications           = lazy(() => import("../pages/admin-dashboard/com
 const ScholarshipManager       = lazy(() => import("../pages/admin-dashboard/scholarships/ScholarshipManager"));
 const UniversityPrograms       = lazy(() => import("../pages/shared/UniversityPrograms"));
 const AdminProgramDetail       = lazy(() => import("../pages/shared/AdminProgramDetail"));
-const UniversityProgramDetails = lazy(() => import("../pages/shared/UniversityProgramDetails"));
+const UniversityProgramDetailsPreview = lazy(() => import("../pages/shared/UniversityProgramDetailsPreview"));
 
 export default function AdminRoutes() {
   return (
@@ -46,7 +46,7 @@ export default function AdminRoutes() {
         {/* Programs */}
         <Route path="programs"          element={<UniversityPrograms />} />
         <Route path="programs/:id"      element={<AdminProgramDetail />} />
-        <Route path="programs/view/:id" element={<UniversityProgramDetails />} />
+        <Route path="programs/view/:id" element={<UniversityProgramDetailsPreview />} />
 
         {/* CMS */}
         <Route path="cms" element={<ContentManagement />}>

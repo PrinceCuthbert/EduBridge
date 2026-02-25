@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { usePrograms } from "../../../hooks/usePrograms";
 import { useApplications } from "../../../hooks/useApplications";
-import { getApplicationById } from "../../../services/applicationService";
+import { getApplicationByIdSync } from "../../../services/applicationService";
 import { useAuth } from "../../../context/AuthContext";
 import { Upload, X, FileText, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -42,7 +42,7 @@ export default function ApplicationSubmitForm() {
   // Load existing application in edit mode
   useEffect(() => {
     if (isEditMode && id) {
-      const app = getApplicationById(id);
+      const app = getApplicationByIdSync(id);
       if (app) {
         setExistingApp(app);
         setForm({
@@ -147,7 +147,7 @@ export default function ApplicationSubmitForm() {
       } else {
         await createApplication({
           ...form,
-          userId:         user?.id,
+          userId:         String(user?.id),
           universityName: selectedProgram?.universityName ?? "",
           programName:    form.departmentName,
           documents:      newDocuments,
@@ -171,7 +171,7 @@ export default function ApplicationSubmitForm() {
     <div className="max-w-2xl mx-auto py-6 px-4">
       {/* Back nav */}
       <button
-        onClick={() => navigate("/dashboard/applications")}
+        onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 mb-6 transition-colors"
       >
         <ArrowLeft size={16} /> Back to Applications
@@ -228,11 +228,18 @@ export default function ApplicationSubmitForm() {
                   className={inputCls}
                 >
                   <option value="">Select a department…</option>
-                  {availableDepartments.map((dept) => (
-                    <option key={dept} value={dept}>
-                      {dept}
-                    </option>
-                  ))}
+                  {availableDepartments.map((dept, i) => {
+                    // dept is now an object: { language, degree, major, ... }
+                    const label = typeof dept === 'string'
+                      ? dept
+                      : `${dept.language} · ${dept.degree} — ${dept.major}`;
+                    const value = typeof dept === 'string' ? dept : label;
+                    return (
+                      <option key={i} value={value}>
+                        {label}
+                      </option>
+                    );
+                  })}
                 </select>
               ) : (
                 <p className="text-sm text-slate-400 italic py-2">

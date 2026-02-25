@@ -9,7 +9,7 @@ import {
 import { toast } from "sonner";
 import AdminCard   from "../../../components/admin/AdminCard";
 import StatusBadge, { STATUS_CONFIG } from "../../../components/shared/StatusBadge";
-import { getApplicationById }    from "../../../services/applicationService";
+import { getApplicationByIdSync } from "../../../services/applicationService";
 import { useApplications }        from "../../../hooks/useApplications";
 // [FIX #5] Uses formatDateLong (full month) from shared utility — src/utils/formatDate.js
 import { formatDateLong } from "../../../utils/formatDate";
@@ -50,7 +50,7 @@ export default function AdminApplicationReview() {
   const { updateStatus } = useApplications();
 
   const loadApp = useCallback(() => {
-    const data = getApplicationById(id);
+    const data = getApplicationByIdSync(id);
     if (!data) {
       toast.error("Application not found.");
       navigate("/admin/applications");
@@ -67,7 +67,7 @@ export default function AdminApplicationReview() {
     try {
       await updateStatus(id, status);
       // Refresh local state from localStorage so badge updates immediately
-      setApp(getApplicationById(id));
+      setApp(getApplicationByIdSync(id));
       toast.success(`Status updated to "${status}"`);
     } catch (err) {
       toast.error("Failed to update status.");

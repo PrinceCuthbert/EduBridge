@@ -6,14 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   ChevronRight,
-  Heart,
   Share2,
   Printer,
-  Minus,
-  Plus
 } from "lucide-react";
 import { toast } from "sonner";
-import { ProgramDepartments, ProgramTimeline, ProgramRequirements, ProgramApplication } from "../../components/program/ProgramSections";
+import { ProgramDepartments, ProgramTimeline, ProgramRequirements, ProgramApplication, ProgramTuitionFees } from "../../components/program/ProgramSections";
 
 export default function ProgramDetail() {
   const { id } = useParams();
@@ -22,7 +19,6 @@ export default function ProgramDetail() {
   const { program, loading, error } = useProgram(id);
   const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState("details");
-  const [quantity, setQuantity] = useState(1);
 
   /* 
     Unified apply handler
@@ -165,9 +161,12 @@ export default function ProgramDetail() {
                 />
               </div>
 
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">
+              <h1 className="text-3xl font-bold text-slate-900 mb-1">
                 {program.universityName}
               </h1>
+              {program.location && (
+                <p className="text-sm text-slate-500 mb-3">{program.location} · {program.country}</p>
+              )}
               <div className="flex items-center justify-center gap-2 mb-4">
                 {program.tags.map((tag) => (
                   <Badge 
@@ -204,15 +203,13 @@ export default function ProgramDetail() {
                   <>
                     <ProgramDepartments departments={program.departments} />
                     <ProgramTimeline timeline={program.timeline} />
+                    <ProgramTuitionFees tuitionFees={program.tuitionFees} />
                     <ProgramRequirements documents={program.requiredDocuments} />
-
-                    {/* Removed this because we are now we are not in the dashboard for application submission */}
-
-                    {/* <ProgramApplication 
-                       applicationLink={program.applicationLink} 
-                       applicationFile={program.applicationFile}
-                       onApply={handleApply}
-                    /> */}
+                    <ProgramApplication
+                      applicationLink={program.applicationLink}
+                      applicationFile={program.applicationFile}
+                      onApply={handleApply}
+                    />
                   </>
                 ) : (
                   <div className="text-center py-12 text-slate-500">
@@ -226,65 +223,48 @@ export default function ProgramDetail() {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
-              <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-                <h2 className="text-xl font-bold text-slate-900 mb-1">
-                  {program.universityName}
-                </h2>
-                <p className="text-2xl font-bold text-emerald-600 mb-6">
-                  {program.tuition}
-                </p>
-
-                <div className="space-y-4 mb-8">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-600">Quantity</span>
-                    <div className="flex items-center border border-slate-300 rounded-md">
-                      <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="p-2 hover:bg-slate-50 text-slate-600 border-r border-slate-300">
-                        <Minus size={14} />
-                      </button>
-                      <span className="w-10 text-center text-slate-900 font-medium">
-                        {quantity}
-                      </span>
-                      <button
-                        onClick={() => setQuantity(quantity + 1)}
-                        className="p-2 hover:bg-slate-50 text-slate-600 border-l border-slate-300">
-                        <Plus size={14} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center text-sm font-semibold pt-4 border-t border-slate-100">
-                    <span className="text-slate-900">
-                      Subtotal (x{quantity})
-                    </span>
-                    <span className="text-emerald-600">{program.tuition}</span>
-                  </div>
+              {/* Application CTA card */}
+              <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900 mb-1">{program.universityName}</h2>
+                  {program.location && (
+                    <p className="text-sm text-slate-500">{program.location} · {program.country}</p>
+                  )}
                 </div>
 
-                <div className="space-y-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-600 text-white">
+                    {program.visaType}
+                  </span>
+                  {program.tags?.slice(0, 2).map(tag => (
+                    <span key={tag} className="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">{tag}</span>
+                  ))}
+                </div>
+
+                <div className="pt-2 space-y-3">
                   <Button
                     onClick={() => handleApply('default')}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 h-11 text-base shadow-sm">
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 h-11 text-base shadow-sm"
+                  >
                     Apply Now
                   </Button>
                   <div className="grid grid-cols-2 gap-3">
-                    <Button variant="outline" className="w-full border-slate-200">
-                      Add to Cart
+                    <Button variant="outline" className="w-full border-slate-200" onClick={() => handleApply('file')}>
+                      Download Form
                     </Button>
                     <Button
                       variant="outline"
-                      className="w-full gap-2 text-slate-600 border-slate-200">
-                      <Heart size={18} /> 0
+                      className="w-full gap-2 text-slate-600 border-slate-200"
+                      onClick={() => handleApply('link')}
+                    >
+                      <Share2 size={18} /> Share
                     </Button>
                   </div>
                 </div>
               </div>
 
               <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-                <h3 className="font-semibold text-slate-900 mb-4">
-                  Share this program
-                </h3>
+                <h3 className="font-semibold text-slate-900 mb-4">Share this program</h3>
                 <div className="flex gap-2">
                   <Button variant="outline" size="icon" className="border-slate-200 text-slate-600">
                     <Share2 size={18} />

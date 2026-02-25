@@ -1,13 +1,21 @@
-﻿import React from 'react';
+﻿import React, { useMemo } from 'react';
 import { FileText, Plane, BookOpen, Globe, User, PlusCircle, ArrowRight, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
+import { useApplications } from '../../../hooks/useApplications';
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const { applications } = useApplications(user?.id);
+
+  const pendingCount  = useMemo(() => applications.filter(a => a.status === 'Pending').length, [applications]);
+  const approvedCount = useMemo(() => applications.filter(a => a.status === 'Approved').length, [applications]);
+
   const stats = [
-    { label: "Total Applications", value: "5", icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
-    { label: "Pending Visa Cases", value: "2", icon: Plane, color: "text-orange-600", bg: "bg-orange-50" },
-    { label: "Library Loans", value: "3", icon: BookOpen, color: "text-purple-600", bg: "bg-purple-50" },
-    { label: "Study Abroad Progress", value: "60%", icon: Globe, color: "text-green-600", bg: "bg-green-50" },
+    { label: "Total Applications", value: applications.length, icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
+    { label: "Pending Review",     value: pendingCount,        icon: Plane,    color: "text-orange-600", bg: "bg-orange-50" },
+    { label: "Approved",           value: approvedCount,       icon: BookOpen, color: "text-purple-600", bg: "bg-purple-50" },
+    { label: "Study Abroad Ready", value: approvedCount > 0 ? "✓" : "—", icon: Globe, color: "text-green-600", bg: "bg-green-50" },
   ];
 
   const quickActions = [

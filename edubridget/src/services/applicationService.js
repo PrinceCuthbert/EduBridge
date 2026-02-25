@@ -30,13 +30,18 @@ export const getApplications = async () => {
 
 export const getApplicationsByUserId = async (userId) => {
   await delay();
-  return _getApps().filter((app) => app.userId === userId);
+  // Compare as strings to handle number/string type mismatches (e.g. userId=1 vs "1")
+  return _getApps().filter((app) => String(app.userId) === String(userId));
 };
 
 export const getApplicationById = async (id) => {
   await delay();
   return _getApps().find((app) => app.id === id) || null;
 };
+
+// Synchronous version for components that cannot use async (e.g. edit-mode load in useEffect)
+export const getApplicationByIdSync = (id) =>
+  _getApps().find((app) => app.id === id) || null;
 
 // ── Write ────────────────────────────────────────────────────────────────────
 
