@@ -1,4 +1,4 @@
-# 🌉 EduBridge – Global Education, Seamlessly Delivered
+# 🌉 TMEDUBRIDGE
 
 > **EduBridge** is my flagship project, designed to transform access to learning for students around the world. It’s not just an app—it's a mission. From global resources to real-time classes and scholarship support, EduBridge offers a unified, beautiful experience built with modern React.js.
 
