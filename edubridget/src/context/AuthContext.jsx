@@ -1,6 +1,6 @@
+// src/context/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
-import { jwtDecode } from "jwt-decode";
-import { processGoogleUser } from "../services/googleAuth";
+import * as userService from "../services/userService";
 
 const AuthContext = createContext(null);
 
@@ -10,13 +10,12 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const initAuth = () => {
-      const storedUser = localStorage.getItem("edubridge_user");
+      const storedUser = localStorage.getItem("edubridge_user_session");
       if (storedUser) {
         try {
           setUser(JSON.parse(storedUser));
         } catch (error) {
-          console.error("Failed to parse user data:", error);
-          localStorage.removeItem("edubridge_user");
+          localStorage.removeItem("edubridge_user_session");
         }
       }
       setLoading(false);
@@ -24,86 +23,56 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  // OPTIMIZATION: Wrap functions in useCallback so they don't recreate on every render
   const login = useCallback(async ({ email, password }) => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    let loggedInUser = null;
-
-    if (email === 'admin@edubridge.africa' && password === 'admin123') {
-      loggedInUser = {
-        id: 'admin_01',
-        name: 'Admin User',
-        email: email,
-        role: 'admin',
-        avatar: 'https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff'
-      };
-    } else if (email === 'student@test.com' && password === 'student123') {
-      loggedInUser = {
-        id: 'student_01',
-        name: 'John Doe',
-        email: email,
-        role: 'student',
-        avatar: 'https://ui-avatars.com/api/?name=John+Doe&background=random'
-      };
-    }
-
-    if (loggedInUser) {
-      localStorage.setItem('edubridge_user', JSON.stringify(loggedInUser));
-      setUser(loggedInUser);
-      return loggedInUser;
-    }
-
-    throw new Error('Invalid email or password');
-  }, []); // Empty dependency array means this function never changes
+    // Call the Model/Service
+    const loggedInUser = await userService.loginUser(email, password);
+    
+    // Update the State
+    localStorage.setItem('edubridge_user_session', JSON.stringify(loggedInUser));
+    setUser(loggedInUser);
+    return loggedInUser;
+  }, []); 
 
   const loginWithGoogle = useCallback(async (credential) => {
     try {
-      const decoded = jwtDecode(credential);
-      const adminEmails = import.meta.env.VITE_ADMIN_EMAILS?.split(",").map((e) => e.trim()) || [];
-      const newUser = processGoogleUser(decoded, adminEmails);
-
-      localStorage.setItem("edubridge_user", JSON.stringify(newUser));
-      setUser(newUser);
-      return newUser;
+   // Call the Service(Model)
+      const googleUser = await  userService.loginWithGoogleToken(credential);
+      
+      // Update the State
+      localStorage.setItem("edubridge_user_session", JSON.stringify(googleUser));
+      setUser(googleUser);
+      return googleUser;
     } catch (err) {
       throw new Error("Google authentication failed");
     }
   }, []);
 
   const signUp = useCallback(async (userData) => {
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Call the Service(Model)
+    const newUser = await userService.registerUser(userData);
     
-    const newUser = {
-      id: `user_${Date.now()}`,
-      name: `${userData.firstName} ${userData.lastName}`,
-      email: userData.email,
-      role: 'student',
-      avatar: `https://ui-avatars.com/api/?name=${userData.firstName}+${userData.lastName}&background=random`
-    };
-
-    localStorage.setItem('edubridge_user', JSON.stringify(newUser));
+    // Update the State
+    localStorage.setItem('edubridge_user_session', JSON.stringify(newUser));
     setUser(newUser);
     return newUser;
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem('edubridge_user');
-    localStorage.removeItem('token');
+    localStorage.removeItem('edubridge_user_session');
     setUser(null);
   }, []);
 
-  const updateProfile = useCallback((updates) => {
-    setUser(prev => {
-      if (!prev) return null; // Safety check
-      const updated = { ...prev, ...updates };
-      localStorage.setItem('edubridge_user', JSON.stringify(updated));
-      return updated;
-    });
-  }, []);
+ // AFTER (writes to DB first, then syncs session)
+const updateProfile = useCallback(async (formData) => {
+  // 1. Write to the DB (same store as userService)
+  const updatedUser = await userService.updateUser(user.id, formData);
+  // 2. Sync the session so UI stays up-to-date
+  const sessionUser = { ...user, ...updatedUser };
+  localStorage.setItem('edubridge_user_session', JSON.stringify(sessionUser));
+  setUser(sessionUser);
+  return updatedUser;
+}, [user]);
 
-  // OPTIMIZATION: Memoize the value object
-  // This object will only reference a new location in memory if [user, loading] changes.
   const value = useMemo(() => ({
     user,
     loading,

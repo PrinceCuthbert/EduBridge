@@ -14,7 +14,10 @@ import {
   DollarSign,
   Upload,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Edit2,
+  Trash2,
+  Video
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -57,6 +60,28 @@ export default function VisaCaseDetails() {
     
     fetchCaseData();
   }, [id, navigate]);
+
+  const handleDeleteDocument = (docId) => {
+    toast.warning("Delete this document?", {
+      description: "This action cannot be undone.",
+      action: {
+        label: "Delete",
+        onClick: () => {
+          // Mock delete
+          setCaseData(prev => ({
+            ...prev,
+            documents: prev.documents.filter(d => d.id !== docId)
+          }));
+          toast.success("Document deleted successfully");
+        }
+      },
+      cancel: { label: "Cancel", onClick: () => {} }
+    });
+  };
+
+  const handleEditDocument = (docId) => {
+    toast.info("Edit document functionality coming soon");
+  };
 
   // Helper function: Get document status styling
   const getDocStatusStyles = (status) => {
@@ -211,20 +236,35 @@ export default function VisaCaseDetails() {
           </div>
           <div>
             <h3 className="font-bold text-slate-900 text-base">Upcoming Appointment</h3>
-            <div className="flex items-center gap-3 text-sm text-slate-600 mt-1">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600 mt-1">
                <span>{caseData.dateBooked} at {caseData.appointmentTime}</span>
-               <span className="text-slate-300">|</span>
+               <span className="text-slate-300 hidden sm:inline">|</span>
                <span className="flex items-center gap-1">
-                 <MapPin size={14} /> {caseData.meetingType}
+                 <Video size={14} className="text-blue-500" /> {caseData.meetingType || 'Online Session'}
                </span>
+               {caseData.meetingLink && (
+                 <>
+                   <span className="text-slate-300 hidden sm:inline">|</span>
+                   <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">
+                     Admin Scheduled
+                   </span>
+                 </>
+               )}
             </div>
           </div>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
-          <Button variant="outline" size="sm" className="flex-1 md:flex-none border-slate-200 text-slate-600 hover:bg-white bg-white/50 h-9">
-            Reschedule
-          </Button>
-          <Button size="sm" className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white h-9">
+          <Button 
+            size="sm" 
+            className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white h-9"
+            onClick={() => {
+              if (caseData.meetingLink) {
+                window.open(caseData.meetingLink, '_blank');
+              } else {
+                toast.error("Waiting for admin to verify and start the meeting.");
+              }
+            }}
+          >
             Join Meeting
           </Button>
         </div>
@@ -278,7 +318,14 @@ export default function VisaCaseDetails() {
                       {icon}
                       {doc.status}
                     </span>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 border-l border-slate-200 pl-2">
+                       <button 
+                         className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                         title="Edit"
+                         onClick={() => handleEditDocument(doc.id)}
+                       >
+                         <Edit2 size={16} />
+                       </button>
                       <button 
                         className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         title="View"
@@ -298,6 +345,13 @@ export default function VisaCaseDetails() {
                       >
                         <Download size={16} />
                       </button>
+                      <button 
+                         className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-0.5"
+                         title="Delete"
+                         onClick={() => handleDeleteDocument(doc.id)}
+                       >
+                         <Trash2 size={16} />
+                       </button>
                     </div>
                   </div>
                 </div>

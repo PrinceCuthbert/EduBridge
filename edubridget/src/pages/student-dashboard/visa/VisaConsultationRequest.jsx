@@ -73,11 +73,16 @@ export default function VisaConsultationRequest() {
     ...formData,
     fee: consultationFee,
     paymentStatus: "pending"
-  };
+    };
 
-  navigate("/dashboard/visa-status/payment", {
+  // Navigate to the branded payment methods page (bank details + image)
+  navigate("/dashboard/visa-status/payment-methods", {
     state: requestPayload
   });
+
+  // navigate("/dashboard/visa-status/payment", {
+  //   state: requestPayload
+  // });
 };
 
   // Standard input styles for consistency

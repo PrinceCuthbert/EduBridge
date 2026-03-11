@@ -28,8 +28,9 @@ const VisaPaymentPage         = lazy(() => import("../pages/student-dashboard/vi
 const VisaCaseDetails         = lazy(() => import("../pages/student-dashboard/visa/VisaCaseDetails"));
 const VisaCaseResponse        = lazy(() => import("../pages/student-dashboard/visa/VisaCaseResponse"));
 const UploadCaseDocuments     = lazy(() => import("../pages/student-dashboard/visa/UploadCaseDocuments"));
+const PaymentMethodsPage      = lazy(() => import("../pages/student-dashboard/visa/PaymentMethodsPage"));
 const UniversityPrograms      = lazy(() => import("../pages/shared/UniversityPrograms"));
-const ProfileSettings         = lazy(() => import("../pages/shared/ProfileSettings"));
+const ProfileSettings         = lazy(() => import("../pages/student-dashboard/settings/StudentSettings"));
 const UniversityProgramDetailsPreview = lazy(() => import("../pages/shared/UniversityProgramDetailsPreview"));
 
 export default function StudentRoutes() {
@@ -56,7 +57,8 @@ export default function StudentRoutes() {
           <Route path="summary/details/:id/upload" element={<UploadCaseDocuments />} />
           <Route path="summary/response/:id" element={<VisaCaseResponse />} />
           <Route path="request" element={<VisaConsultationRequest />} />
-          <Route  path="payment" element={<VisaPaymentPage />}></Route>
+          <Route path="payment" element={<VisaPaymentPage />}></Route>
+          <Route path="payment-methods" element={<PaymentMethodsPage />} />
         </Route>
 
         {/* Programs */}

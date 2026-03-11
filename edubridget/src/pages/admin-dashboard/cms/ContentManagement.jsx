@@ -1,13 +1,15 @@
 ﻿import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { Award, BookOpen, FileText, Image } from 'lucide-react';
+import { Award, BookOpen, FileText, Image, Building2, HelpCircle } from 'lucide-react';
 
 export default function ContentManagement() {
   const tabs = [
-    { name: 'Scholarships', path: 'scholarships', icon: Award },
-    { name: 'Library', path: 'library', icon: BookOpen },
-    { name: 'Blog Posts', path: 'posts', icon: FileText },
-    { name: 'Media', path: 'media', icon: Image },
+    { name: 'Scholarships',   path: 'scholarships',   icon: Award       },
+    { name: 'Library',        path: 'library',        icon: BookOpen    },
+    { name: 'Blog Posts',     path: 'posts',          icon: FileText    },
+    { name: 'Media',          path: 'media',          icon: Image       },
+    { name: 'Publishers',     path: 'publishers',     icon: Building2   }, // Priority 7
+    { name: 'Poll Questions', path: 'poll-questions', icon: HelpCircle  }, // Priority 8
   ];
 
   return (

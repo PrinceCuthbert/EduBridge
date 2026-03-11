@@ -1,22 +1,15 @@
 ﻿// src/pages/admin/AdminApplicationReview.jsx
-// Admin detail — review a single application and update its status.
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, Mail, Phone, Calendar, FileText, Download,Hash,
+  ArrowLeft, Mail, Phone, Calendar, FileText, Download, Hash,
   GraduationCap, AlertCircle, CheckCircle, XCircle, Clock, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import AdminCard   from "../../../components/admin/AdminCard";
-import StatusBadge, { STATUS_CONFIG } from "../../../components/shared/StatusBadge";
-import { getApplicationByIdSync } from "../../../services/applicationService";
-import { useApplications }        from "../../../hooks/useApplications";
-// [FIX #5] Uses formatDateLong (full month) from shared utility — src/utils/formatDate.js
+import StatusBadge from "../../../components/shared/StatusBadge";
+import { useApplications } from "../../../hooks/useApplications";
 import { formatDateLong } from "../../../utils/formatDate";
-
-
-// The review page is where the admin can review the applications of the students
-// and update the status of the applications
 
 const STATUSES = ["Pending", "Reviewing", "Needs Changes", "Approved", "Rejected"];
 
@@ -31,12 +24,12 @@ const statusIcon = (s) => {
   }
 };
 
-// [FIX #5] formatDate removed — using formatDateLong imported from src/utils/formatDate.js
-
-const getFileIcon = (type = "") => {
-  if (type.includes("image")) return "🖼️";
-  if (type.includes("zip"))   return "📦";
-  if (type.includes("word") || type.includes("document")) return "📝";
+const getFileIcon = (fileName = "") => {
+  const lowerName = fileName.toLowerCase();
+  if (lowerName.match(/\.(jpeg|jpg|gif|png)$/)) return "🖼️";
+  if (lowerName.match(/\.(zip|rar)$/))   return "📦";
+  if (lowerName.match(/\.(doc|docx)$/)) return "📝";
+  if (lowerName.match(/\.(pdf)$/)) return "📄";
   return "📄";
 };
 
@@ -44,30 +37,24 @@ export default function AdminApplicationReview() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [app,        setApp]        = useState(null);
-  const [updating,   setUpdating]   = useState(null); // status string being updated
+  // 1. Consume the Hook (Acting as the Controller)
+  // Passing 'id' tells the hook to isolate just this application.
+  const { 
+    singleApplication: app, 
+    loading, 
+    updateStatus 
+  } = useApplications({trackerId: id});
 
-  const { updateStatus } = useApplications();
+  const [updating, setUpdating] = useState(null);
 
-  const loadApp = useCallback(() => {
-    const data = getApplicationByIdSync(id);
-    if (!data) {
-      toast.error("Application not found.");
-      navigate("/admin/applications");
-      return;
-    }
-    setApp(data);
-  }, [id, navigate]);
-
-  useEffect(() => { loadApp(); }, [loadApp]);
-
+  // 2. Handle Status Change via the Hook
   const handleStatusChange = async (status) => {
     if (updating || app?.status === status) return;
     setUpdating(status);
+    
     try {
+      // updateStatus is an async function from our hook
       await updateStatus(id, status);
-      // Refresh local state from localStorage so badge updates immediately
-      setApp(getApplicationByIdSync(id));
       toast.success(`Status updated to "${status}"`);
     } catch (err) {
       toast.error("Failed to update status.");
@@ -76,9 +63,26 @@ export default function AdminApplicationReview() {
     }
   };
 
-  if (!app) return null;
+  if (loading) {
+    return (
+      <div className="flex flex-col justify-center items-center h-64 text-slate-500">
+        <Loader2 className="animate-spin mb-4" size={32} />
+        <p>Loading application details...</p>
+      </div>
+    );
+  }
 
-  const initials = ((app.firstName?.[0] ?? "") + (app.lastName?.[0] ?? "")).toUpperCase() || "?";
+  if (!app && !loading) {
+    return (
+      <div className="flex flex-col justify-center items-center h-64">
+         <p className="text-slate-500 mb-4">Application not found.</p>
+         <button onClick={() => navigate("/admin/applications")} className="px-4 py-2 bg-slate-900 text-white rounded-lg">Go Back</button>
+      </div>
+    );
+  }
+
+  // 3. Read data from the nested applicant DTO
+  const initials = ((app.applicant?.firstName?.[0] ?? "") + (app.applicant?.lastName?.[0] ?? "")).toUpperCase() || "?";
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12 animate-in fade-in duration-500">
@@ -96,9 +100,9 @@ export default function AdminApplicationReview() {
               Application Review
             </h1>
             <div className="flex items-center gap-2 text-sm text-slate-500 mt-0.5">
-              <span className="font-mono">{app.id}</span>
+              <span className="font-mono">{app.trackerId}</span>
               <span className="text-slate-300">•</span>
-              <span>{app.firstName} {app.lastName}</span>
+              <span>{app.applicant?.firstName} {app.applicant?.lastName}</span>
             </div>
           </div>
         </div>
@@ -118,7 +122,7 @@ export default function AdminApplicationReview() {
               <div className="flex-1 space-y-4">
                 <div>
                   <h2 className="text-lg font-bold text-slate-900">
-                    {app.firstName} {app.lastName}
+                    {app.applicant?.firstName} {app.applicant?.lastName}
                   </h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
@@ -126,19 +130,19 @@ export default function AdminApplicationReview() {
                     <p className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
                       <Mail size={13} /> Email
                     </p>
-                    <p className="text-sm font-medium text-slate-900 truncate">{app.email}</p>
+                    <p className="text-sm font-medium text-slate-900 truncate">{app.applicant?.email}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
                       <Phone size={13} /> Phone
                     </p>
-                    <p className="text-sm font-medium text-slate-900">{app.phone || "—"}</p>
+                    <p className="text-sm font-medium text-slate-900">{app.applicant?.phone || "—"}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
-                      <Hash size={13} /> Application ID
+                      <Hash size={13} /> Tracker ID
                     </p>
-                    <p className="text-sm font-mono text-slate-900">{app.id}</p>
+                    <p className="text-sm font-mono text-slate-900">{app.trackerId}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
@@ -160,8 +164,8 @@ export default function AdminApplicationReview() {
                 <GraduationCap size={24} className="text-blue-600" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">{app.universityName}</h3>
-                <p className="text-sm text-slate-500">{app.programName}</p>
+                <h3 className="text-base font-bold text-slate-900">{app.programDetails?.universityName}</h3>
+                <p className="text-sm text-slate-500">{app.programDetails?.majorName}</p>
               </div>
             </div>
           </AdminCard>
@@ -174,31 +178,29 @@ export default function AdminApplicationReview() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {app.documents.map((doc) => (
                   <div
-                    key={doc.id}
+                    key={doc.fileId}
                     className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg hover:border-blue-200 hover:shadow-sm transition-all group"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-9 h-9 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-100 shrink-0">
-                        <span className="text-base">{getFileIcon(doc.type)}</span>
+                        {/* Derive icon from the fileName */}
+                        <span className="text-base">{getFileIcon(doc.fileName)}</span>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-slate-900 truncate">{doc.name}</p>
+                        <p className="text-sm font-medium text-slate-900 truncate">{doc.fileName}</p>
                         <p className="text-xs text-slate-400">
-                          {(doc.size / 1024).toFixed(1)} KB ·{" "}
-                          {new Date(doc.uploadedAt).toLocaleDateString()}
+                          {doc.size} · {new Date(doc.uploadDate).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
-                    {doc.url && (
-                      <a
-                        href={doc.url}
-                        download={doc.name}
-                        className="p-1.5 text-slate-400 hover:text-blue-600 rounded transition-colors ml-2 shrink-0"
-                        title="Download"
-                      >
-                        <Download size={15} />
-                      </a>
-                    )}
+                    {/* Simulated Download link */}
+                    <button
+                      className="p-1.5 text-slate-400 hover:text-blue-600 rounded transition-colors ml-2 shrink-0"
+                      title="Download"
+                      onClick={() => toast.success(`Downloading ${doc.fileName}...`)}
+                    >
+                      <Download size={15} />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -211,7 +213,7 @@ export default function AdminApplicationReview() {
           <AdminCard title="Status Management">
             <div className="space-y-2">
               <p className="text-xs text-slate-500 mb-3">
-                Current status: <span className="font-medium">{app.status}</span>
+                Current status: <span className="font-medium text-slate-800">{app.status}</span>
               </p>
               {STATUSES.map((s) => {
                 const isActive  = app.status === s;
@@ -228,10 +230,7 @@ export default function AdminApplicationReview() {
                       }`}
                   >
                     <span className={isActive ? "text-white" : "text-slate-400"}>
-                      {isBusy
-                        ? <Loader2 size={14} className="animate-spin" />
-                        : statusIcon(s)
-                      }
+                      {isBusy ? <Loader2 size={14} className="animate-spin" /> : statusIcon(s)}
                     </span>
                     {s}
                   </button>

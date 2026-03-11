@@ -1,5 +1,5 @@
 // src/services/applicationService.js
-// Data layer for applications — swap localStorage calls for fetch() to connect a real backend.
+import { MOCK_UNIFIED_APPLICATIONS } from "../data/mockData";
 
 const STORAGE_KEY = "edubridge_applications";
 
@@ -9,12 +9,17 @@ const generateId = () =>
 // Simulate network latency
 const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Internal synchronous read
+// Internal synchronous read — Now seeds with DTO mock data if empty!
 const _getApps = () => {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_UNIFIED_APPLICATIONS));
+      return MOCK_UNIFIED_APPLICATIONS;
+    }
+    return JSON.parse(data);
   } catch {
-    return [];
+    return MOCK_UNIFIED_APPLICATIONS;
   }
 };
 
@@ -30,43 +35,54 @@ export const getApplications = async () => {
 
 export const getApplicationsByUserId = async (userId) => {
   await delay();
-  // Compare as strings to handle number/string type mismatches (e.g. userId=1 vs "1")
-  return _getApps().filter((app) => String(app.userId) === String(userId));
+  // Changed to look inside the nested applicant object
+  return _getApps().filter((app) => String(app.applicant?.identityId) === String(userId));
 };
 
 export const getApplicationById = async (id) => {
   await delay();
-  return _getApps().find((app) => app.id === id) || null;
+  // Changed app.id to app.trackerId
+  return _getApps().find((app) => app.trackerId === id) || null;
 };
 
-// Synchronous version for components that cannot use async (e.g. edit-mode load in useEffect)
 export const getApplicationByIdSync = (id) =>
-  _getApps().find((app) => app.id === id) || null;
+  _getApps().find((app) => app.trackerId === id) || null;
 
 // ── Write ────────────────────────────────────────────────────────────────────
 
 export const createApplication = async (data) => {
   await delay();
   const apps = _getApps();
+  
+  // Build the new DTO structure when a student applies
   const newApp = {
-    ...data,
-    id: generateId(),
+    trackerId: generateId(),
+    applicationId: Math.floor(Math.random() * 10000), // Simulated DB auto-increment
+    submissionDate: new Date().toISOString(),
     status: "Pending",
-    submissionDate: new Date().toISOString().split("T")[0],
+    applicant: data.applicant || {}, 
+    programDetails: data.programDetails || {},
+    trackerStages: [
+      { stage: "Submitted", completed: true, date: new Date().toISOString().split("T")[0] },
+      { stage: "Under Review", completed: false, date: null },
+      { stage: "Decision", completed: false, date: null },
+      { stage: "Enrolled", completed: false, date: null }
+    ],
+    documents: data.documents || []
   };
+  
   apps.push(newApp);
   _saveApps(apps);
   return newApp;
 };
 
-/** Student-editable update — status can never be changed through this function. */
 export const updateApplication = async (id, data) => {
   await delay();
   const apps = _getApps();
-  const idx = apps.findIndex((app) => app.id === id);
+  const idx = apps.findIndex((app) => app.trackerId === id);
   if (idx === -1) throw new Error("Application not found");
 
-  const { status, ...safeData } = data; // strip status intentionally
+  const { status, trackerStages, ...safeData } = data; // Prevent student from changing status/stages
   apps[idx] = { ...apps[idx], ...safeData };
   _saveApps(apps);
   return apps[idx];
@@ -76,7 +92,7 @@ export const updateApplication = async (id, data) => {
 export const updateApplicationStatus = async (id, status) => {
   await delay();
   const apps = _getApps();
-  const idx = apps.findIndex((app) => app.id === id);
+  const idx = apps.findIndex((app) => app.trackerId === id);
   if (idx === -1) throw new Error("Application not found");
 
   apps[idx].status = status;
@@ -84,9 +100,21 @@ export const updateApplicationStatus = async (id, status) => {
   return apps[idx];
 };
 
+/** NEW: Admin-only Tracker Stages update. */
+export const updateTrackerStages = async (id, stages) => {
+  await delay();
+  const apps = _getApps();
+  const idx = apps.findIndex((app) => app.trackerId === id);
+  if (idx === -1) throw new Error("Application not found");
+
+  apps[idx].trackerStages = stages;
+  _saveApps(apps);
+  return apps[idx];
+};
+
 export const deleteApplication = async (id) => {
   await delay();
-  const apps = _getApps().filter((app) => app.id !== id);
+  const apps = _getApps().filter((app) => app.trackerId !== id);
   _saveApps(apps);
   return true;
 };

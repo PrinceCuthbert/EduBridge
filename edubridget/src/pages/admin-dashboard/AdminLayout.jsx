@@ -18,6 +18,8 @@ import {
   PanelLeft,
   MessageSquare,
   ChevronDown,
+  Activity,
+  ShieldCheck,
 } from "lucide-react";
 
 export default function AdminLayout() {
@@ -45,16 +47,18 @@ export default function AdminLayout() {
   }, []);
 
   const navItems = [
-    { label: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
-    { label: "Manage Users", path: "/admin/users", icon: Users },
-    { label: "Applications", path: "/admin/applications", icon: FileText },
-    { label: "Visa Cases", path: "/admin/visa", icon: Plane },
-    { label: "University Programs", path: "/admin/programs", icon: GraduationCap },
-    { label: 'Content (CMS)', path: '/admin/cms', icon: ScrollText },
-    { label: 'Branches', path: '/admin/branches', icon: Building2 },
-    { label: 'Financial Reports', path: '/admin/finance', icon: DollarSign },
-    { label: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
-    { label: 'Communications', path: '/admin/communications', icon: MessageSquare },
+    { label: "Dashboard",         path: "/admin/dashboard",    icon: LayoutDashboard },
+    { label: "Manage Users",      path: "/admin/users",        icon: Users },
+    // { label: "Roles",             path: "/admin/roles",        icon: ShieldCheck },    // Priority 9
+    { label: "Applications",      path: "/admin/applications", icon: FileText },
+    { label: "App Tracker",       path: "/admin/tracker",      icon: Activity },       // Priority 4
+    { label: "Visa Cases",        path: "/admin/visa",         icon: Plane },
+    { label: "University Programs",path: "/admin/programs",   icon: GraduationCap },
+    { label: 'Content (CMS)',     path: '/admin/cms',          icon: ScrollText },
+    { label: 'Branches',          path: '/admin/branches',     icon: Building2 },
+    { label: 'Financial Reports', path: '/admin/finance',      icon: DollarSign },
+    { label: 'Analytics',         path: '/admin/analytics',    icon: BarChart3 },
+    { label: 'Communications',    path: '/admin/communications',icon: MessageSquare },
   ];
 
   const settingsItem = { label: 'Settings', path: '/admin/settings', icon: Settings };

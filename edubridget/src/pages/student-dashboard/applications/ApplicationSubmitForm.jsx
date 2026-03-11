@@ -8,6 +8,7 @@ import { useAuth } from "../../../context/AuthContext";
 import { Upload, X, FileText, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
+
 const ACCEPTED_TYPES = ".pdf,.doc,.docx,.zip,.jpg,.jpeg,.png";
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
@@ -311,8 +312,8 @@ export default function ApplicationSubmitForm() {
             <label className={labelCls}>Phone Number</label>
             <input
             type="tel"
-  pattern="^\+?[0-9\s\-]{7,15}$"
-  placeholder="e.g. +254 712 345 678"
+            pattern="^\+?[0-9\s\-]{7,15}$"
+            placeholder="e.g. +254 712 345 678"
               value={form.phone} onChange={set("phone")}
               className={inputCls}
             />
@@ -405,9 +406,6 @@ export default function ApplicationSubmitForm() {
               ? "Save Changes"
               : "Submit Application"}
           </button>
-          <p className="text-center text-xs text-slate-400">
-            By submitting you agree to our Terms &amp; Conditions.
-          </p>
         </form>
       </div>
     </div>

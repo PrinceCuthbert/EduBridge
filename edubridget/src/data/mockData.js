@@ -2,6 +2,7 @@ export const MOCK_PROGRAMS = [
   // --- Program 1 ---
   {
     id: 1,
+    publisher_id: 1,    // PROGRAM.publisher_id → PUBLISHERS table (Publisher: "TM EduBridge")
     universityName: "Daegu Arts University",
     visaType: "D-2",
     tags: ["ON SALE", "BEST"],
@@ -14,15 +15,12 @@ export const MOCK_PROGRAMS = [
       "https://placehold.co/600x400/1e40af/ffffff/png?text=Daegu+Arts+University&font=roboto",
       "https://placehold.co/600x400/2563eb/ffffff/png?text=Campus+View&font=roboto",
     ],
-    // Structured departments: each row = one program track
-    departments: [
-      { language: "English", degree: "B.A.", major: "Arts Therapy",               duration: "4 years / 8 semesters", credits: "140 credits", languageRequirement: "TOEFL / IELTS" },
-      { language: "English", degree: "B.A.", major: "Fashion Design",             duration: "4 years / 8 semesters", credits: "140 credits", languageRequirement: "TOEFL / IELTS" },
-      { language: "English", degree: "B.A.", major: "Digital Animation",          duration: "4 years / 8 semesters", credits: "140 credits", languageRequirement: "TOEFL / IELTS" },
-      { language: "Korean",  degree: "B.A.", major: "Piano Pedagogy",             duration: "4 years / 8 semesters", credits: "140 credits", languageRequirement: "TOPIK Level 3+" },
-      { language: "Korean",  degree: "B.A.", major: "Jazz & Commercial Music",    duration: "4 years / 8 semesters", credits: "140 credits", languageRequirement: "TOPIK Level 3+" },
-      { language: "Korean",  degree: "B.A.", major: "Visual Communication Design",duration: "4 years / 8 semesters", credits: "140 credits", languageRequirement: "TOPIK Level 3+" },
-    ],
+    // REFACTORED (Priority 2): departments[] replaced with department_major_ids[]
+    // These IDs reference MOCK_DEPARTMENT_MAJORS in mockMajors.js
+    // Old: departments: [{ language, degree, major, duration, credits, languageRequirement }, ...]
+    // New: resolve with getProgramMajors(1) from mockMajors.js
+    // Backend: GET /api/programs/1/majors
+    department_major_ids: [1, 2, 3, 4, 5, 6],
     // Structured timeline: each row = one application stage
     timeline: [
       { stage: "Stage 1",    registrationStart: "2025-12-01", registrationEnd: "2025-12-23", examDate: "2025-12-26", resultDate: "2026-01-12" },
@@ -63,6 +61,7 @@ export const MOCK_PROGRAMS = [
   // --- Program 2 ---
   {
     id: 2,
+    publisher_id: 1,    // PROGRAM.publisher_id → PUBLISHERS.id
     universityName: "Tongmyong University",
     visaType: "D-4",
     tags: ["NEW", "ON SALE"],
@@ -72,11 +71,9 @@ export const MOCK_PROGRAMS = [
       "Leading university in Busan with strong industry connections and practical training programs.",
     logo: "https://ui-avatars.com/api/?name=Tongmyong&background=2563EB&color=fff&size=128",
     images: [],
-    departments: [
-      { language: "Korean",  degree: "Certificate", major: "Korean Language",         duration: "1 year / 2 semesters",  credits: "60 credits",  languageRequirement: "None (beginner welcome)" },
-      { language: "English", degree: "B.A.",        major: "International Studies",    duration: "4 years / 8 semesters", credits: "130 credits", languageRequirement: "TOEFL 80+ / IELTS 6.0+" },
-      { language: "English", degree: "B.B.A.",      major: "Business Administration",  duration: "4 years / 8 semesters", credits: "130 credits", languageRequirement: "TOEFL 80+ / IELTS 6.0+" },
-    ],
+    // REFACTORED (Priority 2): resolve with getProgramMajors(2) from mockMajors.js
+    // Backend: GET /api/programs/2/majors
+    department_major_ids: [7, 8, 9],
     timeline: [
       { stage: "Stage 1", registrationStart: "2025-08-01", registrationEnd: "2025-08-31", examDate: "2025-09-10", resultDate: "2025-09-15" },
       { stage: "Stage 2", registrationStart: "2025-09-01", registrationEnd: "2025-09-20", examDate: "2025-09-28", resultDate: "2025-09-30" },
@@ -111,6 +108,7 @@ export const MOCK_PROGRAMS = [
   // --- Program 3 ---
   {
     id: 3,
+    publisher_id: 1,    // PROGRAM.publisher_id → PUBLISHERS.id
     universityName: "Seoul Women's University",
     visaType: "D-2",
     tags: ["BEST"],
@@ -120,11 +118,9 @@ export const MOCK_PROGRAMS = [
       "Prestigious women's university in Seoul focusing on leadership and innovation.",
     logo: "https://ui-avatars.com/api/?name=SWU&background=D946EF&color=fff&size=128",
     images: [],
-    departments: [
-      { language: "English", degree: "B.Sc.", major: "Computer Science",    duration: "4 years / 8 semesters", credits: "135 credits", languageRequirement: "TOEFL 85+ / IELTS 6.5+" },
-      { language: "English", degree: "B.A.",  major: "Digital Media",       duration: "4 years / 8 semesters", credits: "130 credits", languageRequirement: "TOEFL 80+ / IELTS 6.0+" },
-      { language: "Korean",  degree: "B.Sc.", major: "Information Security", duration: "4 years / 8 semesters", credits: "135 credits", languageRequirement: "TOPIK Level 4+" },
-    ],
+    // REFACTORED (Priority 2): resolve with getProgramMajors(3) from mockMajors.js
+    // Backend: GET /api/programs/3/majors
+    department_major_ids: [10, 11, 12],
     timeline: [
       { stage: "Stage 1", registrationStart: "2025-10-01", registrationEnd: "2025-10-20", examDate: "2025-10-27", resultDate: "2025-11-05" },
       { stage: "Stage 2", registrationStart: "2025-10-25", registrationEnd: "2025-11-05", examDate: "2025-11-15", resultDate: "2025-11-20" },
@@ -550,110 +546,73 @@ export const MOCK_PARTNERS = [
   },
 ];
 
-export const MOCK_APPLICATIONS = [
+/**
+ * MOCK_UNIFIED_APPLICATIONS (The DTO)
+ * This represents the joined view of APPLICATION_TRACKER, IDENTITY, USER,
+ * DEPARTMENT_MAJOR_APPLICATION, INSTITUTION, and SYSTEM_FILES.
+ * Backend equivalent: GET /api/admin/tracker
+ */
+export const MOCK_UNIFIED_APPLICATIONS = [
   {
-    id: "APP-2024-001",
-    studentName: "Alice Mutesi",
-    scholarship: "Global Excellence Scholarship",
-    programId: "1", 
-    date: "2024-02-01",
-    status: "Pending",
-    email: "alice@example.com",
-    documents: ["Passport.pdf", "Transcript.pdf"],
-    firstName: "Alice",
-    lastName: "Mutesi",
-    description: "I am highly motivated to study...",
-    paperTitle: "Impact of AI in Education"
-  },
-  {
-    id: "APP-2024-002",
-    studentName: "David Kwizera",
-    scholarship: "DAAD Master Studies",
-    programId: "2",
-    date: "2024-01-28",
+    trackerId: "APP-1771461317295-608",
+    applicationId: 101,
+    submissionDate: "2026-02-19T10:30:00Z",
     status: "Reviewing",
-    email: "david@example.com",
-    documents: ["Passport.pdf"],
-    firstName: "David",
-    lastName: "Kwizera",
-    description: "Seeking to expand my knowledge in...",
-    paperTitle: "Sustainable Energy Solutions"
+    
+    applicant: {
+      identityId: 1,
+      firstName: "Prince",
+      lastName: "Cuthbert",
+      email: "princecuth@gmail.com",
+      phone: "+250798697800"
+    },
+    
+    programDetails: {
+      universityName: "Daegu Arts University",
+      majorName: "Architecture Interior Design"
+    },
+    
+    trackerStages: [
+      { stage: "Submitted", completed: true, date: "2026-02-19" },
+      { stage: "Under Review", completed: true, date: "2026-02-20" },
+      { stage: "Decision", completed: false, date: null },
+      { stage: "Enrolled", completed: false, date: null }
+    ],
+    
+    documents: [
+      { fileId: 1, fileName: "ClassDiagram.png", size: "313.2 KB", uploadDate: "2026-02-19" },
+      { fileId: 2, fileName: "Edu Bridge Sequence Flow.jpg", size: "55.0 KB", uploadDate: "2026-02-19" }
+    ]
   },
   {
-    id: "APP-2024-003", 
-    studentName: "Sarah Uwase",
-    scholarship: "Fullbright Program",
-    programId: "3",
-    date: "2024-01-25",
-    status: "Needs Changes",
-    email: "sarah@example.com",
-    documents: ["Passport.pdf"],
-    firstName: "Sarah",
-    lastName: "Uwase",
-    description: "Passionate about public health...",
-    paperTitle: "Community Health Initiatives"
-  },
-  {
-    id: "APP-2024-004",
-    studentName: "John Doe",
-    scholarship: "Global Excellence Scholarship",
-    programId: "1",
-    date: "2024-02-02",
-    status: "Approved",
-    email: "john@example.com",
-    documents: ["Passport.pdf"],
-    firstName: "John",
-    lastName: "Doe",
-    description: "Experienced researcher...",
-    paperTitle: "Advanced Machine Learning"
-  },
+    trackerId: "APP-2024-001",
+    applicationId: 102,
+    submissionDate: "2026-02-01T09:15:00Z",
+    status: "Pending",
+    
+    applicant: {
+      identityId: 2,
+      firstName: "Alice",
+      lastName: "Mutesi",
+      email: "alice@example.com",
+      phone: "+250788123456"
+    },
+    
+    programDetails: {
+      universityName: "Daegu Arts University",
+      majorName: "Fine Arts"
+    },
+    
+    trackerStages: [
+      { stage: "Submitted", completed: true, date: "2026-02-01" },
+      { stage: "Under Review", completed: false, date: null },
+      { stage: "Decision", completed: false, date: null },
+      { stage: "Enrolled", completed: false, date: null }
+    ],
+    
+    documents: [
+      { fileId: 3, fileName: "Passport.pdf", size: "1.2 MB", uploadDate: "2026-02-01" },
+      { fileId: 4, fileName: "Transcript.pdf", size: "3.4 MB", uploadDate: "2026-02-01" }
+    ]
+  }
 ];
-
-
-export  const applications = [
-    {
-      id: "CAM001234",
-      university: "University of Cambridge",
-      program: "MPhil in Advanced Computer Science",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Coat_of_Arms_of_the_University_of_Cambridge.svg/1200px-Coat_of_Arms_of_the_University_of_Cambridge.svg.png",
-      date: "2023-01-15",
-      status: "Accepted",
-      statusColor: "bg-green-50 text-green-700 border-green-100",
-    },
-    {
-      id: "OXF005678",
-      university: "University of Oxford",
-      program: "MSc in Financial Economics",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Coat_of_arms_of_the_University_of_Oxford.svg/1200px-Coat_of_arms_of_the_University_of_Oxford.svg.png",
-      date: "2023-02-20",
-      status: "Under Review",
-      statusColor: "bg-orange-50 text-orange-700 border-orange-100",
-    },
-    {
-      id: "LSE009012",
-      university: "London School of Economics",
-      program: "MSc in International Relations",
-      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/4/42/LSE_Coat_of_Arms.svg/1200px-LSE_Coat_of_Arms.svg.png",
-      date: "2023-03-10",
-      status: "Under Review",
-      statusColor: "bg-orange-50 text-orange-700 border-orange-100",
-    },
-    {
-      id: "IMP003456",
-      university: "Imperial College London",
-      program: "MEng Aeronautical Engineering",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Shield_of_Imperial_College_London.svg/1200px-Shield_of_Imperial_College_London.svg.png",
-      date: "2023-04-01",
-      status: "Declined",
-      statusColor: "bg-red-50 text-red-700 border-red-100",
-    },
-    {
-      id: "UCL007890",
-      university: "University College London",
-      program: "BSc Computer Science",
-      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d1/University_College_London_coat_of_arms.svg/1200px-University_College_London_coat_of_arms.svg.png",
-      date: "2023-04-25",
-      status: "Under Review",
-      statusColor: "bg-orange-50 text-orange-700 border-orange-100",
-    },
-  ];

@@ -97,15 +97,17 @@ const Hero = () => {
               {/* CTAs with amber primary button */}
               <div className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start">
                 <Link to="/signin">
-                  <button className="w-full sm:w-auto px-6 py-3 bg-accent hover:bg-accent-light text-slate-900 rounded-2xl font-bold shadow-glow-amber hover:shadow-glow-amber hover:scale-105 active:scale-95 transition-all text-base">
+                  {/* Previously: rounded-2xl — that class was what gave this button its heavily curved/pill shape */}
+                  <button className="w-full sm:w-auto px-6 py-3 bg-accent hover:bg-accent-light text-slate-900 rounded font-bold shadow-glow-amber hover:shadow-glow-amber hover:scale-105 active:scale-95 transition-all text-base">
                     {t('home_page.hero.cta_primary')}
                     <ArrowRight className="inline-block ml-2 h-5 w-5" />
                   </button>
                 </Link>
 
+                {/* Previously: rounded-2xl — that class was what gave this button its heavily curved/pill shape */}
                 <button
                   onClick={() => setIsVideoOpen(true)}
-                  className="w-full sm:w-auto px-6 py-3 flex items-center justify-center gap-3 text-white font-semibold hover:bg-white/10 border-2 border-white/30 rounded-2xl backdrop-blur-sm transition-all group text-base">
+                  className="w-full sm:w-auto px-6 py-3 flex items-center justify-center gap-3 text-white font-semibold hover:bg-white/10 border-2 border-white/30 rounded backdrop-blur-sm transition-all group text-base">
                   <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 group-hover:scale-110 transition-all">
                     <Play size={16} className="fill-white ml-0.5" />
                   </div>

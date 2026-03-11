@@ -1,10 +1,11 @@
 ﻿import React, { useState } from 'react';
-import { DollarSign, FileText, Users, TrendingDown, Download, Filter } from 'lucide-react';
+import { DollarSign, FileText, Users, TrendingDown, Download, Filter, CreditCard, Globe } from 'lucide-react';
 import AdminPageHeader from "../../../components/admin/AdminPageHeader";
 import AdminStatsGrid from "../../../components/admin/AdminStatsGrid";
 import AdminCard from "../../../components/admin/AdminCard";
 import AdminTable from "../../../components/admin/AdminTable";
 import AdminFilterBar from "../../../components/admin/AdminFilterBar";
+import { MOCK_FILE_RECORDS, FILE_STATUS_STYLES } from "../../../data/fileRecords"; // Priority 10: FILE entity
 
 export default function FinancialReports() {
   const [timeRange, setTimeRange] = useState("This Month");
@@ -194,6 +195,66 @@ export default function FinancialReports() {
            data={serviceRevenue}
            isLoading={false}
          />
+      </div>
+
+      {/* ── Priority 10: FILE entity — Payment File Records ── */}
+      <div className="space-y-4">
+        <div className="px-2 flex items-center gap-2">
+          <CreditCard size={16} className="text-slate-400" />
+          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Payment Files (FILE Entity)</h3>
+          <span className="text-[10px] bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-full font-bold uppercase">Schema: FILE</span>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  {['ID', 'Student', 'Country', 'Amount', 'Description', 'Status', 'Date'].map(h => (
+                    <th key={h} className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {MOCK_FILE_RECORDS.map(file => {
+                  const style = FILE_STATUS_STYLES[file.status] || FILE_STATUS_STYLES.Pending;
+                  return (
+                    <tr key={file.id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="px-5 py-3">
+                        <span className="text-xs font-mono bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{file.id}</span>
+                      </td>
+                      <td className="px-5 py-3">
+                        <p className="text-sm font-medium text-slate-900">{file.studentName}</p>
+                        <p className="text-xs text-slate-400">{file.user_id}</p>
+                      </td>
+                      <td className="px-5 py-3">
+                        <div className="flex items-center gap-1.5">
+                          <Globe size={13} className="text-slate-400" />
+                          <span className="text-sm text-slate-600">{file.country}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3">
+                        <span className="text-sm font-semibold text-slate-900">
+                          {file.currency} {parseFloat(file.amount).toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3">
+                        <p className="text-xs text-slate-500 max-w-[200px] truncate">{file.description}</p>
+                      </td>
+                      <td className="px-5 py-3">
+                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${style.bg} ${style.text} ${style.border}`}>
+                          {file.status}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-xs text-slate-400 font-mono">
+                        {new Date(file.created_at).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );

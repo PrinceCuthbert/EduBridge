@@ -47,9 +47,9 @@ export default function CMSLibrary() {
               <FileText size={20} className="text-slate-400" />
            </div>
            <div>
-              {/* CHANGED: Removed font-serif, text-[15px]. Added text-sm font-medium */}
+             
               <div className="text-sm font-medium text-slate-900">{item.title}</div>
-              {/* CHANGED: Removed uppercase tracking-wider. Added text-xs text-slate-500 */}
+           
               <div className="text-xs text-slate-500">{item.category}</div>
            </div>
         </div>

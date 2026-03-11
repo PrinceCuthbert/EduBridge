@@ -18,8 +18,10 @@ import {
   Phone,
   Calendar,
   FileText,
-  ArrowRight,
   Search,
+  Video,
+  Link as LinkIcon,
+  Download
 } from "lucide-react";
 import { toast } from "sonner";
 import Modal from "../../../components/Modal";
@@ -37,6 +39,13 @@ export default function VisaCases() {
   const [selectedCase, setSelectedCase] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+
+  const [scheduleData, setScheduleData] = useState({
+    date: "",
+    time: "",
+    type: "Zoom",
+    link: "",
+  });
   
   const [formData, setFormData] = useState({
     clientName: "",
@@ -95,13 +104,7 @@ export default function VisaCases() {
       bg: "bg-emerald-50",
       trend: "98% rate",
     },
-    // {
-    //   label: "Revenue",
-    //   value: `$${cases.reduce((sum, c) => sum + parseInt(c.consultationFee.replace("$", "") || 0), 0)}`,
-    //   icon: DollarSign,
-    //   color: "text-indigo-600",
-    //   bg: "bg-indigo-50",
-    // },
+    
   ], [cases]);
 
   const handleAddCase = () => {
@@ -122,7 +125,35 @@ export default function VisaCases() {
 
   const handleViewDetails = (caseItem) => {
     setSelectedCase(caseItem);
+    setScheduleData({
+      date: caseItem.appointmentDate || "",
+      time: caseItem.appointmentTime || "",
+      type: caseItem.meetingType || "Zoom",
+      link: caseItem.meetingLink || ""
+    });
     setIsDetailsOpen(true);
+  };
+
+  const handleSaveSchedule = () => {
+    setCases(cases.map((c) =>
+      c.id === selectedCase.id
+        ? {
+            ...c,
+            appointmentDate: scheduleData.date,
+            appointmentTime: scheduleData.time,
+            meetingType: scheduleData.type,
+            meetingLink: scheduleData.link,
+          }
+        : c
+    ));
+    setSelectedCase((prev) => ({
+      ...prev,
+      appointmentDate: scheduleData.date,
+      appointmentTime: scheduleData.time,
+      meetingType: scheduleData.type,
+      meetingLink: scheduleData.link,
+    }));
+    toast.success("Meeting scheduled successfully. Student will see the join link.");
   };
 
   const handleDeleteCase = (caseItem) => {
@@ -443,8 +474,8 @@ export default function VisaCases() {
         <Modal
           isOpen={isDetailsOpen}
           onClose={() => setIsDetailsOpen(false)}
-          title="Case Details"
-          size="md"
+          title="Case Details & Management"
+          size="lg"
         >
           <div className="space-y-6">
              {/* Header */}
@@ -495,13 +526,93 @@ export default function VisaCases() {
                 </div>
              </div>
 
-             {/* Notes */}
-             {selectedCase.notes && (
-               <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                 <p className="text-xs font-semibold text-slate-500 mb-1">NOTES</p>
-                 <p className="text-sm text-slate-700">{selectedCase.notes}</p>
+             {/* Documents Section */}
+             {selectedCase.documents && selectedCase.documents.length > 0 && (
+               <div className="space-y-3">
+                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Submitted Documents</p>
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                   {selectedCase.documents.map((doc, idx) => (
+                     <div key={idx} className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-blue-300 transition-colors">
+                       <div className="flex items-center gap-3">
+                         <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                           <FileText size={16} />
+                         </div>
+                         <p className="text-sm font-medium text-slate-900 truncate max-w-[120px]">{typeof doc === 'string' ? doc : doc.name || 'Document'}</p>
+                       </div>
+                       <div className="flex items-center gap-2">
+                         <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded" title="View"><Eye size={14} /></button>
+                         <button className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded" title="Download"><Download size={14} /></button>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
                </div>
              )}
+
+             {/* Admin Meeting Scheduler */}
+             <div className="bg-blue-50/50 border border-blue-100 p-5 rounded-xl space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Calendar size={18} className="text-blue-600" />
+                  <h4 className="text-sm font-bold text-slate-900">Schedule Consultation Meeting</h4>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-slate-700">Date</label>
+                    <input 
+                      type="date" 
+                      value={scheduleData.date}
+                      onChange={(e) => setScheduleData({...scheduleData, date: e.target.value})}
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-slate-700">Time</label>
+                    <input 
+                      type="time" 
+                      value={scheduleData.time}
+                      onChange={(e) => setScheduleData({...scheduleData, time: e.target.value})}
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-slate-700">Form of Communication</label>
+                    <div className="relative">
+                      <Video size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <select 
+                        value={scheduleData.type}
+                        onChange={(e) => setScheduleData({...scheduleData, type: e.target.value})}
+                        className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      >
+                        <option value="Zoom">Zoom Meeting</option>
+                        <option value="Google Meet">Google Meet</option>
+                        <option value="Microsoft Teams">Microsoft Teams</option>
+                        <option value="In Person">In Person (Office)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-slate-700">Meeting Link / Address</label>
+                    <div className="relative">
+                      <LinkIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input 
+                        type="url"
+                        placeholder="https://..."
+                        value={scheduleData.link}
+                        onChange={(e) => setScheduleData({...scheduleData, link: e.target.value})}
+                        className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-end pt-2">
+                  <button 
+                    onClick={handleSaveSchedule}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+                  >
+                    Save & Notify Student
+                  </button>
+                </div>
+             </div>
 
              <div className="pt-2">
                 <button 
