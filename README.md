@@ -92,7 +92,7 @@ If you're a **recruiter**, **fellow developer**, or **open-source enthusiast** l
 - 📫 **Email**: - 📫 **Email**: [ishimweprincecuthbert@gmail.com](https://mail.google.com/mail/?view=cm&fs=1&to=ishimweprincecuthbert@gmail.com)
 
 - 🐦 **Instagram**: [prince_cuthbert](https://instagram.com/prince_cuthbert)  
-- 🌐 **Portfolio**: *Coming soon*  
+- 🌐 **Portfolio**: *https://princecuthbert.netlify.app/*  
 - 📁 **Live Demo**: *Coming soon*
 
 ---
