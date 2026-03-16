@@ -24,14 +24,16 @@ export default function AdminLayout() {
   const { user, logout } = useAuth();
   const displayName =
     user?.name ||
-    [user?.identity?.firstName, user?.identity?.lastName].filter(Boolean).join(" ") ||
+    [user?.identity?.firstName, user?.identity?.lastName]
+      .filter(Boolean)
+      .join(" ") ||
     "Admin";
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  
+
   // Ref for the profile dropdown to detect outside clicks
   const dropdownRef = useRef(null);
 
@@ -49,21 +51,29 @@ export default function AdminLayout() {
   }, []);
 
   const navItems = [
-    { label: "Dashboard",         path: "/admin/dashboard",    icon: LayoutDashboard },
-    { label: "Manage Users",      path: "/admin/users",        icon: Users },
+    { label: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
+    { label: "Manage Users", path: "/admin/users", icon: Users },
     // { label: "Roles",             path: "/admin/roles",        icon: ShieldCheck },    // Priority 9
-    { label: "Applications",      path: "/admin/applications", icon: FileText },
-    { label: "App Tracker",       path: "/admin/tracker",      icon: Activity },       // Priority 4
-    { label: "Visa Cases",        path: "/admin/visa",         icon: Plane },
-    { label: "University Programs",path: "/admin/programs",   icon: GraduationCap },
-    { label: 'Content (CMS)',     path: '/admin/cms',          icon: ScrollText },
-    { label: 'Branches',          path: '/admin/branches',     icon: Building2 },
-    { label: 'Financial Reports', path: '/admin/finance',      icon: DollarSign },
-    { label: 'Analytics',         path: '/admin/analytics',    icon: BarChart3 },
-    { label: 'Communications',    path: '/admin/communications',icon: MessageSquare },
+    { label: "Applications", path: "/admin/applications", icon: FileText },
+    { label: "App Tracker", path: "/admin/tracker", icon: Activity }, // Priority 4
+    { label: "Visa Cases", path: "/admin/visa", icon: Plane },
+    {
+      label: "University Programs",
+      path: "/admin/programs",
+      icon: GraduationCap,
+    },
+    { label: "Content (CMS)", path: "/admin/cms", icon: ScrollText },
+    { label: "Branches", path: "/admin/branches", icon: Building2 },
+    { label: "Financial Reports", path: "/admin/finance", icon: DollarSign },
+    { label: "Analytics", path: "/admin/analytics", icon: BarChart3 },
+    // { label: 'Communications',    path: '/admin/communications',icon: MessageSquare },
   ];
 
-  const settingsItem = { label: 'Settings', path: '/admin/settings', icon: Settings };
+  const settingsItem = {
+    label: "Settings",
+    path: "/admin/settings",
+    icon: Settings,
+  };
 
   const handleLogout = () => {
     logout();
@@ -90,9 +100,9 @@ export default function AdminLayout() {
           ${isCollapsed ? "lg:w-[80px]" : "lg:w-[260px]"}
           w-[260px]
         `}>
-        
         {/* Logo Area */}
-        <div className={`flex items-center h-16 px-6 border-b border-slate-800`}>
+        <div
+          className={`flex items-center h-16 px-6 border-b border-slate-800`}>
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
               <GraduationCap className="text-white w-5 h-5" />
@@ -118,7 +128,7 @@ export default function AdminLayout() {
               <span className="text-xs font-medium text-slate-500">Menu</span>
             </div>
           )}
-          
+
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
@@ -163,9 +173,11 @@ export default function AdminLayout() {
               `}
               title={settingsItem.label}>
               <Settings size={20} className="text-slate-400" />
-              {!isCollapsed && <span className="text-sm font-medium">Settings</span>}
+              {!isCollapsed && (
+                <span className="text-sm font-medium">Settings</span>
+              )}
             </Link>
-            
+
             <button
               onClick={handleLogout}
               className={`
@@ -175,7 +187,9 @@ export default function AdminLayout() {
                 `}
               title="Sign Out">
               <LogOut size={20} />
-              {!isCollapsed && <span className="text-sm font-medium">Sign Out</span>}
+              {!isCollapsed && (
+                <span className="text-sm font-medium">Sign Out</span>
+              )}
             </button>
           </div>
         </div>
@@ -191,22 +205,24 @@ export default function AdminLayout() {
               className="p-2 bg-white hover:bg-slate-100 rounded-lg text-slate-600 lg:hidden border border-slate-200">
               <Menu size={20} />
             </button>
-            <button 
+            <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg hidden lg:flex transition-colors">
-              <PanelLeft size={20} className={isCollapsed ? "rotate-180" : ""} />
+              <PanelLeft
+                size={20}
+                className={isCollapsed ? "rotate-180" : ""}
+              />
             </button>
-            
+
             <div className="hidden sm:flex flex-col">
               <h2 className="text-slate-900 font-bold text-lg leading-tight">
-                {navItems.find((i) => i.path === location.pathname)?.label || "Dashboard"}
+                {navItems.find((i) => i.path === location.pathname)?.label ||
+                  "Dashboard"}
               </h2>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-           
-
             {/* Profile Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
@@ -214,24 +230,42 @@ export default function AdminLayout() {
                 className="flex items-center gap-3 pl-1 pr-2 py-1 hover:bg-slate-50 rounded-lg border border-transparent hover:border-slate-200 transition-all group">
                 <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center overflow-hidden">
                   {user?.avatar ? (
-                    <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
+                    <img
+                      src={user.avatar}
+                      alt={displayName}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <span className="font-bold text-xs">
-                      {displayName.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2)}
+                      {displayName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()
+                        .substring(0, 2)}
                     </span>
                   )}
                 </div>
                 <div className="hidden md:flex flex-col text-left">
-                  <span className="text-sm font-semibold text-slate-700 leading-none mb-0.5">{displayName}</span>
-                  <span className="text-xs font-medium text-slate-500 leading-none">Admin Account</span>
+                  <span className="text-sm font-semibold text-slate-700 leading-none mb-0.5">
+                    {displayName}
+                  </span>
+                  <span className="text-xs font-medium text-slate-500 leading-none">
+                    Admin Account
+                  </span>
                 </div>
-                <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  size={14}
+                  className={`text-slate-400 transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`}
+                />
               </button>
 
               {isProfileOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 py-2 animate-in fade-in zoom-in-95 duration-100 z-50">
-                   <div className="px-4 py-2 border-b border-slate-100 mb-1">
-                    <p className="text-sm font-semibold text-slate-900 truncate">{user?.email || "admin@edubridge.com"}</p>
+                  <div className="px-4 py-2 border-b border-slate-100 mb-1">
+                    <p className="text-sm font-semibold text-slate-900 truncate">
+                      {user?.email || "admin@edubridge.com"}
+                    </p>
                     <p className="text-xs text-slate-500">Active Session</p>
                   </div>
                   <div className="px-1 space-y-0.5">
