@@ -1,5 +1,10 @@
 import React, { useEffect, Suspense, lazy } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import { Toaster } from "sonner";
 import "aos/dist/aos.css";
 import AOS from "aos";
@@ -24,6 +29,32 @@ const ScrollToTop = () => {
 
   return null;
 };
+
+// ── Storage migration ─────────────────────────────────────────
+// Bumping this version clears stale mock data from any visitor's
+// browser on their next load. Only runs in production.
+// DEV keeps its seed data untouched.
+const STORAGE_VERSION = "v2";
+const VERSION_KEY = "edubridge_storage_version";
+
+// Mock data keys that should be empty in production.
+// Users key is intentionally excluded — demo accounts must survive.
+const MOCK_ONLY_KEYS = [
+  "edubridge_visa_requests",
+  "edubridge_applications",
+  "edubridge_programs",
+];
+
+// This to clean the browser of any mock data that might conflict with the current version of the app. And for any user or device.
+function purgeStaleMockData() {
+  if (import.meta.env.DEV) return; // never touch dev storage
+  if (localStorage.getItem(VERSION_KEY) === STORAGE_VERSION) return; // already migrated
+  MOCK_ONLY_KEYS.forEach((key) => localStorage.removeItem(key));
+  localStorage.setItem(VERSION_KEY, STORAGE_VERSION);
+}
+
+// Run once — before React renders anything.
+purgeStaleMockData();
 
 function App() {
   usePageLanguage();
@@ -51,14 +82,10 @@ function App() {
               title: "text-base font-semibold leading-snug",
               description: "text-sm mt-0.5 leading-relaxed opacity-90",
               // ── Per-type colors (system palette) ─────────────
-              success:
-                "bg-emerald-50 border-emerald-200 text-emerald-900",
-              error:
-                "bg-red-50 border-red-200 text-red-900",
-              warning:
-                "bg-red-50 border-red-200 text-red-900",
-              info:
-                "bg-blue-50 border-blue-200 text-blue-900",
+              success: "bg-emerald-50 border-emerald-200 text-emerald-900",
+              error: "bg-red-50 border-red-200 text-red-900",
+              warning: "bg-red-50 border-red-200 text-red-900",
+              info: "bg-blue-50 border-blue-200 text-blue-900",
               // ── Action / cancel buttons ───────────────────────
               actionButton:
                 "bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-3.5 py-1.5 rounded-lg transition-colors",
