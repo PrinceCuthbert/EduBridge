@@ -30,7 +30,7 @@ export default function MyApplications() {
   const [sortOrder,    setSortOrder]    = useState("Newest First");
   const [expandedApp,  setExpandedApp]  = useState(null); 
 
-  const { applications, loading, deleteApplication } = useApplications(user?.id);
+  const { applications, loading, deleteApplication } = useApplications({ userId: user?.id });
 
   // ── Filter & sort ──────────────────────────────────────────────────────────
   const displayed = [...applications]

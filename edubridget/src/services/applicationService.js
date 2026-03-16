@@ -35,8 +35,10 @@ export const getApplications = async () => {
 
 export const getApplicationsByUserId = async (userId) => {
   await delay();
-  // Changed to look inside the nested applicant object
-  return _getApps().filter((app) => String(app.applicant?.identityId) === String(userId));
+  const id = String(userId);
+  return _getApps().filter((app) =>
+    String(app.applicant?.identityId) === id || String(app.userId) === id
+  );
 };
 
 export const getApplicationById = async (id) => {
@@ -60,8 +62,18 @@ export const createApplication = async (data) => {
     applicationId: Math.floor(Math.random() * 10000), // Simulated DB auto-increment
     submissionDate: new Date().toISOString(),
     status: "Pending",
-    applicant: data.applicant || {}, 
-    programDetails: data.programDetails || {},
+    userId: data.userId || null, // top-level for quick filtering
+    applicant: data.applicant || {
+      identityId: data.userId || null,
+      firstName:  data.firstName  || "",
+      lastName:   data.lastName   || "",
+      email:      data.email      || "",
+      phone:      data.phone      || "",
+    },
+    programDetails: data.programDetails || {
+      universityName: data.universityName || "",
+      majorName:      data.programName   || data.departmentName || "",
+    },
     trackerStages: [
       { stage: "Submitted", completed: true, date: new Date().toISOString().split("T")[0] },
       { stage: "Under Review", completed: false, date: null },

@@ -23,23 +23,30 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
+  // Persist session: stores user object + JWT token (if backend provides one).
+  // When backend sends { token, user } instead of just the user object,
+  // the token is stored under 'token' so axios interceptors in api/services.js can read it.
+  const _persistSession = (result) => {
+    const user = result?.user ?? result;
+    const token = result?.token ?? null;
+    localStorage.setItem('edubridge_user_session', JSON.stringify(user));
+    if (token) {
+      localStorage.setItem('token', token);
+    }
+    return user;
+  };
+
   const login = useCallback(async ({ email, password }) => {
-    // Call the Model/Service
-    const loggedInUser = await userService.loginUser(email, password);
-    
-    // Update the State
-    localStorage.setItem('edubridge_user_session', JSON.stringify(loggedInUser));
+    const result = await userService.loginUser(email, password);
+    const loggedInUser = _persistSession(result);
     setUser(loggedInUser);
     return loggedInUser;
-  }, []); 
+  }, []);
 
   const loginWithGoogle = useCallback(async (credential) => {
     try {
-   // Call the Service(Model)
-      const googleUser = await  userService.loginWithGoogleToken(credential);
-      
-      // Update the State
-      localStorage.setItem("edubridge_user_session", JSON.stringify(googleUser));
+      const result = await userService.loginWithGoogleToken(credential);
+      const googleUser = _persistSession(result);
       setUser(googleUser);
       return googleUser;
     } catch (err) {
@@ -48,17 +55,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signUp = useCallback(async (userData) => {
-    // Call the Service(Model)
-    const newUser = await userService.registerUser(userData);
-    
-    // Update the State
-    localStorage.setItem('edubridge_user_session', JSON.stringify(newUser));
+    const result = await userService.registerUser(userData);
+    const newUser = _persistSession(result);
     setUser(newUser);
     return newUser;
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem('edubridge_user_session');
+    localStorage.removeItem('token');
     setUser(null);
   }, []);
 

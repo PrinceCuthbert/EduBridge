@@ -1,89 +1,76 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
-  FileText, 
+// ─────────────────────────────────────────────────────────────
+//  src/pages/dashboard/VisaRequestForm.jsx
+//
+//  WHY THIS FILE EXISTS:
+//  Mirrors ApplicationSubmitForm.jsx.
+//  Uses useVisaConsultations hook to submit a new request.
+// ─────────────────────────────────────────────────────────────
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  FileText,
   ChevronDown,
   Video,
   ArrowLeft,
-  Globe
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+  Globe,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
-export default function VisaConsultationRequest() {
+import { useVisaConsultations } from "@/hooks/useVisaConsultations";
+import { VISA_TYPES, VISA_COUNTRIES, MEETING_TYPES } from "@/data/mockVisaData";
+import { useAuth } from "@/context/AuthContext";
+
+export default function VisaRequestForm() {
   const navigate = useNavigate();
+
+  const { user } = useAuth();
+
+  const { submitRequest } = useVisaConsultations(user?.id);
+
   const [formData, setFormData] = useState({
-      clientName: '',
-      email: '',
-      phone: '',
-      countryOfOrigin: '',
-      destination: '',
-      visaType: '',
-      appointmentDate: '',
-      appointmentType: 'Video Call',
-      notes: ''
+    fullName: user?.identity ? `${user.identity.firstName} ${user.identity.lastName}` : "",
+    email: user?.email || "",
+    phone: user?.identity?.phone || "",
+    countryOfOrigin: user?.identity?.nationality || "",
+    destination: "",
+    countryCode: "",
+    visaType: "",
+    preferredDate: "",
+    meetingType: "Video Call",
+    notes: "",
   });
-
-  const countries = [
-    { value: 'Canada', label: 'Canada' },
-    { value: 'USA', label: 'USA' },
-    { value: 'UK', label: 'United Kingdom' },
-    { value: 'Australia', label: 'Australia' },
-    { value: 'South Korea', label: 'South Korea' },
-  ];
-
-  const visaTypes = [
-    { value: 'Student', label: 'Student Visa' },
-    { value: 'Tourist', label: 'Tourist Visa' },
-    { value: 'Work', label: 'Work Visa' },
-  ];
-
-  const appointmentTypes = [
-    { value: 'Phone Call', label: 'Phone Call' },
-    { value: 'Video Call', label: 'Video Call' },
-    { value: 'In Person', label: 'In Person' },
-  ];
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "destination") {
+      const country = VISA_COUNTRIES.find((c) => c.name === value);
+      setFormData((prev) => ({
+        ...prev,
+        destination: value,
+        countryCode: country?.code ?? "",
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   // Mock submission logic
-  //   toast.success("Request submitted successfully!");
-  //   navigate('/dashboard/visa-status/summary');
-  // };
-
-  const handleSubmit = (e) => {
-  e.preventDefault();
-
-  // temporary fee logic (later backend)
-  const consultationFee =
-    formData.visaType === "Student" ? 150 :
-    formData.visaType === "Work" ? 200 :
-    100;
-
-  const requestPayload = {
-    ...formData,
-    fee: consultationFee,
-    paymentStatus: "pending"
-    };
-
-  // Navigate to the branded payment methods page (bank details + image)
-  navigate("/dashboard/visa-status/payment-methods", {
-    state: requestPayload
-  });
-
-  // navigate("/dashboard/visa-status/payment", {
-  //   state: requestPayload
-  // });
-};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await submitRequest(formData);
+      toast.success("Consultation request submitted successfully!");
+      navigate("/dashboard/visa-status/summary");
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
 
   // Standard input styles for consistency
   const inputClassName = "w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400";
@@ -114,15 +101,15 @@ export default function VisaConsultationRequest() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            {/* Client Name */}
+            {/* Full Name */}
             <div className="space-y-1">
-              <label htmlFor="clientName" className={labelClassName}>Full Name</label>
+              <label htmlFor="fullName" className={labelClassName}>Full Name</label>
               <div className="relative">
                 <User size={16} className={iconClassName} />
                 <input 
-                   id="clientName" 
-                   name="clientName" 
-                   value={formData.clientName}
+                   id="fullName" 
+                   name="fullName" 
+                   value={formData.fullName}
                    onChange={handleChange}
                    placeholder="John Doe" 
                    className={inputClassName}
@@ -160,7 +147,7 @@ export default function VisaConsultationRequest() {
                    type="tel" 
                    value={formData.phone}
                    onChange={handleChange}
-                   placeholder="+1 (555) 000-0000" 
+                   placeholder="+254..." 
                    className={inputClassName}
                 />
               </div>
@@ -176,7 +163,7 @@ export default function VisaConsultationRequest() {
                    name="countryOfOrigin" 
                    value={formData.countryOfOrigin}
                    onChange={handleChange}
-                   placeholder="e.g. Nigeria" 
+                   placeholder="e.g. Kenya" 
                    className={inputClassName}
                    required
                 />
@@ -188,15 +175,22 @@ export default function VisaConsultationRequest() {
               <label htmlFor="destination" className={labelClassName}>Destination</label>
               <div className="relative">
                 <MapPin size={16} className={iconClassName} />
-                <input 
+                <select 
                    id="destination" 
                    name="destination" 
                    value={formData.destination}
                    onChange={handleChange}
-                   placeholder="e.g. Canada" 
-                   className={inputClassName}
+                   className={selectClassName}
                    required
-                />
+                >
+                   <option value="" disabled>Select Country</option>
+                   {VISA_COUNTRIES.map((c) => (
+                     <option key={c.code} value={c.name}>
+                       {c.name}
+                     </option>
+                   ))}
+                </select>
+                <ChevronDown size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" />
               </div>
             </div>
 
@@ -214,9 +208,9 @@ export default function VisaConsultationRequest() {
                    required
                 >
                    <option value="" disabled>Select Visa Type</option>
-                   {visaTypes.map((visaType) => (
-                     <option key={visaType.value} value={visaType.value}>
-                       {visaType.label}
+                   {VISA_TYPES.map((t) => (
+                     <option key={t} value={t}>
+                       {t}
                      </option>
                    ))}
                 </select>
@@ -224,16 +218,16 @@ export default function VisaConsultationRequest() {
               </div>
             </div>
 
-             {/* Appointment Date */}
+             {/* Preferred Date */}
              <div className="space-y-1">
-              <label htmlFor="appointmentDate" className={labelClassName}>Preferred Date</label>
+              <label htmlFor="preferredDate" className={labelClassName}>Preferred Date</label>
               <div className="relative">
                 <Calendar size={16} className={iconClassName} />
                 <input 
-                   id="appointmentDate" 
-                   name="appointmentDate" 
+                   id="preferredDate" 
+                   name="preferredDate" 
                    type="date"
-                   value={formData.appointmentDate}
+                   value={formData.preferredDate}
                    onChange={handleChange}
                    className={inputClassName}
                    required
@@ -241,21 +235,21 @@ export default function VisaConsultationRequest() {
               </div>
             </div>
              
-             {/* Appointment Type */}
-             <div className="space-y-1 md:col-span-2">
-              <label htmlFor="appointmentType" className={labelClassName}>Meeting Format</label>
+             {/* Meeting Format */}
+             <div className="space-y-1">
+              <label htmlFor="meetingType" className={labelClassName}>Meeting Format</label>
               <div className="relative">
                 <Video size={16} className={iconClassName} />
                 <select 
-                   id="appointmentType" 
-                   name="appointmentType" 
-                   value={formData.appointmentType}
+                   id="meetingType" 
+                   name="meetingType" 
+                   value={formData.meetingType}
                    onChange={handleChange}
                    className={selectClassName}
                 >
-                   {appointmentTypes.map((type) => (
-                     <option key={type.value} value={type.value}>
-                       {type.label}
+                   {MEETING_TYPES.map((type) => (
+                     <option key={type} value={type}>
+                       {type}
                      </option>
                    ))}
                 </select>

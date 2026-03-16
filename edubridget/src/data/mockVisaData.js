@@ -1,217 +1,184 @@
-// Mock data for visa consultation requests
-// In production, this would come from an API filtered by the current user
+// ─────────────────────────────────────────────────────────────
+//  src/data/mockVisaData.js
+//
+//  WHY THIS FILE EXISTS:
+//  Same role as mockData.js for the application module.
+//  It holds seed records AND the lookup helpers the UI needs
+//  (status colours, country flags, visa type list).
+//
+//  FUTURE BACKEND SWAP:
+//  When the backend is ready, delete MOCK_VISA_REQUESTS and
+//  CURRENT_USER_ID — nothing else in this file changes.
+// ─────────────────────────────────────────────────────────────
 
-// Simulated current logged-in user
-export const CURRENT_USER_ID = "user_123";
+// ── Status config (single source of truth for colours) ───────
+// Every component that renders a status badge imports this.
+// Add a new status here and every badge in the app updates.
+export const VISA_STATUS_CONFIG = {
+  New: {
+    label: "New",
+    badge: "bg-blue-50 text-blue-700 border-blue-100",
+    dot: "bg-blue-500",
+    icon: "clock",
+  },
+  "In Progress": {
+    label: "In Progress",
+    badge: "bg-yellow-50 text-yellow-700 border-yellow-100",
+    dot: "bg-yellow-500",
+    icon: "alert",
+  },
+  "Pending Documents": {
+    label: "Pending Documents",
+    badge: "bg-orange-50 text-orange-700 border-orange-100",
+    dot: "bg-orange-500",
+    icon: "upload",
+  },
+  Approved: {
+    label: "Approved",
+    badge: "bg-emerald-50 text-emerald-700 border-emerald-100",
+    dot: "bg-emerald-500",
+    icon: "check",
+  },
+  Rejected: {
+    label: "Rejected",
+    badge: "bg-red-50 text-red-700 border-red-100",
+    dot: "bg-red-500",
+    icon: "x",
+  },
+};
 
-// Mock consultations database (contains data for multiple users)
-export const MOCK_CONSULTATIONS = [
-  // Current user's consultations
+// ── Visa types offered ────────────────────────────────────────
+export const VISA_TYPES = [
+  "Study Visa",
+  "Work Visa",
+  "Tourist Visa",
+  "Business Visa",
+  "Transit Visa",
+  "Family Reunification",
+];
+
+// ── Supported destination countries ──────────────────────────
+export const VISA_COUNTRIES = [
+  { code: "CA", name: "Canada" },
+  { code: "US", name: "USA" },
+  { code: "GB", name: "UK" },
+  { code: "AU", name: "Australia" },
+  { code: "DE", name: "Germany" },
+  { code: "FR", name: "France" },
+  { code: "KR", name: "South Korea" },
+];
+
+// ── Meeting formats ───────────────────────────────────────────
+export const MEETING_TYPES = ["Video Call", "In-Person", "Phone Call"];
+
+// ── Helper: country code → flag emoji ────────────────────────
+// Used by VisaSummary table and VisaCases table.
+export const getCountryFlag = (code) => {
+  if (!code) return "🌍";
+  return code
+    .toUpperCase()
+    .split("")
+    .map((c) => String.fromCodePoint(127397 + c.charCodeAt(0)))
+    .join("");
+};
+
+// ─────────────────────────────────────────────────────────────
+//  SEED DATA
+//  Simulates what the backend would return.
+//  Shape matches the database APPLICATION table:
+//    id, userId, status, submissionDate, ...visa-specific fields
+// ─────────────────────────────────────────────────────────────
+export const MOCK_VISA_REQUESTS = [
   {
-    id: "case_001",
-    userId: "user_123",
+    id: "VR-001",
+    userId: "USR-002", // links to USER table
+    // ── Form fields (from VisaRequestForm) ──
+    fullName: "John Kariuki",
+    email: "john.k@email.com",
+    phone: "+254 712 000 001",
+    countryOfOrigin: "Kenya",
     destination: "Canada",
     countryCode: "CA",
     visaType: "Study Visa",
-    dateBooked: "2024-02-15",
-    meetingType: "Online",
-    fee: "$150",
+    preferredDate: "2024-02-15",
+    meetingType: "Video Call",
+    notes: "Need help with student permit requirements.",
+    // ── System-generated fields ──
     status: "In Progress",
-    appointmentTime: "10:00 AM PST",
-    duration: "45 Minutes",
-    createdAt: "2024-02-01",
-    // Documents for this case
-    documents: [
-      { 
-        id: "doc_001",
-        name: "Passport Scan.pdf", 
-        status: "Verified", 
-        date: "2024-01-10", 
-        size: "2.4 MB",
-        url: "#" 
-      },
-      { 
-        id: "doc_002",
-        name: "Admission Letter.pdf", 
-        status: "Verified", 
-        date: "2024-01-12", 
-        size: "1.1 MB",
-        url: "#" 
-      },
-      { 
-        id: "doc_003",
-        name: "Bank Statement.pdf", 
-        status: "Received", 
-        date: "2024-01-15", 
-        size: "3.5 MB",
-        url: "#" 
-      },
-      { 
-        id: "doc_004",
-        name: "Medical Report.pdf", 
-        status: "Pending", 
-        date: "-", 
-        size: "-",
-        url: "#" 
-      },
-    ],
-    // Admin feedback for this case
-    adminFeedback: [
-      {
-        id: "fb_001",
-        message: 'Your bank statements are clear, but we need a higher-resolution scan of your passport. Please upload a new scan at your earliest convenience.',
-        timestamp: '2024-02-12T14:30:00',
-        status: 'Action Required'
-      },
-      {
-        id: "fb_002",
-        message: 'All documents have been verified. Your consultation is scheduled for February 15th at 10:00 AM PST via video call.',
-        timestamp: '2024-02-10T09:15:00',
-        status: 'Informational'
-      },
-    ]
+    submissionDate: "2024-02-10",
+    // ── Admin-only fields (student never sets these) ──
+    consultationFee: "$150",
+    feeStatus: "Paid",
+    appointmentDate: "2024-02-15",
+    appointmentTime: "10:00",
+    meetingLink: "https://zoom.us/j/example",
+    adminNotes: "",
   },
   {
-    id: "case_002",
-    userId: "user_123",
+    id: "VR-002",
+    userId: "USR-002",
+    fullName: "John Kariuki",
+    email: "john.k@email.com",
+    phone: "+254 712 000 001",
+    countryOfOrigin: "Kenya",
     destination: "UK",
     countryCode: "GB",
     visaType: "Work Visa",
-    dateBooked: "2024-02-18",
+    preferredDate: "2024-02-18",
     meetingType: "In-Person",
-    fee: "$200",
+    notes: "",
     status: "Approved",
-    appointmentTime: "2:00 PM EST",
-    duration: "60 Minutes",
-    createdAt: "2024-01-25",
-    documents: [
-      { 
-        id: "doc_005",
-        name: "Passport Copy.pdf", 
-        status: "Verified", 
-        date: "2024-01-20", 
-        size: "2.1 MB",
-        url: "#" 
-      },
-      { 
-        id: "doc_006",
-        name: "Job Offer Letter.pdf", 
-        status: "Verified", 
-        date: "2024-01-22", 
-        size: "980 KB",
-        url: "#" 
-      },
-      { 
-        id: "doc_007",
-        name: "Police Clearance.pdf", 
-        status: "Verified", 
-        date: "2024-01-24", 
-        size: "1.5 MB",
-        url: "#" 
-      },
-    ],
-    adminFeedback: [
-      {
-        id: "fb_003",
-        message: 'Congratulations! Your work visa application has been approved. You will receive the official documents via email within 3-5 business days.',
-        timestamp: '2024-02-16T11:20:00',
-        status: 'Informational'
-      },
-    ]
+    submissionDate: "2024-02-12",
+    consultationFee: "$200",
+    feeStatus: "Paid",
+    appointmentDate: "2024-02-18",
+    appointmentTime: "14:00",
+    meetingLink: "",
+    adminNotes: "All documents verified.",
   },
   {
-    id: "case_003",
-    userId: "user_123",
+    id: "VR-003",
+    userId: "USR-002",
+    fullName: "John Kariuki",
+    email: "john.k@email.com",
+    phone: "+254 712 000 001",
+    countryOfOrigin: "Kenya",
     destination: "USA",
     countryCode: "US",
     visaType: "General Visit",
-    dateBooked: "2024-02-20",
-    meetingType: "Online",
-    fee: "$100",
+    preferredDate: "2024-02-20",
+    meetingType: "Video Call",
+    notes: "Tourist trip, 2 weeks.",
     status: "Pending Documents",
-    appointmentTime: "3:00 PM PST",
-    duration: "30 Minutes",
-    createdAt: "2024-02-05",
-    documents: [
-      { 
-        id: "doc_008",
-        name: "Passport.pdf", 
-        status: "Received", 
-        date: "2024-02-06", 
-        size: "2.8 MB",
-        url: "#" 
-      },
-    ],
-    adminFeedback: [
-      {
-        id: "fb_004",
-        message: 'We have received your passport copy. Please also submit your bank statement and travel itinerary to proceed.',
-        timestamp: '2024-02-08T10:15:00',
-        status: 'Action Required'
-      },
-    ]
+    submissionDate: "2024-02-14",
+    consultationFee: "$100",
+    feeStatus: "Unpaid",
+    appointmentDate: "",
+    appointmentTime: "",
+    meetingLink: "",
+    adminNotes: "",
   },
-  
-  // Other users' consultations (should NOT appear in the current user's dashboard)
+  // ── Extra records (other students — visible to admin only) ──
   {
-    id: "case_004",
-    userId: "user_456",
+    id: "VR-004",
+    userId: "USR-002",
+    fullName: "Sarah Wanjiku",
+    email: "sarah.w@email.com",
+    phone: "+254 722 000 002",
+    countryOfOrigin: "Kenya",
     destination: "Australia",
     countryCode: "AU",
-    visaType: "Student Visa",
-    dateBooked: "2024-02-22",
-    meetingType: "Online",
-    fee: "$175",
+    visaType: "Study Visa",
+    preferredDate: "2024-02-12",
+    meetingType: "Video Call",
+    notes: "",
     status: "New",
-    appointmentTime: "11:00 AM AEDT",
-    duration: "45 Minutes",
-    createdAt: "2024-02-10",
-    documents: [],
-    adminFeedback: []
-  },
-  {
-    id: "case_005",
-    userId: "user_789",
-    destination: "Germany",
-    countryCode: "DE",
-    visaType: "Work Visa",
-    dateBooked: "2024-02-25",
-    meetingType: "Online",
-    fee: "$180",
-    status: "In Progress",
-    appointmentTime: "4:00 PM CET",
-    duration: "60 Minutes",
-    createdAt: "2024-02-12",
-    documents: [],
-    adminFeedback: []
+    submissionDate: "2024-02-08",
+    consultationFee: "",
+    feeStatus: "Unpaid",
+    appointmentDate: "",
+    appointmentTime: "",
+    meetingLink: "",
+    adminNotes: "",
   },
 ];
-
-// Helper function to get consultations for the current user only
-export const getCurrentUserConsultations = () => {
-  return MOCK_CONSULTATIONS.filter(consultation => consultation.userId === CURRENT_USER_ID);
-};
-
-// Helper function to get a specific consultation by ID (with user verification)
-export const getConsultationById = (id) => {
-  const consultation = MOCK_CONSULTATIONS.find(c => c.id === id);
-  
-  // Security check: only return if it belongs to the current user
-  if (consultation && consultation.userId === CURRENT_USER_ID) {
-    return consultation;
-  }
-  
-  return null; // Case not found or doesn't belong to current user
-};
-
-// Helper function to get country flag emoji
-export const getCountryFlag = (countryCode) => {
-  const flags = {
-    'CA': '🇨🇦',
-    'GB': '🇬🇧',
-    'US': '🇺🇸',
-    'AU': '🇦🇺',
-    'DE': '🇩🇪',
-  };
-  return flags[countryCode] || '🌍';
-};

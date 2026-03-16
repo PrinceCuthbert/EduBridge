@@ -66,7 +66,7 @@ export function ProgramDepartments({ departments }) {
                   </span>
                 </td>
                 <td className="px-4 py-3.5 text-sm font-semibold text-slate-700">{dept.degree}</td>
-                <td className="px-4 py-3.5 text-sm font-medium text-slate-900">{dept.major}</td>
+                <td className="px-4 py-3.5 text-sm font-medium text-slate-900">{dept.major ?? dept.name}</td>
                 <td className="px-4 py-3.5 text-sm text-slate-500 leading-snug">
                   {dept.duration}
                   {dept.credits && <span className="block text-xs text-slate-400 mt-0.5">{dept.credits}</span>}
@@ -88,7 +88,7 @@ export function ProgramDepartments({ departments }) {
               }`}>{dept.language}</span>
               <span className="text-xs font-semibold text-slate-500">{dept.degree}</span>
             </div>
-            <p className="font-semibold text-slate-900">{dept.major}</p>
+            <p className="font-semibold text-slate-900">{dept.major ?? dept.name}</p>
             <div className="grid grid-cols-2 gap-2 text-xs text-slate-500 pt-1">
               <div>
                 <span className="block font-medium text-slate-400 uppercase tracking-wider text-[10px] mb-0.5">Duration</span>

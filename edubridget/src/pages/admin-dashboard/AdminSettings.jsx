@@ -31,12 +31,12 @@ export default function AdminSettings() {
 
   // --- Fetch Fresh Data from DB on Mount ---
   useEffect(() => {
+    let cancelled = false;
     const loadFreshData = async () => {
       if (!user?.id) return;
       try {
-        // 1. Fetch the absolute latest data from the SSOT (Database)
         const freshUser = await getUserById(user.id);
-        
+        if (cancelled) return;
         const freshData = {
           firstName:   freshUser.identity?.firstName   || '',
           lastName:    freshUser.identity?.lastName    || '',
@@ -48,16 +48,16 @@ export default function AdminSettings() {
           role:        freshUser.role                  || 'student',
           status:      freshUser.status                || 'Active',
         };
-        
         setProfileData(freshData);
         setOriginalData(freshData);
       } catch (error) {
-        toast.error("Failed to sync latest profile data");
+        if (!cancelled) toast.error("Failed to sync latest profile data");
       } finally {
-        setIsLoadingProfile(false);
+        if (!cancelled) setIsLoadingProfile(false);
       }
     };
     loadFreshData();
+    return () => { cancelled = true; };
   }, [user?.id]);
 
   // --- Password Form State ---

@@ -3,11 +3,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { usePrograms } from "../../../hooks/usePrograms";
 import { useApplications } from "../../../hooks/useApplications";
-import { getApplicationByIdSync } from "../../../services/applicationService";
+import { getApplicationById } from "../../../services/applicationService";
+import { getProgramMajors } from "../../../data/mockMajors";
 import { useAuth } from "../../../context/AuthContext";
 import { Upload, X, FileText, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-
 
 const ACCEPTED_TYPES = ".pdf,.doc,.docx,.zip,.jpg,.jpeg,.png";
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -18,49 +18,55 @@ const labelCls = "block text-sm font-medium text-slate-700 mb-1.5";
 
 export default function ApplicationSubmitForm() {
   const navigate = useNavigate();
-  const { id } = useParams();                          // programId (create) | applicationId (edit)
+  const { id } = useParams(); // programId (create) | applicationId (edit)
   const [searchParams] = useSearchParams();
   const isEditMode = searchParams.get("edit") === "true";
 
   const { user } = useAuth();
   const { programs } = usePrograms();
-  const { createApplication, updateApplication } = useApplications(user?.id);
+  const { createApplication, updateApplication } = useApplications({
+    userId: user?.id,
+  });
 
   const [form, setForm] = useState({
-    programId:      isEditMode ? "" : (id ?? ""),
+    programId: isEditMode ? "" : (id ?? ""),
     departmentName: "",
-    firstName:      "",
-    lastName:       "",
-    phone:          "",
-    email:          user?.email ?? "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: user?.email ?? "",
     submissionDate: new Date().toISOString().split("T")[0],
   });
-  const [existingDocs, setExistingDocs]   = useState([]);
-  const [newFiles,     setNewFiles]       = useState([]);
-  const [existingApp,  setExistingApp]    = useState(null);
-  const [submitting,   setSubmitting]     = useState(false);
+  const [existingDocs, setExistingDocs] = useState([]);
+  const [newFiles, setNewFiles] = useState([]);
+  const [existingApp, setExistingApp] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Load existing application in edit mode
+  // Load existing application in edit mode (async — works with real backend too)
   useEffect(() => {
-    if (isEditMode && id) {
-      const app = getApplicationByIdSync(id);
+    if (!isEditMode || !id) return;
+    getApplicationById(id).then((app) => {
       if (app) {
         setExistingApp(app);
         setForm({
-          programId:       app.programId       ?? "",
-          departmentName:  app.departmentName  ?? "",
-          firstName:       app.firstName       ?? "",
-          lastName:        app.lastName        ?? "",
-          phone:           app.phone           ?? "",
-          email:           app.email           ?? user?.email ?? "",
-          submissionDate:  app.submissionDate  ?? new Date().toISOString().split("T")[0],
+          programId: app.programDetails?.universityName
+            ? (app.programId ?? "")
+            : (app.programId ?? ""),
+          departmentName:
+            app.programDetails?.majorName ?? app.departmentName ?? "",
+          firstName: app.applicant?.firstName ?? app.firstName ?? "",
+          lastName: app.applicant?.lastName ?? app.lastName ?? "",
+          phone: app.applicant?.phone ?? app.phone ?? "",
+          email: app.applicant?.email ?? app.email ?? user?.email ?? "",
+          submissionDate:
+            app.submissionDate ?? new Date().toISOString().split("T")[0],
         });
         setExistingDocs(app.documents ?? []);
       } else {
         toast.error("Application not found.");
         navigate("/dashboard/applications");
       }
-    }
+    });
   }, [id, isEditMode]);
 
   const set = (field) => (e) =>
@@ -70,18 +76,19 @@ export default function ApplicationSubmitForm() {
   const handleUniversityChange = (e) => {
     setForm((prev) => ({
       ...prev,
-      programId:      e.target.value,
+      programId: e.target.value,
       departmentName: "",
     }));
   };
 
-  // TODO (DB integration): replace this local derivation with a fetch call:
-  // GET /api/programs/:id/departments  — returns a departments[] for the selected university.
-  // The select logic below stays identical; only the data source changes.
+  // Resolve the majors for the selected program using the join table.
+  // Backend swap: replace getProgramMajors(id) with GET /api/programs/:id/majors
   const selectedUniversityProgram = programs.find(
-    (p) => String(p.id) === String(form.programId)
+    (p) => String(p.id) === String(form.programId),
   );
-  const availableDepartments = selectedUniversityProgram?.departments ?? [];
+  const availableDepartments = selectedUniversityProgram
+    ? getProgramMajors(selectedUniversityProgram.id)
+    : [];
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -96,22 +103,23 @@ export default function ApplicationSubmitForm() {
     e.target.value = ""; // reset so same file can be re-added after removal
   };
 
-  const removeNewFile      = (idx) => setNewFiles((prev) => prev.filter((_, i) => i !== idx));
-  const removeExistingDoc  = (docId) => setExistingDocs((prev) => prev.filter((d) => d.id !== docId));
+  const removeNewFile = (idx) =>
+    setNewFiles((prev) => prev.filter((_, i) => i !== idx));
+  const removeExistingDoc = (docId) =>
+    setExistingDocs((prev) => prev.filter((d) => d.id !== docId));
 
   // Convert a File object to a persistent Base64 data URL.
   // Unlike URL.createObjectURL(), a data: URL survives page refreshes and
   // works in any browser session — which means the admin can download it too.
 
-  // Trade - off to be aware of: Base64 encoding increases file size by ~33 %. 
-  // For a localStorage - based demo this is fine, but in production you'd 
+  // Trade - off to be aware of: Base64 encoding increases file size by ~33 %.
+  // For a localStorage - based demo this is fine, but in production you'd
   // upload files directly to S3 / Cloudinary instead and store just the resulting URL.
-
 
   const fileToBase64 = (file) =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload  = () => resolve(reader.result); // "data:<mime>;base64,<data>"
+      reader.onload = () => resolve(reader.result); // "data:<mime>;base64,<data>"
       reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
       reader.readAsDataURL(file);
     });
@@ -122,47 +130,50 @@ export default function ApplicationSubmitForm() {
     setSubmitting(true);
 
     try {
-      const selectedProgram = programs.find((p) => String(p.id) === String(form.programId));
+      const selectedProgram = programs.find(
+        (p) => String(p.id) === String(form.programId),
+      );
 
       // Encode every file as Base64 so the URL is a self-contained string
       // that persists in localStorage and is readable by any session (e.g. admin).
       const newDocuments = await Promise.all(
         newFiles.map(async (file) => ({
-          id:         `doc-${Date.now()}-${Math.random()}`,
-          name:       file.name,
-          type:       file.type,
-          size:       file.size,
-          url:        await fileToBase64(file),
+          id: `doc-${Date.now()}-${Math.random()}`,
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          url: await fileToBase64(file),
           uploadedAt: new Date().toISOString(),
-        }))
+        })),
       );
 
       if (isEditMode) {
         await updateApplication(id, {
           ...form,
-          documents:      [...existingDocs, ...newDocuments],
+          documents: [...existingDocs, ...newDocuments],
           universityName: selectedProgram?.universityName ?? "",
-          programName:    form.departmentName,
+          programName: form.departmentName,
         });
         toast.success("Application updated successfully");
       } else {
         await createApplication({
           ...form,
-          userId:         String(user?.id),
+          userId: String(user?.id),
           universityName: selectedProgram?.universityName ?? "",
-          programName:    form.departmentName,
-          documents:      newDocuments,
+          programName: form.departmentName,
+          documents: newDocuments,
         });
         toast.success("Application submitted successfully");
       }
 
       navigate("/dashboard/applications");
     } catch (err) {
-     const msg = err?.response?.status === 422
-    ? "Please check your form fields."
-    : "Network error. Please try again.";
-  toast.error(msg);
-  console.error(err);
+      const msg =
+        err?.response?.status === 422
+          ? "Please check your form fields."
+          : "Network error. Please try again.";
+      toast.error(msg);
+      console.error(err);
     } finally {
       setSubmitting(false);
     }
@@ -173,8 +184,7 @@ export default function ApplicationSubmitForm() {
       {/* Back nav */}
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 mb-6 transition-colors"
-      >
+        className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 mb-6 transition-colors">
         <ArrowLeft size={16} /> Back to Applications
       </button>
 
@@ -204,8 +214,7 @@ export default function ApplicationSubmitForm() {
               value={form.programId}
               onChange={handleUniversityChange}
               required
-              className={inputCls}
-            >
+              className={inputCls}>
               <option value="">Select a university…</option>
               {programs.map((p) => (
                 <option key={p.id} value={String(p.id)}>
@@ -226,15 +235,15 @@ export default function ApplicationSubmitForm() {
                   value={form.departmentName}
                   onChange={set("departmentName")}
                   required
-                  className={inputCls}
-                >
+                  className={inputCls}>
                   <option value="">Select a department…</option>
                   {availableDepartments.map((dept, i) => {
-                    // dept is now an object: { language, degree, major, ... }
-                    const label = typeof dept === 'string'
-                      ? dept
-                      : `${dept.language} · ${dept.degree} — ${dept.major}`;
-                    const value = typeof dept === 'string' ? dept : label;
+                    // dept shape from getProgramMajors: { name, language, degree, ... }
+                    const label =
+                      typeof dept === "string"
+                        ? dept
+                        : `${dept.degree} — ${dept.name} (${dept.language})`;
+                    const value = typeof dept === "string" ? dept : label;
                     return (
                       <option key={i} value={value}>
                         {label}
@@ -260,8 +269,7 @@ export default function ApplicationSubmitForm() {
                 href={existingApp.applicationLink}
                 target="_blank"
                 rel="noreferrer"
-                className="text-sm text-blue-600 hover:underline break-all"
-              >
+                className="text-sm text-blue-600 hover:underline break-all">
                 {existingApp.applicationLink}
               </a>
             </div>
@@ -272,16 +280,22 @@ export default function ApplicationSubmitForm() {
             <div>
               <label className={labelCls}>First Name</label>
               <input
-                type="text" placeholder="e.g. John"
-                value={form.firstName} onChange={set("firstName")} required
+                type="text"
+                placeholder="e.g. John"
+                value={form.firstName}
+                onChange={set("firstName")}
+                required
                 className={inputCls}
               />
             </div>
             <div>
               <label className={labelCls}>Last Name</label>
               <input
-                type="text" placeholder="e.g. Doe"
-                value={form.lastName} onChange={set("lastName")} required
+                type="text"
+                placeholder="e.g. Doe"
+                value={form.lastName}
+                onChange={set("lastName")}
+                required
                 className={inputCls}
               />
             </div>
@@ -292,7 +306,8 @@ export default function ApplicationSubmitForm() {
             <div>
               <label className={labelCls}>Submission Date</label>
               <input
-                type="date" value={form.submissionDate}
+                type="date"
+                value={form.submissionDate}
                 onChange={set("submissionDate")}
                 className={inputCls}
               />
@@ -300,8 +315,10 @@ export default function ApplicationSubmitForm() {
             <div>
               <label className={labelCls}>Student Email</label>
               <input
-                type="email" value={form.email}
-                onChange={set("email")} required
+                type="email"
+                value={form.email}
+                onChange={set("email")}
+                required
                 className={inputCls}
               />
             </div>
@@ -311,10 +328,11 @@ export default function ApplicationSubmitForm() {
           <div>
             <label className={labelCls}>Phone Number</label>
             <input
-            type="tel"
-            pattern="^\+?[0-9\s\-]{7,15}$"
-            placeholder="e.g. +254 712 345 678"
-              value={form.phone} onChange={set("phone")}
+              type="tel"
+              pattern="^\+?[0-9\s\-]{7,15}$"
+              placeholder="e.g. +254 712 345 678"
+              value={form.phone}
+              onChange={set("phone")}
               className={inputCls}
             />
           </div>
@@ -327,11 +345,12 @@ export default function ApplicationSubmitForm() {
                 {existingDocs.map((doc) => (
                   <div
                     key={doc.id}
-                    className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"
-                  >
+                    className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <FileText size={15} className="text-slate-400 shrink-0" />
-                      <span className="text-sm text-slate-700 truncate">{doc.name}</span>
+                      <span className="text-sm text-slate-700 truncate">
+                        {doc.name}
+                      </span>
                       <span className="text-xs text-slate-400 shrink-0">
                         ({(doc.size / 1024).toFixed(1)} KB)
                       </span>
@@ -339,8 +358,7 @@ export default function ApplicationSubmitForm() {
                     <button
                       type="button"
                       onClick={() => removeExistingDoc(doc.id)}
-                      className="p-1 hover:text-red-500 text-slate-400 transition-colors ml-2 shrink-0"
-                    >
+                      className="p-1 hover:text-red-500 text-slate-400 transition-colors ml-2 shrink-0">
                       <X size={14} />
                     </button>
                   </div>
@@ -356,13 +374,18 @@ export default function ApplicationSubmitForm() {
             </label>
             <label className="block border-2 border-dashed border-slate-200 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition-colors">
               <Upload size={24} className="mx-auto mb-3 text-slate-400" />
-              <p className="text-sm text-slate-600">Click to upload or drag &amp; drop</p>
+              <p className="text-sm text-slate-600">
+                Click to upload or drag &amp; drop
+              </p>
               <p className="text-xs text-slate-400 mt-1">
                 PDF, DOCX, ZIP, Images (max 10 MB each)
               </p>
               <input
-                type="file" multiple accept={ACCEPTED_TYPES}
-                onChange={handleFileChange} className="hidden"
+                type="file"
+                multiple
+                accept={ACCEPTED_TYPES}
+                onChange={handleFileChange}
+                className="hidden"
               />
             </label>
 
@@ -371,11 +394,12 @@ export default function ApplicationSubmitForm() {
                 {newFiles.map((file, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg px-3 py-2"
-                  >
+                    className="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <FileText size={15} className="text-blue-500 shrink-0" />
-                      <span className="text-sm text-slate-700 truncate">{file.name}</span>
+                      <span className="text-sm text-slate-700 truncate">
+                        {file.name}
+                      </span>
                       <span className="text-xs text-slate-400 shrink-0">
                         ({(file.size / 1024).toFixed(1)} KB)
                       </span>
@@ -383,8 +407,7 @@ export default function ApplicationSubmitForm() {
                     <button
                       type="button"
                       onClick={() => removeNewFile(idx)}
-                      className="p-1 hover:text-red-500 text-slate-400 transition-colors ml-2 shrink-0"
-                    >
+                      className="p-1 hover:text-red-500 text-slate-400 transition-colors ml-2 shrink-0">
                       <X size={14} />
                     </button>
                   </div>
@@ -397,14 +420,15 @@ export default function ApplicationSubmitForm() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition-colors disabled:opacity-60 mt-2"
-          >
+            className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition-colors disabled:opacity-60 mt-2">
             {submitting && <Loader2 size={18} className="animate-spin" />}
             {submitting
-              ? newFiles.length > 0 ? "Uploading files…" : "Saving…"
+              ? newFiles.length > 0
+                ? "Uploading files…"
+                : "Saving…"
               : isEditMode
-              ? "Save Changes"
-              : "Submit Application"}
+                ? "Save Changes"
+                : "Submit Application"}
           </button>
         </form>
       </div>

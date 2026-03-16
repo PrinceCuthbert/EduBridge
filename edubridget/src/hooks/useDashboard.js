@@ -2,22 +2,23 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getUsers } from '../services/userService';
 import { getApplications } from '../services/applicationService';
+import { getVisaRequests } from '../services/visaService';
 import { Users, FileText, Plane, Award } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function useDashboard() {
-  const [data, setData] = useState({ users: [], applications: [] });
+  const [data, setData] = useState({ users: [], applications: [], visaCases: [] });
   const [loading, setLoading] = useState(true);
 
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // Fetch from both databases in parallel for speed!
-      const [usersRes, appsRes] = await Promise.all([
+      const [usersRes, appsRes, visaRes] = await Promise.all([
         getUsers(),
-        getApplications()
+        getApplications(),
+        getVisaRequests(),
       ]);
-      setData({ users: usersRes, applications: appsRes });
+      setData({ users: usersRes, applications: appsRes, visaCases: visaRes });
     } catch (error) {
       toast.error("Failed to load dashboard statistics");
     } finally {
@@ -31,8 +32,9 @@ export function useDashboard() {
 
   // 1. Calculate Stat Cards Dynamically
   const stats = useMemo(() => {
-    const { users, applications } = data;
+    const { users, applications, visaCases } = data;
     const pendingApps = applications.filter(a => a.status === 'Pending').length;
+    const activeVisa = visaCases.filter(v => v.status !== 'Approved' && v.status !== 'Rejected').length;
 
     return [
       {
@@ -57,8 +59,8 @@ export function useDashboard() {
         bg: "bg-amber-50"
       },
       {
-        label: "Active Visa Cases", // We will stub this until you build the Visa DB
-        value: "0",
+        label: "Active Visa Cases",
+        value: activeVisa.toString(),
         icon: Plane,
         color: "text-indigo-600",
         bg: "bg-indigo-50"

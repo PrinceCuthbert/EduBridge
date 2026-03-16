@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { 
-  FileText, 
-  CheckCircle, 
-  Clock, 
+import {
+  FileText,
+  CheckCircle,
+  Clock,
   AlertCircle,
   Download,
   Eye,
   ArrowLeft,
-  MapPin,
   Calendar,
   Briefcase,
   DollarSign,
@@ -19,11 +18,12 @@ import {
   Trash2,
   Video
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { getConsultationById, getCountryFlag } from '@/data/mockVisaData';
+import { getCountryFlag } from '@/data/mockVisaData';
+import { getVisaRequestById } from '@/services/visaService';
+import VisaStatusBadge from '@/components/visa/VisaStatusBadge';
 
 export default function VisaCaseDetails() {
   const { id } = useParams();
@@ -41,7 +41,7 @@ export default function VisaCaseDetails() {
         // Simulating API call
         await new Promise((resolve) => setTimeout(resolve, 600));
         
-        const foundCase = getConsultationById(id);
+        const foundCase = await getVisaRequestById(id);
         
         if (!foundCase) {
           toast.error("Case not found or access denied");
@@ -101,17 +101,6 @@ export default function VisaCaseDetails() {
           badge: "bg-amber-50 text-amber-700 border-amber-100", 
           icon: <AlertCircle size={12} className="mr-1" />
         };
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "New": return "bg-blue-50 text-blue-700 border-blue-100";
-      case "In Progress": return "bg-yellow-50 text-yellow-700 border-yellow-100";
-      case "Pending Documents": return "bg-orange-50 text-orange-700 border-orange-100";
-      case "Approved": return "bg-emerald-50 text-emerald-700 border-emerald-100";
-      case "Rejected": return "bg-red-50 text-red-700 border-red-100";
-      default: return "bg-slate-50 text-slate-700 border-slate-100";
     }
   };
 
@@ -186,9 +175,7 @@ export default function VisaCaseDetails() {
             </div>
             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Status</p>
             <div className="mt-1">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(caseData.status)}`}>
-                {caseData.status}
-              </span>
+              <VisaStatusBadge status={caseData.status} />
             </div>
           </CardContent>
         </Card>

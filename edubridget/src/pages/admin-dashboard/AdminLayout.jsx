@@ -10,7 +10,6 @@ import {
   LogOut,
   Menu,
   Settings,
-  Bell,
   ScrollText,
   Building2,
   DollarSign,
@@ -19,11 +18,14 @@ import {
   MessageSquare,
   ChevronDown,
   Activity,
-  ShieldCheck,
 } from "lucide-react";
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
+  const displayName =
+    user?.name ||
+    [user?.identity?.firstName, user?.identity?.lastName].filter(Boolean).join(" ") ||
+    "Admin";
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -212,16 +214,16 @@ export default function AdminLayout() {
                 className="flex items-center gap-3 pl-1 pr-2 py-1 hover:bg-slate-50 rounded-lg border border-transparent hover:border-slate-200 transition-all group">
                 <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center overflow-hidden">
                   {user?.avatar ? (
-                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                    <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
                   ) : (
                     <span className="font-bold text-xs">
-                      {user?.name?.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2) || "AD"}
+                      {displayName.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2)}
                     </span>
                   )}
                 </div>
                 <div className="hidden md:flex flex-col text-left">
-                  <span className="text-sm font-semibold text-slate-700 leading-none mb-0.5">{user?.name || "Admin User"}</span>
-                  <span className="text-xs font-medium text-slate-500 leading-none">Super Admin</span>
+                  <span className="text-sm font-semibold text-slate-700 leading-none mb-0.5">{displayName}</span>
+                  <span className="text-xs font-medium text-slate-500 leading-none">Admin Account</span>
                 </div>
                 <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`} />
               </button>

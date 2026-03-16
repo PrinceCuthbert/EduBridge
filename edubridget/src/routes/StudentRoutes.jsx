@@ -23,7 +23,7 @@ const MyApplications          = lazy(() => import("../pages/student-dashboard/ap
 const ApplicationSubmitForm   = lazy(() => import("../pages/student-dashboard/applications/ApplicationSubmitForm"));
 const ApplicationPreview      = lazy(() => import("../pages/student-dashboard/applications/ApplicationPreview"));
 const VisaSummary             = lazy(() => import("../pages/student-dashboard/visa/VisaSummary"));
-const VisaConsultationRequest = lazy(() => import("../pages/student-dashboard/visa/VisaConsultationRequest"));
+const VisaRequestForm         = lazy(() => import("../pages/student-dashboard/visa/VisaRequestForm"));
 const VisaPaymentPage         = lazy(() => import("../pages/student-dashboard/visa/VisaPaymentPage"));
 const VisaCaseDetails         = lazy(() => import("../pages/student-dashboard/visa/VisaCaseDetails"));
 const VisaCaseResponse        = lazy(() => import("../pages/student-dashboard/visa/VisaCaseResponse"));
@@ -56,7 +56,7 @@ export default function StudentRoutes() {
           <Route path="summary/details/:id" element={<VisaCaseDetails />} />
           <Route path="summary/details/:id/upload" element={<UploadCaseDocuments />} />
           <Route path="summary/response/:id" element={<VisaCaseResponse />} />
-          <Route path="request" element={<VisaConsultationRequest />} />
+          <Route path="request" element={<VisaRequestForm />} />
           <Route path="payment" element={<VisaPaymentPage />}></Route>
           <Route path="payment-methods" element={<PaymentMethodsPage />} />
         </Route>

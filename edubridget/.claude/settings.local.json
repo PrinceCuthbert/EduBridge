@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"import.*VisaCases\\\\|import.*VisaSummary\\\\|import.*VisaRequestForm\" /d/SideProjects/EduBridgefromfigma/edubridget/src/routes/*.jsx)"
+    ]
+  }
+}

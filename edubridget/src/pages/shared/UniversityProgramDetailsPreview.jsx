@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useProgram } from "../../hooks/usePrograms";
 import { ArrowLeft } from "lucide-react";
 import { ProgramDepartments, ProgramTimeline, ProgramRequirements, ProgramApplication, ProgramTuitionFees } from "../../components/program/ProgramSections";
+import { getProgramMajors } from "../../data/mockMajors";
 
 export default function UniversityProgramDetailsPreview({ backPath = "/admin/programs" }) {
   const { id } = useParams();
@@ -142,7 +143,11 @@ export default function UniversityProgramDetailsPreview({ backPath = "/admin/pro
 
         {/* Content Tables */}
         <div className="p-6 sm:p-8 space-y-10">
-            <ProgramDepartments departments={program.departments} />
+            <ProgramDepartments departments={
+              program.departments?.length
+                ? program.departments
+                : getProgramMajors(program.id)
+            } />
             <ProgramTimeline timeline={program.timeline} />
             <ProgramTuitionFees tuitionFees={program.tuitionFees} />
             <ProgramRequirements documents={program.requiredDocuments} />

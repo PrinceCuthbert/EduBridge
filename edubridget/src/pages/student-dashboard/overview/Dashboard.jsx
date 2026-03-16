@@ -6,7 +6,7 @@ import { useApplications } from '../../../hooks/useApplications';
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { applications } = useApplications(user?.id);
+  const { applications } = useApplications({ userId: user?.id });
 
   const pendingCount  = useMemo(() => applications.filter(a => a.status === 'Pending').length, [applications]);
   const approvedCount = useMemo(() => applications.filter(a => a.status === 'Approved').length, [applications]);
