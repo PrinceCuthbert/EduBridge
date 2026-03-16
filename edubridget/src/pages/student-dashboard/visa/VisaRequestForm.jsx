@@ -65,8 +65,10 @@ export default function VisaRequestForm() {
     e.preventDefault();
     try {
       await submitRequest(formData);
-      toast.success("Consultation request submitted successfully!");
-      navigate("/dashboard/visa-status/summary");
+      toast.success("Consultation request submitted! Please complete your payment.");
+      navigate("/dashboard/visa-status/payment-methods", {
+        state: { visaType: formData.visaType },
+      });
     } catch (err) {
       toast.error(err.message);
     }

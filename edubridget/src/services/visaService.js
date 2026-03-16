@@ -37,7 +37,21 @@ const readAll = () => {
 };
 
 const writeAll = (records) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  } catch (err) {
+    // DOMException: QuotaExceededError — browser storage is full
+    if (
+      err instanceof DOMException &&
+      (err.name === "QuotaExceededError" ||
+        err.name === "NS_ERROR_DOM_QUOTA_REACHED")
+    ) {
+      throw new Error(
+        "Browser storage is full. Try uploading smaller files, or delete existing documents to free up space.",
+      );
+    }
+    throw err;
+  }
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -117,6 +131,9 @@ export const createVisaRequest = async (formData, userId) => {
     appointmentTime: "",
     meetingLink: "",
     adminNotes: "",
+
+    // ── Documents uploaded by student ──
+    documents: [],
   };
 
   writeAll([...all, newRequest]);
@@ -213,6 +230,42 @@ export const updateVisaSchedule = async (id, schedule) => {
   );
   writeAll(updated);
   return updated.find((r) => r.id === id);
+};
+
+/**
+ * Student adds documents to their case.
+ * Merges new documents into the existing documents array — never overwrites.
+ *
+ * @param {string} id       - visa request ID
+ * @param {Array}  newDocs  - array of { id, name, type, size, url, uploadedAt }
+ */
+export const addDocumentsToVisaRequest = async (id, newDocs) => {
+  const all = readAll();
+  const updated = all.map((r) =>
+    r.id === id
+      ? { ...r, documents: [...(r.documents ?? []), ...newDocs] }
+      : r
+  );
+  writeAll(updated);
+  return updated.find((r) => r.id === id);
+};
+
+/**
+ * Student deletes a single document from their case.
+ * Only removes the document — all other fields stay unchanged.
+ *
+ * @param {string} caseId - visa request ID
+ * @param {string} docId  - document ID to remove
+ */
+export const deleteDocumentFromVisaRequest = async (caseId, docId) => {
+  const all = readAll();
+  const updated = all.map((r) =>
+    r.id === caseId
+      ? { ...r, documents: (r.documents ?? []).filter((d) => d.id !== docId) }
+      : r
+  );
+  writeAll(updated);
+  return updated.find((r) => r.id === caseId);
 };
 
 /**

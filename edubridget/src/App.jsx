@@ -41,8 +41,31 @@ function App() {
         <ScrollToTop />
         <Toaster
           position="top-center"
-          richColors
-          toastOptions={{ style: { zIndex: 9999 } }}
+          toastOptions={{
+            style: { zIndex: 9999 },
+            classNames: {
+              // ── Base toast shell ──────────────────────────────
+              toast:
+                "rounded-xl border shadow-lg px-5 py-4 font-sans flex gap-3 items-start",
+              // ── Typography ────────────────────────────────────
+              title: "text-base font-semibold leading-snug",
+              description: "text-sm mt-0.5 leading-relaxed opacity-90",
+              // ── Per-type colors (system palette) ─────────────
+              success:
+                "bg-emerald-50 border-emerald-200 text-emerald-900",
+              error:
+                "bg-red-50 border-red-200 text-red-900",
+              warning:
+                "bg-red-50 border-red-200 text-red-900",
+              info:
+                "bg-blue-50 border-blue-200 text-blue-900",
+              // ── Action / cancel buttons ───────────────────────
+              actionButton:
+                "bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-3.5 py-1.5 rounded-lg transition-colors",
+              cancelButton:
+                "bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium px-3.5 py-1.5 rounded-lg transition-colors",
+            },
+          }}
         />
         <div className="flex flex-col min-h-screen">
           {/* ErrorBoundary catches chunk load failures from lazy routes */}

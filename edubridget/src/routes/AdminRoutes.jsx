@@ -22,6 +22,7 @@ const RoleManagement           = lazy(() => import("../pages/admin-dashboard/use
 const FinancialReports         = lazy(() => import("../pages/admin-dashboard/finance/FinancialReports"));
 const Analytics                = lazy(() => import("../pages/admin-dashboard/analytics/Analytics"));
 const VisaCases                = lazy(() => import("../pages/admin-dashboard/visa/VisaCases"));
+const AdminVisaCaseDetails     = lazy(() => import("../pages/admin-dashboard/visa/AdminVisaCaseDetails"));
 const Communications           = lazy(() => import("../pages/admin-dashboard/communications/Communications"));
 const ScholarshipManager       = lazy(() => import("../pages/admin-dashboard/scholarships/ScholarshipManager"));
 const UniversityPrograms       = lazy(() => import("../pages/shared/UniversityPrograms"));
@@ -47,6 +48,7 @@ export default function AdminRoutes() {
 
         {/* Visa */}
         <Route path="visa" element={<VisaCases />} />
+        <Route path="visa/:id" element={<AdminVisaCaseDetails />} />
 
         {/* Programs */}
         <Route path="programs"          element={<UniversityPrograms />} />

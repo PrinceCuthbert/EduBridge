@@ -12,6 +12,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Plus,
   Eye,
@@ -82,6 +83,8 @@ const EMPTY_FORM = {
 };
 
 export default function VisaCases() {
+  const navigate = useNavigate();
+
   // ── Data — all logic lives in the hook ───────────────────
   const {
     cases,
@@ -221,7 +224,16 @@ export default function VisaCases() {
   const handleSaveSchedule = async () => {
     if (!selectedCase) return;
     try {
-      const updated = await setSchedule(selectedCase.id, scheduleData);
+      // Normalize the meeting link — if the admin omits the protocol
+      // (e.g. types "zoom.us/j/123" instead of "https://zoom.us/j/123"),
+      // browsers treat it as a relative path and append it to the current URL.
+      const rawLink = scheduleData.meetingLink.trim();
+      const normalizedLink =
+        rawLink && !/^https?:\/\//i.test(rawLink) ? `https://${rawLink}` : rawLink;
+      const updated = await setSchedule(selectedCase.id, {
+        ...scheduleData,
+        meetingLink: normalizedLink,
+      });
       setSelectedCase(updated);
       toast.success("Meeting scheduled. Student will see the join link.");
     } catch (err) {
@@ -315,12 +327,12 @@ export default function VisaCases() {
       render: (c) => (
         <div className="flex items-center justify-end gap-2">
           <button
-            onClick={() => handleOpenDetails(c)}
+            onClick={() => navigate(`/admin/visa/${c.id}`)}
             className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
             <Eye size={16} />
           </button>
           <button
-            onClick={() => handleOpenEdit(c)}
+            onClick={() => handleOpenDetails(c)}
             className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
             <Edit size={16} />
           </button>

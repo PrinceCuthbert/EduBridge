@@ -178,26 +178,33 @@ export default function AdminApplicationReview() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {app.documents.map((doc) => (
                   <div
-                    key={doc.fileId}
+                    key={doc.id}
                     className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg hover:border-blue-200 hover:shadow-sm transition-all group"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-9 h-9 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-100 shrink-0">
-                        {/* Derive icon from the fileName */}
-                        <span className="text-base">{getFileIcon(doc.fileName)}</span>
+                        <span className="text-base">{getFileIcon(doc.name)}</span>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-slate-900 truncate">{doc.fileName}</p>
+                        <p className="text-sm font-medium text-slate-900 truncate">{doc.name}</p>
                         <p className="text-xs text-slate-400">
-                          {doc.size} · {new Date(doc.uploadDate).toLocaleDateString()}
+                          {doc.size ? `${(doc.size / 1024).toFixed(1)} KB` : "—"} · {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString() : "—"}
                         </p>
                       </div>
                     </div>
-                    {/* Simulated Download link */}
                     <button
                       className="p-1.5 text-slate-400 hover:text-blue-600 rounded transition-colors ml-2 shrink-0"
                       title="Download"
-                      onClick={() => toast.success(`Downloading ${doc.fileName}...`)}
+                      onClick={() => {
+                        if (doc.url) {
+                          const a = document.createElement("a");
+                          a.href = doc.url;
+                          a.download = doc.name;
+                          a.click();
+                        } else {
+                          toast.error("File data not available.");
+                        }
+                      }}
                     >
                       <Download size={15} />
                     </button>

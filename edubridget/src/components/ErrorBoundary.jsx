@@ -23,7 +23,16 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    // Update state so the next render shows the fallback UI
+    // Chunk load failure (stale Vite HMR or stale deployment) — reload transparently
+    if (
+      error?.message?.includes("Failed to fetch dynamically imported module") ||
+      error?.message?.includes("Importing a module script failed") ||
+      error?.message?.includes("Loading chunk") ||
+      error?.name === "ChunkLoadError"
+    ) {
+      window.location.reload();
+      return { hasError: false };
+    }
     return { hasError: true };
   }
 

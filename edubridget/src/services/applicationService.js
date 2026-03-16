@@ -14,7 +14,10 @@ const _getApps = () => {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (!data) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_UNIFIED_APPLICATIONS));
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(MOCK_UNIFIED_APPLICATIONS),
+      );
       return MOCK_UNIFIED_APPLICATIONS;
     }
     return JSON.parse(data);
@@ -36,8 +39,9 @@ export const getApplications = async () => {
 export const getApplicationsByUserId = async (userId) => {
   await delay();
   const id = String(userId);
-  return _getApps().filter((app) =>
-    String(app.applicant?.identityId) === id || String(app.userId) === id
+  return _getApps().filter(
+    (app) =>
+      String(app.applicant?.identityId) === id || String(app.userId) === id,
   );
 };
 
@@ -55,7 +59,7 @@ export const getApplicationByIdSync = (id) =>
 export const createApplication = async (data) => {
   await delay();
   const apps = _getApps();
-  
+
   // Build the new DTO structure when a student applies
   const newApp = {
     trackerId: generateId(),
@@ -65,24 +69,28 @@ export const createApplication = async (data) => {
     userId: data.userId || null, // top-level for quick filtering
     applicant: data.applicant || {
       identityId: data.userId || null,
-      firstName:  data.firstName  || "",
-      lastName:   data.lastName   || "",
-      email:      data.email      || "",
-      phone:      data.phone      || "",
+      firstName: data.firstName || "",
+      lastName: data.lastName || "",
+      email: data.email || "",
+      phone: data.phone || "",
     },
     programDetails: data.programDetails || {
       universityName: data.universityName || "",
-      majorName:      data.programName   || data.departmentName || "",
+      majorName: data.programName || data.departmentName || "",
     },
     trackerStages: [
-      { stage: "Submitted", completed: true, date: new Date().toISOString().split("T")[0] },
+      {
+        stage: "Submitted",
+        completed: true,
+        date: new Date().toISOString().split("T")[0],
+      },
       { stage: "Under Review", completed: false, date: null },
       { stage: "Decision", completed: false, date: null },
-      { stage: "Enrolled", completed: false, date: null }
+      { stage: "Enrolled", completed: false, date: null },
     ],
-    documents: data.documents || []
+    documents: data.documents || [],
   };
-  
+
   apps.push(newApp);
   _saveApps(apps);
   return newApp;
