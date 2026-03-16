@@ -23,15 +23,12 @@ const STORAGE_KEY = "edubridge_visa_requests";
 // Same trick as applicationService.js.
 // If the key doesn't exist yet, write the mock records so the
 // UI has something to show on a fresh browser session.
-const seedIfEmpty = () => {
-  if (!localStorage.getItem(STORAGE_KEY)) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_VISA_REQUESTS));
-  }
-};
-
 // ── Internal read/write helpers ───────────────────────────────
 const readAll = () => {
-  seedIfEmpty();
+  // Seed mock data only in development — production starts empty.
+  if (import.meta.env.DEV && !localStorage.getItem(STORAGE_KEY)) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_VISA_REQUESTS));
+  }
   const data = localStorage.getItem(STORAGE_KEY);
   return data ? JSON.parse(data) : [];
 };

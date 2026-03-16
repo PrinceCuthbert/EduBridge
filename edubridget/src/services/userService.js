@@ -12,6 +12,8 @@ const _getUsersDB = () => {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (!data) {
+      // Always seed the demo accounts (admin + student) in both dev and prod.
+      // These are the permanent demo credentials shown on the sign-in page.
       localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_USERS));
       return MOCK_USERS;
     }

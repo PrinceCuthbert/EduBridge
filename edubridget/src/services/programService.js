@@ -21,12 +21,16 @@ const _read = () => {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (!data) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_PROGRAMS));
-      return [...MOCK_PROGRAMS];
+      // Seed mock data only in development — production starts empty.
+      if (import.meta.env.DEV) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_PROGRAMS));
+        return [...MOCK_PROGRAMS];
+      }
+      return [];
     }
     return JSON.parse(data);
   } catch {
-    return [...MOCK_PROGRAMS];
+    return import.meta.env.DEV ? [...MOCK_PROGRAMS] : [];
   }
 };
 

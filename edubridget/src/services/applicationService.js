@@ -9,20 +9,24 @@ const generateId = () =>
 // Simulate network latency
 const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Internal synchronous read — Now seeds with DTO mock data if empty!
+// Internal synchronous read — seeds mock data in development only.
 const _getApps = () => {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (!data) {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(MOCK_UNIFIED_APPLICATIONS),
-      );
-      return MOCK_UNIFIED_APPLICATIONS;
+      // Seed mock data only in development — production starts empty.
+      if (import.meta.env.DEV) {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(MOCK_UNIFIED_APPLICATIONS),
+        );
+        return MOCK_UNIFIED_APPLICATIONS;
+      }
+      return [];
     }
     return JSON.parse(data);
   } catch {
-    return MOCK_UNIFIED_APPLICATIONS;
+    return import.meta.env.DEV ? MOCK_UNIFIED_APPLICATIONS : [];
   }
 };
 

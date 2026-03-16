@@ -83,7 +83,6 @@ function SignUpPage() {
       setLoading(false);
     }
 
-    console.log("Registration Data:", registrationData);
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
