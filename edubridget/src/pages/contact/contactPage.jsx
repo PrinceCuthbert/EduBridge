@@ -11,8 +11,8 @@ import {
 } from "lucide-react";
 import { motion } from 'framer-motion';
 
-import { faqs } from "../../data/faqData";
 import FAQSection from "../../components/FAQSection";
+import { faqs } from "../../data/faqData";
 
 function ContactPage() {
   const { t } = useTranslation();

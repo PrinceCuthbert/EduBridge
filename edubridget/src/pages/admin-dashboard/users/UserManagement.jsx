@@ -58,7 +58,7 @@ export default function UserManagement() {
       phone: user.identity?.phone || "",
       nationality: user.identity?.nationality || "",
       gender: user.identity?.gender || "",
-      dateOfBirth: user.identity?.date_birth || "",
+      dateOfBirth: user.identity?.dob || "",
       status: user.status || "Active",
       password: "" // Leave blank for security when editing
     } : INITIAL_FORM_DATA);
@@ -328,7 +328,7 @@ export default function UserManagement() {
              <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-1"><div className="flex items-center gap-2 text-xs font-medium text-slate-500 uppercase"><Phone size={14} /> Phone</div><p className="text-sm font-medium text-slate-900">{selectedUser.identity?.phone || "—"}</p></div>
                 <div className="space-y-1"><div className="flex items-center gap-2 text-xs font-medium text-slate-500 uppercase"><MapPin size={14} /> Nationality</div><p className="text-sm font-medium text-slate-900">{selectedUser.identity?.nationality || "—"}</p></div>
-                <div className="space-y-1"><div className="flex items-center gap-2 text-xs font-medium text-slate-500 uppercase"><Calendar size={14} /> DOB</div><p className="text-sm font-medium text-slate-900">{selectedUser.identity?.date_birth || "—"}</p></div>
+                <div className="space-y-1"><div className="flex items-center gap-2 text-xs font-medium text-slate-500 uppercase"><Calendar size={14} /> DOB</div><p className="text-sm font-medium text-slate-900">{selectedUser.identity?.dob || "—"}</p></div>
                 <div className="space-y-1"><div className="flex items-center gap-2 text-xs font-medium text-slate-500 uppercase"><Users size={14} /> Gender</div><p className="text-sm font-medium text-slate-900">{selectedUser.identity?.gender || "—"}</p></div>
              </div>
 

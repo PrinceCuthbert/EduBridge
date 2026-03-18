@@ -1,29 +1,19 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MOCK_POLL_QUESTIONS } from '../../../data/mockPublishersRoles';
 import { MOCK_PROGRAMS } from '../../../data/mockData';
 import { toast } from 'sonner';
 import { HelpCircle, Plus, Pencil, Trash2, X, Save, ChevronDown } from 'lucide-react';
 
-/**
- * CMSPollQuestions — POLL_QUESTION entity management (Priority 8)
- * Schema: POLL_QUESTION { id, cat_id, program_id }
- *
- * Admin manages pre-application survey questions tied to specific programs.
- * Backend: GET/POST/PUT/DELETE /api/poll-questions
- */
-
+// ─── Poll Questions ───────────────────────────────────────────────────────────
 const QUESTION_TYPES = ['single-choice', 'multi-choice', 'text'];
 const EMPTY_FORM = { program_id: '', cat_id: 1, question: '', options: ['', ''], type: 'single-choice' };
 
 function PollModal({ question, onSave, onClose }) {
-  const [form, setForm] = useState(question ? { ...question, options: [...(question.options || ['',''])] } : { ...EMPTY_FORM, options: ['', ''] });
-
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
-  const setOption = (i, v) => {
-    const opts = [...form.options];
-    opts[i] = v;
-    set('options', opts);
-  };
+  const [form, setForm] = useState(
+    question ? { ...question, options: [...(question.options || ['', ''])] } : { ...EMPTY_FORM, options: ['', ''] }
+  );
+  const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
+  const setOption = (i, v) => { const o = [...form.options]; o[i] = v; set('options', o); };
   const addOption = () => set('options', [...form.options, '']);
   const removeOption = (i) => set('options', form.options.filter((_, idx) => idx !== i));
 
@@ -44,13 +34,10 @@ function PollModal({ question, onSave, onClose }) {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Program <span className="text-red-500">*</span></label>
             <div className="relative">
-              <select
-                value={form.program_id}
-                onChange={e => set('program_id', e.target.value)}
-                className="w-full appearance-none pr-8 px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
+              <select value={form.program_id} onChange={e => set('program_id', e.target.value)}
+                className="w-full appearance-none pr-8 px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">Select program…</option>
-                {MOCK_PROGRAMS.map(p => <option key={p.id} value={p.id}>{p.universityName}</option>)}
+                {MOCK_PROGRAMS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
               <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
@@ -74,13 +61,9 @@ function PollModal({ question, onSave, onClose }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Question Text <span className="text-red-500">*</span></label>
-            <textarea
-              value={form.question}
-              onChange={e => set('question', e.target.value)}
-              rows={3}
+            <textarea value={form.question} onChange={e => set('question', e.target.value)} rows={3}
               placeholder="Enter the survey question…"
-              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            />
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
           </div>
           {form.type !== 'text' && (
             <div>
@@ -88,13 +71,8 @@ function PollModal({ question, onSave, onClose }) {
               <div className="space-y-2">
                 {form.options.map((opt, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={opt}
-                      onChange={e => setOption(i, e.target.value)}
-                      placeholder={`Option ${i + 1}`}
-                      className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+                    <input type="text" value={opt} onChange={e => setOption(i, e.target.value)} placeholder={`Option ${i + 1}`}
+                      className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     {form.options.length > 2 && (
                       <button onClick={() => removeOption(i)} className="p-1.5 text-slate-400 hover:text-red-500 rounded transition-colors"><X size={14} /></button>
                     )}
@@ -118,33 +96,33 @@ function PollModal({ question, onSave, onClose }) {
   );
 }
 
+// ─── FAQ Manager ──────────────────────────────────────────────────────────────
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function CMSPollQuestions() {
   const [questions, setQuestions] = useState([...MOCK_POLL_QUESTIONS]);
-  const [modal, setModal] = useState(null);
+  const [pollModal, setPollModal] = useState(null);
   const [filterProgram, setFilterProgram] = useState('All');
 
-  const filtered = filterProgram === 'All' ? questions : questions.filter(q => String(q.program_id) === filterProgram);
-
-  const handleSave = (form) => {
-    if (modal === 'add') {
-      setQuestions(p => [...p, { ...form, id: Date.now() }]);
+  const handlePollSave = (form) => {
+    if (pollModal === 'add') {
+      setQuestions((p) => [...p, { ...form, id: Date.now() }]);
       toast.success('Question added');
     } else {
-      setQuestions(p => p.map(q => q.id === form.id ? form : q));
+      setQuestions((p) => p.map((q) => (q.id === form.id ? form : q)));
       toast.success('Question updated');
     }
-    setModal(null);
+    setPollModal(null);
   };
 
-  const handleDelete = (q) => {
-    toast.warning('Delete this question?', {
-      action: { label: 'Delete', onClick: () => { setQuestions(p => p.filter(x => x.id !== q.id)); toast.success('Question deleted'); } },
+  const handlePollDelete = (q) => {
+    toast('Delete this question?', {
+      action: { label: 'Delete', onClick: () => setQuestions((p) => p.filter((x) => x.id !== q.id)) },
       cancel: { label: 'Cancel', onClick: () => {} },
-      duration: 6000,
     });
   };
 
-  const getProgramName = (pid) => MOCK_PROGRAMS.find(p => p.id === pid)?.universityName || `Program ${pid}`;
+  const filteredQuestions =
+    filterProgram === 'All' ? questions : questions.filter((q) => String(q.program_id) === filterProgram);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -158,24 +136,25 @@ export default function CMSPollQuestions() {
             <select value={filterProgram} onChange={e => setFilterProgram(e.target.value)}
               className="appearance-none pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
               <option value="All">All Programs</option>
-              {MOCK_PROGRAMS.map(p => <option key={p.id} value={p.id}>{p.universityName}</option>)}
+              {MOCK_PROGRAMS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
             <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
-          <button onClick={() => setModal('add')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-medium text-sm hover:bg-blue-700 transition-colors">
+          <button onClick={() => setPollModal('add')}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-medium text-sm hover:bg-blue-700 transition-colors">
             <Plus size={16} /> Add Question
           </button>
         </div>
       </div>
 
       <div className="space-y-3">
-        {filtered.length === 0 && (
+        {filteredQuestions.length === 0 && (
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
             <HelpCircle size={32} className="mx-auto text-slate-300 mb-3" />
             <p className="text-sm text-slate-500">No questions yet for this program.</p>
           </div>
         )}
-        {filtered.map(q => {
+        {filteredQuestions.map(q => {
           const prog = MOCK_PROGRAMS.find(p => p.id === q.program_id);
           return (
             <div key={q.id} className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-sm transition-all">
@@ -184,7 +163,7 @@ export default function CMSPollQuestions() {
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-full uppercase tracking-wide">{q.type}</span>
                     <span className="text-[10px] font-bold bg-slate-50 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-full">Cat {q.cat_id}</span>
-                    {prog && <span className="text-xs text-slate-500 font-medium">{prog.universityName}</span>}
+                    {prog && <span className="text-xs text-slate-500 font-medium">{prog.name}</span>}
                   </div>
                   <p className="text-sm font-semibold text-slate-900 mb-2">{q.question}</p>
                   {q.options && (
@@ -194,8 +173,8 @@ export default function CMSPollQuestions() {
                   )}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <button onClick={() => setModal(q)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="Edit"><Pencil size={15} /></button>
-                  <button onClick={() => handleDelete(q)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Delete"><Trash2 size={15} /></button>
+                  <button onClick={() => setPollModal(q)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="Edit"><Pencil size={15} /></button>
+                  <button onClick={() => handlePollDelete(q)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Delete"><Trash2 size={15} /></button>
                 </div>
               </div>
             </div>
@@ -203,7 +182,7 @@ export default function CMSPollQuestions() {
         })}
       </div>
 
-      {modal !== null && <PollModal question={modal === 'add' ? null : modal} onSave={handleSave} onClose={() => setModal(null)} />}
+      {pollModal !== null && <PollModal question={pollModal === 'add' ? null : pollModal} onSave={handlePollSave} onClose={() => setPollModal(null)} />}
     </div>
   );
 }

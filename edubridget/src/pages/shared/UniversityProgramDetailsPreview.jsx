@@ -98,14 +98,14 @@ export default function UniversityProgramDetailsPreview({ backPath = "/admin/pro
             <div className="w-24 h-24 mx-auto mb-5 bg-white rounded-2xl p-2.5 border border-slate-100 shadow-md flex items-center justify-center">
               <img
                 src={program.logo || 'https://placehold.co/80x80?text=Logo'}
-                alt={program.universityName}
+                alt={program.name}
                 className="max-w-full max-h-full object-contain"
                 onError={(e) => { e.target.src = 'https://placehold.co/80x80?text=Logo'; }}
               />
             </div>
 
             {/* Name */}
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">{program.universityName}</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">{program.name}</h2>
 
             {/* Location + Country pills */}
             <div className="flex items-center justify-center gap-2 flex-wrap mb-4">

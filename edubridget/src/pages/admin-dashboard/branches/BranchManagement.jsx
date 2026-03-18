@@ -76,32 +76,19 @@ export default function BranchManagement() {
     toast.warning(`Delete ${branchName}?`, {
       action: {
         label: "Delete",
-        onClick: async () => {
-          try {
-            await deleteBranch(branchId);
-            toast.success("Branch removed");
-          } catch (error) {
-            toast.error("Failed to delete branch");
-          }
-        },
+        onClick: () => deleteBranch(branchId),
       },
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      if (editingBranch) {
-        await updateBranch(editingBranch.id, formData);
-        toast.success("Branch updated successfully");
-      } else {
-        await createBranch(formData);
-        toast.success("Branch registered successfully");
-      }
-      setIsModalOpen(false);
-    } catch (error) {
-      toast.error("Failed to save branch configuration");
+    if (editingBranch) {
+      updateBranch(editingBranch.id, formData);
+    } else {
+      createBranch(formData);
     }
+    setIsModalOpen(false);
   };
 
   const filteredBranches = branches.filter(b => 

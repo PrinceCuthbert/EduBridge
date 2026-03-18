@@ -138,11 +138,11 @@ export default function UniversityPrograms({ isReadOnly = false }) {
   const columns = [
     {
       header: 'University',
-      accessor: 'universityName',
+      accessor: 'name',
       render: (program) => (
         <div className="flex items-center gap-3">
           <div className="flex-1">
-            <div className="font-medium text-sm text-slate-900">{program.universityName}</div>
+            <div className="font-medium text-sm text-slate-900">{program.name}</div>
           </div>
         </div>
       )
@@ -238,7 +238,7 @@ export default function UniversityPrograms({ isReadOnly = false }) {
   // Filter programs
   const filteredPrograms = programs.filter(program => {
     const matchesSearch = 
-      program.universityName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      program.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       program.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
       program.description.toLowerCase().includes(searchQuery.toLowerCase());
     

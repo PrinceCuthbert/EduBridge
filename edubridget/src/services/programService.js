@@ -15,7 +15,7 @@ const STORAGE_KEY = "edubridge_programs";
 
 const delay = (ms = 400) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// ── Internal helpers ──────────────────────────────────────────────────────────
+// ── Internal helpers ──────────────────a────────────────────────────────────────
 
 const _read = () => {
   try {
@@ -51,17 +51,85 @@ export const getProgramById = async (id) => {
 };
 
 // ── Write ─────────────────────────────────────────────────────────────────────
+// src/services/programService.js
 
 export const createProgram = async (data) => {
   await delay();
   const all = _read();
-  const newId = Math.max(...all.map((p) => p.id), 0) + 1;
+
+  // 1. Simulate Backend Relational IDs
+  const institutionId = Math.floor(Math.random() * 10000);
+
+  // 2. THIS IS THE DTO MAPPER
+  // We format the incoming UI data to perfectly match the SQL Database Schema
+
+  const relationalPayload = {
+    // --- 1. INSTITUTION TABLE ---
+    institution: {
+      id: institutionId,
+      identity_id: data.representative_id || null, // FK from schema
+      name: data.name,
+      category: "University", // From DB schema
+      location: JSON.stringify({ country: data.country, city: data.location }), // DB expects JSON
+      phone: null, // Add to UI later if needed
+      id_document: null, // FK from schema
+      email: null, // Add to UI later if needed
+    },
+
+    // --- 2. DEPARTMENT & MAJOR TABLES ---
+    // The backend will iterate through this array to populate DEPARTMENT, MAJOR, and DEPARTMENT_MAJOR
+    departments_and_majors: data.departments.map((dept) => ({
+      department: {
+        institution_id: institutionId,
+        category: dept.degree || "General",
+      },
+      major: {
+        name: dept.major,
+        language: dept.language,
+        // Mapping your required documents array into the DB's JSON requirements column
+        requirements: JSON.stringify(data.requiredDocuments),
+      },
+      // Note: Backend will insert these, get the IDs, and insert into DEPARTMENT_MAJOR
+    })),
+
+    // --- 3. FEES TABLE ---
+    fees: data.tuitionFees.map((fee) => ({
+      level: fee.level,
+      amount: fee.amount,
+      description: fee.item, // Mapped UI 'item' to DB 'description'
+      status: data.status,
+    })),
+
+    // --- 4. ORPHAN DATA (Needs DB Updates) ---
+    // These fields exist in your UI but DO NOT have columns in your ERD.
+    // By grouping them here, you clearly tell your backend developer
+    // "We need to add these columns/tables to the database."
+    unmapped_frontend_data: {
+      visa_type: data.visaType,
+      logo_url: data.logo,
+      application_link: data.applicationLink,
+      // Timeline needs actual date columns added to APPLICATION_SCHEDULE
+      schedules: data.timeline,
+    },
+  };
+
+  // For the sake of the mock frontend working today, we save the flat 'data'
+  // so the UI can read it back easily.
+  // BUT in production, the backend will execute SQL INSERTs using the 'relationalPayload'.
+
+  // ADD THIS LINE:
+  console.log(
+    "🚀 PAYLOAD SENDING TO BACKEND:",
+    JSON.stringify(relationalPayload, null, 2),
+  );
+
   const newProgram = {
-    id: newId,
+    id: institutionId,
     ...data,
-    status: data.status || "Active",
+    _databaseMap: relationalPayload, // We attach it so you can inspect it in the browser!
     createdAt: new Date().toISOString(),
   };
+
   _save([...all, newProgram]);
   return newProgram;
 };

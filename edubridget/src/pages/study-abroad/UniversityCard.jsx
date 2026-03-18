@@ -16,7 +16,7 @@ const UniversityCard = React.memo(({ university }) => {
             university.logo ||
             `https://ui-avatars.com/api/?name=${university.visaType}&background=random&color=fff&size=128&font-size=0.33`
           }
-          alt={university.universityName}
+          alt={university.name}
           className="w-full h-full object-cover"
           rounded={true}
           showSkeleton={true}
@@ -27,7 +27,7 @@ const UniversityCard = React.memo(({ university }) => {
           {university.visaType}
         </div>
         <h3 className="font-bold text-xs text-slate-900 mb-2 line-clamp-2 min-h-[32px] px-1 leading-tight">
-          {university.universityName}
+          {university.name}
         </h3>
 
         <div className="flex flex-col gap-1 items-center mt-1">

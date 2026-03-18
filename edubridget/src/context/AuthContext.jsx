@@ -36,8 +36,9 @@ export const AuthProvider = ({ children }) => {
     return user;
   };
 
-  const login = useCallback(async ({ email, password }) => {
-    const result = await userService.loginUser(email, password);
+  const login = useCallback(async ({ identifier, password }) => {
+    // identifier = email OR username — userService.loginUser checks both
+    const result = await userService.loginUser(identifier, password);
     const loggedInUser = _persistSession(result);
     setUser(loggedInUser);
     return loggedInUser;
@@ -78,6 +79,21 @@ const updateProfile = useCallback(async (formData) => {
   return updatedUser;
 }, [user]);
 
+  // ── Permission checking ──────────────────────────────────────────────────
+  // Falls back to role-defaults so old sessions (no permissions array) still work.
+  // When backend is live, user.permissions comes from ROLE_PERMISSION table via JWT.
+  const DEFAULT_ROLE_PERMISSIONS = useMemo(() => ({
+    admin:   ['all'],
+    student: ['view_own_app', 'submit_app', 'edit_profile'],
+    staff:   ['view_apps', 'update_app_status'],
+  }), []);
+
+  const hasPermission = useCallback((permissionName) => {
+    if (!user) return false;
+    const perms = user.permissions ?? DEFAULT_ROLE_PERMISSIONS[user.role?.toLowerCase()] ?? [];
+    return perms.includes('all') || perms.includes(permissionName);
+  }, [user, DEFAULT_ROLE_PERMISSIONS]);
+
   const value = useMemo(() => ({
     user,
     loading,
@@ -86,10 +102,11 @@ const updateProfile = useCallback(async (formData) => {
     signUp,
     logout,
     updateProfile,
+    hasPermission,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
     isStudent: user?.role === 'student'
-  }), [user, loading, login, loginWithGoogle, signUp, logout, updateProfile]);
+  }), [user, loading, login, loginWithGoogle, signUp, logout, updateProfile, hasPermission]);
 
   return (
     <AuthContext.Provider value={value}>

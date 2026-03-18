@@ -136,7 +136,7 @@ export default function ProgramDetail() {
           </span>
           <ChevronRight size={14} className="mx-2" />
           <span className="font-semibold text-slate-900 line-clamp-1">
-            {program.universityName}
+            {program.name}
           </span>
         </div>
 
@@ -156,13 +156,13 @@ export default function ProgramDetail() {
               <div className="w-32 h-32 mx-auto mb-6 relative flex items-center justify-center">
                 <img
                   src={program.logo}
-                  alt={program.universityName}
+                  alt={program.name}
                   className="max-w-full max-h-full object-contain"
                 />
               </div>
 
               <h1 className="text-3xl font-bold text-slate-900 mb-1">
-                {program.universityName}
+                {program.name}
               </h1>
               {program.location && (
                 <p className="text-sm text-slate-500 mb-3">{program.location} · {program.country}</p>
@@ -226,7 +226,7 @@ export default function ProgramDetail() {
               {/* Application CTA card */}
               <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
                 <div>
-                  <h2 className="text-xl font-bold text-slate-900 mb-1">{program.universityName}</h2>
+                  <h2 className="text-xl font-bold text-slate-900 mb-1">{program.name}</h2>
                   {program.location && (
                     <p className="text-sm text-slate-500">{program.location} · {program.country}</p>
                   )}

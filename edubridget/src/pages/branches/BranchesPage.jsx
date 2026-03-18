@@ -2,33 +2,45 @@ import { useState, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Phone, Mail, Clock, User, ChevronRight, Building2 } from "lucide-react";
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  User,
+  ChevronRight,
+  Building2,
+} from "lucide-react";
 import { Link } from "react-router-dom";
-const InteractiveMap = lazy(() => import("@/components/InteractiveMap"));
-import { branches } from "@/data/branches";
+import { useBranches } from "@/hooks/useBranches";
 import { useTranslation } from "react-i18next";
+
+const InteractiveMap = lazy(() => import("@/components/InteractiveMap"));
 
 const BranchesPage = () => {
   const { t } = useTranslation();
-  // State to track selected branch for the map
-  const [selectedBranch, setSelectedBranch] = useState(branches[0]); // Default to Rwanda (Head Office)
+  const { branches } = useBranches();
+  const [selectedBranch, setSelectedBranch] = useState(
+    () => branches.find((b) => b.isHeadOffice) ?? branches[0] ?? null
+  );
 
   return (
     <div className="min-h-screen bg-slate-50">
       <main>
         {/* Hero */}
-        <section className="py-16 md:py-20" style={{ backgroundColor: '#1e3a8a' }}>
+        <section
+          className="py-16 md:py-20"
+          style={{ backgroundColor: "#1e3a8a" }}>
           <div className="container mx-auto px-4 md:px-8">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center text-white"
-            >
+              className="text-center text-white">
               <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-                {t('branches_page.hero_title')}
+                {t("branches_page.hero_title")}
               </h1>
               <p className="text-xl text-white/90 max-w-2xl mx-auto">
-                {t('branches_page.hero_subtitle')}
+                {t("branches_page.hero_subtitle")}
               </p>
             </motion.div>
           </div>
@@ -36,79 +48,91 @@ const BranchesPage = () => {
 
         {/* Find Us Map - Interactive Multi-Location */}
         <section className="py-16 bg-white">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 font-serif">
-                {t('branches_page.find_us.title')}
-              </h2>
-              <p className="text-slate-600">{t('branches_page.find_us.subtitle')}</p>
+          {!selectedBranch ? (
+            <div className="flex justify-center items-center py-24">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
             </div>
-
-            {/* Branch Tabs */}
-            <div className="max-w-5xl mx-auto mb-6">
-              <div className="flex flex-wrap gap-2 justify-center">
-                {branches.map((branch) => (
-                  <button
-                    key={branch.country}
-                    onClick={() => setSelectedBranch(branch)}
-                    className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                      selectedBranch.country === branch.country
-                        ? 'bg-primary text-white shadow-md'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    {branch.flag} {branch.city}
-                    {branch.isHeadOffice && (
-                      <Building2 className="inline-block h-4 w-4 ml-1" />
-                    )}
-                  </button>
-                ))}
+          ) : (
+            <div className="container mx-auto px-6">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 font-serif">
+                  {t("branches_page.find_us.title")}
+                </h2>
+                <p className="text-slate-600">
+                  {t("branches_page.find_us.subtitle")}
+                </p>
               </div>
-            </div>
 
-            {/* Dynamic Info Card */}
-            <div className="max-w-5xl mx-auto mb-6 bg-gradient-to-br from-slate-50 to-blue-50/30 p-5 rounded-2xl border border-slate-200 shadow-soft">
-              <div className="flex items-start gap-4">
-                <MapPin className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
-                <div>
-                  <h3 className="font-bold text-xl text-slate-900 mb-1">
-                    {selectedBranch.country} - {selectedBranch.city}
-                  </h3>
-                  <p className="text-slate-600 text-sm mb-3">{selectedBranch.address}</p>
-                  <div className="flex flex-wrap gap-4 text-sm text-slate-500">
-                    <span className="flex items-center gap-1.5">
-                      <Phone className="h-4 w-4 text-primary" />
-                      {selectedBranch.phone}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Mail className="h-4 w-4 text-primary" />
-                      {selectedBranch.email}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Clock className="h-4 w-4 text-primary" />
-                      {selectedBranch.hours}
-                    </span>
+              {/* Branch Tabs */}
+              <div className="max-w-5xl mx-auto mb-6">
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {branches.map((branch) => (
+                    <button
+                      key={branch.country}
+                      onClick={() => setSelectedBranch(branch)}
+                      className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                        selectedBranch.country === branch.country
+                          ? "bg-primary text-white shadow-md"
+                          : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                      }`}>
+                      {branch.flag} {branch.city}
+                      {branch.isHeadOffice && (
+                        <Building2 className="inline-block h-4 w-4 ml-1" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dynamic Info Card */}
+              <div className="max-w-5xl mx-auto mb-6 bg-gradient-to-br from-slate-50 to-blue-50/30 p-5 rounded-2xl border border-slate-200 shadow-soft">
+                <div className="flex items-start gap-4">
+                  <MapPin className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-bold text-xl text-slate-900 mb-1">
+                      {selectedBranch.country} - {selectedBranch.city}
+                    </h3>
+                    <p className="text-slate-600 text-sm mb-3">
+                      {selectedBranch.address}
+                    </p>
+                    <div className="flex flex-wrap gap-4 text-sm text-slate-500">
+                      <span className="flex items-center gap-1.5">
+                        <Phone className="h-4 w-4 text-primary" />
+                        {selectedBranch.phone}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <Mail className="h-4 w-4 text-primary" />
+                        {selectedBranch.email}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <Clock className="h-4 w-4 text-primary" />
+                        {selectedBranch.hours}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Interactive Leaflet Map - Landscape on mobile */}
-           <div className="max-w-5xl mx-auto">
-             <Suspense fallback={
-               <div className="h-[400px] md:h-[500px] bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center">
-                  <span className="text-slate-400 text-sm">Loading map...</span>
-               </div>
-             }>
-               <InteractiveMap 
-                 branches={branches}
-                 selectedBranch={selectedBranch}
-                 onMarkerClick={setSelectedBranch}
-                 className="h-[400px] md:h-[500px] lg:h-[550px]"
-               />
-             </Suspense>
-</div>    
-          </div>
+              {/* Interactive Leaflet Map - Landscape on mobile */}
+              <div className="max-w-5xl mx-auto">
+                <Suspense
+                  fallback={
+                    <div className="h-[400px] md:h-[500px] bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center">
+                      <span className="text-slate-400 text-sm">
+                        Loading map...
+                      </span>
+                    </div>
+                  }>
+                  <InteractiveMap
+                    branches={branches}
+                    selectedBranch={selectedBranch}
+                    onMarkerClick={setSelectedBranch}
+                    className="h-[400px] md:h-[500px] lg:h-[550px]"
+                  />
+                </Suspense>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Branches Grid */}
@@ -121,15 +145,15 @@ const BranchesPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card className={`h-full overflow-hidden border-slate-200 shadow-sm hover:shadow-lg transition-shadow bg-white ${branch.isHeadOffice ? "border-primary ring-1 ring-primary/20" : ""}`}>
+                  transition={{ delay: index * 0.1 }}>
+                  <Card
+                    className={`h-full overflow-hidden border-slate-200 shadow-sm hover:shadow-lg transition-shadow bg-white ${branch.isHeadOffice ? "border-primary ring-1 ring-primary/20" : ""}`}>
                     {branch.isHeadOffice && (
                       <div className="bg-primary text-white text-center py-2 text-sm font-medium">
-                        🏢 {t('branches_page.head_office_badge')}
+                        🏢 {t("branches_page.head_office_badge")}
                       </div>
                     )}
-                    <div 
+                    <div
                       className="h-40 bg-cover bg-center"
                       style={{ backgroundImage: `url(${branch.image})` }}
                     />
@@ -140,7 +164,7 @@ const BranchesPage = () => {
                           {branch.country}
                         </h3>
                       </div>
-                      
+
                       <div className="space-y-2 text-sm text-slate-600 mb-4">
                         <p className="flex items-start gap-2">
                           <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 text-primary" />
@@ -166,14 +190,19 @@ const BranchesPage = () => {
 
                       <div className="flex flex-wrap gap-1 mb-4">
                         {branch.services.slice(0, 3).map((service) => (
-                          <span key={service} className="text-xs bg-slate-100 px-2 py-1 rounded-full text-slate-600">
+                          <span
+                            key={service}
+                            className="text-xs bg-slate-100 px-2 py-1 rounded-full text-slate-600">
                             {service}
                           </span>
                         ))}
                       </div>
 
-                      <Button variant="outline" className="w-full border-slate-200 hover:bg-slate-50 hover:text-primary" size="sm">
-                        {t('branches_page.contact_branch_button')}
+                      <Button
+                        variant="outline"
+                        className="w-full border-slate-200 hover:bg-slate-50 hover:text-primary"
+                        size="sm">
+                        {t("branches_page.contact_branch_button")}
                         <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>
                     </CardContent>
@@ -188,14 +217,16 @@ const BranchesPage = () => {
         <section className="py-16 bg-white text-center">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
-              {t('branches_page.cta.title')}
+              {t("branches_page.cta.title")}
             </h2>
             <p className="text-slate-600 mb-8 max-w-xl mx-auto">
-              {t('branches_page.cta.description')}
+              {t("branches_page.cta.description")}
             </p>
             <Link to="/visa-consultation">
-              <Button size="lg" className="bg-primary hover:bg-primary-dark text-white">
-                {t('branches_page.cta.button')}
+              <Button
+                size="lg"
+                className="bg-primary hover:bg-primary-dark text-white">
+                {t("branches_page.cta.button")}
               </Button>
             </Link>
           </div>

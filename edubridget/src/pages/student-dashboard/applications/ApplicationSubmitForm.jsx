@@ -151,7 +151,7 @@ export default function ApplicationSubmitForm() {
         await updateApplication(id, {
           ...form,
           documents: [...existingDocs, ...newDocuments],
-          universityName: selectedProgram?.universityName ?? "",
+          universityName: selectedProgram?.name ?? "",
           programName: form.departmentName,
         });
         toast.success("Application updated successfully");
@@ -159,7 +159,7 @@ export default function ApplicationSubmitForm() {
         await createApplication({
           ...form,
           userId: String(user?.id),
-          universityName: selectedProgram?.universityName ?? "",
+          universityName: selectedProgram?.name ?? "",
           programName: form.departmentName,
           documents: newDocuments,
         });
@@ -218,7 +218,7 @@ export default function ApplicationSubmitForm() {
               <option value="">Select a university…</option>
               {programs.map((p) => (
                 <option key={p.id} value={String(p.id)}>
-                  {p.universityName}
+                  {p.name}
                 </option>
               ))}
             </select>

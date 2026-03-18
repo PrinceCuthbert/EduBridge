@@ -1,38 +1,16 @@
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { GraduationCap, Calendar, DollarSign, Globe, ChevronRight, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
-import { BASE_URL } from "@/config/api";
 import { useTranslation } from "react-i18next";
-
 import AnimatedCounter from "@/components/AnimatedCounter";
+import { MOCK_SCHOLARSHIPS } from "@/data/mockData";
 
 const ScholarshipsPage = () => {
   const { t } = useTranslation();
-  const [scholarships, setScholarships] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchScholarships = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`${BASE_URL}/scholarships`);
-        if (!res.ok) throw new Error("Failed to load scholarships");
-        const data = await res.json();
-        setScholarships(data);
-      } catch (error) {
-        console.error("Error loading scholarships:", error);
-        toast.error("Failed to load scholarships");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchScholarships();
-  }, []);
+  const scholarships = MOCK_SCHOLARSHIPS;
+  const loading = false;
 
   return (
     <div className="min-h-screen bg-slate-50">

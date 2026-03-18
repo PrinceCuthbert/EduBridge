@@ -3,7 +3,8 @@ export const MOCK_PROGRAMS = [
   {
     id: 1,
     publisher_id: 1,    // PROGRAM.publisher_id → PUBLISHERS table (Publisher: "TM EduBridge")
-    universityName: "Daegu Arts University",
+    representative_id: null, // FK → USER table (staff contact for this institution)
+    name: "Daegu Arts University",
     visaType: "D-2",
     tags: ["ON SALE", "BEST"],
     country: "South Korea",
@@ -29,8 +30,8 @@ export const MOCK_PROGRAMS = [
     ],
     // Tuition fees per degree level
     tuitionFees: [
-      { level: "Bachelor's", item: "Entrance Fee (one-time)",    amount: "300,000 KRW" },
-      { level: "Bachelor's", item: "Tuition (per semester)",     amount: "2,500,000 KRW" },
+      { level: "Bachelor's", item: "Entrance Fee (one-time)",    amount: 300000,   currency: "KRW" },
+      { level: "Bachelor's", item: "Tuition (per semester)",     amount: 2500000,  currency: "KRW" },
     ],
     // Categorized required documents
     requiredDocuments: [
@@ -62,7 +63,8 @@ export const MOCK_PROGRAMS = [
   {
     id: 2,
     publisher_id: 1,    // PROGRAM.publisher_id → PUBLISHERS.id
-    universityName: "Tongmyong University",
+    representative_id: null,
+    name: "Tongmyong University",
     visaType: "D-4",
     tags: ["NEW", "ON SALE"],
     country: "South Korea",
@@ -79,10 +81,10 @@ export const MOCK_PROGRAMS = [
       { stage: "Stage 2", registrationStart: "2025-09-01", registrationEnd: "2025-09-20", examDate: "2025-09-28", resultDate: "2025-09-30" },
     ],
     tuitionFees: [
-      { level: "Certificate", item: "Entrance Fee (one-time)",  amount: "200,000 KRW" },
-      { level: "Certificate", item: "Tuition (per semester)",   amount: "1,800,000 KRW" },
-      { level: "Bachelor's",  item: "Entrance Fee (one-time)",  amount: "300,000 KRW" },
-      { level: "Bachelor's",  item: "Tuition (per semester)",   amount: "2,200,000 KRW" },
+      { level: "Certificate", item: "Entrance Fee (one-time)",  amount: 200000,  currency: "KRW" },
+      { level: "Certificate", item: "Tuition (per semester)",   amount: 1800000, currency: "KRW" },
+      { level: "Bachelor's",  item: "Entrance Fee (one-time)",  amount: 300000,  currency: "KRW" },
+      { level: "Bachelor's",  item: "Tuition (per semester)",   amount: 2200000, currency: "KRW" },
     ],
     requiredDocuments: [
       {
@@ -109,7 +111,8 @@ export const MOCK_PROGRAMS = [
   {
     id: 3,
     publisher_id: 1,    // PROGRAM.publisher_id → PUBLISHERS.id
-    universityName: "Seoul Women's University",
+    representative_id: null,
+    name: "Seoul Women's University",
     visaType: "D-2",
     tags: ["BEST"],
     country: "South Korea",
@@ -126,10 +129,10 @@ export const MOCK_PROGRAMS = [
       { stage: "Stage 2", registrationStart: "2025-10-25", registrationEnd: "2025-11-05", examDate: "2025-11-15", resultDate: "2025-11-20" },
     ],
     tuitionFees: [
-      { level: "Bachelor's", item: "Entrance Fee (one-time)",  amount: "400,000 KRW" },
-      { level: "Bachelor's", item: "Tuition (per semester)",   amount: "2,800,000 KRW" },
-      { level: "Master's",   item: "Entrance Fee (one-time)",  amount: "500,000 KRW" },
-      { level: "Master's",   item: "Tuition (per semester)",   amount: "3,200,000 KRW" },
+      { level: "Bachelor's", item: "Entrance Fee (one-time)",  amount: 400000,  currency: "KRW" },
+      { level: "Bachelor's", item: "Tuition (per semester)",   amount: 2800000, currency: "KRW" },
+      { level: "Master's",   item: "Entrance Fee (one-time)",  amount: 500000,  currency: "KRW" },
+      { level: "Master's",   item: "Tuition (per semester)",   amount: 3200000, currency: "KRW" },
     ],
     requiredDocuments: [
       {

@@ -16,6 +16,7 @@ import { validateSignUpForm } from "../../utils/validation";
 const initialFormState = {
   firstName: "",
   lastName: "",
+  username: "",
   email: "",
   phoneNumber: "",
   nationality: "",
@@ -60,6 +61,7 @@ function SignUpPage() {
     const registrationData = {
       firstName: formData.firstName.trim(),
       lastName: formData.lastName.trim(),
+      username: formData.username.trim(),
       email: formData.email.trim().toLowerCase(),
       phoneNumber: formData.phoneNumber.trim(),
       nationality: formData.nationality.trim(),
@@ -82,7 +84,6 @@ function SignUpPage() {
     } finally {
       setLoading(false);
     }
-
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
@@ -186,8 +187,26 @@ function SignUpPage() {
                   </div>
                 </div>
 
-                {/* Row 2: Contact Info */}
+                {/* Row 2: Account Credentials */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="username"
+                      className="block text-sm font-semibold text-slate-700 mb-2">
+                      Username
+                    </label>
+                    <input
+                      id="username"
+                      name="username"
+                      type="text"
+                      required
+                      value={formData.username}
+                      onChange={handleChange}
+                      placeholder="johndoe99"
+                      disabled={loading}
+                      className="w-full px-4 py-3 bg-blue-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A237E] transition-all disabled:opacity-50"
+                    />
+                  </div>
                   <div>
                     <label
                       htmlFor="email"
@@ -206,6 +225,10 @@ function SignUpPage() {
                       className="w-full px-4 py-3 bg-blue-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A237E] transition-all disabled:opacity-50"
                     />
                   </div>
+                </div>
+
+                {/* Row 3: Contact & Nationality */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label
                       htmlFor="phoneNumber"
@@ -223,9 +246,27 @@ function SignUpPage() {
                       className="w-full px-4 py-3 bg-blue-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A237E] transition-all disabled:opacity-50"
                     />
                   </div>
+                  <div>
+                    <label
+                      htmlFor="nationality"
+                      className="block text-sm font-semibold text-slate-700 mb-2">
+                      Nationality
+                    </label>
+                    <input
+                      id="nationality"
+                      name="nationality"
+                      type="text"
+                      required
+                      value={formData.nationality}
+                      onChange={handleChange}
+                      placeholder="e.g. Rwandan"
+                      disabled={loading}
+                      className="w-full px-4 py-3 bg-blue-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A237E] transition-all disabled:opacity-50"
+                    />
+                  </div>
                 </div>
 
-                {/* Row 3: Demographics (DOB & Gender) */}
+                {/* Row 4: Demographics (DOB & Gender) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label
@@ -265,26 +306,6 @@ function SignUpPage() {
                       <option value="Female">Female</option>
                     </select>
                   </div>
-                </div>
-
-                {/* Row 4: Nationality */}
-                <div>
-                  <label
-                    htmlFor="nationality"
-                    className="block text-sm font-semibold text-slate-700 mb-2">
-                    Nationality
-                  </label>
-                  <input
-                    id="nationality"
-                    name="nationality"
-                    type="text"
-                    required
-                    value={formData.nationality}
-                    onChange={handleChange}
-                    placeholder="e.g. Rwandan"
-                    disabled={loading}
-                    className="w-full px-4 py-3 bg-blue-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A237E] transition-all disabled:opacity-50"
-                  />
                 </div>
 
                 {/* Row 5: Passwords */}
@@ -352,7 +373,7 @@ function SignUpPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 bg-gradient-to-r from-[#1A237E] via-[#283593] to-[#1A237E] hover:from-[#283593] hover:to-[#1A237E] text-white font-bold rounded-lg transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+                  className="w-full py-3.5 mt-2 bg-gradient-to-r from-[#1A237E] via-[#283593] to-[#1A237E] hover:from-[#283593] hover:to-[#1A237E] text-white font-bold rounded-lg transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
                   {loading ? (
                     <>
                       <FontAwesomeIcon

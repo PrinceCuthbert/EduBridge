@@ -22,26 +22,24 @@ export default function ContentManagement() {
         <p className="text-slate-500">Manage website content, resources, and media from a single dashboard.</p>
       </div>
 
-      {/* Navigation */}
-      <div className="border-b border-slate-200">
-        <nav className="flex space-x-8">
+      {/* Navigation — horizontally scrollable on small screens */}
+      <div className="border-b border-slate-200 -mx-1">
+        <nav className="flex overflow-x-auto scrollbar-none px-1 gap-1 sm:gap-0">
           {tabs.map((tab) => (
             <NavLink
               key={tab.name}
               to={tab.path}
               className={({ isActive }) =>
-                // CHANGED: border-primary -> border-blue-600
-                // CHANGED: text-primary -> text-blue-600
-                // ADDED: transition-all for smoother hover effects
-                `flex items-center gap-2 py-4 px-1 border-b-2 text-sm font-medium transition-all ${
+                `flex items-center gap-1.5 py-3.5 px-3 sm:px-4 border-b-2 text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                   isActive
                     ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
                 }`
               }
             >
-              <tab.icon size={18} />
-              {tab.name}
+              <tab.icon size={16} className="flex-shrink-0" />
+              <span className="hidden xs:inline sm:inline">{tab.name}</span>
+              <span className="inline xs:hidden sm:hidden">{tab.name.split(' ')[0]}</span>
             </NavLink>
           ))}
         </nav>

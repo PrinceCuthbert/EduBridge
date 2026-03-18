@@ -1,40 +1,20 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import OptimizedImage from "@/components/OptimizedImage";
-import { BASE_URL } from "../../config/api";
-import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { MOCK_BLOGS } from "@/data/mockData";
 
 const ITEMS_PER_PAGE = 6;
 
 export default function BlogPage() {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`${BASE_URL}/blogs`);
-        if (!res.ok) throw new Error("Failed to load blogs");
-        const data = await res.json();
-        setBlogs(data);
-      } catch (error) {
-        console.error("Error loading blogs:", error);
-        toast.error("Failed to load blogs");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBlogs();
-  }, []);
+  const blogs = MOCK_BLOGS;
+  const loading = false;
 
   // Pagination Logic
   const totalPages = Math.ceil(blogs.length / ITEMS_PER_PAGE);

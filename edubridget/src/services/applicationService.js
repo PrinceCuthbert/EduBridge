@@ -1,10 +1,8 @@
 // src/services/applicationService.js
 import { MOCK_UNIFIED_APPLICATIONS } from "../data/mockData";
+import { v4 as uuidv4 } from "uuid";
 
 const STORAGE_KEY = "edubridge_applications";
-
-const generateId = () =>
-  `APP-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
 // Simulate network latency
 const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -66,7 +64,7 @@ export const createApplication = async (data) => {
 
   // Build the new DTO structure when a student applies
   const newApp = {
-    trackerId: generateId(),
+    trackerId: uuidv4(),
     applicationId: Math.floor(Math.random() * 10000), // Simulated DB auto-increment
     submissionDate: new Date().toISOString(),
     status: "Pending",

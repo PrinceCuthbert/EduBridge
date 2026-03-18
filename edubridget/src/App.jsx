@@ -71,26 +71,25 @@ function App() {
       <Router>
         <ScrollToTop />
         <Toaster
-          position="top-center"
+          position="top-center" // Standard modern placement, but you can keep top-center
+          expand={true} // Stacks them beautifully when multiple fire
+          richColors // Magically adds the perfect colored icons for success/error/warning
           toastOptions={{
             style: { zIndex: 9999 },
             classNames: {
-              // ── Base toast shell ──────────────────────────────
+              // ── Base toast shell (Clean white, subtle border, nice shadow) ──
               toast:
-                "rounded-xl border shadow-lg px-5 py-4 font-sans flex gap-3 items-start",
-              // ── Typography ────────────────────────────────────
-              title: "text-base font-semibold leading-snug",
-              description: "text-sm mt-0.5 leading-relaxed opacity-90",
-              // ── Per-type colors (system palette) ─────────────
-              success: "bg-emerald-50 border-emerald-200 text-emerald-900",
-              error: "bg-red-50 border-red-200 text-red-900",
-              warning: "bg-red-50 border-red-200 text-red-900",
-              info: "bg-blue-50 border-blue-200 text-blue-900",
-              // ── Action / cancel buttons ───────────────────────
+                "group flex gap-3 items-start w-full bg-white border border-slate-200 rounded-xl shadow-lg p-4 font-sans",
+
+              // ── Typography ──
+              title: "text-sm font-semibold text-slate-900",
+              description: "text-sm text-slate-500 mt-1",
+
+              // ── Interactive Buttons ──
               actionButton:
-                "bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-3.5 py-1.5 rounded-lg transition-colors",
+                "bg-slate-900 text-white font-medium px-3 py-1.5 rounded-md text-xs transition-colors hover:bg-slate-800",
               cancelButton:
-                "bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium px-3.5 py-1.5 rounded-lg transition-colors",
+                "bg-slate-100 text-slate-700 font-medium px-3 py-1.5 rounded-md text-xs transition-colors hover:bg-slate-200",
             },
           }}
         />

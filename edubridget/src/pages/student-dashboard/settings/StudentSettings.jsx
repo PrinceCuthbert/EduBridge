@@ -44,7 +44,7 @@ export default function StudentSettings() {
           phone:       fresh.identity?.phone       || '',
           nationality: fresh.identity?.nationality || '',
           gender:      fresh.identity?.gender      || '',
-          dateOfBirth: fresh.identity?.date_birth  || '',
+          dateOfBirth: fresh.identity?.dob  || '',
           language:    fresh.identity?.language    || '',
           role:        fresh.role                  || 'student',
           status:      fresh.status                || 'Active',

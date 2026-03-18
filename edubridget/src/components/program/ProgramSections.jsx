@@ -217,7 +217,11 @@ export function ProgramTuitionFees({ tuitionFees }) {
                 {rows.map((row, idx) => (
                   <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-4 py-3 text-slate-600">{row.item}</td>
-                    <td className="px-4 py-3 text-slate-900 font-bold text-right tabular-nums">{row.amount}</td>
+                    <td className="px-4 py-3 text-slate-900 font-bold text-right tabular-nums">
+                      {typeof row.amount === 'number'
+                        ? `${row.amount.toLocaleString()} ${row.currency ?? ''}`
+                        : row.amount}
+                    </td>
                   </tr>
                 ))}
               </tbody>

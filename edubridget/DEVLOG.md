@@ -1,6 +1,6 @@
 # EduBridge — Developer Log
-**Last updated:** March 17, 2026
-**Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix)
+**Last updated:** March 19, 2026
+**Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix) · March 17 session 4 (full MVC for CMS content types, UI/UX landing page overhaul, FAQ MVC connection) · March 18 session 5 (DB alignment audit, CMS content architecture decision, hook/page cleanup, bug fixes) · March 18–19 sessions 6–8 (full DB alignment sprint, DashboardLayout consolidation, Institution DTO mapper)
 
 ---
 
@@ -625,3 +625,705 @@ AdminVisaCaseDetails (/admin/visa/:id)       [NEW FILE]
 | Admin route definitions | `src/routes/AdminRoutes.jsx` |
 | Status badge colours | `src/data/mockVisaData.js` → `VISA_STATUS_CONFIG` |
 | Program majors / join table | `src/data/mockMajors.js` |
+
+---
+
+---
+
+## Session 4 — March 17, 2026
+
+### Part 8 — Full MVC for CMS Content Types + Landing Page UI Overhaul + FAQ MVC
+
+This session completed the MVC architecture for all remaining content types, overhauled the landing page UI/UX to be more interactive and modern, fixed the CMS tab nav responsiveness, and connected the FAQ section on ContactPage to the admin CMS via a persistent service layer.
+
+---
+
+#### 8a. Landing Page — Hero Wave & Video Loop Removed
+
+**File:** `src/pages/home/pages/Hero.jsx`
+
+The hero section had a curved SVG wave divider at the bottom and a background video that stuttered at the loop point. Both were removed:
+- SVG wave `<div>` (with gradient `<path>`) deleted entirely
+- Background video is a known issue (requires video re-encoding for seamless loop) — not fixable in code
+
+---
+
+#### 8b. New Animated Stats Bar
+
+**New file:** `src/pages/home/pages/StatsBar.jsx`
+**Updated:** `src/pages/home/LandingPage.jsx`
+
+A new stats section placed directly below the hero shows 4 animated counters that trigger when scrolled into view:
+
+| Stat | Value |
+|------|-------|
+| Students Enrolled | 10,000+ |
+| Countries Reached | 25+ |
+| Visa Success Rate | 98% |
+| Years Experience | 10+ |
+
+Uses `useInView` + `requestAnimationFrame` with easeOutExpo easing. Numbers ≥ 1000 are formatted as `Xk`.
+
+---
+
+#### 8c. Landing Page — WhyChoose & AcademicServices Redesign
+
+**Files:** `src/pages/home/pages/WhyChoose.jsx`, `src/pages/home/pages/AcademicServices.jsx`
+
+Both sections were rewritten to remove the `useCMSManager`/`FeatureGrid`/`FeatureCard` dependency. The new versions use:
+- Inline data arrays with per-item icon, color, and background
+- framer-motion `whileInView` scroll-triggered animations with staggered delays (`i * 0.1s`)
+- `whileHover={{ y: -6, boxShadow: "..." }}` lift effect
+- Pill badges ("Why EduBridge", "What We Offer")
+- Colored icon backgrounds (blue, emerald, amber, purple, rose, teal)
+
+---
+
+#### 8d. New Testimonials Carousel (Dark Theme)
+
+**File:** `src/pages/home/pages/Testimonials.jsx` (rewritten)
+
+Replaced the previous testimonials section with a dark navy auto-scrolling carousel:
+- Background: `bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900`
+- Auto-advances every 4 seconds, pauses on hover (`onMouseEnter/Leave`)
+- `AnimatePresence` with slide-in (`x: 60`) / slide-out (`x: -60`) transition
+- Arrow nav buttons (left/right), dot indicators (active: `w-8 bg-amber-400`, inactive: `w-2 bg-white/30`)
+- 5 testimonials: Jane M. (Kenya), Samuel O. (Nigeria), Ms. Amina B. (Tanzania), David K. (Uganda), Grace N. (Rwanda)
+
+---
+
+#### 8e. New Gallery Teaser Section
+
+**New file:** `src/pages/home/pages/GalleryTeaser.jsx`
+**Updated:** `src/pages/home/LandingPage.jsx`
+
+A masonry grid showing the first 6 items from `MOCK_MEDIA` (linked to `/gallery` for full view):
+- 3-column CSS `columns` masonry layout
+- Hover overlay with student name, country (MapPin icon), program (GraduationCap icon)
+- Scroll-triggered staggered animations (`delay: i * 0.08`)
+- "View All Stories" link to `/gallery`
+
+**Updated `LandingPage.jsx` section order:**
+Hero → StatsBar → Partners → WhyChoose → AcademicServices → GalleryTeaser → Testimonials → CallToAction
+
+---
+
+#### 8f. Full MVC for 4 Content Types
+
+**Problem:** `CMSScholarships`, `CMSPosts`, and `CMSMedia` all used `useCMSManager` which only mutated in-memory arrays — admin changes were lost on page refresh. `BranchesPage` read from a static import. `ScholarshipsPage` and `BlogPage` fetched from `BASE_URL/scholarships` and `BASE_URL/blogs` — endpoints that don't exist.
+
+**New Model layer (4 service files):**
+
+| File | Storage Key | Seed Data |
+|------|-------------|-----------|
+| `src/services/scholarshipService.js` | `edubridge_scholarships` | `MOCK_SCHOLARSHIPS` |
+| `src/services/postService.js` | `edubridge_posts` | `MOCK_BLOGS` |
+| `src/services/mediaService.js` | `edubridge_media` | `MOCK_MEDIA` |
+| `src/services/branchService.js` | `edubridge_branches` | `branches` from `branches.js` (full schema with coordinates) |
+
+Each service follows the `programService.js` pattern: `_read()` with DEV-only seeding, `_save()`, async CRUD (`get`, `getById`, `create`, `update`, `delete`).
+
+**New Controller layer (8 hooks):**
+
+| Hook | Purpose |
+|------|---------|
+| `useScholarships` | Public read for ScholarshipsPage |
+| `useAdminScholarships` | Admin CRUD with toast feedback |
+| `usePosts` | Public read for BlogPage |
+| `useAdminPosts` | Admin CRUD with toast feedback |
+| `useMedia` | Public read for GalleryPage |
+| `useAdminMedia` | Admin CRUD with toast feedback |
+| `useBranches` (updated) | Replaced in-memory module variable with `branchService` localStorage calls |
+| `useFAQQuestions` | Public read + admin CRUD for FAQ items on ContactPage |
+
+**Updated CMS pages (admin):**
+- `CMSScholarships.jsx` — now uses `useAdminScholarships` (add/edit/remove persisted to localStorage)
+- `CMSPosts.jsx` — now uses `useAdminPosts`
+- `CMSMedia.jsx` — now uses `useAdminMedia`, shows loading skeleton
+
+**Updated public pages:**
+- `ScholarshipsPage.jsx` — replaced `fetch(BASE_URL/scholarships)` with `useScholarships()` hook
+- `BlogPage.jsx` — replaced `fetch(BASE_URL/blogs)` with `usePosts()` hook
+- `GalleryPage.jsx` — replaced static `MOCK_MEDIA` import with `useMedia()` hook
+- `BranchesPage.jsx` — replaced static `branches` import with `useBranches()` hook; selectedBranch initialised via `useEffect` once data loads; loading spinner while branches fetch
+
+---
+
+#### 8g. ContentManagement Tab Nav — Responsiveness Fix
+
+**File:** `src/pages/admin-dashboard/cms/ContentManagement.jsx`
+
+The 6-tab nav (`flex space-x-8`) overflowed on small screens with no scroll or wrap.
+
+**Fix:** Changed to `flex overflow-x-auto scrollbar-none` with `whitespace-nowrap flex-shrink-0` on each tab link. Tabs now horizontally scroll on mobile instead of overflowing. Short-form tab labels shown on very small screens (`xs:` breakpoint).
+
+---
+
+#### 8h. FAQ MVC Connection — CMSPollQuestions → ContactPage
+
+**New file:** `src/services/faqService.js`
+**New hook:** `src/hooks/useFAQQuestions.js`
+**Updated:** `src/pages/admin-dashboard/cms/CMSPollQuestions.jsx`, `src/pages/contact/contactPage.jsx`
+
+The FAQ section on ContactPage previously read from a static array in `faqData.js` — admin edits had no effect.
+
+**Architecture:**
+```
+Admin (CMSPollQuestions FAQ Manager tab)
+  → useFAQQuestions.add/edit/remove()
+      → faqService.createFAQ/updateFAQ/deleteFAQ()
+          → localStorage: "edubridge_faqs"
+              ↑ seeded from faqData.js on first load
+
+ContactPage
+  → useFAQQuestions.faqs (read)
+      → faqService.getFAQs()
+          → localStorage: "edubridge_faqs"
+```
+
+**CMSPollQuestions** now has two sub-tabs:
+1. **FAQ Manager** (default) — add/edit/delete Q&A pairs that appear live on ContactPage
+2. **Poll Questions** — existing program-specific assessment questions (unchanged)
+
+**ContactPage** now uses `const { faqs } = useFAQQuestions()` — live data instead of static import.
+
+---
+
+### Architecture — Updated (after Session 4)
+
+```
+src/
+├── services/                    ← MODEL
+│   ├── userService.js
+│   ├── applicationService.js
+│   ├── visaService.js
+│   ├── programService.js
+│   ├── scholarshipService.js    ← NEW
+│   ├── postService.js           ← NEW
+│   ├── mediaService.js          ← NEW
+│   ├── branchService.js         ← NEW
+│   └── faqService.js            ← NEW
+│
+├── hooks/                       ← CONTROLLER
+│   ├── useApplications.js
+│   ├── useVisaConsultations.js
+│   ├── useAdminVisaCases.js
+│   ├── usePrograms.js
+│   ├── useDashboard.js
+│   ├── useBranches.js           ← UPDATED (localStorage-backed)
+│   ├── useScholarships.js       ← NEW
+│   ├── useAdminScholarships.js  ← NEW
+│   ├── usePosts.js              ← NEW
+│   ├── useAdminPosts.js         ← NEW
+│   ├── useMedia.js              ← NEW
+│   ├── useAdminMedia.js         ← NEW
+│   └── useFAQQuestions.js       ← NEW
+│
+└── pages/                       ← VIEW
+    ├── home/pages/
+    │   ├── Hero.jsx             (wave removed)
+    │   ├── StatsBar.jsx         ← NEW
+    │   ├── WhyChoose.jsx        (rewritten with framer-motion)
+    │   ├── AcademicServices.jsx (rewritten with framer-motion)
+    │   ├── Testimonials.jsx     (rewritten — dark carousel)
+    │   └── GalleryTeaser.jsx    ← NEW
+    ├── admin-dashboard/cms/
+    │   ├── ContentManagement.jsx (tab nav fixed — scrollable)
+    │   ├── CMSScholarships.jsx   (useAdminScholarships)
+    │   ├── CMSPosts.jsx          (useAdminPosts)
+    │   ├── CMSMedia.jsx          (useAdminMedia)
+    │   └── CMSPollQuestions.jsx  (FAQ Manager + Poll Questions sub-tabs)
+    ├── scholarships/ScholarshipsPage.jsx  (useScholarships)
+    ├── blog/BlogPage.jsx                  (usePosts)
+    ├── gallery/GalleryPage.jsx            (useMedia)
+    ├── branches/BranchesPage.jsx          (useBranches)
+    └── contact/contactPage.jsx            (useFAQQuestions)
+```
+
+---
+
+## Session 5 — March 18, 2026
+
+### DB Alignment Audit (Real ERD)
+
+Reviewed the actual EDUBRIDGE DATABASE SCHEMA ERD. Updated the alignment score from the vague "60%" claimed previously to an honest **~45%**.
+
+Key findings:
+
+- The core academic flow (USER → IDENTITY → APPLICATION_TRACKER → DEPARTMENT_MAJOR_APPLICATION) has reasonable frontend coverage but with field-level mismatches.
+- `USER.id` was `"USR-001"` (string) — DB uses integer PKs. Decided to switch to **UUIDs** going forward.
+- `IDENTITY.dob` was named `date_birth` in mock data — renamed to align.
+- `USER` had a denormalized `role` field — DB has a separate `ROLE` table with no direct FK on USER. To be aligned progressively.
+- The APPLICATION table in DB is **finance-only** (fees). The frontend `MOCK_UNIFIED_APPLICATIONS` is a DTO that joins APPLICATION_TRACKER + IDENTITY + INSTITUTION — which is correct architecture for a read model, but not the same shape as the raw table.
+
+Full field-level mismatch table documented in the audit above this session.
+
+---
+
+### Architecture Decision — CMS Content Goes to a Headless CMS
+
+**Problem identified:** In Session 4 we gave Blog posts, Scholarships, Testimonials/Media, Branches, FAQ items, and Library resources a full localStorage-backed MVC layer (service file + hook file). This was over-engineered and wrong for what these features actually are.
+
+**Why it was wrong:** These content types do not belong in the application database at all:
+
+- They are marketing/informational content — they change on editorial schedules, not business logic schedules.
+- They have no relational integrity requirements with USER, APPLICATION, or any other core table.
+- The real DB ERD (reviewed this session) has zero tables for any of them, confirming they are out of scope for the backend.
+- Persisting them to localStorage gave a false sense of "working" persistence — any real deployment would start empty and the admin edits would be invisible to other users.
+
+**Decision:** Use a **headless CMS** (Strapi, Sanity, Contentful, or similar) for this content when the backend is built. Until then, read from static mock data files — no fake persistence.
+
+---
+
+### What Was Deleted
+
+The following 12 files were removed entirely:
+
+**Service files (Model layer) — deleted:**
+
+- `src/services/scholarshipService.js`
+- `src/services/postService.js`
+- `src/services/mediaService.js`
+- `src/services/branchService.js`
+- `src/services/faqService.js`
+
+**Hook files (Controller layer) — deleted:**
+
+- `src/hooks/useScholarships.js`
+- `src/hooks/useAdminScholarships.js`
+- `src/hooks/usePosts.js`
+- `src/hooks/useAdminPosts.js`
+- `src/hooks/useMedia.js`
+- `src/hooks/useAdminMedia.js`
+- `src/hooks/useFAQQuestions.js`
+
+---
+
+### How Each Feature Now Works
+
+| Feature | Public page reads from | Admin page writes to |
+| --- | --- | --- |
+| Blog / News | `MOCK_BLOGS` (mockData.js) | `useState(MOCK_BLOGS)` — session only |
+| Scholarships | `MOCK_SCHOLARSHIPS` (mockData.js) | `useState(MOCK_SCHOLARSHIPS)` — session only |
+| Gallery / Testimonials | `MOCK_MEDIA` (mockData.js) | `useState(MOCK_MEDIA)` — session only |
+| FAQ | `faqs` (faqData.js) | `MOCK_POLL_QUESTIONS` — session only |
+| Branches (public) | `branches` (branches.js) via `useBranches` | — |
+| Branches (admin) | `useBranches` hook state | `useBranches` — session only |
+
+"Session only" means admin edits are in-memory and reset on page refresh. This is intentional — the real persistence will come from a CMS API call when that is integrated.
+
+---
+
+### useBranches — CRUD Moved Into the Hook
+
+`BranchManagement.jsx` was calling `createBranch`, `updateBranch`, `deleteBranch` from `useBranches`, but the hook only returned static data — those functions were `undefined`.
+
+Fixed by moving all mutation logic into the hook:
+
+- `useBranches` now owns `useState(STATIC_BRANCHES)` and exposes `createBranch`, `updateBranch`, `deleteBranch` with `toast.success` feedback inside.
+- `BranchManagement` became a pure UI component: it handles form state, modal open/close, and the confirmation toast. No try/catch, no async.
+- `BranchesPage` (public) is unaffected — it only destructures `{ branches }`.
+
+---
+
+### BranchesPage — Hook Error Fixed
+
+**Bug:** `Error: Should have a queue. You are likely calling Hooks conditionally.`
+
+**Root cause — two issues in the same file:**
+
+1. `const InteractiveMap = lazy(...)` was placed between `import` statements (line 15, between lines 14 and 16). In ESM, all `import` declarations are hoisted but `const` is not. Vite's HMR saw the module boundary as malformed, corrupting React's fiber hook queue on hot reload.
+
+2. `useState(null)` + `useEffect` to initialize `selectedBranch` from branches was unnecessary extra work. Since `useBranches` returns data synchronously (no async), `branches` is available on the first render.
+
+**Fix:**
+
+- Moved `const InteractiveMap = lazy(...)` to after all `import` statements.
+- Replaced `useState(null)` + `useEffect` with a single lazy initializer: `useState(() => branches.find(b => b.isHeadOffice) ?? branches[0] ?? null)`.
+- Removed `useEffect` and its import.
+- Removed the `loading` variable and the `loading || !selectedBranch` JSX guard (branches are always synchronously available).
+
+---
+
+### CMS Admin Pages — `window.confirm` Replaced with Toast
+
+All delete handlers in `src/pages/admin-dashboard/cms/` were using `window.confirm()` which blocks the JS thread and looks out of place in a modern UI. Replaced with sonner's action toast pattern across all four pages:
+
+```js
+toast('Delete this item?', {
+  action: { label: 'Delete', onClick: () => remove(id) },
+  cancel: { label: 'Cancel', onClick: () => {} },
+});
+```
+
+Files updated: `CMSScholarships.jsx`, `CMSPosts.jsx`, `CMSMedia.jsx`, `CMSPollQuestions.jsx`.
+
+---
+
+### Updated Architecture (after Session 5)
+
+```text
+src/
+├── services/                    ← MODEL (business data only)
+│   ├── userService.js
+│   ├── applicationService.js
+│   ├── visaService.js
+│   └── programService.js
+│
+├── hooks/                       ← CONTROLLER
+│   ├── useApplications.js
+│   ├── useVisaConsultations.js
+│   ├── useAdminVisaCases.js
+│   ├── usePrograms.js
+│   ├── useDashboard.js
+│   └── useBranches.js           (useState + CRUD, seeded from branches.js)
+│
+├── data/                        ← CMS CONTENT (static until headless CMS)
+│   ├── mockData.js              (MOCK_BLOGS, MOCK_SCHOLARSHIPS, MOCK_MEDIA)
+│   ├── mockUsers.js
+│   ├── mockMajors.js
+│   ├── mockVisaData.js
+│   ├── faqData.js
+│   └── branches.js
+│
+└── pages/                       ← VIEW
+    ├── admin-dashboard/cms/
+    │   ├── CMSScholarships.jsx  (useState(MOCK_SCHOLARSHIPS), toast confirm)
+    │   ├── CMSPosts.jsx         (useState(MOCK_BLOGS), toast confirm)
+    │   ├── CMSMedia.jsx         (useState(MOCK_MEDIA), toast confirm)
+    │   └── CMSPollQuestions.jsx (useState(MOCK_POLL_QUESTIONS), no FAQ tab)
+    ├── scholarships/            → reads MOCK_SCHOLARSHIPS directly
+    ├── blog/                    → reads MOCK_BLOGS directly
+    ├── gallery/                 → reads MOCK_MEDIA directly
+    ├── contact/                 → reads faqs from faqData.js directly
+    └── branches/                → reads via useBranches hook
+```
+
+---
+
+## Session 6 — March 18, 2026
+
+### Part A — CMS Admin Pages: useCMSManager Consolidation
+
+**Problem:** Three CMS admin pages (`CMSScholarships`, `CMSPosts`, `CMSMedia`) each had ~30 lines of copy-pasted state + handlers (useState, useMemo, add/edit/remove helpers) while `useCMSManager` — a hook that centralises exactly this logic — sat unused. Only `CMSLibrary` was using it.
+
+**What we did:**
+- Rewrote all three pages to destructure from `useCMSManager(MOCK_DATA, EMPTY, searchKeys)` instead of owning their own state.
+- Removed all inline `useState`, `useMemo`, `toast`, `add/edit/remove` helpers from each file.
+- Removed the `loading ? (...) : (...)` ternary from `CMSMedia` — `loading` was always `false`.
+
+| Page | Hook call | Search keys |
+|------|-----------|-------------|
+| `CMSScholarships` | `useCMSManager(MOCK_SCHOLARSHIPS, EMPTY, ['title', 'location'])` | title, location |
+| `CMSPosts` | `useCMSManager(MOCK_BLOGS, EMPTY, ['title', 'category'])` | title, category |
+| `CMSMedia` | `useCMSManager(MOCK_MEDIA, EMPTY, ['studentName', 'country'])` | studentName, country |
+
+Any future change to delete confirmation UX, tag handling, or submit logic only needs to happen in one place: `src/hooks/useCMSManager.js`.
+
+---
+
+### Part B — SYSTEM_FILES: fileService.js Pattern
+
+**Problem:** Both `CMSMedia` and `CMSLibrary` used `URL.createObjectURL(file)` to handle image/document uploads. This creates a temporary blob URL that:
+- Exists only in the current browser session
+- Cannot be stored in any database
+- Is lost on page refresh
+
+The real DB has a `SYSTEM_FILES` table (`id INT PK`, `file STRING` path, `user_id FK`). Files should be uploaded to the server, which stores them and returns a path like `/uploads/abc123.jpg`.
+
+**What we did:**
+- Created `src/services/fileService.js` — a stub that matches the final API interface today.
+- Both `handleFileUpload` functions in `CMSMedia` and `CMSLibrary` are now `async` and call `uploadFile(file)` from the service.
+- Stub returns `{ id: null, file: blob_url }` — same shape as the real API will return.
+- When the backend is ready: swap only the body of `uploadFile()` in `fileService.js`. No component changes needed.
+
+```js
+// fileService.js stub (dev)
+export async function uploadFile(file) {
+  await new Promise(r => setTimeout(r, 200));
+  return { id: null, file: URL.createObjectURL(file) };
+}
+
+// fileService.js real (when backend is live — only this changes)
+export async function uploadFile(file) {
+  const body = new FormData();
+  body.append('file', file);
+  const res = await fetch('/api/files', { method: 'POST', body,
+    headers: { Authorization: `Bearer ${getToken()}` } });
+  if (!res.ok) throw new Error('Upload failed');
+  return res.json(); // { id: 42, file: '/uploads/2026/03/abc123.jpg' }
+}
+```
+
+---
+
+### Part C — DB Alignment: USER + IDENTITY Tables
+
+**This was the main alignment sprint.** Previous score was ~45%. Target: bring USER and IDENTITY to full alignment.
+
+#### USER table — changes made
+
+| Field | Before | After | Notes |
+|-------|--------|-------|-------|
+| `id` | `"USR-001"` (string) | UUID `"00000000-0000-0000-0000-000000000001"` | Architectural decision: UUIDs over DB auto-increment |
+| `username` | missing | `email.split("@")[0]` fallback | DB requires username column |
+| `salt` | missing | `null` | Backend concern — acknowledged |
+| `created_at` | missing | ISO timestamp | Seeded in mock, set on `registerUser` |
+| `updated_at` | missing | ISO timestamp | Set on every `updateUser` and `updatePassword` call |
+| `permissions` | missing | `["all"]` / `["view_own_app", "submit_app"]` | Seeded per role; ROLE_PERMISSION table when backend live |
+
+**Stable seed UUIDs added to mockUsers.js:**
+```js
+export const SEED_USER_IDS = {
+  ADMIN:   "00000000-0000-0000-0000-000000000001",
+  STUDENT: "00000000-0000-0000-0000-000000000002",
+};
+```
+
+#### IDENTITY table — changes made
+
+| Field | Before | After | Notes |
+|-------|--------|-------|-------|
+| `id` | missing | UUID per identity row | Added to each identity object |
+| `user_id` | missing | `userId` from parent | FK back to USER |
+| `dob` | `date_birth` | `dob` | Renamed in mockUsers.js, userService.js, AdminSettings, StudentSettings, UserManagement |
+| `language` | missing | `"English"` default | DB column |
+| `id_document` | missing | `null` | FK → SYSTEM_FILES — placeholder |
+| camelCase keys | inconsistent | `firstName`, `lastName` kept camelCase | JS convention; service layer translates to `first_name`/`last_name` on real API call |
+
+**Note on `phone`:** `identity.phone` exists in the frontend but has no column in the DB IDENTITY table. You must add `phone VARCHAR(20)` to the IDENTITY table before running migrations.
+
+#### mockVisaData.js — linked to new UUIDs
+
+All 4 visa records had `userId: "USR-002"` — updated to `"00000000-0000-0000-0000-000000000002"` to stay linked to John Doe after the ID migration.
+
+#### Files changed in this alignment:
+
+| File | Change |
+|------|--------|
+| `src/data/mockUsers.js` | Full rewrite — UUID IDs, SEED_USER_IDS export, all new fields |
+| `src/services/userService.js` | Full rewrite — uuid import, registerUser/loginWithGoogleToken/updateUser all aligned |
+| `src/data/mockVisaData.js` | 4 × `userId: "USR-002"` → UUID |
+| `src/pages/admin-dashboard/AdminSettings.jsx` | `identity?.date_birth` → `identity?.dob` |
+| `src/pages/student-dashboard/settings/StudentSettings.jsx` | `identity?.date_birth` → `identity?.dob` |
+| `src/pages/admin-dashboard/users/UserManagement.jsx` | `identity?.date_birth` → `identity?.dob` (2 occurrences) |
+
+---
+
+### Part D — Auth: Login with Email or Username + Permissions
+
+#### Email OR username login
+
+`loginUser` was updated to accept an `identifier` parameter that is matched against both `user.email` and `user.username`:
+
+```js
+// userService.js
+const user = users.find(u =>
+  u.email.toLowerCase()    === identifier.toLowerCase() ||
+  u.username?.toLowerCase() === identifier.toLowerCase()
+);
+```
+
+This mirrors the SQL query the backend will run:
+```sql
+SELECT * FROM user WHERE email = ? OR username = ?
+```
+
+`SignInPage.jsx` — the email input field was renamed to an `identifier` field (`type="text"`, label "Email or Username"). Demo quick-fill buttons also updated.
+
+`AuthContext.jsx` — `login({ email, password })` → `login({ identifier, password })` — the parameter rename makes the intent explicit.
+
+#### hasPermission added to AuthContext
+
+```js
+const hasPermission = useCallback((permissionName) => {
+  if (!user) return false;
+  const perms = user.permissions ?? DEFAULT_ROLE_PERMISSIONS[user.role?.toLowerCase()] ?? [];
+  return perms.includes('all') || perms.includes(permissionName);
+}, [user, DEFAULT_ROLE_PERMISSIONS]);
+```
+
+- Falls back to `DEFAULT_ROLE_PERMISSIONS` so existing sessions without a `permissions` array still work.
+- When the backend is live, `user.permissions` comes from the `ROLE_PERMISSION` table via JWT — same code, no component changes.
+- `hasPermission` is exposed on the context and available in every hook/component via `useAuth()`.
+- **Existing components are not changed** — `isAdmin` / `isStudent` still handle coarse route-level access. `hasPermission` is opt-in for fine-grained control, and will be used when a `staff` role is introduced.
+
+---
+
+### Updated DB Alignment Score — March 18, 2026
+
+| DB Table | Before Session 5 | After Session 6 | Key delta |
+|----------|-----------------|-----------------|-----------|
+| USER | 70% | **90%** | UUID IDs, username, salt, timestamps, permissions |
+| IDENTITY | 65% | **90%** | dob, id, user_id, id_document, language — all added |
+| ROLE | 80% | **85%** | staff role added, description is frontend-only extra |
+| PERMISSION | 0% | **40%** | `hasPermission()` + `DEFAULT_ROLE_PERMISSIONS` stub |
+| ROLE_PERMISSION | 0% | **40%** | default mappings per role seeded in AuthContext |
+| SYSTEM_FILES | 35% | **55%** | `fileService.js` with matching `{ id, file }` shape; `id_document` FK noted on identity |
+| APPLICATION_TRACKER | 60% | 60% | unchanged |
+| FEES | 40% | 40% | string amounts vs float columns — not yet fixed |
+| MAJOR | 70% | 70% | unchanged |
+| INSTITUTION | 30% | 30% | universityName/location shape mismatch — not yet fixed |
+| APPLICATION (finance) | 25% | 25% | unchanged |
+| APPLICATION_SCHEDULE | 0% | 0% | no frontend equivalent |
+| MAJOR_APPSCHEDULE | 0% | 0% | no frontend equivalent |
+| DEPT_MAJOR_APP_TRACKER | 0% | 0% | join table — no frontend equivalent |
+
+**Overall: ~45% → ~55%** (+10 points this session)
+
+The 10-point gain came entirely from the USER/IDENTITY/auth layer which was the biggest realistic blocker for backend integration. The remaining gap is dominated by zero-coverage DB tables (APPLICATION_SCHEDULE, join tables) and type mismatches in the fees/institution areas.
+
+---
+
+### What Remains (Prioritised)
+
+| # | Task | Tables affected | Effort |
+|---|------|-----------------|--------|
+| 1 | INSTITUTION: rename `universityName` → `name`, fix `location` shape | INSTITUTION | Medium |
+| 2 | APPLICATION FEES: change string amounts to float in mock data + applicationService | FEES | Small |
+| 3 | Visa request IDs: `"VR-001"` → UUID format | VISA_REQUEST (future table) | Small |
+| 4 | Application IDs: `"APP-xxx"` → UUID format | APPLICATION_TRACKER | Small |
+| 5 | APPLICATION_SCHEDULE: add scheduling concept to frontend | APPLICATION_SCHEDULE | Large |
+| 6 | Use `hasPermission()` in at least one real component (staff role guard) | ROLE_PERMISSION | Medium |
+| 7 | Add `phone VARCHAR(20)` to DB IDENTITY table | IDENTITY | DB migration |
+
+---
+
+## Session 7 — March 18, 2026
+
+### DB Alignment: INSTITUTION + FEES + ID formats
+
+This session addressed the top three remaining alignment items from the Session 6 "What Remains" table.
+
+---
+
+#### Part A — INSTITUTION: `universityName` → `name` + `representative_id`
+
+**Files changed:** `src/data/mockData.js`, `src/services/programService.js`, and 7 component files.
+
+**Problem:** The DB INSTITUTION table has `name` as its primary identifier column. Every program record in `MOCK_PROGRAMS` used `universityName` — a frontend-invented field name that would silently mismatch when API responses arrive with `name`.
+
+**Changes in `mockData.js`:**
+- `universityName` renamed to `name` in all 3 `MOCK_PROGRAMS` records
+- `representative_id: null` added to each program (FK → USER table — the staff contact responsible for this institution)
+
+**Changes in `programService.js`:**
+- `createProgram` now explicitly sets `representative_id: data.representative_id ?? null` on new records
+
+**Component updates (read `program.name` instead of `program.universityName`):**
+
+| File | What changed |
+|------|-------------|
+| `AdminProgramDetail.jsx` | `formData.name` (all 5 occurrences) |
+| `ProgramDetail.jsx` | `program.name` (all 4 occurrences) |
+| `UniversityCard.jsx` | `university.name` |
+| `UniversityPrograms.jsx` | column accessor + display + filter |
+| `UniversityProgramDetailsPreview.jsx` | alt + display |
+| `CMSPollQuestions.jsx` | option display + inline badge |
+| `ApplicationSubmitForm.jsx` | dropdown display (`p.name`) + DTO population (`selectedProgram?.name`) |
+
+**Note:** `programDetails.universityName` in the application DTO (`applicationService.js`, `MOCK_UNIFIED_APPLICATIONS`) is **kept as-is** — it is a descriptive frontend read-model alias, not the raw DB column name, and renaming it would touch every application display component without backend benefit.
+
+---
+
+#### Part B — FEES: Numeric amounts + currency field
+
+**Files changed:** `src/data/mockData.js`, `src/components/program/ProgramSections.jsx`, `src/pages/shared/AdminProgramDetail.jsx`
+
+**Problem:** `tuitionFees[].amount` was stored as a formatted string (`"300,000 KRW"`) — the DB `amount` column is `FLOAT`. String amounts cannot be sorted, compared, or aggregated on the backend.
+
+**Changes in `mockData.js`:**
+All `tuitionFees` rows in all 3 programs updated:
+```js
+// Before:
+{ level: "Bachelor's", item: "Entrance Fee", amount: "300,000 KRW" }
+
+// After:
+{ level: "Bachelor's", item: "Entrance Fee", amount: 300000, currency: "KRW" }
+```
+
+**Changes in `ProgramSections.jsx` (`ProgramTuitionFees`):**
+Amount cell now formats the number:
+```jsx
+{typeof row.amount === 'number'
+  ? `${row.amount.toLocaleString()} ${row.currency ?? ''}`
+  : row.amount}  // fallback for any legacy string values
+```
+
+**Changes in `AdminProgramDetail.jsx`:**
+- Default new fee row: `{ level: "Bachelor's", item: "", amount: 0, currency: "KRW" }`
+- Amount input changed from `type="text"` → `type="number"`, stores `Number(e.target.value)`
+- Added `currency` select dropdown (KRW / USD / EUR / GBP) next to amount field
+
+---
+
+#### Part C — ID Formats: Visa requests + Application tracker IDs → UUID
+
+**Files changed:** `src/data/mockVisaData.js`, `src/services/visaService.js`, `src/services/applicationService.js`
+
+**Problem:** New visa and application records were generated with timestamp-based IDs (`VR-${Date.now()}`, `APP-${Date.now()}`). Seed data used `VR-001` notation. The backend will use UUIDs for all PKs.
+
+**Visa changes:**
+
+Added `SEED_VISA_IDS` export to `mockVisaData.js` (same pattern as `SEED_USER_IDS`):
+```js
+export const SEED_VISA_IDS = {
+  VR001: "20000000-0000-0000-0000-000000000001",
+  VR002: "20000000-0000-0000-0000-000000000002",
+  VR003: "20000000-0000-0000-0000-000000000003",
+  VR004: "20000000-0000-0000-0000-000000000004",
+};
+```
+
+All 4 `MOCK_VISA_REQUESTS` records updated to use `SEED_VISA_IDS.VR00x`.
+
+`visaService.js` — `createVisaRequest` now generates:
+```js
+id: uuidv4(),  // was: `VR-${Date.now()}-${Math.random()...}`
+```
+
+**Application changes:**
+
+`applicationService.js` — removed `generateId()` helper, replaced with:
+```js
+import { v4 as uuidv4 } from "uuid";
+// createApplication:
+trackerId: uuidv4(),  // was: generateId() → `APP-${Date.now()}-${Math.floor(...)}`
+```
+
+Seed data `MOCK_UNIFIED_APPLICATIONS` track IDs (`APP-1771461317295-608`, `APP-2024-001`) are left unchanged — they are demo data and will be replaced by real UUIDs when the backend is live.
+
+---
+
+### Updated DB Alignment Score — March 18, 2026 (Session 7)
+
+| DB Table | Session 6 | Session 7 | Key delta |
+|----------|-----------|-----------|-----------|
+| USER | 90% | 90% | unchanged |
+| IDENTITY | 90% | 90% | unchanged |
+| ROLE | 85% | 85% | unchanged |
+| PERMISSION | 40% | 40% | unchanged |
+| ROLE_PERMISSION | 40% | 40% | unchanged |
+| SYSTEM_FILES | 55% | 55% | unchanged |
+| APPLICATION_TRACKER | 60% | **70%** | trackerId now UUID |
+| FEES | 40% | **65%** | amount → FLOAT, currency field added |
+| MAJOR | 70% | 70% | unchanged |
+| INSTITUTION | 30% | **75%** | `name` aligned, `representative_id` added |
+| APPLICATION (finance) | 25% | 25% | unchanged |
+| APPLICATION_SCHEDULE | 0% | 0% | no frontend equivalent |
+| MAJOR_APPSCHEDULE | 0% | 0% | no frontend equivalent |
+| DEPT_MAJOR_APP_TRACKER | 0% | 0% | join table — no frontend equivalent |
+
+**Overall: ~55% → ~62%** (+7 points this session)
+
+---
+
+### What Remains (Updated)
+
+| # | Task | Tables affected | Effort |
+|---|------|-----------------|--------|
+| 1 | APPLICATION_SCHEDULE: add scheduling concept to frontend | APPLICATION_SCHEDULE | Large |
+| 2 | Use `hasPermission()` in at least one real component (staff role guard) | ROLE_PERMISSION | Medium |
+| 3 | APPLICATION (finance): wire fee fields to APPLICATION_TRACKER on submit | APPLICATION | Medium |
+| 4 | Add `phone VARCHAR(20)` to DB IDENTITY table | IDENTITY | DB migration |
+

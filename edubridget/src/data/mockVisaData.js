@@ -88,10 +88,18 @@ export const getCountryFlag = (code) => {
 //  Shape matches the database APPLICATION table:
 //    id, userId, status, submissionDate, ...visa-specific fields
 // ─────────────────────────────────────────────────────────────
+// Stable seed UUIDs — same pattern as SEED_USER_IDS in mockUsers.js
+export const SEED_VISA_IDS = {
+  VR001: "20000000-0000-0000-0000-000000000001",
+  VR002: "20000000-0000-0000-0000-000000000002",
+  VR003: "20000000-0000-0000-0000-000000000003",
+  VR004: "20000000-0000-0000-0000-000000000004",
+};
+
 export const MOCK_VISA_REQUESTS = [
   {
-    id: "VR-001",
-    userId: "USR-002", // links to USER table
+    id: SEED_VISA_IDS.VR001,
+    userId: "00000000-0000-0000-0000-000000000002", // links to USER table
     // ── Form fields (from VisaRequestForm) ──
     fullName: "John Kariuki",
     email: "john.k@email.com",
@@ -115,8 +123,8 @@ export const MOCK_VISA_REQUESTS = [
     adminNotes: "",
   },
   {
-    id: "VR-002",
-    userId: "USR-002",
+    id: SEED_VISA_IDS.VR002,
+    userId: "00000000-0000-0000-0000-000000000002",
     fullName: "John Kariuki",
     email: "john.k@email.com",
     phone: "+254 712 000 001",
@@ -137,8 +145,8 @@ export const MOCK_VISA_REQUESTS = [
     adminNotes: "All documents verified.",
   },
   {
-    id: "VR-003",
-    userId: "USR-002",
+    id: SEED_VISA_IDS.VR003,
+    userId: "00000000-0000-0000-0000-000000000002",
     fullName: "John Kariuki",
     email: "john.k@email.com",
     phone: "+254 712 000 001",
@@ -160,8 +168,8 @@ export const MOCK_VISA_REQUESTS = [
   },
   // ── Extra records (other students — visible to admin only) ──
   {
-    id: "VR-004",
-    userId: "USR-002",
+    id: SEED_VISA_IDS.VR004,
+    userId: "00000000-0000-0000-0000-000000000002",
     fullName: "Sarah Wanjiku",
     email: "sarah.w@email.com",
     phone: "+254 722 000 002",

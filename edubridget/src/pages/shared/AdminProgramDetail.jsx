@@ -32,7 +32,7 @@ export default function AdminProgramDetail() {
   } = usePrograms(false);
 
   const [formData, setFormData] = useState({
-    universityName: "",
+    name: "",
     visaType: "D-2",
     tags: [],
     country: "",
@@ -65,7 +65,7 @@ export default function AdminProgramDetail() {
   useEffect(() => {
     if (!fetchedProgram) return;
     setFormData({
-      universityName: fetchedProgram.universityName ?? "",
+      name: fetchedProgram.name ?? "",
       visaType: fetchedProgram.visaType ?? "D-2",
       country: fetchedProgram.country ?? "",
       location: fetchedProgram.location ?? "",
@@ -166,7 +166,7 @@ export default function AdminProgramDetail() {
       ...prev,
       tuitionFees: [
         ...(prev.tuitionFees || []),
-        { level: "Bachelor's", item: "", amount: "" },
+        { level: "Bachelor's", item: "", amount: 0, currency: "KRW" },
       ],
     }));
   };
@@ -281,9 +281,9 @@ export default function AdminProgramDetail() {
                 <label className={labelClassName}>University Name</label>
                 <input
                   type="text"
-                  value={formData.universityName}
+                  value={formData.name}
                   onChange={(e) =>
-                    setFormData({ ...formData, universityName: e.target.value })
+                    setFormData({ ...formData, name: e.target.value })
                   }
                   className={inputClassName}
                   placeholder="Enter official university name..."
@@ -693,7 +693,7 @@ export default function AdminProgramDetail() {
                   style={{ display: formData.logo ? "none" : "flex" }}
                   className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 items-center justify-center">
                   <span className="text-white text-2xl font-bold select-none">
-                    {(formData.universityName || "U")
+                    {(formData.name || "U")
                       .split(" ")
                       .filter(Boolean)
                       .slice(0, 2)
@@ -752,8 +752,8 @@ export default function AdminProgramDetail() {
               </button>
             }>
             {formData.tuitionFees?.length > 0 && (
-              <div className="hidden sm:grid grid-cols-[160px_1fr_160px_40px] gap-2 mb-2 px-1">
-                {["Level", "Item", "Amount", ""].map((h) => (
+              <div className="hidden sm:grid grid-cols-[160px_1fr_160px_80px_40px] gap-2 mb-2 px-1">
+                {["Level", "Item", "Amount", "Currency", ""].map((h) => (
                   <span
                     key={h}
                     className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
@@ -807,21 +807,37 @@ export default function AdminProgramDetail() {
                       />
                     </div>
                   </div>
-                  {/* Amount + delete */}
+                  {/* Amount + Currency + delete */}
                   <div className="flex items-center gap-2">
                     <div className="flex-1">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">
                         Amount
                       </span>
                       <input
-                        type="text"
-                        placeholder="e.g. 2,500,000 KRW"
+                        type="number"
+                        min={0}
+                        placeholder="e.g. 2500000"
                         value={fee.amount}
                         onChange={(e) =>
-                          updateTuitionFee(idx, "amount", e.target.value)
+                          updateTuitionFee(idx, "amount", Number(e.target.value))
                         }
                         className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none"
                       />
+                    </div>
+                    <div className="w-24">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">
+                        Currency
+                      </span>
+                      <select
+                        value={fee.currency ?? "KRW"}
+                        onChange={(e) =>
+                          updateTuitionFee(idx, "currency", e.target.value)
+                        }
+                        className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none">
+                        {["KRW", "USD", "EUR", "GBP"].map((c) => (
+                          <option key={c}>{c}</option>
+                        ))}
+                      </select>
                     </div>
                     <button
                       onClick={() => removeTuitionFee(idx)}

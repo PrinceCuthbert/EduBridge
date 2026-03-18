@@ -16,6 +16,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { MOCK_VISA_REQUESTS } from "../data/mockVisaData";
+import { v4 as uuidv4 } from "uuid";
 
 const STORAGE_KEY = "edubridge_visa_requests";
 
@@ -115,7 +116,7 @@ export const createVisaRequest = async (formData, userId) => {
     notes: formData.notes ?? "",
 
     // ── System-generated (never from form) ──
-    id: `VR-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    id: uuidv4(),
     userId,
     status: "New",
     submissionDate: new Date().toISOString().split("T")[0],
