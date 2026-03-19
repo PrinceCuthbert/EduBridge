@@ -431,15 +431,34 @@
     "float_success": "Taux de Réussite"
   },
   "why_choose": {
-    "title": "Pourquoi choisir TM EduBridge ?",
-    "subtitle": "Nous fournissons des services éducatifs complets adaptés aux étudiants d'Afrique de l'Est poursuivant des opportunités locales et internationales.",
+    "badge": "Pourquoi EduBridge",
+    "title": "Pourquoi Choisir EduBridge ?",
+    "subtitle": "Vivez une éducation conçue pour l'apprenant africain moderne",
     "features": {
-      "expert": { "title": "Instruction Experte", "desc": "Apprenez auprès d'instructeurs qualifiés ayant des années d'expérience dans l'enseignement." },
-      "resources": { "title": "Ressources Complètes", "desc": "Accédez à notre vaste bibliothèque numérique avec des ebooks, journaux et examens passés." },
-      "live": { "title": "Classes en Direct", "desc": "Cours en ligne interactifs avec un soutien en temps réel." },
-      "certs": { "title": "Certificats", "desc": "Obtenez des certificats reconnus à la fin du cours." },
-      "community": { "title": "Soutien Communautaire", "desc": "Rejoignez une communauté dynamique d'apprenants et de professionnels." },
-      "regional": { "title": "Présence Régionale", "desc": "Avec des bureaux partout en Afrique de l'Est, nous sommes proches de vous." }
+      "educators": {
+        "title": "Apprenez auprès des Meilleurs Éducateurs d'Afrique de l'Est",
+        "desc": "Enseignement expert de la part d'universitaires et de leaders industriels reconnus"
+      },
+      "resources": {
+        "title": "Ressources Numériques de Classe Mondiale",
+        "desc": "Accédez à des matériaux d'apprentissage de pointe à tout moment, n'importe où"
+      },
+      "classes": {
+        "title": "Cours Interactifs en Direct",
+        "desc": "Engagement en temps réel avec des instructeurs et des pairs à travers le continent"
+      },
+      "certificates": {
+        "title": "Certificats Reconnus Mondialement",
+        "desc": "Des accréditations qui ouvrent des portes aux opportunités dans le monde entier"
+      },
+      "community": {
+        "title": "Communauté Étudiante Dynamique",
+        "desc": "Rejoignez des milliers d'apprenants ambitieux qui construisent l'avenir de l'Afrique"
+      },
+      "excellence": {
+        "title": "Excellence d'Afrique de l'Est",
+        "desc": "Curriculum adapté aux opportunités et défis régionaux"
+      }
     }
   },
   "services": {
@@ -542,6 +561,7 @@
       "success_rate": "Taux de Réussite"
     },
     "services": {
+      "badge": "Ce Que Nous Offrons",
       "title": "Nos Services Académiques",
       "subtitle": "Votre solution unique pour l'excellence académique",
       "items": {
@@ -572,8 +592,16 @@
       }
     },
     "testimonials": {
+      "badge": "Témoignages d'Étudiants",
       "title": "Ce Que Disent Nos Apprenants",
-      "subtitle": "Écoutez les étudiants et les éducateurs de toute l'Afrique qui ont bénéficié de TM EduBridge."
+      "subtitle": "Écoutez les étudiants et les éducateurs de toute l'Afrique qui ont bénéficié de TM EduBridge.",
+      "reviews": {
+        "jane_m":   { "name": "Jane M.",      "location": "Kenya",     "text": "TM EduBridge a transformé mon expérience d'apprentissage. J'ai réussi mes examens nationaux avec brio !" },
+        "samuel_o": { "name": "Samuel O.",    "location": "Nigeria",   "text": "En tant que professionnel actif, les options d'apprentissage flexibles m'ont permis d'obtenir une certification à mon propre rythme." },
+        "amina_b":  { "name": "Mme Amina B.", "location": "Tanzanie",  "text": "En tant qu'éducatrice, j'ai trouvé leurs ressources alignées avec notre programme et faciles à mettre en œuvre." },
+        "david_k":  { "name": "David K.",     "location": "Ouganda",   "text": "Les conseils visa étaient exceptionnels. EduBridge a rendu mon rêve d'études à l'étranger une réalité." },
+        "grace_n":  { "name": "Grace N.",     "location": "Rwanda",    "text": "De la candidature à l'arrivée, chaque étape a été gérée avec soin. J'étudie maintenant à Séoul !" }
+      }
     }
   },
   "partners_page": {
@@ -664,6 +692,7 @@
     }
   },
   "branches_page": {
+    "loading_map": "Chargement de la carte...",
     "hero_title": "Nos Succursales",
     "hero_subtitle": "Visitez l'un de nos bureaux en Afrique de l'Est pour une consultation et un soutien en personne.",
     "find_us": {
@@ -677,5 +706,17 @@
       "description": "Réservez une consultation en ligne et obtenez les mêmes conseils d'experts, où que vous soyez.",
       "button": "Réserver une Consultation en Ligne"
     }
+  },
+  "stats_bar": {
+    "students_enrolled": "Étudiants Inscrits",
+    "countries_reached": "Pays Couverts",
+    "visa_success_rate": "Taux de Réussite Visa",
+    "years_experience": "Années d'Expérience"
+  },
+  "gallery_teaser": {
+    "badge": "Histoires de Réussite",
+    "title": "Les Étudiants Qui Ont Réussi",
+    "subtitle": "De vrais étudiants. De vraies destinations. De vrais succès.",
+    "view_all": "Voir Toutes les Histoires"
   }
 }

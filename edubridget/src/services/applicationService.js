@@ -91,6 +91,11 @@ export const createApplication = async (data) => {
       { stage: "Enrolled", completed: false, date: null },
     ],
     documents: data.documents || [],
+    fee: {
+      amount: data.fee?.amount ?? null,
+      currency: data.fee?.currency ?? null,
+      status: "Pending",
+    },
   };
 
   apps.push(newApp);

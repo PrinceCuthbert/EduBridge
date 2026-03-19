@@ -64,7 +64,7 @@ export default function DashboardLayout() {
     { label: "Content (CMS)", path: "/admin/cms", icon: ScrollText },
     { label: "Branches", path: "/admin/branches", icon: Building2 },
     { label: "Financial Reports", path: "/admin/finance", icon: DollarSign },
-    { label: "Analytics", path: "/admin/analytics", icon: BarChart3 },
+    // { label: "Analytics", path: "/admin/analytics", icon: BarChart3 },
   ];
 
   const studentNavItems = [

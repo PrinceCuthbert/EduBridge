@@ -11,7 +11,7 @@ export const MOCK_OVERVIEW_STATS = [
     value: "1,284",
     change: "+12.5%",
     trend: "12% increase",
-    icon: "Users",          // resolved to lucide icon inside the component
+    icon: "Users", // resolved to lucide icon inside the component
     color: "text-blue-600",
     bg: "bg-blue-50",
   },
@@ -41,58 +41,6 @@ export const MOCK_OVERVIEW_STATS = [
     icon: "Award",
     color: "text-emerald-600",
     bg: "bg-emerald-50",
-  },
-];
-
-// ─── Branch Management ───────────────────────────────────────────────────────
-export const MOCK_BRANCHES = [
-  {
-    id: 1,
-    name: "EduBridge Rwanda HQ",
-    location: "Kigali, Rwanda",
-    address: "KG 123 Street, Nyarugenge District",
-    phone: "+250 788 123 456",
-    email: "rwanda@edubridge.com",
-    hours: "Mon-Fri: 8AM-6PM, Sat: 8AM-1PM",
-    staff: 12,
-    managerName: "Jean Claude Niyonzima",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "EduBridge Kenya",
-    location: "Nairobi, Kenya",
-    address: "Westlands Business Park, Tower A",
-    phone: "+254 700 123 456",
-    email: "kenya@edubridge.com",
-    hours: "Mon-Fri: 8AM-6PM",
-    staff: 8,
-    managerName: "Sarah Wanjiku",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "EduBridge Uganda",
-    location: "Kampala, Uganda",
-    address: "Plot 24, Nakasero Road",
-    phone: "+256 772 123 456",
-    email: "uganda@edubridge.com",
-    hours: "Mon-Fri: 8:30AM-5:30PM",
-    staff: 6,
-    managerName: "David Ochieng",
-    status: "Active",
-  },
-  {
-    id: 4,
-    name: "EduBridge Tanzania",
-    location: "Dar es Salaam, Tanzania",
-    address: "Posta Road, CBD",
-    phone: "+255 755 123 456",
-    email: "tanzania@edubridge.com",
-    hours: "Opening Q2 2024",
-    staff: 2,
-    managerName: "Amina Hassan",
-    status: "Coming Soon",
   },
 ];
 

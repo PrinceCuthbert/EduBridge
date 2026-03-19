@@ -2,7 +2,7 @@ export const MOCK_PROGRAMS = [
   // --- Program 1 ---
   {
     id: 1,
-    publisher_id: 1,    // PROGRAM.publisher_id → PUBLISHERS table (Publisher: "TM EduBridge")
+    publisher_id: 1, // PROGRAM.publisher_id → PUBLISHERS table (Publisher: "TM EduBridge")
     representative_id: null, // FK → USER table (staff contact for this institution)
     name: "Daegu Arts University",
     visaType: "D-2",
@@ -24,14 +24,42 @@ export const MOCK_PROGRAMS = [
     department_major_ids: [1, 2, 3, 4, 5, 6],
     // Structured timeline: each row = one application stage
     timeline: [
-      { stage: "Stage 1",    registrationStart: "2025-12-01", registrationEnd: "2025-12-23", examDate: "2025-12-26", resultDate: "2026-01-12" },
-      { stage: "Stage 2",    registrationStart: "2025-12-24", registrationEnd: "2025-12-30", examDate: "2026-01-05", resultDate: "2026-01-12" },
-      { stage: "Registration", registrationStart: "2026-01-29", registrationEnd: "2026-02-02", examDate: "—",        resultDate: "—" },
+      {
+        stage: "Stage 1",
+        registrationStart: "2025-12-01",
+        registrationEnd: "2025-12-23",
+        examDate: "2025-12-26",
+        resultDate: "2026-01-12",
+      },
+      {
+        stage: "Stage 2",
+        registrationStart: "2025-12-24",
+        registrationEnd: "2025-12-30",
+        examDate: "2026-01-05",
+        resultDate: "2026-01-12",
+      },
+      {
+        stage: "Registration",
+        registrationStart: "2026-01-29",
+        registrationEnd: "2026-02-02",
+        examDate: "—",
+        resultDate: "—",
+      },
     ],
     // Tuition fees per degree level
     tuitionFees: [
-      { level: "Bachelor's", item: "Entrance Fee (one-time)",    amount: 300000,   currency: "KRW" },
-      { level: "Bachelor's", item: "Tuition (per semester)",     amount: 2500000,  currency: "KRW" },
+      {
+        level: "Bachelor's",
+        item: "Entrance Fee (one-time)",
+        amount: 300000,
+        currency: "KRW",
+      },
+      {
+        level: "Bachelor's",
+        item: "Tuition (per semester)",
+        amount: 2500000,
+        currency: "KRW",
+      },
     ],
     // Categorized required documents
     requiredDocuments: [
@@ -49,9 +77,7 @@ export const MOCK_PROGRAMS = [
       },
       {
         category: "References",
-        items: [
-          "Letter of Reference (one from Korea, one from home country)",
-        ],
+        items: ["Letter of Reference (one from Korea, one from home country)"],
       },
     ],
     status: "Active",
@@ -62,7 +88,7 @@ export const MOCK_PROGRAMS = [
   // --- Program 2 ---
   {
     id: 2,
-    publisher_id: 1,    // PROGRAM.publisher_id → PUBLISHERS.id
+    publisher_id: 1, // PROGRAM.publisher_id → PUBLISHERS.id
     representative_id: null,
     name: "Tongmyong University",
     visaType: "D-4",
@@ -77,14 +103,46 @@ export const MOCK_PROGRAMS = [
     // Backend: GET /api/programs/2/majors
     department_major_ids: [7, 8, 9],
     timeline: [
-      { stage: "Stage 1", registrationStart: "2025-08-01", registrationEnd: "2025-08-31", examDate: "2025-09-10", resultDate: "2025-09-15" },
-      { stage: "Stage 2", registrationStart: "2025-09-01", registrationEnd: "2025-09-20", examDate: "2025-09-28", resultDate: "2025-09-30" },
+      {
+        stage: "Stage 1",
+        registrationStart: "2025-08-01",
+        registrationEnd: "2025-08-31",
+        examDate: "2025-09-10",
+        resultDate: "2025-09-15",
+      },
+      {
+        stage: "Stage 2",
+        registrationStart: "2025-09-01",
+        registrationEnd: "2025-09-20",
+        examDate: "2025-09-28",
+        resultDate: "2025-09-30",
+      },
     ],
     tuitionFees: [
-      { level: "Certificate", item: "Entrance Fee (one-time)",  amount: 200000,  currency: "KRW" },
-      { level: "Certificate", item: "Tuition (per semester)",   amount: 1800000, currency: "KRW" },
-      { level: "Bachelor's",  item: "Entrance Fee (one-time)",  amount: 300000,  currency: "KRW" },
-      { level: "Bachelor's",  item: "Tuition (per semester)",   amount: 2200000, currency: "KRW" },
+      {
+        level: "Certificate",
+        item: "Entrance Fee (one-time)",
+        amount: 200000,
+        currency: "KRW",
+      },
+      {
+        level: "Certificate",
+        item: "Tuition (per semester)",
+        amount: 1800000,
+        currency: "KRW",
+      },
+      {
+        level: "Bachelor's",
+        item: "Entrance Fee (one-time)",
+        amount: 300000,
+        currency: "KRW",
+      },
+      {
+        level: "Bachelor's",
+        item: "Tuition (per semester)",
+        amount: 2200000,
+        currency: "KRW",
+      },
     ],
     requiredDocuments: [
       {
@@ -103,14 +161,15 @@ export const MOCK_PROGRAMS = [
       },
     ],
     status: "Active",
-    applicationFile: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    applicationFile:
+      "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     applicationLink: null,
   },
 
   // --- Program 3 ---
   {
     id: 3,
-    publisher_id: 1,    // PROGRAM.publisher_id → PUBLISHERS.id
+    publisher_id: 1, // PROGRAM.publisher_id → PUBLISHERS.id
     representative_id: null,
     name: "Seoul Women's University",
     visaType: "D-2",
@@ -125,14 +184,46 @@ export const MOCK_PROGRAMS = [
     // Backend: GET /api/programs/3/majors
     department_major_ids: [10, 11, 12],
     timeline: [
-      { stage: "Stage 1", registrationStart: "2025-10-01", registrationEnd: "2025-10-20", examDate: "2025-10-27", resultDate: "2025-11-05" },
-      { stage: "Stage 2", registrationStart: "2025-10-25", registrationEnd: "2025-11-05", examDate: "2025-11-15", resultDate: "2025-11-20" },
+      {
+        stage: "Stage 1",
+        registrationStart: "2025-10-01",
+        registrationEnd: "2025-10-20",
+        examDate: "2025-10-27",
+        resultDate: "2025-11-05",
+      },
+      {
+        stage: "Stage 2",
+        registrationStart: "2025-10-25",
+        registrationEnd: "2025-11-05",
+        examDate: "2025-11-15",
+        resultDate: "2025-11-20",
+      },
     ],
     tuitionFees: [
-      { level: "Bachelor's", item: "Entrance Fee (one-time)",  amount: 400000,  currency: "KRW" },
-      { level: "Bachelor's", item: "Tuition (per semester)",   amount: 2800000, currency: "KRW" },
-      { level: "Master's",   item: "Entrance Fee (one-time)",  amount: 500000,  currency: "KRW" },
-      { level: "Master's",   item: "Tuition (per semester)",   amount: 3200000, currency: "KRW" },
+      {
+        level: "Bachelor's",
+        item: "Entrance Fee (one-time)",
+        amount: 400000,
+        currency: "KRW",
+      },
+      {
+        level: "Bachelor's",
+        item: "Tuition (per semester)",
+        amount: 2800000,
+        currency: "KRW",
+      },
+      {
+        level: "Master's",
+        item: "Entrance Fee (one-time)",
+        amount: 500000,
+        currency: "KRW",
+      },
+      {
+        level: "Master's",
+        item: "Tuition (per semester)",
+        amount: 3200000,
+        currency: "KRW",
+      },
     ],
     requiredDocuments: [
       {
@@ -157,6 +248,79 @@ export const MOCK_PROGRAMS = [
     status: "Active",
     applicationLink: null,
     applicationFile: null,
+  },
+];
+
+export const DESTINATIONS = [
+  {
+    name: "Australia",
+    description: "World-class education with work opportunities",
+    tuition: "$20,000 - $45,000/year",
+    living: "$18,000 - $24,000/year",
+    features: [
+      "Post-study work visa",
+      "High quality of life",
+      "Multicultural environment",
+    ],
+    image:
+      "https://images.unsplash.com/photo-1540448051910-09cfadd5df61?auto=format&fit=crop&w=600&q=80", // Sydney Opera House
+  },
+  {
+    name: "United States",
+    description: "Top-ranked universities and research opportunities",
+    tuition: "$25,000 - $55,000/year",
+    living: "$15,000 - $25,000/year",
+    features: [
+      "Flexible education system",
+      "Diverse programs",
+      "Innovation hub",
+    ],
+    image:
+      "https://images.unsplash.com/photo-1543783207-c13fad267277?q=80&w=1470&auto=format&fit=crop", // Statue of Liberty
+  },
+  {
+    name: "Canada",
+    description: "Affordable education with immigration pathways",
+    tuition: "$15,000 - $35,000/year",
+    living: "$12,000 - $18,000/year",
+    features: [
+      "Post-graduation work permit",
+      "Safe and welcoming",
+      "Quality education",
+    ],
+    image:
+      "https://images.unsplash.com/photo-1517935706615-2717063c2225?auto=format&fit=crop&w=600&q=80", // CN Tower
+  },
+  {
+    name: "Europe",
+    description: "Affordable/free education with cultural diversity",
+    tuition: "€0 - €20,000/year",
+    living: "€8,000 - €15,000/year",
+    features: [
+      "Many programs in English",
+      "Cultural experience",
+      "Travel opportunities",
+    ],
+    image:
+      "https://images.unsplash.com/photo-1511739001486-9608275626ba?auto=format&fit=crop&w=600&q=80", // Eiffel Tower
+  },
+  {
+    name: "South Korea",
+    description: "Advanced technology with scholarship opportunities",
+    tuition: "$3,000 - $10,000/year",
+    living: "$8,000 - $12,000/year",
+    features: ["KGSP scholarships", "Tech industry", "Dynamic culture"],
+    image:
+      "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=600&q=80", // Gyeongbokgung Palace
+  },
+  {
+    name: "Japan",
+    description: "Cutting-edge technology and traditional culture",
+    tuition: "$5,000 - $12,000/year",
+    living: "$10,000 - $15,000/year",
+    features: ["MEXT scholarships", "Advanced technology", "Safe environment"],
+    image:
+      "https://images.unsplash.com/photo-1490806843928-2666d632c318?auto=format&fit=crop&w=600&q=80", // Mt Fuji
   },
 ];
 
@@ -561,61 +725,81 @@ export const MOCK_UNIFIED_APPLICATIONS = [
     applicationId: 101,
     submissionDate: "2026-02-19T10:30:00Z",
     status: "Reviewing",
-    
+
     applicant: {
       identityId: 1,
       firstName: "Prince",
       lastName: "Cuthbert",
       email: "princecuth@gmail.com",
-      phone: "+250798697800"
+      phone: "+250798697800",
     },
-    
+
     programDetails: {
       universityName: "Daegu Arts University",
-      majorName: "Architecture Interior Design"
+      majorName: "Architecture Interior Design",
     },
-    
+
     trackerStages: [
       { stage: "Submitted", completed: true, date: "2026-02-19" },
       { stage: "Under Review", completed: true, date: "2026-02-20" },
       { stage: "Decision", completed: false, date: null },
-      { stage: "Enrolled", completed: false, date: null }
+      { stage: "Enrolled", completed: false, date: null },
     ],
-    
+
     documents: [
-      { fileId: 1, fileName: "ClassDiagram.png", size: "313.2 KB", uploadDate: "2026-02-19" },
-      { fileId: 2, fileName: "Edu Bridge Sequence Flow.jpg", size: "55.0 KB", uploadDate: "2026-02-19" }
-    ]
+      {
+        fileId: 1,
+        fileName: "ClassDiagram.png",
+        size: "313.2 KB",
+        uploadDate: "2026-02-19",
+      },
+      {
+        fileId: 2,
+        fileName: "Edu Bridge Sequence Flow.jpg",
+        size: "55.0 KB",
+        uploadDate: "2026-02-19",
+      },
+    ],
   },
   {
     trackerId: "APP-2024-001",
     applicationId: 102,
     submissionDate: "2026-02-01T09:15:00Z",
     status: "Pending",
-    
+
     applicant: {
       identityId: 2,
       firstName: "Alice",
       lastName: "Mutesi",
       email: "alice@example.com",
-      phone: "+250788123456"
+      phone: "+250788123456",
     },
-    
+
     programDetails: {
       universityName: "Daegu Arts University",
-      majorName: "Fine Arts"
+      majorName: "Fine Arts",
     },
-    
+
     trackerStages: [
       { stage: "Submitted", completed: true, date: "2026-02-01" },
       { stage: "Under Review", completed: false, date: null },
       { stage: "Decision", completed: false, date: null },
-      { stage: "Enrolled", completed: false, date: null }
+      { stage: "Enrolled", completed: false, date: null },
     ],
-    
+
     documents: [
-      { fileId: 3, fileName: "Passport.pdf", size: "1.2 MB", uploadDate: "2026-02-01" },
-      { fileId: 4, fileName: "Transcript.pdf", size: "3.4 MB", uploadDate: "2026-02-01" }
-    ]
-  }
+      {
+        fileId: 3,
+        fileName: "Passport.pdf",
+        size: "1.2 MB",
+        uploadDate: "2026-02-01",
+      },
+      {
+        fileId: 4,
+        fileName: "Transcript.pdf",
+        size: "3.4 MB",
+        uploadDate: "2026-02-01",
+      },
+    ],
+  },
 ];

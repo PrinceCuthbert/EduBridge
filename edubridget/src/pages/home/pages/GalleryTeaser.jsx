@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, MapPin, GraduationCap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { MOCK_MEDIA } from "@/data/mockData";
 
 const preview = MOCK_MEDIA.slice(0, 6);
 
 export default function GalleryTeaser() {
+  const { t } = useTranslation();
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,20 +21,20 @@ export default function GalleryTeaser() {
         >
           <div>
             <span className="inline-block px-4 py-1.5 bg-emerald-50 text-emerald-700 text-sm font-semibold rounded-full mb-4 tracking-wide uppercase">
-              Success Stories
+              {t("gallery_teaser.badge")}
             </span>
             <h2 className="text-3xl lg:text-4xl font-bold text-slate-900">
-              Students Who Made It
+              {t("gallery_teaser.title")}
             </h2>
             <p className="text-slate-500 mt-2 text-lg max-w-xl">
-              Real students. Real destinations. Real success.
+              {t("gallery_teaser.subtitle")}
             </p>
           </div>
           <Link
             to="/gallery"
             className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors shrink-0 group"
           >
-            View All Stories
+            {t("gallery_teaser.view_all")}
             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </motion.div>

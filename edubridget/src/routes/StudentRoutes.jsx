@@ -58,9 +58,7 @@ const UniversityPrograms = lazy(
 const ProfileSettings = lazy(
   () => import("../pages/student-dashboard/settings/StudentSettings"),
 );
-const UniversityProgramDetailsPreview = lazy(
-  () => import("../pages/shared/UniversityProgramDetailsPreview"),
-);
+const ProgramDetail = lazy(() => import("../pages/study-abroad/ProgramDetail"));
 
 export default function StudentRoutes() {
   return (
@@ -106,9 +104,7 @@ export default function StudentRoutes() {
         />
         <Route
           path="programs/:id"
-          element={
-            <UniversityProgramDetailsPreview backPath="/dashboard/programs" />
-          }
+          element={<ProgramDetail previewMode backPath="/dashboard/programs" />}
         />
 
         {/* Profile */}

@@ -1327,3 +1327,211 @@ Seed data `MOCK_UNIFIED_APPLICATIONS` track IDs (`APP-1771461317295-608`, `APP-2
 | 3 | APPLICATION (finance): wire fee fields to APPLICATION_TRACKER on submit | APPLICATION | Medium |
 | 4 | Add `phone VARCHAR(20)` to DB IDENTITY table | IDENTITY | DB migration |
 
+---
+
+## Session 8 — March 19, 2026
+
+### Layout Consolidation: `DashboardLayout.jsx`
+
+**New file:** `src/layouts/DashboardLayout.jsx`
+**Deleted:** `src/pages/admin-dashboard/AdminLayout.jsx`, `src/pages/student-dashboard/StudentDashboardLayout.jsx`
+**Routes already updated** (both import from `../layouts/DashboardLayout`)
+
+The two layout files were structurally identical — same sidebar chrome, same header, same profile dropdown. The only differences were the nav item arrays and the settings path. Merging them into one `DashboardLayout` eliminates the duplication permanently.
+
+**How it works:**
+```js
+const isAdmin = user?.role === "admin";
+const currentNavItems = isAdmin ? adminNavItems : studentNavItems;
+const settingsPath    = isAdmin ? "/admin/settings" : "/dashboard/profile";
+const portalName      = isAdmin ? "Admin Portal"    : "Student Portal";
+```
+- One `useAuth()` call, one sidebar, one header, one profile dropdown.
+- Sidebar swaps nav arrays at runtime — no conditional rendering of entire components.
+- `displayName` priority: `username` → `firstName + lastName` → `"User"` — same safe fallback for both roles.
+- `displayEmail` from `user.email` with "No email provided" fallback.
+- Both `AdminLayout`'s stray `console.log("AdminLayout Rendered...")` and `StudentDashboardLayout`'s commented-out Bell/MessageSquare/Search imports are gone.
+
+---
+
+### `programService.js` — Relational DTO Mapper
+
+**File:** `src/services/programService.js`
+
+The `createProgram` function was upgraded to produce a `relationalPayload` object that acts as a **blueprint for the backend developer**. When the admin submits a new university program via the form, the frontend data (one large nested JSON) is transformed into the exact shape required by the normalized SQL database.
+
+```js
+const relationalPayload = {
+  institution: {
+    id: institutionId,
+    identity_id: data.representative_id || null,  // FK → USER
+    name: data.name,
+    category: "University",
+    location: JSON.stringify({ country: data.country, city: data.location }),
+    // ...
+  },
+  departments_and_majors: data.departments.map((dept) => ({
+    department: { institution_id: institutionId, category: dept.degree },
+    major: { name: dept.major, language: dept.language,
+             requirements: JSON.stringify(data.requiredDocuments) },
+  })),
+  fees: data.tuitionFees.map((fee) => ({
+    level: fee.level,
+    amount: fee.amount,       // ← now FLOAT (aligned in Session 7)
+    description: fee.item,   // UI "item" → DB "description"
+    status: data.status,
+  })),
+  unmapped_frontend_data: {
+    visa_type: data.visaType,        // needs column in INSTITUTION or MAJOR
+    logo_url: data.logo,             // needs logo_id FK → SYSTEM_FILES
+    application_link: data.applicationLink,
+    schedules: data.timeline,        // needs APPLICATION_SCHEDULE date columns
+  },
+};
+```
+
+The mock frontend still saves the flat `data` object to localStorage for immediate UI reads. The `relationalPayload` is logged to the console and attached as `_databaseMap` on the saved record so the backend developer can inspect it in DevTools.
+
+**ERD flaws surfaced by this mapper:**
+
+| Gap | Required DB change |
+|-----|--------------------|
+| `fees.institution_id` missing | Add `institution_id FK` to FEES table |
+| Institution logo not storable | Add `logo_id FK → SYSTEM_FILES` to INSTITUTION |
+| Visa type has no DB column | Add `visa_type VARCHAR` to INSTITUTION or MAJOR |
+| Timeline dates lost | Add `start_date`, `end_date`, `exam_date`, `result_date` columns to APPLICATION_SCHEDULE |
+
+---
+
+## End-of-Day Architecture Summary — March 18–19, 2026
+
+This two-day sprint took the frontend from a loosely-wired prototype to a backend-ready architecture. Here is a single, consolidated record of every decision made and the reasoning behind it.
+
+---
+
+### 1. The ID Standard — UUIDs Everywhere
+
+**Decision:** All new records use `uuidv4()` from the `uuid` package. Seed data uses stable human-readable UUIDs (e.g., `"00000000-0000-0000-0000-000000000001"` for the admin seed user).
+
+**Why:** String IDs like `"USR-001"` and `"VR-001"` would cause FK constraint failures the moment a real backend assigns real PKs. UUIDs are portable across backend frameworks, safe for distributed inserts, and avoid the N+1 collision problem of auto-increment integers in a distributed context.
+
+**Files changed:** `mockUsers.js` (SEED_USER_IDS), `mockVisaData.js` (SEED_VISA_IDS), `visaService.js`, `applicationService.js`
+
+---
+
+### 2. Content vs. Transactional Data — The Boundary Decision
+
+**Decision:** Transactional data (Users, Applications, Fees, Visa Requests) → SQL database. Marketing content (Blogs, FAQ, Media, Branches) → Headless CMS (Sanity/Strapi/Contentful, TBD).
+
+**Why:** The real ERD has zero tables for any CMS content type. Adding those tables to the SQL database would break normalization and pollute the schema with editorial data that changes on a completely different schedule than business data. The DB schema confirmed this is out of scope.
+
+**Effect on code:** 12 service/hook files (`scholarshipService`, `postService`, `mediaService`, etc.) were deleted in Session 5. CMS admin pages use `useState(MOCK_DATA)` — session-only, no fake persistence. Public pages read static mock data files until a real CMS API is wired.
+
+---
+
+### 3. USER + IDENTITY Tables — Full Schema Alignment
+
+**Before:** Mock users had string IDs, no `username`, no `salt`, no `created_at`/`updated_at`, no `permissions`. The identity object used `date_birth` and was missing `id`, `user_id`, `language`, `id_document`.
+
+**After:** All fields present and aligned with the ERD. `dob` (was `date_birth`) consistent across 6 files. `identity.id`, `identity.user_id`, `identity.language`, `identity.id_document: null` (FK → SYSTEM_FILES) all added.
+
+**Remaining DB gap:** `phone VARCHAR(20)` does not exist in the DB IDENTITY table. Must be added before migration.
+
+---
+
+### 4. Authentication — Email OR Username Login + Permission-Based Access Control
+
+**Login flexibility:** `loginUser(identifier, password)` now matches on `user.email` OR `user.username` — mirrors `SELECT * FROM user WHERE email = ? OR username = ?`.
+
+**PBAC:** `hasPermission(permissionName)` added to `AuthContext`. Falls back to `DEFAULT_ROLE_PERMISSIONS` per role so existing sessions without a `permissions` array still work. When the backend is live, `user.permissions` from the `ROLE_PERMISSION` join table replaces the fallback automatically.
+
+**Existing route guards unchanged:** `isAdmin`/`isStudent` still handle coarse route-level access. `hasPermission` is opt-in for fine-grained control (e.g., a future `staff` role that can view but not delete applications).
+
+---
+
+### 5. SYSTEM_FILES — File Upload Architecture
+
+**Problem being solved:** Both `CMSMedia` and `CMSLibrary` used `URL.createObjectURL(file)` — a blob URL that only exists in the current browser tab, cannot be stored in a database, and is lost on refresh.
+
+**Solution:** `fileService.js` — a stub with the same interface as the real API (`uploadFile(file) → { id, file: path }`). The frontend never calls `createObjectURL` directly again; it always goes through the service. When the backend is live, only the body of `uploadFile()` changes. No component changes needed.
+
+**DB linkage:** `identity.id_document` is now `null` (placeholder) — a FK to the SYSTEM_FILES table. When a real upload happens, the returned `id` is stored there.
+
+---
+
+### 6. AdminSettings — Double Write Bug Fixed
+
+**Bug:** `AdminSettings.jsx` called `userService.updateUser()` directly and then passed the result to `updateProfile()` (AuthContext), which called `userService.updateUser()` again. This caused two writes per save, a ~1.6s delay, and a race condition risk on the session state.
+
+**Fix:** `AdminSettings.handleSaveProfile` calls `updateProfile(profileData)` only. `AuthContext.updateProfile` is the single authority — it writes to the DB and syncs the session in the correct order.
+
+---
+
+### 7. INSTITUTION Table + Program DTO
+
+**Field rename:** `universityName` → `name` across 8 files — aligns with INSTITUTION.name.
+
+**Fields added:** `representative_id: null` (FK → USER) on all program records.
+
+**DTO mapper in `programService.js`:** The `createProgram` function now builds a `relationalPayload` that maps the flat UI form into the normalized INSERT structure required by the backend (INSTITUTION + DEPARTMENT + MAJOR + FEES tables).
+
+**ERD gaps surfaced:** FEES is missing `institution_id` FK; INSTITUTION is missing `logo_id` FK; neither INSTITUTION nor MAJOR has a `visa_type` column; APPLICATION_SCHEDULE has no date columns yet.
+
+---
+
+### 8. Global Toast UI Polish
+
+**File:** `src/App.jsx`
+
+Replaced Sonner's `richColors` preset with a custom `classNames` config using the app's Tailwind palette (emerald for success, red for error/warning, blue for info). Title bumped to `text-base font-semibold`, description to `text-sm`. All 40+ `toast.*()` calls across the app now render consistently without any local changes.
+
+---
+
+### 9. Layout Consolidation
+
+`AdminLayout.jsx` + `StudentDashboardLayout.jsx` → `src/layouts/DashboardLayout.jsx`
+
+One component, two nav arrays, one role check. ~350 lines of duplicated layout code eliminated. Future sidebar, header, or dropdown changes are made in exactly one place.
+
+---
+
+### Final DB Alignment Score — March 19, 2026
+
+| DB Table | Score | Status |
+|----------|-------|--------|
+| USER | **90%** | UUID, username, timestamps, permissions. Salt is backend concern. |
+| IDENTITY | **90%** | dob, id, user_id, id_document FK, language all added. `phone` column still missing from DB schema. |
+| ROLE | **85%** | staff role prepared; description is frontend-extra. |
+| PERMISSION | **40%** | DEFAULT_ROLE_PERMISSIONS stub; real rows come from backend. |
+| ROLE_PERMISSION | **40%** | Fallback mapping seeded; will be replaced by JWT claims. |
+| SYSTEM_FILES | **55%** | fileService.js stub matches `{ id, file }` shape; id_document FK noted. |
+| INSTITUTION | **75%** | `name` aligned, `representative_id` added, DTO mapper built. logo_id + visa_type still missing from DB. |
+| FEES | **65%** | Amount is now FLOAT with currency field. institution_id FK still missing from DB. |
+| APPLICATION_TRACKER | **70%** | trackerId is UUID. applicant DTO is joined view (correct). |
+| MAJOR | **70%** | department_major_ids pattern correct; join table write is backend concern. |
+| APPLICATION (finance) | **25%** | No fee record created on application submit yet. |
+| APPLICATION_SCHEDULE | **0%** | No frontend equivalent yet. |
+| MAJOR_APPSCHEDULE | **0%** | Join table — no frontend equivalent yet. |
+| DEPT_MAJOR_APP_TRACKER | **0%** | Join table — no frontend equivalent yet. |
+
+**Overall: ~62%** — The entire user/auth/identity layer, all UUID IDs, the program/institution shape, and all fee amounts are now backend-ready. The remaining gap is dominated by join tables and the financial application flow, both of which require backend work before the frontend can wire them.
+
+---
+
+### Next Priority Tasks
+
+| # | Task | Effort | Status |
+|---|------|--------|--------|
+| 1 | Add `institution_id` FK to DB FEES table | DB migration | ⏳ Pending |
+| 2 | Add `logo_id` FK + `visa_type` column to DB INSTITUTION | DB migration | ⏳ Pending |
+| 3 | Add date columns to APPLICATION_SCHEDULE | DB migration | ⏳ Pending |
+| 4 | Add `phone VARCHAR(20)` to IDENTITY table | DB migration | ⏳ Pending |
+| 5 | Wire APPLICATION fee record creation on `createApplication` | Medium | ✅ Done (Session 8) |
+| 6 | Use `hasPermission()` in at least one live UI component | Medium | ✅ Done (Session 8) |
+| 7 | Connect real auth API (`userService.loginUser` → `authAPI.login`) | Large | ⏳ Pending |
+| 8 | **Translation audit** — scan all pages for hardcoded strings not in translation files | Medium | ⏳ Tomorrow |
+| 9 | Add missing translation keys for new home sections (StatsBar, GalleryTeaser, Testimonials cards) | Small | ⏳ Tomorrow |
+| 10 | Fix untranslated strings in `sw/translation.json` (`resources.scholarships`, `services.items.scholarships/study_abroad`) | Small | ⏳ Tomorrow |
+| 11 | APPLICATION_SCHEDULE: add scheduling UI to program form (start/exam/result dates) | Large | ⏳ Tomorrow |
+| 12 | Expose fee fields in `ApplicationSubmitForm.jsx` so students populate the fee block | Small | ⏳ Tomorrow |
+

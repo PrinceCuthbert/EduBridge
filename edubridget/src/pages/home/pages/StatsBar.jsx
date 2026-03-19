@@ -1,12 +1,13 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 import { Users, Globe, TrendingUp, Award } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const STATS = [
-  { icon: Users,      value: 10000, suffix: "+", label: "Students Enrolled",   color: "text-blue-600",   bg: "bg-blue-50"   },
-  { icon: Globe,      value: 25,    suffix: "+", label: "Countries Reached",   color: "text-emerald-600",bg: "bg-emerald-50"},
-  { icon: TrendingUp, value: 98,    suffix: "%", label: "Visa Success Rate",   color: "text-amber-600",  bg: "bg-amber-50"  },
-  { icon: Award,      value: 10,    suffix: "+", label: "Years Experience",    color: "text-purple-600", bg: "bg-purple-50" },
+  { icon: Users,      value: 10000, suffix: "+", labelKey: "stats_bar.students_enrolled", color: "text-blue-600",   bg: "bg-blue-50"   },
+  { icon: Globe,      value: 25,    suffix: "+", labelKey: "stats_bar.countries_reached", color: "text-emerald-600",bg: "bg-emerald-50"},
+  { icon: TrendingUp, value: 98,    suffix: "%", labelKey: "stats_bar.visa_success_rate", color: "text-amber-600",  bg: "bg-amber-50"  },
+  { icon: Award,      value: 10,    suffix: "+", labelKey: "stats_bar.years_experience",  color: "text-purple-600", bg: "bg-purple-50" },
 ];
 
 function CountUp({ target, suffix, inView }) {
@@ -37,6 +38,7 @@ function CountUp({ target, suffix, inView }) {
 }
 
 export default function StatsBar() {
+  const { t } = useTranslation();
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
@@ -44,9 +46,9 @@ export default function StatsBar() {
     <section ref={ref} className="bg-white border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {STATS.map(({ icon: Icon, value, suffix, label, color, bg }, i) => (
+          {STATS.map(({ icon: Icon, value, suffix, labelKey, color, bg }, i) => (
             <motion.div
-              key={label}
+              key={labelKey}
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: i * 0.1 }}
@@ -58,7 +60,7 @@ export default function StatsBar() {
               <p className={`text-3xl lg:text-4xl font-bold ${color} mb-1`}>
                 <CountUp target={value} suffix={suffix} inView={inView} />
               </p>
-              <p className="text-sm text-slate-500 font-medium">{label}</p>
+              <p className="text-sm text-slate-500 font-medium">{t(labelKey)}</p>
             </motion.div>
           ))}
         </div>

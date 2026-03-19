@@ -27,7 +27,7 @@ export default function AcademicServices() {
           className="text-center mb-12"
         >
           <span className="inline-block px-4 py-1.5 bg-purple-50 text-purple-700 text-sm font-semibold rounded-full mb-4 tracking-wide uppercase">
-            What We Offer
+            {t("home_page.services.badge")}
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             {t("home_page.services.title")}

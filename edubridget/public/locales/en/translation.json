@@ -466,32 +466,33 @@
     "float_success": "Success Rate"
   },
   "why_choose": {
-    "title": "Why Choose TM EduBridge?",
-    "subtitle": "We provide comprehensive education services tailored for East African students pursuing local and international opportunities.",
+    "badge": "Why EduBridge",
+    "title": "Why Choose EduBridge?",
+    "subtitle": "Experience education designed for the modern African learner",
     "features": {
-      "expert": {
-        "title": "Expert Instruction",
-        "desc": "Learn from qualified instructors with years of teaching experience across East African curricula."
+      "educators": {
+        "title": "Learn from East Africa's Top Educators",
+        "desc": "Expert instruction from proven academics and industry leaders"
       },
       "resources": {
-        "title": "Comprehensive Resources",
-        "desc": "Access our extensive digital library with ebooks, journals, and past papers."
+        "title": "World-Class Digital Resources",
+        "desc": "Access cutting-edge learning materials anytime, anywhere"
       },
-      "live": {
-        "title": "Live Classes",
-        "desc": "Interactive online classes with real-time support and collaborative learning."
+      "classes": {
+        "title": "Live Interactive Classes",
+        "desc": "Real-time engagement with instructors and peers across the continent"
       },
-      "certs": {
-        "title": "Certificates",
-        "desc": "Earn recognized certificates upon course completion."
+      "certificates": {
+        "title": "Globally Recognized Certificates",
+        "desc": "Credentials that open doors to opportunities worldwide"
       },
       "community": {
-        "title": "Community Support",
-        "desc": "Join a vibrant community of learners and professionals."
+        "title": "Vibrant Student Community",
+        "desc": "Join thousands of ambitious learners building Africa's future"
       },
-      "regional": {
-        "title": "Regional Presence",
-        "desc": "With offices across East Africa, we're close to you."
+      "excellence": {
+        "title": "East African Excellence",
+        "desc": "Tailored curriculum addressing regional opportunities and challenges"
       }
     }
   },
@@ -625,6 +626,7 @@
       "success_rate": "Success Rate"
     },
     "services": {
+      "badge": "What We Offer",
       "title": "Our Academic Services",
       "subtitle": "Your one-stop solution for academic excellence",
       "items": {
@@ -655,8 +657,16 @@
       }
     },
     "testimonials": {
+      "badge": "Student Stories",
       "title": "What Our Learners Say",
-      "subtitle": "Hear from students and educators across Africa who have benefited from TM EduBridge."
+      "subtitle": "Hear from students and educators across Africa who have benefited from TM EduBridge.",
+      "reviews": {
+        "jane_m":   { "name": "Jane M.",      "location": "Kenya",    "text": "TM EduBridge transformed my learning experience. I passed my national exams with flying colors!" },
+        "samuel_o": { "name": "Samuel O.",     "location": "Nigeria",  "text": "As a working professional, the flexible learning options helped me earn a certification in my own time." },
+        "amina_b":  { "name": "Ms. Amina B.", "location": "Tanzania", "text": "As an educator, I've found their resources aligned with our curriculum and easy to implement." },
+        "david_k":  { "name": "David K.",     "location": "Uganda",   "text": "The visa guidance was exceptional. EduBridge made my dream of studying abroad a reality." },
+        "grace_n":  { "name": "Grace N.",     "location": "Rwanda",   "text": "From application to arrival, every step was handled with care. I'm now studying in Seoul!" }
+      }
     }
   },
   "partners_page": {
@@ -762,6 +772,7 @@
     }
   },
   "branches_page": {
+    "loading_map": "Loading map...",
     "hero_title": "Our Branches",
     "hero_subtitle": "Visit any of our offices across East Africa for in-person consultation and support.",
     "find_us": {
@@ -775,5 +786,17 @@
       "description": "Book an online consultation and get the same expert guidance from anywhere.",
       "button": "Book Online Consultation"
     }
+  },
+  "stats_bar": {
+    "students_enrolled": "Students Enrolled",
+    "countries_reached": "Countries Reached",
+    "visa_success_rate": "Visa Success Rate",
+    "years_experience": "Years Experience"
+  },
+  "gallery_teaser": {
+    "badge": "Success Stories",
+    "title": "Students Who Made It",
+    "subtitle": "Real students. Real destinations. Real success.",
+    "view_all": "View All Stories"
   }
 }

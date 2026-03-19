@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -12,7 +12,11 @@ import {
   Upload,
   FileText,
 } from "lucide-react";
-import { usePrograms, useProgram } from "../../hooks/usePrograms";
+import {
+  usePrograms,
+  useProgram,
+  useProgramForm,
+} from "../../hooks/usePrograms";
 import DatePicker from "../../components/ui/DatePicker";
 import AdminCard from "../../components/admin/AdminCard";
 
@@ -31,27 +35,26 @@ export default function AdminProgramDetail() {
     loading: saveLoading,
   } = usePrograms(false);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    visaType: "D-2",
-    tags: [],
-    country: "",
-    location: "",
-    description: "",
-    logo: "",
-    images: [],
-    // Structured: { language, degree, major, duration, credits, languageRequirement }
-    departments: [],
-    // Structured: { stage, registrationStart, registrationEnd, examDate, resultDate }
-    timeline: [],
-    // New: { level, item, amount }
-    tuitionFees: [],
-    // Categorized: [{ category, items: [] }]
-    requiredDocuments: [],
-    status: "Active",
-    applicationLink: "",
-    applicationFile: null,
-  });
+  // Use Form hook for local state management
+  const {
+    formData,
+    setFormData,
+    addDepartment,
+    updateDepartment,
+    removeDepartment,
+    addTimelineStep,
+    updateTimeline,
+    removeTimeline,
+    addTuitionFee,
+    updateTuitionFee,
+    removeTuitionFee,
+    addDocCategory,
+    updateDocCategory,
+    removeDocCategory,
+    addDocItem,
+    updateDocItem,
+    removeDocItem,
+  } = useProgramForm(fetchedProgram);
 
   // Common styles for inputs to ensure consistency
   const inputClassName =
@@ -59,174 +62,25 @@ export default function AdminProgramDetail() {
   const labelClassName =
     "block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1.5 ml-1";
 
-  // Populate form when editing — safely merge with defaults so new
-  // structured fields never end up as `undefined` even if the stored
-  // program predates the current schema.
-  useEffect(() => {
-    if (!fetchedProgram) return;
-    setFormData({
-      name: fetchedProgram.name ?? "",
-      visaType: fetchedProgram.visaType ?? "D-2",
-      country: fetchedProgram.country ?? "",
-      location: fetchedProgram.location ?? "",
-      description: fetchedProgram.description ?? "",
-      logo: fetchedProgram.logo ?? "",
-      images: Array.isArray(fetchedProgram.images) ? fetchedProgram.images : [],
-      tags: Array.isArray(fetchedProgram.tags) ? fetchedProgram.tags : [],
-      departments: Array.isArray(fetchedProgram.departments)
-        ? fetchedProgram.departments
-        : [],
-      timeline: Array.isArray(fetchedProgram.timeline)
-        ? fetchedProgram.timeline
-        : [],
-      tuitionFees: Array.isArray(fetchedProgram.tuitionFees)
-        ? fetchedProgram.tuitionFees
-        : [],
-      requiredDocuments: Array.isArray(fetchedProgram.requiredDocuments)
-        ? fetchedProgram.requiredDocuments
-        : [],
-      status: fetchedProgram.status ?? "Active",
-      applicationLink: fetchedProgram.applicationLink ?? "",
-      applicationFile: fetchedProgram.applicationFile ?? null,
-    });
-  }, [fetchedProgram]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Sanitize data to prevent typos like trailing spaces or lowercase characters
+    const sanitizedData = {
+      ...formData,
+      visaType: formData.visaType.trim().toUpperCase(),
+    };
+
+    // Log the payload for debugging (Runs on both Create and Edit)
+    console.log("Submitting Program Payload:", sanitizedData);
+
     if (isNew) {
-      const created = await addProgram(formData);
+      const created = await addProgram(sanitizedData);
       if (created) navigate("/admin/programs");
     } else {
-      const ok = await updateProgram(Number(id), formData);
+      const ok = await updateProgram(Number(id), sanitizedData);
       if (ok) navigate("/admin/programs");
     }
-  };
-
-  // ── Departments CRUD ─────────────────────────────────────────────────────
-  const addDepartment = () => {
-    setFormData((prev) => ({
-      ...prev,
-      departments: [
-        ...prev.departments,
-        {
-          language: "English",
-          degree: "",
-          major: "",
-          duration: "",
-          credits: "",
-          languageRequirement: "",
-        },
-      ],
-    }));
-  };
-  const updateDepartment = (index, field, value) => {
-    const updated = [...formData.departments];
-    updated[index] = { ...updated[index], [field]: value };
-    setFormData({ ...formData, departments: updated });
-  };
-  const removeDepartment = (index) => {
-    setFormData({
-      ...formData,
-      departments: formData.departments.filter((_, i) => i !== index),
-    });
-  };
-
-  // ── Timeline CRUD ─────────────────────────────────────────────────────────
-  const addTimelineStep = () => {
-    setFormData((prev) => ({
-      ...prev,
-      timeline: [
-        ...prev.timeline,
-        {
-          stage: "",
-          registrationStart: "",
-          registrationEnd: "",
-          examDate: "",
-          resultDate: "",
-        },
-      ],
-    }));
-  };
-  const updateTimeline = (index, field, value) => {
-    const updated = [...formData.timeline];
-    updated[index] = { ...updated[index], [field]: value };
-    setFormData({ ...formData, timeline: updated });
-  };
-  const removeTimeline = (index) => {
-    setFormData({
-      ...formData,
-      timeline: formData.timeline.filter((_, i) => i !== index),
-    });
-  };
-
-  // ── Tuition Fees CRUD ─────────────────────────────────────────────────────
-  const addTuitionFee = () => {
-    setFormData((prev) => ({
-      ...prev,
-      tuitionFees: [
-        ...(prev.tuitionFees || []),
-        { level: "Bachelor's", item: "", amount: 0, currency: "KRW" },
-      ],
-    }));
-  };
-  const updateTuitionFee = (index, field, value) => {
-    const updated = [...(formData.tuitionFees || [])];
-    updated[index] = { ...updated[index], [field]: value };
-    setFormData({ ...formData, tuitionFees: updated });
-  };
-  const removeTuitionFee = (index) => {
-    setFormData({
-      ...formData,
-      tuitionFees: (formData.tuitionFees || []).filter((_, i) => i !== index),
-    });
-  };
-
-  // ── Required Documents CRUD ───────────────────────────────────────────────
-  const addDocCategory = () => {
-    setFormData((prev) => ({
-      ...prev,
-      requiredDocuments: [
-        ...prev.requiredDocuments,
-        { category: "", items: [""] },
-      ],
-    }));
-  };
-  const updateDocCategory = (catIdx, value) => {
-    const updated = [...formData.requiredDocuments];
-    updated[catIdx] = { ...updated[catIdx], category: value };
-    setFormData({ ...formData, requiredDocuments: updated });
-  };
-  const removeDocCategory = (catIdx) => {
-    setFormData({
-      ...formData,
-      requiredDocuments: formData.requiredDocuments.filter(
-        (_, i) => i !== catIdx,
-      ),
-    });
-  };
-  const addDocItem = (catIdx) => {
-    const updated = [...formData.requiredDocuments];
-    updated[catIdx] = {
-      ...updated[catIdx],
-      items: [...updated[catIdx].items, ""],
-    };
-    setFormData({ ...formData, requiredDocuments: updated });
-  };
-  const updateDocItem = (catIdx, itemIdx, value) => {
-    const updated = [...formData.requiredDocuments];
-    const items = [...updated[catIdx].items];
-    items[itemIdx] = value;
-    updated[catIdx] = { ...updated[catIdx], items };
-    setFormData({ ...formData, requiredDocuments: updated });
-  };
-  const removeDocItem = (catIdx, itemIdx) => {
-    const updated = [...formData.requiredDocuments];
-    updated[catIdx] = {
-      ...updated[catIdx],
-      items: updated[catIdx].items.filter((_, i) => i !== itemIdx),
-    };
-    setFormData({ ...formData, requiredDocuments: updated });
   };
 
   if (fetchLoading && !isNew) {
@@ -294,28 +148,22 @@ export default function AdminProgramDetail() {
               <div>
                 <label className={labelClassName}>Visa Type</label>
                 <div className="relative">
-                  <select
+                  <input
+                    list="visa-options"
                     value={formData.visaType}
                     onChange={(e) =>
                       setFormData({ ...formData, visaType: e.target.value })
                     }
-                    className={`${inputClassName} appearance-none cursor-pointer`}>
+                    className={inputClassName}
+                    placeholder="Type or select a visa type..."
+                  />
+                  <datalist id="visa-options">
                     <option value="D-2">D-2 (Degree)</option>
-                    <option value="D-4">D-4 (Language)</option>
-                  </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                    <svg
-                      width="10"
-                      height="10"
-                      viewBox="0 0 12 12"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round">
-                      <path d="M2.5 4.5L6 8L9.5 4.5" />
-                    </svg>
-                  </div>
+                    <option value="D-4">D-4 (Language) </option>
+                    <option value="D-4-1">D-4-1 (Language)</option>
+                    <option value="F-1">F-1 (Student)</option>
+                    <option value="J-1">J-1 (Exchange)</option>
+                  </datalist>
                 </div>
               </div>
 
@@ -819,7 +667,11 @@ export default function AdminProgramDetail() {
                         placeholder="e.g. 2500000"
                         value={fee.amount}
                         onChange={(e) =>
-                          updateTuitionFee(idx, "amount", Number(e.target.value))
+                          updateTuitionFee(
+                            idx,
+                            "amount",
+                            Number(e.target.value),
+                          )
                         }
                         className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none"
                       />

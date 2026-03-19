@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import AdminCard   from "../../../components/admin/AdminCard";
 import StatusBadge from "../../../components/shared/StatusBadge";
 import { useApplications } from "../../../hooks/useApplications";
+import { useAuth } from "../../../context/AuthContext";
 import { formatDateLong } from "../../../utils/formatDate";
 
 const STATUSES = ["Pending", "Reviewing", "Needs Changes", "Approved", "Rejected"];
@@ -39,10 +40,13 @@ export default function AdminApplicationReview() {
 
   // 1. Consume the Hook (Acting as the Controller)
   // Passing 'id' tells the hook to isolate just this application.
-  const { 
-    singleApplication: app, 
-    loading, 
-    updateStatus 
+  const { hasPermission } = useAuth();
+  const canUpdateStatus = hasPermission("update_app_status");
+
+  const {
+    singleApplication: app,
+    loading,
+    updateStatus
   } = useApplications({trackerId: id});
 
   const [updating, setUpdating] = useState(null);
@@ -218,32 +222,38 @@ export default function AdminApplicationReview() {
         {/* ── Right col — Status management ────────────────────────── */}
         <div>
           <AdminCard title="Status Management">
-            <div className="space-y-2">
-              <p className="text-xs text-slate-500 mb-3">
-                Current status: <span className="font-medium text-slate-800">{app.status}</span>
+            {!canUpdateStatus ? (
+              <p className="text-xs text-slate-400 italic">
+                You do not have permission to change the application status.
               </p>
-              {STATUSES.map((s) => {
-                const isActive  = app.status === s;
-                const isBusy    = updating === s;
-                return (
-                  <button
-                    key={s}
-                    disabled={isActive || !!updating}
-                    onClick={() => handleStatusChange(s)}
-                    className={`w-full px-4 py-2.5 rounded-lg text-sm font-medium text-left flex items-center gap-3 border transition-all
-                      ${isActive
-                        ? "bg-slate-900 text-white border-slate-900 shadow-sm cursor-default"
-                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-400 disabled:opacity-50"
-                      }`}
-                  >
-                    <span className={isActive ? "text-white" : "text-slate-400"}>
-                      {isBusy ? <Loader2 size={14} className="animate-spin" /> : statusIcon(s)}
-                    </span>
-                    {s}
-                  </button>
-                );
-              })}
-            </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs text-slate-500 mb-3">
+                  Current status: <span className="font-medium text-slate-800">{app.status}</span>
+                </p>
+                {STATUSES.map((s) => {
+                  const isActive = app.status === s;
+                  const isBusy   = updating === s;
+                  return (
+                    <button
+                      key={s}
+                      disabled={isActive || !!updating}
+                      onClick={() => handleStatusChange(s)}
+                      className={`w-full px-4 py-2.5 rounded-lg text-sm font-medium text-left flex items-center gap-3 border transition-all
+                        ${isActive
+                          ? "bg-slate-900 text-white border-slate-900 shadow-sm cursor-default"
+                          : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-400 disabled:opacity-50"
+                        }`}
+                    >
+                      <span className={isActive ? "text-white" : "text-slate-400"}>
+                        {isBusy ? <Loader2 size={14} className="animate-spin" /> : statusIcon(s)}
+                      </span>
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </AdminCard>
         </div>
       </div>

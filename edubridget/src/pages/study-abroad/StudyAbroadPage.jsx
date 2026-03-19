@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useRef, useMemo } from "react";
 // import { Card, CardContent } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
@@ -7,86 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import OptimizedImage from "@/components/OptimizedImage";
-import { BASE_URL } from "../../config/api";
 import { toast } from "sonner";
-import { MOCK_PROGRAMS } from "../../data/mockData"; // Keep as fallback type or initial state shape reference if needed, but we will fetch
+import { usePrograms } from "../../hooks/usePrograms";
+import { DESTINATIONS } from "../../data/mockData"; // Keep as fallback type or initial state shape reference if needed, but we will fetch
+
 import DestinationCard from "@/components/studyAbroad/DestinationCard";
 import ApplicationProcess from "@/components/studyAbroad/ApplicationProcess";
 
 import UniversityCard from "./UniversityCard";
-
-const DESTINATIONS = [
-  {
-    name: "Australia",
-    description: "World-class education with work opportunities",
-    tuition: "$20,000 - $45,000/year",
-    living: "$18,000 - $24,000/year",
-    features: [
-      "Post-study work visa",
-      "High quality of life",
-      "Multicultural environment",
-    ],
-    image:
-      "https://images.unsplash.com/photo-1540448051910-09cfadd5df61?auto=format&fit=crop&w=600&q=80", // Sydney Opera House
-  },
-  {
-    name: "United States",
-    description: "Top-ranked universities and research opportunities",
-    tuition: "$25,000 - $55,000/year",
-    living: "$15,000 - $25,000/year",
-    features: [
-      "Flexible education system",
-      "Diverse programs",
-      "Innovation hub",
-    ],
-    image:
-      "https://images.unsplash.com/photo-1543783207-c13fad267277?q=80&w=1470&auto=format&fit=crop", // Statue of Liberty
-  },
-  {
-    name: "Canada",
-    description: "Affordable education with immigration pathways",
-    tuition: "$15,000 - $35,000/year",
-    living: "$12,000 - $18,000/year",
-    features: [
-      "Post-graduation work permit",
-      "Safe and welcoming",
-      "Quality education",
-    ],
-    image:
-      "https://images.unsplash.com/photo-1517935706615-2717063c2225?auto=format&fit=crop&w=600&q=80", // CN Tower
-  },
-  {
-    name: "Europe",
-    description: "Affordable/free education with cultural diversity",
-    tuition: "€0 - €20,000/year",
-    living: "€8,000 - €15,000/year",
-    features: [
-      "Many programs in English",
-      "Cultural experience",
-      "Travel opportunities",
-    ],
-    image:
-      "https://images.unsplash.com/photo-1511739001486-9608275626ba?auto=format&fit=crop&w=600&q=80", // Eiffel Tower
-  },
-  {
-    name: "South Korea",
-    description: "Advanced technology with scholarship opportunities",
-    tuition: "$3,000 - $10,000/year",
-    living: "$8,000 - $12,000/year",
-    features: ["KGSP scholarships", "Tech industry", "Dynamic culture"],
-    image:
-      "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=600&q=80", // Gyeongbokgung Palace
-  },
-  {
-    name: "Japan",
-    description: "Cutting-edge technology and traditional culture",
-    tuition: "$5,000 - $12,000/year",
-    living: "$10,000 - $15,000/year",
-    features: ["MEXT scholarships", "Advanced technology", "Safe environment"],
-    image:
-      "https://images.unsplash.com/photo-1490806843928-2666d632c318?auto=format&fit=crop&w=600&q=80", // Mt Fuji
-  },
-];
 
 const LOADING_PROP = "lazy";
 
@@ -175,43 +103,34 @@ const UniversitySection = React.memo(
 
 export default function StudyAbroadPage() {
   const { t } = useTranslation();
-  const [programs, setPrograms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchPrograms = async () => {
-      try {
-        setLoading(true);
-        // FETCH DATA WHEN PAGE LOADS
-        const res = await fetch(`${BASE_URL}/programs`);
+  // 1. Use the exact same hook the Admin page uses!
+  const { programs, loading } = usePrograms();
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch programs");
-        }
+  // 2. Dynamically group Active programs by their visaType
+  const programsByVisa = useMemo(() => {
+    const grouped = {};
 
-        const data = await res.json();
-        setPrograms(data);
-      } catch (err) {
-        console.error("Error fetching programs:", err);
-        setError(err.message);
-        toast.error("Failed to load programs");
-      } finally {
-        setLoading(false);
+    // Only show active programs to the public
+    const activePrograms = programs.filter((p) => p.status === "Active");
+
+    activePrograms.forEach((program) => {
+      // Fallback if an admin forgets to set a visa type
+      const visa = program.visaType || "Other";
+      if (!grouped[visa]) {
+        grouped[visa] = [];
       }
-    };
+      grouped[visa].push(program);
+    });
 
-    fetchPrograms();
-  }, []); // Empty dependency array = run once on mount
-
-  const d2Programs = useMemo(
-    () => programs.filter((p) => p.visaType === "D-2"),
-    [programs],
-  );
-  const d4Programs = useMemo(
-    () => programs.filter((p) => p.visaType === "D-4"),
-    [programs],
-  );
+    // Optional: Sort the keys so they appear in a consistent order (e.g., D-2 then D-4)
+    return Object.keys(grouped)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = grouped[key];
+        return acc;
+      }, {});
+  }, [programs]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -230,23 +149,33 @@ export default function StudyAbroadPage() {
       {/* Available Universities Section */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <UniversitySection
-            title="D-2"
-            visaType={t("study_abroad_page.universities.visa_label")}
-            subtitle={t("study_abroad_page.universities.d2_subtitle")}
-            universities={d2Programs}
-            loading={loading}
-          />
-
-          <div className="w-full h-px bg-slate-100 my-8"></div>
-
-          <UniversitySection
-            title="D-4"
-            visaType={t("study_abroad_page.universities.visa_label")}
-            subtitle={t("study_abroad_page.universities.d4_subtitle")}
-            universities={d4Programs}
-            loading={loading}
-          />
+          {/* 3. Map over the dynamic groups to render sections automatically */}
+          {Object.entries(programsByVisa).length === 0 && !loading ? (
+            <div className="text-center py-12 text-slate-500">
+              {t("study_abroad_page.universities.no_programs")}
+            </div>
+          ) : (
+            Object.entries(programsByVisa).map(([visa, unis], index, array) => (
+              <React.Fragment key={visa}>
+                <UniversitySection
+                  title={visa}
+                  visaType={t("study_abroad_page.universities.visa_label")}
+                  subtitle={
+                    visa === "D-2"
+                      ? t("study_abroad_page.universities.d2_subtitle")
+                      : visa === "D-4"
+                        ? t("study_abroad_page.universities.d4_subtitle")
+                        : `Available Universities offering ${visa} programs`
+                  }
+                  universities={unis}
+                  loading={loading}
+                />
+                {index < array.length - 1 && (
+                  <div className="w-full h-px bg-slate-100 my-8"></div>
+                )}
+              </React.Fragment>
+            ))
+          )}
         </div>
       </section>
 

@@ -431,15 +431,34 @@
     "float_success": "Kiwango cha Mafanikio"
   },
   "why_choose": {
-    "title": "Kwa Nini Uchague TM EduBridge?",
-    "subtitle": "Tunatoa huduma kamili za elimu zilizoundwa kwa ajili ya wanafunzi wa Afrika Mashariki.",
+    "badge": "Kwa Nini EduBridge",
+    "title": "Kwa Nini Uchague EduBridge?",
+    "subtitle": "Pata elimu iliyoundwa kwa mwanafunzi wa kisasa wa Afrika",
     "features": {
-      "expert": { "title": "Mafunzo ya Kitaalamu", "desc": "Jifunze kutoka kwa wakufunzi waliohitimu na wenye uzoefu wa kufundisha." },
-      "resources": { "title": "Rasilimali Kamili", "desc": "Pata maktaba yetu ya dijitali yenye vitabu, majarida na mitihani iliyopita." },
-      "live": { "title": "Madarasa ya Moja kwa Moja", "desc": "Madarasa ya mtandaoni yenye usaidizi wa wakati halisi." },
-      "certs": { "title": "Vyeti", "desc": "Pata vyeti vinavyotambulika baada ya kumaliza kozi." },
-      "community": { "title": "Usaidizi wa Jamii", "desc": "Jiunge na jamii changamfu ya wanafunzi na wataalamu." },
-      "regional": { "title": "Uwepo wa Kikanda", "desc": "Tukiwa na ofisi kote Afrika Mashariki, tuko karibu nawe." }
+      "educators": {
+        "title": "Jifunze kutoka kwa Waelimishaji Bora wa Afrika Mashariki",
+        "desc": "Mafunzo ya kitaalamu kutoka kwa wasomi na viongozi wa tasnia waliothibitishwa"
+      },
+      "resources": {
+        "title": "Rasilimali za Kidijitali za Kiwango cha Dunia",
+        "desc": "Pata nyenzo za kujifunza za kisasa wakati wowote, mahali popote"
+      },
+      "classes": {
+        "title": "Madarasa ya Maingiliano ya Moja kwa Moja",
+        "desc": "Ushirikiano wa wakati halisi na wakufunzi na wenzako barani kote"
+      },
+      "certificates": {
+        "title": "Vyeti Vinavyotambulika Kimataifa",
+        "desc": "Vyeti vinavyofungua milango ya fursa duniani kote"
+      },
+      "community": {
+        "title": "Jamii ya Wanafunzi Changamfu",
+        "desc": "Jiunge na maelfu ya wanafunzi wenye tamaa wanaojenga mustakabali wa Afrika"
+      },
+      "excellence": {
+        "title": "Ubora wa Afrika Mashariki",
+        "desc": "Mtaala ulioundwa kukabiliana na fursa na changamoto za kikanda"
+      }
     }
   },
   "services": {
@@ -542,6 +561,7 @@
       "success_rate": "Kiwango cha Mafanikio"
     },
     "services": {
+      "badge": "Tunachotoa",
       "title": "Huduma Zetu za Kitaaluma",
       "subtitle": "Suluhisho lako la moja kwa moja kwa ubora wa kitaaluma",
       "items": {
@@ -572,8 +592,16 @@
       }
     },
     "testimonials": {
+      "badge": "Hadithi za Wanafunzi",
       "title": "Wanafunzi Wetu Wanasema Nini",
-      "subtitle": "Sikia kutoka kwa wanafunzi na waelimishaji kote Afrika ambao wamenufaika na TM EduBridge."
+      "subtitle": "Sikia kutoka kwa wanafunzi na waelimishaji kote Afrika ambao wamenufaika na TM EduBridge.",
+      "reviews": {
+        "jane_m":   { "name": "Jane M.",      "location": "Kenya",    "text": "TM EduBridge ilibadilisha uzoefu wangu wa kujifunza. Nilifaulu mitihani yangu ya kitaifa kwa mafanikio makubwa!" },
+        "samuel_o": { "name": "Samuel O.",    "location": "Nigeria",  "text": "Kama mtaalamu anayefanya kazi, chaguo za kujifunza zinazobadilika zilinisaidia kupata cheti kwa muda wangu mwenyewe." },
+        "amina_b":  { "name": "Bi. Amina B.", "location": "Tanzania", "text": "Kama mwalimu, nimepata rasilimali zao zinazolingana na mtaala wetu na rahisi kutekeleza." },
+        "david_k":  { "name": "David K.",     "location": "Uganda",   "text": "Mwongozo wa visa ulikuwa wa kipekee. EduBridge ilifanya ndoto yangu ya kusoma nje kuwa ukweli." },
+        "grace_n":  { "name": "Grace N.",     "location": "Rwanda",   "text": "Kutoka maombi hadi kuwasili, kila hatua ilichukuliwa kwa uangalifu. Sasa nasoma Seoul!" }
+      }
     }
   },
   "partners_page": {
@@ -664,6 +692,7 @@
     }
   },
   "branches_page": {
+    "loading_map": "Inapakia ramani...",
     "hero_title": "Matawi Yetu",
     "hero_subtitle": "Tembelea ofisi yetu yoyote kote Afrika Mashariki kwa ushauri na usaidizi wa ana kwa ana.",
     "find_us": {
@@ -677,5 +706,17 @@
       "description": "Weka miadi ya ushauri mtandaoni na upate mwongozo uleule wa kitaalamu kutoka popote.",
       "button": "Weka Miadi ya Ushauri Mtandaoni"
     }
+  },
+  "stats_bar": {
+    "students_enrolled": "Wanafunzi Waliojisajili",
+    "countries_reached": "Nchi Zilizofikwa",
+    "visa_success_rate": "Kiwango cha Mafanikio ya Visa",
+    "years_experience": "Miaka ya Uzoefu"
+  },
+  "gallery_teaser": {
+    "badge": "Hadithi za Mafanikio",
+    "title": "Wanafunzi Waliofanikiwa",
+    "subtitle": "Wanafunzi wa kweli. Maeneo ya kweli. Mafanikio ya kweli.",
+    "view_all": "Angalia Hadithi Zote"
   }
 }

@@ -1,260 +1,515 @@
-﻿import React, { useState } from 'react';
-import { DollarSign, FileText, Users, TrendingDown, Download, Filter, CreditCard, Globe } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend,
+  AreaChart, Area,
+} from "recharts";
+import {
+  DollarSign, FileText, TrendingDown, Download,
+  RefreshCw, CreditCard, TrendingUp, Clock,
+} from "lucide-react";
 import AdminPageHeader from "../../../components/admin/AdminPageHeader";
-import AdminStatsGrid from "../../../components/admin/AdminStatsGrid";
 import AdminCard from "../../../components/admin/AdminCard";
 import AdminTable from "../../../components/admin/AdminTable";
-import AdminFilterBar from "../../../components/admin/AdminFilterBar";
-import { MOCK_FILE_RECORDS, FILE_STATUS_STYLES } from "../../../data/fileRecords"; // Priority 10: FILE entity
+import {
+  getFinancialStats,
+  getRevenueByMonth,
+  getApplicationsByMonth,
+  getVisitorsByMonth,
+  getRecentTransactions,
+} from "../../../services/financialService";
+import { exportToCSV, formatDataForExport } from "../../../utils/exportHelpers";
+
+// ── Chart colour palette ──────────────────────────────────────
+const COLORS = {
+  blue:    "#3b82f6",
+  violet:  "#8b5cf6",
+  emerald: "#10b981",
+  amber:   "#f59e0b",
+  rose:    "#f43f5e",
+  sky:     "#0ea5e9",
+};
+
+const PIE_COLORS = [COLORS.blue, COLORS.emerald, COLORS.rose, COLORS.amber, COLORS.violet, COLORS.sky];
+
+// ── Custom Recharts tooltip ───────────────────────────────────
+const ChartTooltip = ({ active, payload, label, prefix = "", suffix = "" }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-white border border-slate-200 rounded-xl shadow-xl p-3 text-xs">
+      <p className="font-bold text-slate-800 mb-2">{label}</p>
+      {payload.map((entry, i) => (
+        <div key={i} className="flex items-center gap-2 py-0.5">
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+          <span className="text-slate-500">{entry.name}:</span>
+          <span className="font-bold text-slate-900">
+            {prefix}{typeof entry.value === "number" ? entry.value.toLocaleString() : entry.value}{suffix}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ── KPI Stat Card ─────────────────────────────────────────────
+const StatCard = ({ label, value, change, trendUp, icon: Icon, color, bg, loading }) => (
+  <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group">
+    {/* Subtle background accent */}
+    <div className={`absolute top-0 right-0 w-24 h-24 rounded-full opacity-[0.06] -translate-y-4 translate-x-4 ${bg}`} />
+    <div className="flex items-start justify-between mb-4">
+      <div className={`w-11 h-11 rounded-xl ${bg} ${color} flex items-center justify-center border border-black/5`}>
+        <Icon size={20} />
+      </div>
+      {change && (
+        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${
+          trendUp ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-600"
+        }`}>
+          {trendUp ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+          {change}
+        </span>
+      )}
+    </div>
+    {loading ? (
+      <div className="space-y-2">
+        <div className="h-7 w-28 bg-slate-100 rounded-lg animate-pulse" />
+        <div className="h-4 w-20 bg-slate-50 rounded animate-pulse" />
+      </div>
+    ) : (
+      <div>
+        <p className="text-2xl font-bold text-slate-900 tracking-tight">{value}</p>
+        <p className="text-sm font-medium text-slate-500 mt-1">{label}</p>
+      </div>
+    )}
+  </div>
+);
+
+// ── Chart skeleton loader ─────────────────────────────────────
+const ChartSkeleton = ({ height = 280 }) => (
+  <div style={{ height }} className="flex items-center justify-center">
+    <div className="space-y-3 w-full px-4">
+      <div className="flex items-end gap-3 justify-around" style={{ height: height - 60 }}>
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex-1 bg-slate-100 rounded-t-md animate-pulse"
+            style={{ height: `${30 + Math.random() * 60}%` }}
+          />
+        ))}
+      </div>
+      <div className="h-3 bg-slate-100 rounded animate-pulse w-full" />
+    </div>
+  </div>
+);
+
+// ── Transaction status badge ──────────────────────────────────
+const TxBadge = ({ status }) => {
+  const styles = {
+    Paid:     "bg-emerald-50 text-emerald-700 border-emerald-200",
+    Unpaid:   "bg-amber-50 text-amber-700 border-amber-200",
+    Refunded: "bg-blue-50 text-blue-700 border-blue-200",
+    Failed:   "bg-rose-50 text-rose-700 border-rose-200",
+    Pending:  "bg-slate-50 text-slate-600 border-slate-200",
+  };
+  return (
+    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wide ${styles[status] || styles.Pending}`}>
+      {status}
+    </span>
+  );
+};
+
+// ── Custom Pie label ──────────────────────────────────────────
+const renderPieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
+  if (percent < 0.05) return null;
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  return (
+    <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={11} fontWeight="700">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
+// ═════════════════════════════════════════════════════════════
+//  Page Component
+// ═════════════════════════════════════════════════════════════
 
 export default function FinancialReports() {
-  const [timeRange, setTimeRange] = useState("This Month");
+  const [stats, setStats]           = useState(null);
+  const [revenueData, setRevenue]   = useState([]);
+  const [appsData, setApps]         = useState([]);
+  const [visitorsData, setVisitors] = useState([]);
+  const [transactions, setTxns]     = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [timeFilter, setTimeFilter] = useState("all");
 
-  const stats = [
-    { label: 'Total Revenue', value: '$75,800', change: '+18%', trend: 'Growth', icon: DollarSign, color: 'text-green-600', bg: 'bg-green-50' },
-    { label: 'Transactions', value: '874', change: '+12%', trend: 'Increase', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Avg. Transaction', value: '$86.72', change: '+8%', trend: 'Uptrend', icon: Users, color: 'text-purple-600', bg: 'bg-purple-50' },
-    { label: 'Refunds', value: '$1,250', change: '-2%', trend: 'Decrease', icon: TrendingDown, color: 'text-yellow-600', bg: 'bg-yellow-50' },
-  ];
-
-  const revenueData = [
-    { month: 'Jan', consultations: 45, library: 25, courses: 15 },
-    { month: 'Feb', consultations: 52, library: 18, courses: 28 },
-    { month: 'Mar', consultations: 48, library: 20, courses: 25 },
-    { month: 'Apr', consultations: 60, library: 28, courses: 30 },
-    { month: 'May', consultations: 55, library: 32, courses: 28 },
-    { month: 'Jun', consultations: 72, library: 38, courses: 38 },
-  ];
-
-  const paymentMethods = [
-    { name: 'Mobile Money', percentage: '45%', color: '#3b82f6' },
-    { name: 'Card Payments', percentage: '35%', color: '#10b981' },
-    { name: 'Bank Transfer', percentage: '15%', color: '#f59e0b' },
-    { name: 'Cash', percentage: '5%', color: '#8b5cf6' },
-  ];
-
-  const serviceRevenue = [
-    { service: 'Visa Consultations', revenue: '$28,500', transactions: 190, avg: '$150', percent: 38 },
-    { service: 'Scholarship Applications', revenue: '$15,200', transactions: 152, avg: '$100', percent: 20 },
-    { service: 'Language Courses', revenue: '$12,400', transactions: 85, avg: '$145', percent: 16 },
-    { service: 'Document Translation', revenue: '$8,200', transactions: 205, avg: '$40', percent: 11 },
-  ];
-
-  const columns = [
-    {
-       header: "Service",
-       render: (row) => <span className="font-medium text-slate-900">{row.service}</span>
-    },
-    {
-       header: "Revenue",
-       className: "text-right",
-       render: (row) => <span className="text-green-600 font-semibold">{row.revenue}</span>
-    },
-    {
-       header: "Transactions",
-       className: "text-right",
-       render: (row) => <span className="text-slate-600">{row.transactions}</span>
-    },
-    {
-       header: "Avg. Value",
-       className: "text-right",
-       render: (row) => <span className="text-slate-600">{row.avg}</span>
-    },
-    {
-       header: "% of Total",
-       className: "text-right",
-       render: (row) => (
-         <div className="flex items-center justify-end gap-3">
-            <div className="w-24 bg-slate-100 rounded-full h-2 overflow-hidden">
-               <div className="bg-blue-500 h-full rounded-full" style={{ width: `${row.percent}%` }} />
-            </div>
-            <span className="text-sm font-medium text-slate-900 w-8">{row.percent}%</span>
-         </div>
-       )
+  const loadAll = useCallback(async (showRefresh = false) => {
+    if (showRefresh) setRefreshing(true);
+    else setLoading(true);
+    try {
+      const [s, rev, apps, vis, txns] = await Promise.all([
+        getFinancialStats(),
+        getRevenueByMonth(),
+        getApplicationsByMonth(),
+        getVisitorsByMonth(),
+        getRecentTransactions(12),
+      ]);
+      setStats(s);
+      setRevenue(rev);
+      setApps(apps);
+      setVisitors(vis);
+      setTxns(txns);
+    } catch (err) {
+      console.error("Financial data error:", err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
+  }, []);
+
+  useEffect(() => { loadAll(); }, [loadAll]);
+
+  // Filter chart data by time range
+  const filteredRevenue = timeFilter === "all" ? revenueData : revenueData.slice(-parseInt(timeFilter));
+  const filteredApps    = timeFilter === "all" ? appsData    : appsData.slice(-parseInt(timeFilter));
+  const filteredVisitors = timeFilter === "all" ? visitorsData : visitorsData.slice(-parseInt(timeFilter));
+
+  // Donut data: sum each status across all months
+  const donutData = (() => {
+    const totals = {};
+    appsData.forEach((m) => {
+      ["New", "Approved", "Rejected", "Pending Documents", "In Progress"].forEach((s) => {
+        totals[s] = (totals[s] || 0) + (m[s] || 0);
+      });
+    });
+    return Object.entries(totals)
+      .filter(([, v]) => v > 0)
+      .map(([name, value]) => ({ name, value }));
+  })();
+
+  // Export handler
+  const handleExport = () => {
+    const rows = transactions.map((t) => ({
+      ID: t.id,
+      Type: t.type,
+      Student: t.studentName,
+      Destination: t.destination,
+      Amount: t.amountFormatted,
+      Status: t.status,
+      Date: t.date,
+    }));
+    exportToCSV(rows, `financial-report-${new Date().toISOString().slice(0, 10)}.csv`);
+  };
+
+  // Table columns
+  const txColumns = [
+    {
+      header: "Student / Type",
+      render: (row) => (
+        <div>
+          <p className="text-sm font-semibold text-slate-800">{row.studentName}</p>
+          <p className="text-xs text-slate-400">{row.type}</p>
+        </div>
+      ),
+    },
+    {
+      header: "Destination",
+      render: (row) => (
+        <span className="text-sm text-slate-600">{row.destination || "—"}</span>
+      ),
+    },
+    {
+      header: "Amount",
+      className: "text-right",
+      render: (row) => (
+        <span className="text-sm font-bold text-slate-900">{row.amountFormatted}</span>
+      ),
+    },
+    {
+      header: "Status",
+      className: "text-center",
+      render: (row) => <TxBadge status={row.status} />,
+    },
+    {
+      header: "Date",
+      className: "text-right",
+      render: (row) => (
+        <span className="text-xs text-slate-400 font-mono">
+          {row.date ? new Date(row.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
+        </span>
+      ),
+    },
   ];
+
+  const kpiCards = stats
+    ? [
+        {
+          label: "Total Revenue",
+          value: stats.formatted.totalRevenue,
+          change: "+18%",
+          trendUp: true,
+          icon: DollarSign,
+          color: "text-emerald-600",
+          bg: "bg-emerald-50",
+        },
+        {
+          label: "Total Transactions",
+          value: stats.totalTransactions.toString(),
+          change: "+12%",
+          trendUp: true,
+          icon: FileText,
+          color: "text-blue-600",
+          bg: "bg-blue-50",
+        },
+        {
+          label: "Avg. Consultation Fee",
+          value: stats.formatted.avgFee,
+          change: "+8%",
+          trendUp: true,
+          icon: CreditCard,
+          color: "text-violet-600",
+          bg: "bg-violet-50",
+        },
+        {
+          label: "Pending Fees",
+          value: stats.pendingCount.toString(),
+          change: `${stats.refundCount} refund${stats.refundCount !== 1 ? "s" : ""}`,
+          trendUp: false,
+          icon: Clock,
+          color: "text-amber-600",
+          bg: "bg-amber-50",
+        },
+      ]
+    : Array.from({ length: 4 }).map((_, i) => ({
+        label: ["Total Revenue", "Transactions", "Avg. Fee", "Pending"][i],
+        value: "—",
+        icon: [DollarSign, FileText, CreditCard, Clock][i],
+        color: ["text-emerald-600", "text-blue-600", "text-violet-600", "text-amber-600"][i],
+        bg:    ["bg-emerald-50",   "bg-blue-50",   "bg-violet-50",   "bg-amber-50"][i],
+      }));
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-1000">
-      <AdminPageHeader 
-        title="Financial Reports" 
-        subtitle="Revenue analytics and payment tracking."
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
+      {/* ── Header ─────────────────────────────────────────────── */}
+      <AdminPageHeader
+        title="Financial Reports"
+        subtitle="Visa consultation revenue, application trends, and platform analytics."
         primaryAction={{
-          label: "Export Report",
+          label: "Export CSV",
           icon: Download,
-          onClick: () => console.log("Exporting..."),
-          rotateIcon: false
+          onClick: handleExport,
+          rotateIcon: false,
         }}
       />
 
-      <AdminStatsGrid stats={stats} />
+      {/* ── Time filter + refresh ───────────────────────────────── */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+          {[
+            { label: "All Time", value: "all"  },
+            { label: "6 Mo",     value: "6"    },
+            { label: "3 Mo",     value: "3"    },
+          ].map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setTimeFilter(opt.value)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
+                timeFilter === opt.value
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={() => loadAll(true)}
+          disabled={refreshing}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-50"
+        >
+          <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
+          Refresh
+        </button>
+      </div>
 
-      <AdminFilterBar 
-        searchPlaceholder="Search transaction ID..." // Placeholder, simplified
-        secondaryActions={
-          <div className="flex items-center gap-3">
-             <div className="relative">
-                <select 
-                  value={timeRange}
-                  onChange={(e) => setTimeRange(e.target.value)}
-                  className="appearance-none pl-4 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-xs font-bold uppercase tracking-wider focus:outline-none focus:border-blue-500 cursor-pointer hover:bg-slate-50 transition-colors"
+      {/* ── KPI Stats ──────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+        {kpiCards.map((card, i) => (
+          <StatCard key={i} {...card} loading={loading} />
+        ))}
+      </div>
+
+      {/* ── Row 1: Bar chart + Donut chart ─────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+        {/* Bar Chart — Revenue by Month (wider col) */}
+        <AdminCard
+          title="Visa Fee Revenue"
+          className="lg:col-span-3"
+          action={
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">
+              USD • Consultation Fees
+            </span>
+          }
+        >
+          {loading ? (
+            <ChartSkeleton height={280} />
+          ) : (
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={filteredRevenue} barSize={20} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={COLORS.blue} stopOpacity={1} />
+                    <stop offset="100%" stopColor={COLORS.violet} stopOpacity={0.8} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94a3b8", fontWeight: 600 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v}`} />
+                <Tooltip content={<ChartTooltip prefix="$" />} cursor={{ fill: "#f8fafc", radius: 8 }} />
+                <Bar dataKey="revenue" name="Revenue" fill="url(#revenueGrad)" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </AdminCard>
+
+        {/* Donut Chart — Applications by Status */}
+        <AdminCard
+          title="Applications by Status"
+          className="lg:col-span-2"
+          action={
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">
+              All Time
+            </span>
+          }
+        >
+          {loading ? (
+            <div className="h-64 flex items-center justify-center">
+              <div className="w-40 h-40 rounded-full border-8 border-slate-100 animate-pulse" />
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={donutData}
+                  cx="50%"
+                  cy="45%"
+                  innerRadius={60}
+                  outerRadius={95}
+                  paddingAngle={3}
+                  dataKey="value"
+                  labelLine={false}
+                  label={renderPieLabel}
+                  animationBegin={0}
+                  animationDuration={800}
                 >
-                  <option>This Month</option>
-                  <option>Last Month</option>
-                  <option>This Year</option>
-                </select>
-                <Filter size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-             </div>
-          </div>
-        }
-      />
-
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Revenue by Service - Bar Chart */}
-        <AdminCard title="Revenue by Service">
-          <div className="h-64 flex items-end justify-around gap-4 border-b border-slate-200 pb-4 mb-6">
-            {revenueData.map((month, index) => (
-              <div key={index} className="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
-                <div className="w-full flex gap-1 items-end justify-center h-48 relative">
-                   {/* Tooltip hint */}
-                  <div 
-                    className="flex-1 bg-blue-500 rounded-t-sm opacity-80 group-hover:opacity-100 transition-all group-hover:scale-y-105 origin-bottom"
-                    style={{ height: `${(month.consultations / 80) * 100}%` }}
-                  />
-                  <div 
-                    className="flex-1 bg-emerald-500 rounded-t-sm opacity-80 group-hover:opacity-100 transition-all group-hover:scale-y-105 origin-bottom"
-                    style={{ height: `${(month.library / 80) * 100}%` }}
-                  />
-                  <div 
-                    className="flex-1 bg-amber-500 rounded-t-sm opacity-80 group-hover:opacity-100 transition-all group-hover:scale-y-105 origin-bottom"
-                    style={{ height: `${(month.courses / 80) * 100}%` }}
-                  />
-                </div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{month.month}</span>
-              </div>
-            ))}
-          </div>
-          <div className="flex items-center justify-center gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 bg-blue-500 rounded-full" />
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Consultations</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Library</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 bg-amber-500 rounded-full" />
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Courses</span>
-            </div>
-          </div>
-        </AdminCard>
-
-        {/* Payment Methods - Donut Chart */}
-        <AdminCard title="Payment Methods">
-          <div className="flex items-center justify-center h-64 mb-6 relative">
-            <div className="relative w-48 h-48 group">
-              <svg viewBox="0 0 100 100" className="transform -rotate-90 drop-shadow-xl">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#f1f5f9" strokeWidth="12" />
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#3b82f6" strokeWidth="12" 
-                  strokeDasharray="113 251" strokeDashoffset="0" className="hover:opacity-80 transition-opacity cursor-pointer" />
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#10b981" strokeWidth="12" 
-                  strokeDasharray="88 251" strokeDashoffset="-113" className="hover:opacity-80 transition-opacity cursor-pointer" />
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#f59e0b" strokeWidth="12" 
-                  strokeDasharray="38 251" strokeDashoffset="-201" className="hover:opacity-80 transition-opacity cursor-pointer" />
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#8b5cf6" strokeWidth="12" 
-                  strokeDasharray="13 251" strokeDashoffset="-239" className="hover:opacity-80 transition-opacity cursor-pointer" />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                 <span className="text-2xl font-bold text-slate-800">Total</span>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            {paymentMethods.map((method, index) => (
-              <div key={index} className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors">
-                <div className={`w-3 h-3 rounded-full shadow-sm ring-1 ring-white`} style={{ backgroundColor: method.color }} />
-                <div className="flex-1">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{method.name}</p>
-                  <p className="text-sm font-bold text-slate-900">{method.percentage}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </AdminCard>
-      </div>
-
-      {/* Service Revenue Table */}
-      <div className="space-y-4">
-         <div className="px-2">
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Service Revenue Breakdown</h3>
-         </div>
-         <AdminTable 
-           columns={columns}
-           data={serviceRevenue}
-           isLoading={false}
-         />
-      </div>
-
-      {/* ── Priority 10: FILE entity — Payment File Records ── */}
-      <div className="space-y-4">
-        <div className="px-2 flex items-center gap-2">
-          <CreditCard size={16} className="text-slate-400" />
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Payment Files (FILE Entity)</h3>
-          <span className="text-[10px] bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-full font-bold uppercase">Schema: FILE</span>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-50 border-b border-slate-200">
-                <tr>
-                  {['ID', 'Student', 'Country', 'Amount', 'Description', 'Status', 'Date'].map(h => (
-                    <th key={h} className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">{h}</th>
+                  {donutData.map((_, index) => (
+                    <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                   ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {MOCK_FILE_RECORDS.map(file => {
-                  const style = FILE_STATUS_STYLES[file.status] || FILE_STATUS_STYLES.Pending;
-                  return (
-                    <tr key={file.id} className="hover:bg-slate-50/60 transition-colors">
-                      <td className="px-5 py-3">
-                        <span className="text-xs font-mono bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{file.id}</span>
-                      </td>
-                      <td className="px-5 py-3">
-                        <p className="text-sm font-medium text-slate-900">{file.studentName}</p>
-                        <p className="text-xs text-slate-400">{file.user_id}</p>
-                      </td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-1.5">
-                          <Globe size={13} className="text-slate-400" />
-                          <span className="text-sm text-slate-600">{file.country}</span>
-                        </div>
-                      </td>
-                      <td className="px-5 py-3">
-                        <span className="text-sm font-semibold text-slate-900">
-                          {file.currency} {parseFloat(file.amount).toFixed(2)}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3">
-                        <p className="text-xs text-slate-500 max-w-[200px] truncate">{file.description}</p>
-                      </td>
-                      <td className="px-5 py-3">
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${style.bg} ${style.text} ${style.border}`}>
-                          {file.status}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-xs text-slate-400 font-mono">
-                        {new Date(file.created_at).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                </Pie>
+                <Legend
+                  iconType="circle"
+                  iconSize={8}
+                  formatter={(value, entry) => (
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}>
+                      {value} <span style={{ color: "#0f172a" }}>({entry.payload.value})</span>
+                    </span>
+                  )}
+                />
+                <Tooltip content={<ChartTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
+        </AdminCard>
+      </div>
+
+      {/* ── Row 2: Applications per Month (stacked bars) ─────────── */}
+      <AdminCard
+        title="Applications per Month — Breakdown"
+        action={
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">
+            By Status
+          </span>
+        }
+      >
+        {loading ? (
+          <ChartSkeleton height={260} />
+        ) : (
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={filteredApps} barSize={14} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94a3b8", fontWeight: 600 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: "#f8fafc" }} />
+              <Legend iconType="circle" iconSize={8} formatter={(v) => <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}>{v}</span>} />
+              <Bar dataKey="New"               name="New"               stackId="a" fill={COLORS.blue}    radius={[0, 0, 0, 0]} />
+              <Bar dataKey="In Progress"       name="In Progress"       stackId="a" fill={COLORS.amber}   radius={[0, 0, 0, 0]} />
+              <Bar dataKey="Pending Documents" name="Pending Documents" stackId="a" fill={COLORS.sky}     radius={[0, 0, 0, 0]} />
+              <Bar dataKey="Approved"          name="Approved"          stackId="a" fill={COLORS.emerald} radius={[0, 0, 0, 0]} />
+              <Bar dataKey="Rejected"          name="Rejected"          stackId="a" fill={COLORS.rose}    radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </AdminCard>
+
+      {/* ── Row 3: Visitors per Month ───────────────────────────── */}
+      <AdminCard
+        title="Platform Visitors per Month"
+        action={
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">
+            Simulated Analytics
+          </span>
+        }
+      >
+        {loading ? (
+          <ChartSkeleton height={220} />
+        ) : (
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={filteredVisitors} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <defs>
+                <linearGradient id="visitorGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stopColor={COLORS.violet} stopOpacity={0.25} />
+                  <stop offset="100%" stopColor={COLORS.violet} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94a3b8", fontWeight: 600 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v}`} />
+              <Tooltip content={<ChartTooltip />} />
+              <Area
+                type="monotone"
+                dataKey="visitors"
+                name="Visitors"
+                stroke={COLORS.violet}
+                strokeWidth={2.5}
+                fill="url(#visitorGrad)"
+                dot={false}
+                activeDot={{ r: 5, fill: COLORS.violet, stroke: "#fff", strokeWidth: 2 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
+      </AdminCard>
+
+      {/* ── Recent Transactions Table ───────────────────────────── */}
+      <div className="space-y-4">
+        <div className="px-1 flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Recent Transactions</h3>
+            <p className="text-xs text-slate-400 mt-0.5">Visa consultation fees + processing fee records</p>
           </div>
+          <span className="text-[10px] font-bold text-slate-400 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full uppercase tracking-wide">
+            {transactions.length} records
+          </span>
         </div>
+        <AdminTable
+          columns={txColumns}
+          data={transactions}
+          isLoading={loading}
+        />
       </div>
     </div>
   );

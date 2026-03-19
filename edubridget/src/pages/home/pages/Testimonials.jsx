@@ -4,36 +4,11 @@ import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const reviews = [
-  {
-    name: "Jane M.",
-    location: "Kenya",
-    text: "TM EduBridge transformed my learning experience. I passed my national exams with flying colors!",
-    image: "https://i.pravatar.cc/150?img=32",
-  },
-  {
-    name: "Samuel O.",
-    location: "Nigeria",
-    text: "As a working professional, the flexible learning options helped me earn a certification in my own time.",
-    image: "https://i.pravatar.cc/150?img=11",
-  },
-  {
-    name: "Ms. Amina B.",
-    location: "Tanzania",
-    text: "As an educator, I've found their resources aligned with our curriculum and easy to implement.",
-    image: "https://i.pravatar.cc/150?img=5",
-  },
-  {
-    name: "David K.",
-    location: "Uganda",
-    text: "The visa guidance was exceptional. EduBridge made my dream of studying abroad a reality.",
-    image: "https://i.pravatar.cc/150?img=15",
-  },
-  {
-    name: "Grace N.",
-    location: "Rwanda",
-    text: "From application to arrival, every step was handled with care. I'm now studying in Seoul!",
-    image: "https://i.pravatar.cc/150?img=47",
-  },
+  { key: "jane_m",   image: "https://i.pravatar.cc/150?img=32" },
+  { key: "samuel_o", image: "https://i.pravatar.cc/150?img=11" },
+  { key: "amina_b",  image: "https://i.pravatar.cc/150?img=5"  },
+  { key: "david_k",  image: "https://i.pravatar.cc/150?img=15" },
+  { key: "grace_n",  image: "https://i.pravatar.cc/150?img=47" },
 ];
 
 const INTERVAL = 4000;

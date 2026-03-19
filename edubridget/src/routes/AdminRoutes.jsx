@@ -67,9 +67,7 @@ const UniversityPrograms = lazy(
 const AdminProgramDetail = lazy(
   () => import("../pages/shared/AdminProgramDetail"),
 );
-const UniversityProgramDetailsPreview = lazy(
-  () => import("../pages/shared/UniversityProgramDetailsPreview"),
-);
+const ProgramDetail = lazy(() => import("../pages/study-abroad/ProgramDetail"));
 
 export default function AdminRoutes() {
   return (
@@ -99,7 +97,7 @@ export default function AdminRoutes() {
         <Route path="programs/:id" element={<AdminProgramDetail />} />
         <Route
           path="programs/view/:id"
-          element={<UniversityProgramDetailsPreview />}
+          element={<ProgramDetail previewMode backPath="/admin/programs" />}
         />
         {/* CMS */}
         <Route path="cms" element={<ContentManagement />}>
@@ -120,7 +118,7 @@ export default function AdminRoutes() {
         <Route path="scholarships" element={<ScholarshipManager />} />
         <Route path="branches" element={<BranchManagement />} />
         <Route path="finance" element={<FinancialReports />} />
-        <Route path="analytics" element={<Analytics />} />
+        {/* <Route path="analytics" element={<Analytics />} /> */}
         <Route path="communications" element={<Communications />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>

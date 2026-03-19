@@ -2,7 +2,7 @@
 // CMS content — state initialised from static data until a headless CMS is integrated.
 import { useState } from "react";
 import { toast } from "sonner";
-import { branches as STATIC_BRANCHES } from "../data/branches";
+import { MOCK_BRANCHES as STATIC_BRANCHES } from "../data/branches";
 
 export function useBranches() {
   const [branches, setBranches] = useState(STATIC_BRANCHES);
@@ -24,5 +24,12 @@ export function useBranches() {
     toast.success("Branch deleted");
   };
 
-  return { branches, loading: false, error: null, createBranch, updateBranch, deleteBranch };
+  return {
+    branches,
+    loading: false,
+    error: null,
+    createBranch,
+    updateBranch,
+    deleteBranch,
+  };
 }

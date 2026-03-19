@@ -21,7 +21,7 @@ const BranchesPage = () => {
   const { t } = useTranslation();
   const { branches } = useBranches();
   const [selectedBranch, setSelectedBranch] = useState(
-    () => branches.find((b) => b.isHeadOffice) ?? branches[0] ?? null
+    () => branches.find((b) => b.isHeadOffice) ?? branches[0] ?? null,
   );
 
   return (
@@ -184,7 +184,7 @@ const BranchesPage = () => {
                         </p>
                         <p className="flex items-center gap-2">
                           <User className="h-4 w-4 flex-shrink-0 text-primary" />
-                          {branch.manager}
+                          {branch.managerName}
                         </p>
                       </div>
 
