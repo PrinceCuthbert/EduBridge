@@ -44,27 +44,26 @@ export default function BranchManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [formData, setFormData] = useState(initialFormState);
 
-  const { branches, loading, createBranch, updateBranch, deleteBranch } =
-    useBranches();
+  const { branches, isLoading, isError, createBranch } = useBranches();
 
   const stats = [
     {
       label: "Active Centers",
-      value: branches.filter((b) => b.status === "Active").length,
+      value: branches.filter((b) => b.status == true).length,
       icon: Building,
       color: "text-blue-600",
       bg: "bg-blue-50",
     },
     {
       label: "Total Staff",
-      value: branches.reduce((sum, b) => sum + b.staff, 0),
+      value: branches.reduce((sum, b) => sum + b.staffCount, 0),
       icon: Users,
       color: "text-indigo-600",
       bg: "bg-indigo-50",
     },
     {
       label: "Regions",
-      value: new Set(branches.map((b) => b.address.split(", ")[1])).size,
+      value: new Set(branches.map((b) => b.country)).size,
       icon: MapPin,
       color: "text-emerald-600",
       bg: "bg-emerald-50",
@@ -126,7 +125,7 @@ export default function BranchManagement() {
   const filteredBranches = branches.filter(
     (b) =>
       b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.location.toLowerCase().includes(searchQuery.toLowerCase()),
+      b.city.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -152,7 +151,7 @@ export default function BranchManagement() {
 
       {/* Branch Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {loading
+        {isLoading
           ? [...Array(4)].map((_, i) => (
               <Skeleton
                 key={i}
@@ -163,16 +162,18 @@ export default function BranchManagement() {
               // CHANGED: rounded-3xl -> rounded-xl, simplified border/shadow
               <div
                 key={branch.id}
-                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden group">
+                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden group"
+              >
                 {/* Status Badge */}
                 <div className="absolute top-4 right-4">
                   <span
                     className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
-                      branch.status === "Active"
+                      branch.status == true
                         ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                         : "bg-amber-50 text-amber-700 border-amber-200"
-                    }`}>
-                    {branch.status}
+                    }`}
+                  >
+                    {branch.status ? "Active" : "Coming Soon"}
                   </span>
                 </div>
 
@@ -189,7 +190,7 @@ export default function BranchManagement() {
                       </h3>
                       <div className="flex items-center gap-1.5 text-sm text-slate-500 font-medium">
                         <MapPin size={14} className="text-slate-400" />
-                        {branch.location}
+                        {branch.city}, {branch.country}
                       </div>
                     </div>
                   </div>
@@ -225,7 +226,7 @@ export default function BranchManagement() {
                         <Users size={14} />
                       </div>
                       <span className="text-sm text-slate-700">
-                        {branch.staff} Staff Members
+                        {branch.staffCount} Staff Members
                       </span>
                     </div>
                   </div>
@@ -253,13 +254,15 @@ export default function BranchManagement() {
                     <button
                       onClick={() => handleEditBranch(branch)}
                       className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="Edit">
+                      title="Edit"
+                    >
                       <Edit size={16} />
                     </button>
                     <button
                       onClick={() => handleDeleteBranch(branch.id, branch.name)}
                       className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete">
+                      title="Delete"
+                    >
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -272,7 +275,8 @@ export default function BranchManagement() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingBranch ? "Edit Branch" : "Register Branch"}
-        size="lg">
+        size="lg"
+      >
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* OPERATIONAL INFO */}
           <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
@@ -282,7 +286,8 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-name"
-                className="text-sm font-medium text-slate-700">
+                className="text-sm font-medium text-slate-700"
+              >
                 Branch Name
               </label>
               <input
@@ -300,7 +305,8 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-location"
-                className="text-sm font-medium text-slate-700">
+                className="text-sm font-medium text-slate-700"
+              >
                 Location
               </label>
               <input
@@ -319,7 +325,8 @@ export default function BranchManagement() {
             <div className="md:col-span-2 space-y-1.5">
               <label
                 htmlFor="branch-address"
-                className="text-sm font-medium text-slate-700">
+                className="text-sm font-medium text-slate-700"
+              >
                 Address
               </label>
               <input
@@ -338,7 +345,8 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-phone"
-                className="text-sm font-medium text-slate-700">
+                className="text-sm font-medium text-slate-700"
+              >
                 Phone
               </label>
               <input
@@ -355,7 +363,8 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-email"
-                className="text-sm font-medium text-slate-700">
+                className="text-sm font-medium text-slate-700"
+              >
                 Email
               </label>
               <input
@@ -373,7 +382,8 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-hours"
-                className="text-sm font-medium text-slate-700">
+                className="text-sm font-medium text-slate-700"
+              >
                 Hours
               </label>
               <input
@@ -392,7 +402,8 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-staff"
-                className="text-sm font-medium text-slate-700">
+                className="text-sm font-medium text-slate-700"
+              >
                 Staff Count
               </label>
               <input
@@ -414,7 +425,8 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-status"
-                className="text-sm font-medium text-slate-700">
+                className="text-sm font-medium text-slate-700"
+              >
                 Status
               </label>
               <select
@@ -424,7 +436,8 @@ export default function BranchManagement() {
                 onChange={(e) =>
                   setFormData({ ...formData, status: e.target.value })
                 }
-                className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none">
+                className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none"
+              >
                 <option value="Active">Active</option>
                 <option value="Coming Soon">Coming Soon</option>
                 <option value="Closed">Closed</option>
@@ -434,7 +447,8 @@ export default function BranchManagement() {
             <div className="md:col-span-2 space-y-1.5">
               <label
                 htmlFor="branch-manager"
-                className="text-sm font-medium text-slate-700">
+                className="text-sm font-medium text-slate-700"
+              >
                 Branch Manager
               </label>
               <input
@@ -508,7 +522,8 @@ export default function BranchManagement() {
               />
               <label
                 htmlFor="isHeadOffice"
-                className="text-sm font-medium text-slate-700">
+                className="text-sm font-medium text-slate-700"
+              >
                 Mark as Head Office
               </label>
             </div>
@@ -579,12 +594,14 @@ export default function BranchManagement() {
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">
+              className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
+            >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm">
+              className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm"
+            >
               {editingBranch ? "Save Changes" : "Register Branch"}
             </button>
           </div>

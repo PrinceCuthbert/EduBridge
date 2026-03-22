@@ -95,3 +95,5 @@ export const MOCK_BRANCHES = [
     coordinates: { lat: -6.816, lng: 39.2803 },
   },
 ];
+
+

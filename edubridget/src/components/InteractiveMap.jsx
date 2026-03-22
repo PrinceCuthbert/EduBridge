@@ -34,7 +34,8 @@ const createCustomIcon = (isHeadOffice = false) => {
         className={`w-10 h-10 rounded-full ${isHeadOffice ? "bg-accent" : "bg-primary"} 
                     shadow-lg flex items-center justify-center border-4 border-white
                     transform -translate-y-1/2`}
-        style={{ position: "relative" }}>
+        style={{ position: "relative" }}
+      >
         <MapPin className="h-5 w-5 text-white" fill="white" />
       </div>
       {isHeadOffice && (
@@ -63,26 +64,36 @@ const MapController = ({ selectedBranch, branches, onMarkerClick }) => {
   const markersRef = useRef({});
 
   useEffect(() => {
-    if (selectedBranch && selectedBranch.coordinates) {
-      const { lat, lng } = selectedBranch.coordinates;
+    if (!selectedBranch || !selectedBranch.coordinates) return;
 
-      // Smooth fly to selected branch
-      map.flyTo([lat, lng], 13, {
-        duration: 1.5,
-        easeLinearity: 0.25,
-      });
+    const geo = selectedBranch.coordinates;
+    const lat = geo.latitude ?? geo._lat ?? geo.lat;
+    const lng = geo.longitude ?? geo._long ?? geo.lng;
 
-      // Auto-open popup after flight completes
-      const timeoutId = setTimeout(() => {
-        const marker = markersRef.current[selectedBranch.country];
-        if (marker) {
-          marker.openPopup();
-        }
-      }, 1600); // Slightly after animation completes
-
-      // Cleanup timeout to prevent memory leak
-      return () => clearTimeout(timeoutId);
+    if (typeof lat !== "number" || typeof lng !== "number") {
+      console.warn(
+        "[MapController] invalid selectedBranch coordinates",
+        selectedBranch,
+      );
+      return;
     }
+
+    // Smooth fly to selected branch
+    map.flyTo([lat, lng], 13, {
+      duration: 1.5,
+      easeLinearity: 0.25,
+    });
+
+    // Auto-open popup after flight completes
+    const timeoutId = setTimeout(() => {
+      const marker = markersRef.current[selectedBranch.country];
+      if (marker) {
+        marker.openPopup();
+      }
+    }, 1600); // Slightly after animation completes
+
+    // Cleanup timeout to prevent memory leak
+    return () => clearTimeout(timeoutId);
   }, [selectedBranch, map]);
 
   return (
@@ -90,7 +101,7 @@ const MapController = ({ selectedBranch, branches, onMarkerClick }) => {
       {branches.map((branch) => (
         <Marker
           key={branch.country}
-          position={[branch.coordinates.lat, branch.coordinates.lng]}
+          position={[branch.coordinates._lat, branch.coordinates._long]}
           icon={createCustomIcon(branch.isHeadOffice)}
           ref={(ref) => {
             if (ref) markersRef.current[branch.country] = ref;
@@ -99,7 +110,8 @@ const MapController = ({ selectedBranch, branches, onMarkerClick }) => {
             click: () => {
               onMarkerClick(branch);
             },
-          }}>
+          }}
+        >
           <Popup className="custom-popup" maxWidth={300}>
             <div className="p-2">
               {/* Header */}
@@ -130,7 +142,8 @@ const MapController = ({ selectedBranch, branches, onMarkerClick }) => {
                   <Phone className="h-4 w-4 text-primary flex-shrink-0" />
                   <a
                     href={`tel:${branch.phone}`}
-                    className="text-primary hover:underline">
+                    className="text-primary hover:underline"
+                  >
                     {branch.phone}
                   </a>
                 </div>
@@ -139,7 +152,8 @@ const MapController = ({ selectedBranch, branches, onMarkerClick }) => {
                   <Mail className="h-4 w-4 text-primary flex-shrink-0" />
                   <a
                     href={`mailto:${branch.email}`}
-                    className="text-primary hover:underline text-xs">
+                    className="text-primary hover:underline text-xs"
+                  >
                     {branch.email}
                   </a>
                 </div>
@@ -166,14 +180,14 @@ const InteractiveMap = ({
   branches,
   selectedBranch,
   onMarkerClick,
-  defaultCenter = { lat: -1.9441, lng: 30.0619 }, // East Africa center
+  defaultCenter = { _lat: -1.9441, _long: 30.0619 }, // East Africa center
   defaultZoom = 5,
   className = "",
 }) => {
   // Smart center logic: selected branch or East Africa region
   const mapCenter = selectedBranch?.coordinates
-    ? [selectedBranch.coordinates.lat, selectedBranch.coordinates.lng]
-    : [defaultCenter.lat, defaultCenter.lng];
+    ? [selectedBranch.coordinates._lat, selectedBranch.coordinates._long]
+    : [defaultCenter._lat, defaultCenter._long];
 
   const initialZoom = selectedBranch ? 13 : defaultZoom;
 
@@ -195,7 +209,8 @@ const InteractiveMap = ({
         zoom={initialZoom}
         scrollWheelZoom={true}
         className="h-full w-full rounded-2xl shadow-lift z-10 relative"
-        style={{ minHeight: "450px" }}>
+        style={{ minHeight: "450px" }}
+      >
         {/* Layer Control - Toggle between Street and Satellite */}
         <LayersControl position="topright">
           {/* Street Map (Default) */}
