@@ -77,7 +77,8 @@ export default function AdminRoutes() {
           <ProtectedRoute allowedRoles={["admin"]}>
             <DashboardLayout />
           </ProtectedRoute>
-        }>
+        }
+      >
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminOverview />} />
         <Route path="users" element={<UserManagement />} />
@@ -113,7 +114,8 @@ export default function AdminRoutes() {
         </Route>
         {/* Roles */}
         {/* This will be handled at the backend side */}
-        {/* <Route path="roles" element={<RoleManagement />} />               Priority 9 */}
+        <Route path="roles" element={<RoleManagement />} />
+        {/* Priority 9 */}
         {/* Other sections */}
         <Route path="scholarships" element={<ScholarshipManager />} />
         <Route path="branches" element={<BranchManagement />} />

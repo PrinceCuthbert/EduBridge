@@ -1,35 +1,47 @@
 // src/hooks/useBranches.js
 // CMS content — state initialised from static data until a headless CMS is integrated.
-import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { MOCK_BRANCHES as STATIC_BRANCHES } from "../data/branches";
+import { collection, addDoc, getDocs } from "firebase/firestore";
+import { db } from "../firebase/config";
+
+const fetchBranches = async () => {
+  const snapshot = await getDocs(collection(db, "branches"));
+  const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return data;
+};
 
 export function useBranches() {
-  const [branches, setBranches] = useState(STATIC_BRANCHES);
+  const queryClient = useQueryClient();
 
-  const createBranch = (data) => {
-    const branch = { ...data, id: Date.now() };
-    setBranches((p) => [...p, branch]);
-    toast.success("Branch registered");
-    return branch;
-  };
+  const { data: branches = [], isLoading, isError, error, status } = useQuery({
+    queryKey: ["branches"],
+    queryFn: fetchBranches,
+    onError: (err) => {
+      console.error("[useBranches] onError", err);
+    },
+  });
 
-  const updateBranch = (id, data) => {
-    setBranches((p) => p.map((b) => (b.id === id ? { ...b, ...data } : b)));
-    toast.success("Branch updated");
-  };
+  const createBranchMutation = useMutation({
+    mutationFn: (newBranch) => addDoc(collection(db, "branches"), newBranch),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["branches"] });
+      toast.success("Branch created");
+    },
+    onError: (err) => {
+      toast.error("Failed to create branch");
+      console.error(err);
+    },
+  });
 
-  const deleteBranch = (id) => {
-    setBranches((p) => p.filter((b) => b.id !== id));
-    toast.success("Branch deleted");
-  };
+  const createBranch = (data) => createBranchMutation.mutate(data);
 
   return {
     branches,
-    loading: false,
-    error: null,
+    isLoading,
+    isError,
+    error,
     createBranch,
-    updateBranch,
-    deleteBranch,
   };
 }

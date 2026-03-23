@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,10 +19,40 @@ const InteractiveMap = lazy(() => import("@/components/InteractiveMap"));
 
 const BranchesPage = () => {
   const { t } = useTranslation();
-  const { branches } = useBranches();
-  const [selectedBranch, setSelectedBranch] = useState(
-    () => branches.find((b) => b.isHeadOffice) ?? branches[0] ?? null,
-  );
+  const { branches, isLoading, isError, error } = useBranches();
+  const [selectedBranch, setSelectedBranch] = useState(null);
+
+  useEffect(() => {
+    if (!isLoading && !isError && branches?.length > 0) {
+      setSelectedBranch(
+        (prev) => prev ?? branches.find((b) => b.isHeadOffice) ?? branches[0],
+      );
+    }
+  }, [isLoading, isError, branches]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading branches...
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Error loading branches: {error?.message || "Unknown error"}
+      </div>
+    );
+  }
+
+  if (!selectedBranch) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        No branch selected yet
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -30,12 +60,14 @@ const BranchesPage = () => {
         {/* Hero */}
         <section
           className="py-16 md:py-20"
-          style={{ backgroundColor: "#1e3a8a" }}>
+          style={{ backgroundColor: "#1e3a8a" }}
+        >
           <div className="container mx-auto px-4 md:px-8">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center text-white">
+              className="text-center text-white"
+            >
               <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
                 {t("branches_page.hero_title")}
               </h1>
@@ -74,7 +106,8 @@ const BranchesPage = () => {
                         selectedBranch.country === branch.country
                           ? "bg-primary text-white shadow-md"
                           : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                      }`}>
+                      }`}
+                    >
                       {branch.flag} {branch.city}
                       {branch.isHeadOffice && (
                         <Building2 className="inline-block h-4 w-4 ml-1" />
@@ -122,7 +155,8 @@ const BranchesPage = () => {
                         Loading map...
                       </span>
                     </div>
-                  }>
+                  }
+                >
                   <InteractiveMap
                     branches={branches}
                     selectedBranch={selectedBranch}
@@ -145,9 +179,11 @@ const BranchesPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}>
+                  transition={{ delay: index * 0.1 }}
+                >
                   <Card
-                    className={`h-full overflow-hidden border-slate-200 shadow-sm hover:shadow-lg transition-shadow bg-white ${branch.isHeadOffice ? "border-primary ring-1 ring-primary/20" : ""}`}>
+                    className={`h-full overflow-hidden border-slate-200 shadow-sm hover:shadow-lg transition-shadow bg-white ${branch.isHeadOffice ? "border-primary ring-1 ring-primary/20" : ""}`}
+                  >
                     {branch.isHeadOffice && (
                       <div className="bg-primary text-white text-center py-2 text-sm font-medium">
                         🏢 {t("branches_page.head_office_badge")}
@@ -192,7 +228,8 @@ const BranchesPage = () => {
                         {branch.services.slice(0, 3).map((service) => (
                           <span
                             key={service}
-                            className="text-xs bg-slate-100 px-2 py-1 rounded-full text-slate-600">
+                            className="text-xs bg-slate-100 px-2 py-1 rounded-full text-slate-600"
+                          >
                             {service}
                           </span>
                         ))}
@@ -201,7 +238,8 @@ const BranchesPage = () => {
                       <Button
                         variant="outline"
                         className="w-full border-slate-200 hover:bg-slate-50 hover:text-primary"
-                        size="sm">
+                        size="sm"
+                      >
                         {t("branches_page.contact_branch_button")}
                         <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>
@@ -225,7 +263,8 @@ const BranchesPage = () => {
             <Link to="/visa-consultation">
               <Button
                 size="lg"
-                className="bg-primary hover:bg-primary-dark text-white">
+                className="bg-primary hover:bg-primary-dark text-white"
+              >
                 {t("branches_page.cta.button")}
               </Button>
             </Link>
