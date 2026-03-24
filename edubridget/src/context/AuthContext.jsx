@@ -1,5 +1,8 @@
 // src/context/AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase/config";
 import * as userService from "../services/userService";
 
 const AuthContext = createContext(null);
@@ -8,90 +11,68 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Firebase Auth manages session automatically — onAuthStateChanged fires on
+  // every page load if the user is already logged in (no localStorage needed).
   useEffect(() => {
-    const initAuth = () => {
-      const storedUser = localStorage.getItem("edubridge_user_session");
-      if (storedUser) {
-        try {
-          setUser(JSON.parse(storedUser));
-        } catch (error) {
-          localStorage.removeItem("edubridge_user_session");
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // Auth knows WHO is logged in — Firestore has the full profile
+        const snapshot = await getDoc(doc(db, "users", firebaseUser.uid));
+        if (snapshot.exists()) {
+          setUser({ id: firebaseUser.uid, ...snapshot.data() });
+        } else {
+          // Auth account exists but no Firestore profile (edge case)
+          setUser(null);
         }
+      } else {
+        setUser(null);
       }
       setLoading(false);
-    };
-    initAuth();
+    });
+
+    return unsubscribe; // cleanup listener on unmount
   }, []);
 
-  // Persist session: stores user object + JWT token (if backend provides one).
-  // When backend sends { token, user } instead of just the user object,
-  // the token is stored under 'token' so axios interceptors in api/services.js can read it.
-  const _persistSession = (result) => {
-    const user = result?.user ?? result;
-    const token = result?.token ?? null;
-    localStorage.setItem('edubridge_user_session', JSON.stringify(user));
-    if (token) {
-      localStorage.setItem('token', token);
-    }
-    return user;
-  };
-
   const login = useCallback(async ({ identifier, password }) => {
-    // identifier = email OR username — userService.loginUser checks both
     const result = await userService.loginUser(identifier, password);
-    const loggedInUser = _persistSession(result);
-    setUser(loggedInUser);
-    return loggedInUser;
+    setUser(result);
+    return result;
   }, []);
 
   const loginWithGoogle = useCallback(async (credential) => {
-    try {
-      const result = await userService.loginWithGoogleToken(credential);
-      const googleUser = _persistSession(result);
-      setUser(googleUser);
-      return googleUser;
-    } catch (err) {
-      throw new Error("Google authentication failed");
-    }
+    const result = await userService.loginWithGoogleToken(credential);
+    setUser(result);
+    return result;
   }, []);
 
   const signUp = useCallback(async (userData) => {
     const result = await userService.registerUser(userData);
-    const newUser = _persistSession(result);
-    setUser(newUser);
-    return newUser;
+    setUser(result);
+    return result;
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('edubridge_user_session');
-    localStorage.removeItem('token');
+  const logout = useCallback(async () => {
+    await signOut(auth); // Firebase clears its own session
     setUser(null);
   }, []);
 
- // AFTER (writes to DB first, then syncs session)
-const updateProfile = useCallback(async (formData) => {
-  // 1. Write to the DB (same store as userService)
-  const updatedUser = await userService.updateUser(user.id, formData);
-  // 2. Sync the session so UI stays up-to-date
-  const sessionUser = { ...user, ...updatedUser };
-  localStorage.setItem('edubridge_user_session', JSON.stringify(sessionUser));
-  setUser(sessionUser);
-  return updatedUser;
-}, [user]);
+  const updateProfile = useCallback(async (formData) => {
+    const updatedUser = await userService.updateUser(user.id, formData);
+    setUser((prev) => ({ ...prev, ...updatedUser }));
+    return updatedUser;
+  }, [user]);
 
-  // ── Permission checking ──────────────────────────────────────────────────
-  // Falls back to role-defaults so old sessions (no permissions array) still work.
-  // When backend is live, user.permissions comes from ROLE_PERMISSION table via JWT.
+  // ── Permission checking ────────────────────────────────────────────────────
   const DEFAULT_ROLE_PERMISSIONS = useMemo(() => ({
-    admin:   ['all'],
-    student: ['view_own_app', 'submit_app', 'edit_profile'],
-    staff:   ['view_apps', 'update_app_status'],
+    admin:   ["all"],
+    student: ["view_own_app", "submit_app", "edit_profile"],
+    staff:   ["view_apps", "update_app_status"],
   }), []);
 
   const hasPermission = useCallback((permissionName) => {
     if (!user) return false;
     const perms = user.permissions ?? DEFAULT_ROLE_PERMISSIONS[user.role?.toLowerCase()] ?? [];
-    return perms.includes('all') || perms.includes(permissionName);
+    return perms.includes("all") || perms.includes(permissionName);
   }, [user, DEFAULT_ROLE_PERMISSIONS]);
 
   const value = useMemo(() => ({
@@ -104,8 +85,8 @@ const updateProfile = useCallback(async (formData) => {
     updateProfile,
     hasPermission,
     isAuthenticated: !!user,
-    isAdmin: user?.role === 'admin',
-    isStudent: user?.role === 'student'
+    isAdmin: user?.role === "admin",
+    isStudent: user?.role === "student",
   }), [user, loading, login, loginWithGoogle, signUp, logout, updateProfile, hasPermission]);
 
   return (
@@ -117,8 +98,6 @@ const updateProfile = useCallback(async (formData) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };
