@@ -1,143 +1,109 @@
 // src/services/userService.js
-import { MOCK_ROLES, MOCK_USERS } from "../data/mockUsers";
-import { jwtDecode } from "jwt-decode";
 import { v4 as uuidv4 } from "uuid";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  setDoc,
+} from "firebase/firestore";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithCredential,
+} from "firebase/auth";
+import { db, auth } from "../firebase/config";
 
-const STORAGE_KEY = "edubridge_db_users";
-
-// Helper: Find Role ID by name
-const getRoleId = (roleName) =>
-  MOCK_ROLES.find((r) => r.name === roleName)?.id || 2;
-
-// ── Internal DB Simulation ───────────────────────────────────────────────────
-
-const _getUsersDB = () => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) {
-      // Seed demo accounts (admin + student) — permanent dev credentials.
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_USERS));
-      return MOCK_USERS;
-    }
-    return JSON.parse(data);
-  } catch {
-    return MOCK_USERS;
-  }
-};
-
-const _saveUsersDB = (users) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-};
-
-// ── Authentication ───────────────────────────────────────────────────────────
+// ── Authentication (Firebase Auth + Firestore profile) ────────────────────────
 
 export const registerUser = async (userData) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  const users = _getUsersDB();
+  // Step 1: Create the account in Firebase Auth (handles password securely)
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    userData.email,
+    userData.password
+  );
+  const uid = userCredential.user.uid;
 
-  if (users.find((u) => u.email === userData.email)) {
-    throw new Error("User with this email already exists");
-  }
-
-  const userId = uuidv4();
-  const identityId = uuidv4();
+  // Step 2: Build the profile — no password stored here, Firestore is public data only
   const roleName = userData.role || "student";
   const now = new Date().toISOString();
-
-  const newUserDTO = {
-    // ── USER table ─────────────────────────────────────────────────────────
-    id: userId,
+  const profile = {
     email: userData.email,
-    username: userData.username || userData.email.split("@")[0], // DB requires username
-    password: userData.password, // backend hashes this + salt
-    salt: null, // backend concern
+    username: userData.username || userData.email.split("@")[0],
     role: roleName,
-    roleId: getRoleId(roleName),
     status: "Active",
     created_at: now,
     updated_at: now,
-    permissions:
-      roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
-
-    // ── IDENTITY table ──────────────────────────────────────────────────────
-    // JS keys stay camelCase (firstName, lastName) — the real API service layer
-    // will translate to snake_case (first_name, last_name) on fetch().
+    permissions: roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
     identity: {
-      id: identityId,
-      user_id: userId,
+      id: uuidv4(),
       firstName: userData.firstName,
       lastName: userData.lastName,
       nationality: userData.nationality || null,
       gender: userData.gender || null,
-      dob: userData.dateOfBirth || null, // ← DB column: dob
+      dob: userData.dateOfBirth || null,
       language: userData.language || "English",
-      phone: userData.phoneNumber || null, // NOTE: add phone VARCHAR to DB IDENTITY table
-      id_document: null, // FK → SYSTEM_FILES
+      phone: userData.phoneNumber || null,
+      id_document: null,
     },
-
-    // ── Frontend helpers (not in DB) ───────────────────────────────────────
     avatar: `https://ui-avatars.com/api/?name=${userData.firstName}+${userData.lastName}&background=random`,
   };
 
-  users.push(newUserDTO);
-  _saveUsersDB(users);
+  // Step 3: Save profile to Firestore using Firebase Auth uid as the document ID
+  // setDoc (not addDoc) lets us control the document ID — uid links Auth ↔ Firestore
+  await setDoc(doc(db, "users", uid), profile);
 
-  const { password, salt, ...safeUser } = newUserDTO;
-  return safeUser;
+  return { id: uid, ...profile };
 };
 
-export const loginUser = async (identifier, providedPassword) => {
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  const users = _getUsersDB();
+export const loginUser = async (email, password) => {
+  // Firebase Auth verifies the password — we never touch it in Firestore
+  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  const uid = userCredential.user.uid;
 
-  // Accepts either email OR username — matches DB where both are unique
-  const user = users.find(
-    (u) =>
-      u.email.toLowerCase() === identifier.toLowerCase() ||
-      u.username?.toLowerCase() === identifier.toLowerCase()
-  );
+  // Fetch the full profile from Firestore using the uid
+  const snapshot = await getDoc(doc(db, "users", uid));
+  if (!snapshot.exists()) throw new Error("User profile not found");
 
-  if (!user || user.password !== providedPassword) {
-    throw new Error("Invalid email/username or password");
-  }
-
-  const { password, salt, ...safeUser } = user;
-  return safeUser;
+  return { id: uid, ...snapshot.data() };
 };
 
 export const loginWithGoogleToken = async (credential) => {
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  // Exchange the Google JWT for a Firebase Auth credential
+  const googleCredential = GoogleAuthProvider.credential(credential);
+  const userCredential = await signInWithCredential(auth, googleCredential);
+  const uid = userCredential.user.uid;
+  const firebaseUser = userCredential.user;
 
-  const decoded = jwtDecode(credential);
-  const adminEmails =
-    import.meta.env.VITE_ADMIN_EMAILS?.split(",").map((e) => e.trim()) || [];
-  const isAdmin = adminEmails.includes(decoded.email);
-  const roleName = isAdmin ? "admin" : "student";
-  const now = new Date().toISOString();
+  // Check if a Firestore profile already exists for this Google user
+  const ref = doc(db, "users", uid);
+  const snapshot = await getDoc(ref);
 
-  const users = _getUsersDB();
-  let user = users.find((u) => u.email === decoded.email);
+  if (!snapshot.exists()) {
+    // First-time Google login — create the profile
+    const adminEmails =
+      import.meta.env.VITE_ADMIN_EMAILS?.split(",").map((e) => e.trim()) || [];
+    const isAdmin = adminEmails.includes(firebaseUser.email);
+    const roleName = isAdmin ? "admin" : "student";
+    const now = new Date().toISOString();
 
-  if (!user) {
-    const userId = uuidv4();
-    user = {
-      id: userId,
-      email: decoded.email,
-      username: decoded.email.split("@")[0],
-      password: null,
-      salt: null,
+    const profile = {
+      email: firebaseUser.email,
+      username: firebaseUser.email.split("@")[0],
       role: roleName,
-      roleId: getRoleId(roleName),
       status: "Active",
       created_at: now,
       updated_at: now,
-      permissions:
-        roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
+      permissions: roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
       identity: {
         id: uuidv4(),
-        user_id: userId,
-        firstName: decoded.given_name || decoded.name || "",
-        lastName: decoded.family_name || "",
+        firstName: firebaseUser.displayName?.split(" ")[0] || "",
+        lastName: firebaseUser.displayName?.split(" ").slice(1).join(" ") || "",
         nationality: null,
         gender: null,
         dob: null,
@@ -145,92 +111,114 @@ export const loginWithGoogleToken = async (credential) => {
         phone: null,
         id_document: null,
       },
-      avatar: decoded.picture,
+      avatar: firebaseUser.photoURL,
     };
-    users.push(user);
-    _saveUsersDB(users);
+
+    await setDoc(ref, profile);
+    return { id: uid, ...profile };
   }
 
-  const { password, salt, ...safeUser } = user;
-  return safeUser;
+  return { id: uid, ...snapshot.data() };
 };
 
-// ── Admin CRUD ───────────────────────────────────────────────────────────────
+// ── Admin CRUD (Firestore) ────────────────────────────────────────────────────
 
+// localStorage version:
+// export const getUsers = async () => {
+//   const users = _getUsersDB();
+//   return users.map(({ password, salt, ...u }) => u);
+// };
 export const getUsers = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  const users = _getUsersDB();
-  return users.map(({ password, salt, ...safeUser }) => safeUser);
+  const snapshot = await getDocs(collection(db, "users"));
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
+// localStorage version:
+// export const getUserById = async (id) => {
+//   const users = _getUsersDB();
+//   const user = users.find((u) => u.id === id);
+//   if (!user) throw new Error("User not found");
+//   return user;
+// };
 export const getUserById = async (id) => {
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  const users = _getUsersDB();
-  const user = users.find((u) => u.id === id);
-  if (!user) throw new Error("User not found");
-  const { password, salt, ...safeUser } = user;
-  return safeUser;
+  const ref = doc(db, "users", id);
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists()) throw new Error("User not found");
+  return { id: snapshot.id, ...snapshot.data() };
 };
 
+// localStorage version:
+// export const createUser = async (formData) => {
+//   return registerUser({ ...formData, phoneNumber: formData.phone });
+// };
 export const createUser = async (formData) => {
-  // Admin form uses 'phone'; registerUser expects 'phoneNumber'
-  return registerUser({ ...formData, phoneNumber: formData.phone });
+  const roleName = formData.role || "student";
+  const now = new Date().toISOString();
+  const newUser = {
+    email: formData.email,
+    username: formData.email.split("@")[0],
+    role: roleName,
+    status: formData.status || "Active",
+    created_at: now,
+    updated_at: now,
+    permissions: roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
+    identity: {
+      id: uuidv4(),
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      nationality: formData.nationality || null,
+      gender: formData.gender || null,
+      dob: formData.dateOfBirth || null,
+      language: formData.language || "English",
+      phone: formData.phone || null,
+      id_document: null,
+    },
+    avatar: `https://ui-avatars.com/api/?name=${formData.firstName}+${formData.lastName}&background=random`,
+  };
+  const docRef = await addDoc(collection(db, "users"), newUser);
+  return { id: docRef.id, ...newUser };
 };
 
+// localStorage version:
+// export const updateUser = async (id, formData) => { ... localStorage logic ... };
 export const updateUser = async (id, formData) => {
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  const users = _getUsersDB();
-  const idx = users.findIndex((u) => u.id === id);
-  if (idx === -1) throw new Error("User not found");
+  const ref = doc(db, "users", id);
+  const snapshot = await getDoc(ref);
+  if (!snapshot.exists()) throw new Error("User not found");
 
-  const roleName = formData.role
-    ? formData.role.toLowerCase()
-    : users[idx].role;
+  const existing = snapshot.data();
+  const roleName = formData.role ? formData.role.toLowerCase() : existing.role;
 
-  users[idx] = {
-    ...users[idx],
-    email: formData.email || users[idx].email,
+  const updates = {
+    email: formData.email || existing.email,
     role: roleName,
-    roleId: getRoleId(roleName),
-    status: formData.status || users[idx].status,
+    status: formData.status || existing.status,
     updated_at: new Date().toISOString(),
+    permissions: roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
     identity: {
-      ...users[idx].identity,
-      firstName: formData.firstName || users[idx].identity.firstName,
-      lastName: formData.lastName || users[idx].identity.lastName,
-      nationality: formData.nationality || users[idx].identity.nationality,
-      phone: formData.phone || users[idx].identity.phone,
-      gender: formData.gender || users[idx].identity.gender,
-      dob: formData.dateOfBirth || users[idx].identity.dob, // ← was date_birth
-      language: formData.language || users[idx].identity.language || "English",
+      ...existing.identity,
+      firstName: formData.firstName || existing.identity.firstName,
+      lastName: formData.lastName || existing.identity.lastName,
+      nationality: formData.nationality || existing.identity.nationality,
+      phone: formData.phone || existing.identity.phone,
+      gender: formData.gender || existing.identity.gender,
+      dob: formData.dateOfBirth || existing.identity.dob,
+      language: formData.language || existing.identity.language || "English",
     },
   };
 
-  _saveUsersDB(users);
-  const { password, salt, ...safeUser } = users[idx];
-  return safeUser;
+  await updateDoc(ref, updates);
+  return { id, ...existing, ...updates };
 };
 
+// localStorage version:
+// export const deleteUser = async (id) => { ... filter localStorage ... };
 export const deleteUser = async (id) => {
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  let users = _getUsersDB();
-  users = users.filter((u) => u.id !== id);
-  _saveUsersDB(users);
+  await deleteDoc(doc(db, "users", id));
   return true;
 };
 
+// updatePassword will be migrated to Firebase Auth's updatePassword() in a later step
 export const updatePassword = async (id, currentPassword, newPassword) => {
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  const users = _getUsersDB();
-  const idx = users.findIndex((u) => u.id === id);
-  if (idx === -1) throw new Error("User not found");
-  if (users[idx].password !== currentPassword)
-    throw new Error("Current password is incorrect");
-  users[idx] = {
-    ...users[idx],
-    password: newPassword,
-    updated_at: new Date().toISOString(),
-  };
-  _saveUsersDB(users);
-  return true;
+  throw new Error("Password update will be available after full Firebase Auth migration.");
 };
