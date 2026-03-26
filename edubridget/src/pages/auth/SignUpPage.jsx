@@ -8,7 +8,6 @@ import {
   faUserPlus,
   faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
-import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
 import { validateSignUpForm } from "../../utils/validation";
 
@@ -86,20 +85,16 @@ function SignUpPage() {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
+  const handleGoogleSignUp = async () => {
     try {
-      const user = await loginWithGoogle(credentialResponse.credential);
+      const user = await loginWithGoogle();
       toast.success(`Welcome, ${user.identity?.firstName || "User"}!`);
       navigate(user.role === "admin" ? "/admin/dashboard" : "/dashboard", {
         replace: true,
       });
     } catch (err) {
-      toast.error("Google Sign-Up failed. Please try again.");
+      toast.error(err.message || "Google Sign-Up failed. Please try again.");
     }
-  };
-
-  const handleGoogleError = () => {
-    toast.error("Google Sign-Up was cancelled or failed");
   };
 
   return (
@@ -401,14 +396,13 @@ function SignUpPage() {
                 </div>
 
                 <div className="w-full">
-                  <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={handleGoogleError}
-                    text="signup_with"
-                    shape="rectangular"
-                    size="large"
-                    logo_alignment="left"
-                  />
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignUp}
+                    className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-slate-300 rounded-lg bg-white hover:bg-slate-50 transition-colors text-slate-700 font-medium text-sm">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                    Sign up with Google
+                  </button>
                 </div>
               </form>
 

@@ -7,7 +7,6 @@ import {
   faRightToBracket,
   faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
-import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "sonner";
 
@@ -67,25 +66,17 @@ function SignInPage() {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
+  const handleGoogleSignIn = async () => {
     try {
-      // 1. Call the Controller (It handles the decoding and DB saving now!)
-      const user = await loginWithGoogle(credentialResponse.credential);
-
+      const user = await loginWithGoogle();
       const displayName = user.username || user.identity?.firstName || "User";
-      toast.success(`Welcome back, ${displayName}! `);
-
-      // 2. Route based on role
+      toast.success(`Welcome back, ${displayName}!`);
       navigate(user.role === "admin" ? "/admin/dashboard" : "/dashboard", {
         replace: true,
       });
     } catch (err) {
-      toast.error("Failed to sign in with Google. Please try again.");
+      toast.error(err.message || "Failed to sign in with Google. Please try again.");
     }
-  };
-
-  const handleGoogleError = () => {
-    toast.error("Google Sign-In was cancelled or failed");
   };
 
   const fillDemo = (role) => {
@@ -253,14 +244,13 @@ function SignInPage() {
                 </div>
 
                 <div className="w-full">
-                  <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={handleGoogleError}
-                    text="signin_with"
-                    shape="rectangular"
-                    size="large"
-                    logo_alignment="left"
-                  />
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignIn}
+                    className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-slate-300 rounded-lg bg-white hover:bg-slate-50 transition-colors text-slate-700 font-medium text-sm">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                    Sign in with Google
+                  </button>
                 </div>
               </form>
 

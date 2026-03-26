@@ -1,6 +1,6 @@
 # EduBridge — Developer Log
-**Last updated:** March 19, 2026
-**Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix) · March 17 session 4 (full MVC for CMS content types, UI/UX landing page overhaul, FAQ MVC connection) · March 18 session 5 (DB alignment audit, CMS content architecture decision, hook/page cleanup, bug fixes) · March 18–19 sessions 6–8 (full DB alignment sprint, DashboardLayout consolidation, Institution DTO mapper)
+**Last updated:** March 26, 2026
+**Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix) · March 17 session 4 (full MVC for CMS content types, UI/UX landing page overhaul, FAQ MVC connection) · March 18 session 5 (DB alignment audit, CMS content architecture decision, hook/page cleanup, bug fixes) · March 18–19 sessions 6–8 (full DB alignment sprint, DashboardLayout consolidation, Institution DTO mapper) · March 26 session 9 (Firebase auth bug fix — UUID mismatch breaking sign-in)
 
 ---
 
@@ -1532,6 +1532,349 @@ One component, two nav arrays, one role check. ~350 lines of duplicated layout c
 | 8 | **Translation audit** — scan all pages for hardcoded strings not in translation files | Medium | ⏳ Tomorrow |
 | 9 | Add missing translation keys for new home sections (StatsBar, GalleryTeaser, Testimonials cards) | Small | ⏳ Tomorrow |
 | 10 | Fix untranslated strings in `sw/translation.json` (`resources.scholarships`, `services.items.scholarships/study_abroad`) | Small | ⏳ Tomorrow |
-| 11 | APPLICATION_SCHEDULE: add scheduling UI to program form (start/exam/result dates) | Large | ⏳ Tomorrow |
-| 12 | Expose fee fields in `ApplicationSubmitForm.jsx` so students populate the fee block | Small | ⏳ Tomorrow |
+| 11 | APPLICATION_SCHEDULE: add scheduling UI to program form (start/exam/result dates) | Large | ⏳ Pending |
+| 12 | Expose fee fields in `ApplicationSubmitForm.jsx` so students populate the fee block | Small | ⏳ Pending |
+
+---
+
+## Session 9 — March 26, 2026
+
+### Firebase Auth Bug: UUID Mismatch Breaking Sign-In
+
+**Branch:** `frontendPhaseI`
+**File changed:** `src/services/userService.js`
+
+---
+
+### Problem
+
+After the Firebase migration, newly registered users could not sign back in. The app would either throw `"User profile not found"` or silently treat the user as unauthenticated after `onAuthStateChanged` fired — even though Firebase Auth held a valid session.
+
+---
+
+### Root Cause
+
+Three bugs, all in `src/services/userService.js`:
+
+#### Bug 1 — `identity.id` was a random UUID with no connection to the Firebase UID
+
+In `registerUser` and `loginWithGoogleToken`, the profile was built like this:
+
+```js
+// BROKEN
+const uid = userCredential.user.uid;  // e.g. "XyZ8abc..."
+
+const profile = {
+  // uid was NOT stored as a field in the document body
+  identity: {
+    id: uuidv4(),  // "550e8400-..." — random, unrelated to uid above
+  },
+};
+
+await setDoc(doc(db, "users", uid), profile);
+```
+
+The Firebase UID existed only as the Firestore document path (`/users/{uid}`). The `identity.id` field held a random throw-away UUID with no link to the Firebase UID. The document body had no `uid` field at all.
+
+**What Firestore actually stored:**
+
+```
+/users/XyZ8abc...          ← UID only in the document path
+{
+  identity: {
+    id: "550e8400-..."      ← unrelated random UUID
+  }
+  // NO "uid" field in the document body
+}
+```
+
+#### Bug 2 — Firestore security rules were silently denied
+
+Firestore security rules that check `resource.data.uid == request.auth.uid` failed because `uid` was not a document field. This caused `getDoc` reads to be denied, making `snapshot.exists()` behave unexpectedly. `AuthContext` then called `setUser(null)`, leaving the user logged out despite a valid Firebase Auth session.
+
+#### Bug 3 — Admin `createUser` had the same mismatch and used `addDoc`
+
+The admin `createUser` function also used `uuidv4()` for `identity.id` and used `addDoc` (Firestore auto-ID). This meant the document ID, `uid` field, and `identity.id` were all three different values — no consistency.
+
+---
+
+### Solution
+
+Ensured the Firebase UID (or one pre-generated UUID for admin-created users) is used consistently as the document ID, the `uid` field, and `identity.id` across all three functions.
+
+#### `registerUser` (email/password signup)
+
+```js
+// FIXED
+const uid = userCredential.user.uid;
+
+const profile = {
+  uid: uid,          // now stored as a searchable field
+  ...
+  identity: {
+    id: uid,         // matches the document ID — no random UUID divergence
+    ...
+  },
+};
+
+await setDoc(doc(db, "users", uid), profile);
+```
+
+#### `loginWithGoogleToken` (Google OAuth — first-time signup)
+
+Same two changes: `uid: uid` as a top-level field and `identity.id: uid`.
+
+#### `createUser` (admin function — no Firebase Auth account)
+
+One UUID generated once, used for document ID, `uid` field, and `identity.id`. Switched from `addDoc` to `setDoc` for consistency:
+
+```js
+// FIXED
+const newId = uuidv4();  // generated once
+
+const newUser = {
+  uid: newId,
+  ...
+  identity: {
+    id: newId,           // document ID, uid, identity.id all the same
+  },
+};
+
+await setDoc(doc(db, "users", newId), newUser);
+```
+
+---
+
+### Resulting Document Structure (all signup paths)
+
+```
+/users/{uid}
+{
+  uid: "XyZ8abc..."        ← document path, uid field, and identity.id all consistent
+  identity: {
+    id: "XyZ8abc..."
+    ...
+  }
+}
+```
+
+---
+
+### Migration Note
+
+Existing users registered before this fix still have the old mismatched `identity.id` in Firestore. New signups are unaffected. Old accounts will need a one-time Firestore migration script to backfill the `uid` field and correct `identity.id` to match the Firebase UID.
+
+---
+
+## Session 10 — March 26, 2026
+
+### Google OAuth Bug: Hybrid Token Exchange Breaking Google Sign-Up/Sign-In
+
+**Branch:** `frontendPhaseI`
+**Files changed:** `src/services/userService.js`, `src/context/AuthContext.jsx`, `src/pages/auth/SignInPage.jsx`, `src/pages/auth/SignUpPage.jsx`, `src/main.jsx`
+
+---
+
+### Problem
+
+Google sign-up and sign-in silently failed. Email/password auth worked fine. Clicking the Google button would either throw an error or show a generic toast — `"Google Sign-Up failed. Please try again."` — with no useful detail.
+
+---
+
+### Root Cause
+
+The app used two separate OAuth systems simultaneously:
+
+1. `@react-oauth/google` — handled the Google popup and returned a raw Google ID token (JWT)
+2. Firebase Auth — expected to receive and verify that token via `signInWithCredential`
+
+The flow looked like this:
+
+```
+User clicks Google button
+  → @react-oauth/google handles the popup
+  → Returns credentialResponse.credential (Google ID token)
+  → Code manually constructs a Firebase credential:
+       GoogleAuthProvider.credential(idToken)   ← only ID token, no access token
+       signInWithCredential(auth, googleCredential)
+```
+
+For this hybrid approach to work, **all three** of the following had to be true simultaneously:
+1. Firebase Auth had Google provider enabled in the Firebase console
+2. `VITE_GOOGLE_CLIENT_ID` in `.env` was the exact same OAuth 2.0 client ID registered in the Firebase Auth Google provider settings
+3. The app's domain was in Firebase's authorized domains list
+
+Any mismatch between the Google client ID used by `@react-oauth/google` and the one Firebase expected would cause silent rejection. The real Firebase error was swallowed in the catch block:
+
+```js
+// SignInPage.jsx / SignUpPage.jsx — before fix
+} catch (err) {
+  toast.error("Google Sign-Up failed. Please try again.");
+  // err.code and err.message never surfaced — impossible to debug
+}
+```
+
+---
+
+### Solution
+
+Removed `@react-oauth/google` entirely and replaced the hybrid flow with Firebase's native `signInWithPopup`. Firebase now owns the full Google OAuth flow — no manual token exchange, no `VITE_GOOGLE_CLIENT_ID` needed, no synchronization between two OAuth systems.
+
+**`userService.js`** — renamed `loginWithGoogleToken(credential)` → `loginWithGoogle()`, swapped `signInWithCredential` for `signInWithPopup`:
+
+```js
+// BEFORE
+export const loginWithGoogleToken = async (credential) => {
+  const googleCredential = GoogleAuthProvider.credential(credential);
+  const userCredential = await signInWithCredential(auth, googleCredential);
+  ...
+};
+
+// AFTER
+export const loginWithGoogle = async () => {
+  const provider = new GoogleAuthProvider();
+  const userCredential = await signInWithPopup(auth, provider);
+  ...
+};
+```
+
+**`AuthContext.jsx`** — updated `loginWithGoogle` to take no arguments and call the renamed service function.
+
+**`SignInPage.jsx` / `SignUpPage.jsx`** — removed `<GoogleLogin>` component from `@react-oauth/google`, replaced with a plain button that calls `loginWithGoogle()` directly. Also surfaced the real error message in the catch block instead of hiding it.
+
+**`main.jsx`** — removed `GoogleOAuthProvider` wrapper and the unused `clientId` variable.
+
+---
+
+### Files Before vs After
+
+| File | Before | After |
+|------|--------|-------|
+| `userService.js` | `signInWithCredential` + manual `GoogleAuthProvider.credential(idToken)` | `signInWithPopup` with a fresh `GoogleAuthProvider` instance |
+| `AuthContext.jsx` | `loginWithGoogle(credential)` — took a token arg | `loginWithGoogle()` — no args |
+| `SignInPage.jsx` | `<GoogleLogin onSuccess={...} onError={...} />` from `@react-oauth/google` | Plain `<button>` calling `loginWithGoogle()` |
+| `SignUpPage.jsx` | Same as SignInPage | Same fix |
+| `main.jsx` | Wrapped app in `<GoogleOAuthProvider clientId={...}>` | Wrapper removed entirely |
+
+---
+
+### Prerequisite
+
+Google Sign-In must be enabled in **Firebase Console → Authentication → Sign-in method → Google**. No additional environment variables are needed.
+
+---
+
+## Session 11 — March 26, 2026
+
+### Username Login + Uniqueness Enforcement + Migration
+
+**Branch:** `frontendPhaseI`
+**Files changed:** `src/services/userService.js`
+**Files created (then deleted):** `src/utils/migrateUsernames.js`, `src/pages/admin/MigrationPage.jsx`
+
+---
+
+### Problem 1 — Username Login Not Working
+
+The sign-in form accepted "Email or Username" but `loginUser` passed the identifier directly to Firebase's `signInWithEmailAndPassword`, which only accepts a valid email. Entering a username threw `auth/invalid-email` and login silently failed.
+
+**Fix — two-step lookup in `loginUser`:**
+
+```js
+// If identifier has no "@" it's a username — look up the email in Firestore first
+const isEmail = identifier.includes("@");
+if (!isEmail) {
+  const q = query(collection(db, "users"), where("username", "==", identifier));
+  const result = await getDocs(q);
+  if (result.empty) throw new Error("No account found with that username.");
+  email = result.docs[0].data().email;
+}
+// Then proceed with signInWithEmailAndPassword using the resolved email
+```
+
+---
+
+### Problem 2 — Username Uniqueness Not Enforced
+
+Nothing prevented two users from registering with the same username. A simple `getDocs` query check was added first, but it had a theoretical race condition — two simultaneous signups could both pass the check before either wrote.
+
+**Fix — Firestore transaction + dedicated `/usernames` collection:**
+
+Instead of a query check, a `runTransaction` atomically claims the username and writes the user profile in one operation. If two users race for the same username, Firestore retries the second transaction which then sees the claimed document and throws.
+
+```js
+await runTransaction(db, async (transaction) => {
+  const usernameRef = doc(db, "usernames", desiredUsername);
+  const usernameSnap = await transaction.get(usernameRef);
+
+  if (usernameSnap.exists()) {
+    throw new Error(`Username "${desiredUsername}" is already taken.`);
+  }
+
+  transaction.set(usernameRef, { uid });           // claim the username
+  transaction.set(doc(db, "users", uid), profile); // write the user profile
+});
+```
+
+If the transaction fails after the Firebase Auth account was already created, the Auth account is deleted immediately to prevent orphaned accounts:
+
+```js
+} catch (err) {
+  await userCredential.user.delete();
+  throw err;
+}
+```
+
+The same transaction pattern was applied to the admin `createUser` function.
+
+**New Firestore collection created:** `/usernames/{username}` → `{ uid: "..." }`
+
+---
+
+### Migration — Backfilling Existing Users
+
+6 existing users had no `/usernames` document. A temporary migration page was built at `/admin/migrate-usernames`, run once, and then deleted along with its utility script and route.
+
+**Users migrated:**
+- Kurube
+- Krube
+- niyomukizaesperance7
+- niyoespe
+- princecuthbert
+- ishimweprincecuthbert
+
+All 6 now have a `/usernames` document in Firestore. New signups are covered by the transaction going forward.
+
+---
+
+## Next Session — March 27, 2026
+
+### Application Submission Migration: localStorage → Firebase
+
+**Context:** The entire application submission system is currently stored in the browser's localStorage under the key `"edubridge_applications"`. This means data is device-specific, browser-specific, and lost on cache clear. File uploads are stored as Base64 strings in localStorage, which quickly hits the ~5–10MB browser limit.
+
+**Known problems with current state:**
+
+| Problem | Effect |
+|---------|--------|
+| Student submits on Chrome | Admin opens Firefox → sees nothing |
+| Browser data cleared | All applications gone permanently |
+| Student uses a different device | Their own submissions are invisible |
+| File uploads | Stored as Base64 — a 5MB file becomes ~7MB of text in storage |
+| localStorage size limit | ~5–10MB total, easily hit with a few file uploads |
+
+**Plan:**
+
+1. **Part 1 — Application data → Firestore**
+   - Rewrite `src/services/applicationService.js` to use Firestore `applications` collection
+   - `src/hooks/useApplications.js` stays the same — only the service layer changes
+
+2. **Part 2 — File uploads → Firebase Storage**
+   - Replace Base64-in-localStorage with Firebase Storage upload + download URLs
+   - Update `ApplicationSubmitForm.jsx` upload handler
+
+**Files to change:**
+- `src/services/applicationService.js` — full rewrite
+- `src/pages/student-dashboard/applications/ApplicationSubmitForm.jsx` — file upload handler
+- `src/data/mockData.js` — seed data no longer needed once Firestore is live
 

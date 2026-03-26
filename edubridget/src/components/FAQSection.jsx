@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, MessageCircle, CheckCircle } from "lucide-react";
+import { ChevronDown, MessageCircle, CheckCircle, Star } from "lucide-react";
 
 function FAQSection({
   faqs,
@@ -145,7 +145,7 @@ function FAQSection({
             )}
           </motion.div>
 
-          {/* ── RIGHT COLUMN: 3D Floating Graduation Image ── */}
+          {/* ── RIGHT COLUMN: Graduation Image Card ── */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -153,75 +153,28 @@ function FAQSection({
             transition={{ duration: 0.7 }}
             className="relative flex items-center justify-center"
           >
-            {/* Glow backdrop */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-blue-400/10 to-transparent rounded-[3rem] blur-2xl scale-110" />
+            {/* Dark card — its bg absorbs the image's black background naturally */}
+            <div className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-900 via-blue-950 to-slate-800">
+              {/* Subtle inner glow at the top */}
+              <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-blue-500/10 to-transparent z-10 pointer-events-none" />
 
-            {/* Hidden SVG blob clipPath definition */}
-            <svg width="0" height="0" className="absolute">
-              <defs>
-                <clipPath id="blob-shape" clipPathUnits="objectBoundingBox">
-                  <path d="
-                    M0.06,0.12 C0.1,0.02 0.22,-0.02 0.35,0.01
-                    C0.46,0.03 0.54,0 0.65,0.02
-                    C0.76,0.04 0.88,0.02 0.95,0.1
-                    C1.02,0.18 1,0.3 0.98,0.42
-                    C0.97,0.5 1.01,0.58 0.99,0.67
-                    C0.97,0.76 0.94,0.85 0.86,0.92
-                    C0.78,0.99 0.67,1.02 0.55,1
-                    C0.44,0.98 0.34,1.03 0.23,0.99
-                    C0.13,0.95 0.04,0.88 0.02,0.77
-                    C0,0.66 0.04,0.56 0.02,0.46
-                    C0,0.36 -0.02,0.24 0.02,0.18
-                    C0.04,0.14 0.04,0.18 0.06,0.12 Z
-                  " />
-                </clipPath>
-              </defs>
-            </svg>
+              <img
+                src="/graduation.jpeg"
+                alt="EduBridge graduates celebrating"
+                className="w-full object-cover mix-blend-luminosity opacity-90"
+              />
 
-            {/* 3D Tilt Card */}
-            <motion.div
-              className="relative"
-              whileHover={{
-                rotateY: 0,
-                rotateX: 0,
-                scale: 1.03,
-                transition: { duration: 0.4 },
-              }}
-              style={{
-                perspective: 1200,
-                transformStyle: "preserve-3d",
-              }}
-            >
-              {/* Blob-clipped image with 3D tilt */}
-              <motion.div
-                className="relative z-10 w-full max-w-md lg:max-w-lg"
-                style={{
-                  clipPath: "url(#blob-shape)",
-                  transform: "perspective(1200px) rotateY(-8deg) rotateX(3deg)",
-                  filter: "drop-shadow(0 30px 60px rgba(30, 58, 138, 0.3))",
-                  marginBottom: "-40px",
-                  marginTop: "-40px",
-                }}
-                whileHover={{
-                  transform: "perspective(1200px) rotateY(0deg) rotateX(0deg) scale(1.03)",
-                  transition: { duration: 0.4 },
-                }}
-              >
-                <img
-                  src="/graduation.jpeg"
-                  alt="EduBridge graduates celebrating with visa approvals and air tickets"
-                  className="w-full h-full object-cover"
-                />
-              </motion.div>
-            </motion.div>
+              {/* Bottom gradient so the card fades cleanly */}
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-900/70 to-transparent pointer-events-none" />
+            </div>
 
-            {/* Floating badge — rendered outside 3D wrapper to avoid preserve-3d clipping */}
+            {/* Floating badge — bottom left */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8, y: 10 }}
               whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.5, duration: 0.4 }}
-              className="absolute bottom-6 left-6 z-30 bg-white rounded-2xl px-4 py-3 shadow-xl border border-slate-100 flex items-center gap-3"
+              className="absolute bottom-5 left-5 z-30 bg-white rounded-2xl px-4 py-3 shadow-xl border border-slate-100 flex items-center gap-3"
             >
               <div className="w-9 h-9 bg-green-50 rounded-xl flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-500" />
@@ -229,6 +182,23 @@ function FAQSection({
               <div>
                 <p className="text-slate-900 font-bold text-sm leading-none">98%</p>
                 <p className="text-slate-500 text-xs mt-0.5">Scholarship Guarantee Rate</p>
+              </div>
+            </motion.div>
+
+            {/* Floating badge — top right */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: -10 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.65, duration: 0.4 }}
+              className="absolute top-5 right-5 z-30 bg-white rounded-2xl px-4 py-3 shadow-xl border border-slate-100 flex items-center gap-3"
+            >
+              <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center">
+                <Star className="w-5 h-5 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-slate-900 font-bold text-sm leading-none">500+</p>
+                <p className="text-slate-500 text-xs mt-0.5">Students Placed Abroad</p>
               </div>
             </motion.div>
           </motion.div>

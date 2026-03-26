@@ -46,7 +46,7 @@ export default function PublicRoutes() {
         />
 
         <Route path="aboutus" element={<AboutUsPage />} />
-        <Route path="contacts" element={<ContactPage />} />
+        <Route path="contact" element={<ContactPage />} />
 
         {/* New Routes */}
         <Route path="library" element={<DigitalLibraryPage />} />

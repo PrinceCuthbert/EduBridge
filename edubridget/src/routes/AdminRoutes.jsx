@@ -77,8 +77,7 @@ export default function AdminRoutes() {
           <ProtectedRoute allowedRoles={["admin"]}>
             <DashboardLayout />
           </ProtectedRoute>
-        }
-      >
+        }>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminOverview />} />
         <Route path="users" element={<UserManagement />} />

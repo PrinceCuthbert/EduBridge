@@ -35,7 +35,7 @@ export const menuConfig = [
     icon: Info,
     type: "dropdown",
     items: [
-      { labelKey: "about.about_us", path: "/aboutuspage", icon: Info },
+      { labelKey: "about.about_us", path: "/aboutus", icon: Info },
       { labelKey: "about.branches", path: "/branches", icon: MapPin },
       { labelKey: "about.partners", path: "/partners", icon: Users },
     ],
@@ -100,7 +100,7 @@ export const menuConfig = [
   {
     id: "contact",
     labelKey: "nav.contact",
-    path: "/contactpage",
+    path: "/contact",
     icon: Phone,
     type: "link",
   },
