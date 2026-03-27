@@ -1,6 +1,234 @@
 # EduBridge — Developer Log
-**Last updated:** March 26, 2026
-**Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix) · March 17 session 4 (full MVC for CMS content types, UI/UX landing page overhaul, FAQ MVC connection) · March 18 session 5 (DB alignment audit, CMS content architecture decision, hook/page cleanup, bug fixes) · March 18–19 sessions 6–8 (full DB alignment sprint, DashboardLayout consolidation, Institution DTO mapper) · March 26 session 9 (Firebase auth bug fix — UUID mismatch breaking sign-in)
+
+**Last updated:** March 27, 2026
+**Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix) · March 17 session 4 (full MVC for CMS content types, UI/UX landing page overhaul, FAQ MVC connection) · March 18 session 5 (DB alignment audit, CMS content architecture decision, hook/page cleanup, bug fixes) · March 18–19 sessions 6–8 (full DB alignment sprint, DashboardLayout consolidation, Institution DTO mapper) · March 26 session 9 (Firebase auth bug fix — UUID mismatch breaking sign-in) · March 27 session 10 (deployed domain auth fix, usernames collection refactor decision) · March 27 session 11 (applicationService Firestore migration, useApplications React Query rewrite, admin createUser secondary app fix, inactive user enforcement) · March 27 session 12 (password change, AdminApplicationReview UI polish, application edit lock, tracker enrolled lock, terminal status lock)
+
+---
+
+## Session 10 — March 27, 2026
+
+### 1. Deployed Domain Fix (Google Auth)
+
+Google sign-in worked locally but failed on deployed versions (Netlify + Firebase Hosting). Root cause: Firebase requires deployed domains to be explicitly whitelisted under **Authentication → Settings → Authorized domains** in the Firebase Console. `localhost` is added by default but deployed domains are not. Fix: manually add the Netlify subdomain and any Firebase Hosting domains in the Console — no code changes needed.
+
+---
+
+### 2. Code Refactor Pending Decision — `usernames` Collection
+
+#### What happened
+
+During the Firebase migration, a separate Firestore collection `usernames/{username}` was created alongside the main `users/{uid}` collection. This was intentional — Firestore has no `UNIQUE` constraint on fields, so the standard workaround is to use the username as a document ID inside a transaction. If the document already exists, the transaction fails atomically, preventing duplicate usernames.
+
+It stores only one field per document: `{ uid }`.
+
+#### The problem
+
+This adds a second collection purely for uniqueness enforcement, which feels like unnecessary database bloat for the current scale of the app.
+
+#### Options
+
+| Option                                                  | Uniqueness guarantee    | Collections           | Risk                                                                           |
+| ------------------------------------------------------- | ----------------------- | --------------------- | ------------------------------------------------------------------------------ |
+| **Keep current** (`usernames` collection + transaction) | Atomic, guaranteed      | `users` + `usernames` | Extra table                                                                    |
+| **Query-based check** (remove `usernames`)              | Best-effort, not atomic | `users` only          | Race condition (two users registering same username at exact same millisecond) |
+| **Drop username uniqueness entirely**                   | None                    | `users` only          | Duplicate usernames possible                                                   |
+
+#### Suggested approach
+
+Remove the `usernames` collection and replace the transaction with a `where("username", "==", x)` query check before writing. The race condition risk is real in theory but negligible in practice for a low-traffic app like EduBridge. Code changes would be limited to `registerUser` and `createUser` in `userService.js`, plus removing the `runTransaction` import.
+
+**Effect on existing users:** zero — existing `users` documents are untouched. The orphaned `usernames` collection can be deleted from Firebase Console at any time.
+
+**Status: not yet implemented — decision pending.**
+
+---
+
+## Session 11 — March 27, 2026
+
+### 1. Phase 2 — applicationService.js migrated to Firestore
+
+Replaced the entire localStorage-based `applicationService.js` with Firestore equivalents. All exported function signatures kept identical so `useApplications.js`, `useDashboard.js`, and all call sites required zero changes.
+
+**What changed:**
+- `getApplications()` → `getDocs(collection(db, "applications"))`
+- `getApplicationsByUserId(id)` → `query(..., where("userId", "==", id))`
+- `getApplicationById(id)` → `getDoc(doc(db, "applications", id))`
+- `createApplication(data)` → `setDoc(doc(db, "applications", trackerId), newApp)`
+- `updateApplication`, `updateApplicationStatus`, `updateTrackerStages` → `updateDoc(...)`
+- `deleteApplication` → `deleteDoc(...)`
+- `getApplicationByIdSync` removed — sync reads cannot exist against a server database
+- All `localStorage` reads/writes, mock data seeding, `_getApps`/`_saveApps` helpers, and `delay()` removed
+
+**userId fix:** `createApplication` now sources `userId` directly from `auth.currentUser.uid` instead of trusting the caller to pass it. Same principle that fixed the user UUID bug — never generate or accept a substitute for the Firebase Auth UID.
+
+**One-time consequence:** Existing localStorage mock data is no longer visible. Firestore starts with an empty `applications` collection. A real test submission is needed to verify the flow end-to-end.
+
+---
+
+### 2. useApplications.js — rewritten with React Query
+
+Replaced `useState` + `useCallback` + `useEffect` with React Query (`useQuery` + `useMutation` + `useQueryClient`). Same pattern as the reference `useBranches.js`.
+
+**3 query modes driven by params:**
+- `["applications"]` — all applications, enabled when no params (admin list/dashboard)
+- `["applications", "user", userId]` — student's own applications, enabled when `userId` is set
+- `["applications", trackerId]` — single application detail, enabled when `trackerId` is set
+
+**Mutations:** `createApplication`, `updateApplication`, `updateStatus`, `updateTrackerStages`, `deleteApplication` — each calls `invalidate()` on success, which busts all relevant cache keys automatically.
+
+**Public API preserved:** `applications`, `singleApplication`, `loading`, `error`, `fetchApplications` — all call sites unchanged.
+
+**Benefit:** React Query handles caching, deduplication, and background revalidation. Navigating back to a previously viewed application returns instantly from cache.
+
+---
+
+### 3. ApplicationPreview.jsx — sync call removed
+
+`getApplicationByIdSync` was the last synchronous localStorage read in a component. Replaced with `useApplications({ trackerId: id })` hook — gets `singleApplication` and `loading` directly. Added a loading skeleton matching the card layout for the brief Firestore fetch delay.
+
+---
+
+### 4. The UUID Bug — documented and fully resolved
+
+**The pattern (what went wrong):**
+Any time a fake ID (`uuidv4()` or `Math.random()`) was generated on the frontend and stored as a user or document identifier, it created a mismatch with the real UID that Firebase Auth assigns. The document would exist in Firestore under the fake ID, but every subsequent Auth-based lookup used the real UID — so the document was effectively invisible.
+
+This manifested as:
+- Sign-in succeeding but user profile not loading (session broken)
+- `getApplicationsByUserId` returning empty results for real users
+- Admin-created users unable to log in at all
+
+**The rule established:** Any document that belongs to a user must store the Firebase Auth UID (`auth.currentUser.uid` or `userCredential.user.uid`) — never a generated substitute. The UID is always sourced from Firebase Auth, never invented.
+
+**Remaining instance flagged:** `createUser` (admin function) still used `uuidv4()` — resolved in item 5 below.
+
+---
+
+### 5. Admin createUser — secondary Firebase app
+
+**Problem:** `createUser` in `userService.js` generated a `uuidv4()` as the user UID. Admin-created users could never log in because their Firestore document ID didn't match their Firebase Auth UID. Calling `createUserWithEmailAndPassword` directly on the main auth instance would also sign out the currently logged-in admin.
+
+**Solution — secondary Firebase app instance:**
+
+```js
+const secondaryApp = initializeApp(firebaseConfig, "adminCreateUser");
+const secondaryAuth = getAuth(secondaryApp);
+
+const credential = await createUserWithEmailAndPassword(
+  secondaryAuth, email, password
+);
+const uid = credential.user.uid; // real Firebase Auth UID
+
+await secondaryAuth.signOut();
+await deleteApp(secondaryApp); // always cleaned up in finally block
+```
+
+The secondary app is completely isolated — it has its own auth state, signs in the new user there, extracts the real UID, then signs out and is deleted. The admin's session on the primary app is never touched.
+
+**Admin flow:** Admin fills the form with the user's details + sets an initial password. The user receives their credentials via the admin (out of band), logs in, and can change their password later.
+
+**firebaseConfig** was also exported from `firebase/config.js` to enable this pattern.
+
+---
+
+### 6. Inactive user enforcement
+
+**Problem:** `status: "Inactive"` was stored in Firestore but Firebase Auth had no knowledge of it. An inactive user could still authenticate successfully because Auth only validates credentials, not application-level status.
+
+**Fix — two layers:**
+
+**Layer 1: At login (`userService.js`)** — after Firebase Auth succeeds and the Firestore profile is fetched, status is checked before returning. If `"Inactive"`, the Auth session is immediately signed out and an error is thrown. Applied to both `loginUser` (email/password) and `loginWithGoogle`.
+
+**Layer 2: At session restore (`AuthContext.jsx`)** — `onAuthStateChanged` fires on every page load for already-logged-in users. Status is now checked here too. If the profile is `"Inactive"` (e.g. admin deactivated the account after the user logged in), Firebase signs out the session automatically on next load.
+
+**Effect:** An inactive user cannot log in via any method. A user who is deactivated while already logged in is signed out on their next page load or refresh. No Firebase Admin SDK required — purely frontend enforced via Firestore status field.
+
+**Pending:** Password change via Firebase Auth `updatePassword()` — flagged for next session.
+
+---
+
+## Session 12 — March 27, 2026
+
+### 1. Password Change — implemented
+
+Replaced the `updatePassword` placeholder (which threw a "not yet implemented" error) with a real Firebase Auth implementation.
+
+**How it works:**
+1. Re-authenticates the user with their current password using `reauthenticateWithCredential` + `EmailAuthProvider.credential` — Firebase requires this before any sensitive operation
+2. Calls `firebaseUpdatePassword(currentUser, newPassword)` to update in Firebase Auth
+3. The `id` param is preserved for signature compatibility but `auth.currentUser` is used directly — consistent with the UID sourcing rule established in session 11
+
+**Note for future:** This only works for email/password users. Google-authenticated users have no password managed by the app — their password is controlled through Google's account settings. A guard should be added to detect `auth.currentUser.providerData` and show an appropriate message to Google users. Flagged as a future task.
+
+---
+
+### 2. AdminApplicationReview UI — restyled to match ApplicationPreview
+
+`AdminApplicationReview.jsx` was using `AdminCard` (rounded-[2rem], p-10, font-serif) which did not match the clean card style used in the student-facing `ApplicationPreview.jsx`. The two pages now share the same visual language:
+
+- `AdminCard` removed and replaced with `bg-white rounded-xl border border-slate-200 shadow-sm p-5`
+- Section headers: `text-xs font-semibold text-slate-500 uppercase tracking-wider`
+- Back button: text + arrow instead of icon-only
+- Header card: tracker ID + title + status badge layout
+- Applicant info rows: inline icon + text (`flex items-center gap-2.5 text-sm text-slate-600`)
+- Document items: color-coded file type backgrounds matching ApplicationPreview's `getFileIcon` pattern
+
+---
+
+### 3. Application edit lock (student dashboard)
+
+In `MyApplications.jsx`, the Edit button now checks the application's tracker stage progression before allowing navigation to the edit form.
+
+**Condition:** `stages.some((s, i) => i >= 1 && s.completed)` — any stage after "Submitted" is done (i.e. the application has moved to "Under Review" or beyond).
+
+**Behaviour when locked:**
+- Button is visually grayed out (`text-slate-200 cursor-not-allowed`)
+- Clicking shows a `toast.info`: *"Your application is currently under review. No changes can be made at this stage."*
+- Navigation to the edit form is blocked entirely
+
+---
+
+### 4. Tracker enrolled lock (AppTracker modal)
+
+Three layers of protection added to the `AppTracker.jsx` update modal:
+
+**Stage toggle guard:** A stage cannot be unchecked if any later stage is already completed. Prevents going backwards through the progression (e.g. cannot uncheck "Under Review" if "Decision" is already done).
+
+**Fully enrolled detection:** `editingApp.trackerStages.every(s => s.completed)` — once all stages including "Enrolled" are saved and complete, the modal enters a locked state.
+
+**Locked modal state:**
+- Green banner: *"This application has been fully enrolled. No further changes can be made."*
+- All stage toggles: `cursor-not-allowed opacity-70`, click is no-op
+- Status dropdown: `disabled`
+- Save button: `disabled cursor-not-allowed`
+- Help text changes from "Click a stage to toggle" → "This application has reached its final stage."
+
+---
+
+### 5. Terminal status lock (AdminApplicationReview)
+
+Once an application is set to "Approved" or "Rejected", no further status changes are allowed.
+
+**Guard in `handleStatusChange`:** If `app.status` is a terminal status, fires `toast.warning` — *"This application has already been finalised and cannot be changed."* — with a description directing to a system administrator. Returns before any Firestore write.
+
+**Visual lock in Status Management panel:**
+- Coloured banner shown: green for Approved, red for Rejected
+- All non-active status buttons: `text-slate-300 border-slate-100 cursor-not-allowed`
+- Active status button (current terminal state): still shows bold/dark so the decision is clearly visible
+
+---
+
+## Pending / Future Tasks
+
+| Priority | Task | Notes |
+|---|---|---|
+| High | Firebase Security Rules — custom claims for admin role | `request.auth.token.role == 'admin'` requires Admin SDK to set custom claims on auth tokens. Without this, admin Firestore rules never match. Needs a Cloud Function. |
+| High | visaService.js → Firestore migration | Still on localStorage. Same pattern as applicationService migration. |
+| Medium | Password change guard for Google users | Detect `auth.currentUser.providerData[0].providerId === 'google.com'` and show message instead of attempting re-auth with email/password |
+| Medium | programService.js → Firestore migration | Still uses localStorage + `Math.random()` IDs |
+| Medium | Admin createUser → Cloud Function (Phase 3) | Current secondary app workaround works but a Cloud Function using Admin SDK is the proper long-term solution |
+| Low | usernames collection refactor | Decision pending — remove `usernames` collection and replace transaction with query-based uniqueness check. See Session 10. |
+| Low | deleteUser — delete Firebase Auth account | Current `deleteUser` only deletes the Firestore profile, not the Firebase Auth account. The Auth account becomes orphaned. Needs Admin SDK or a Cloud Function. |
 
 ---
 
@@ -13,44 +241,53 @@ This session was a full codebase review and repair sprint. The app had recently 
 ## Part 1 — File Structure Fix
 
 ### Problem
+
 A previous refactor created two new directories that shouldn't exist:
+
 - `src/pages/dashboard/` (should be `src/pages/student-dashboard/visa/`)
 - `src/pages/admin/` (should be `src/pages/admin-dashboard/visa/`)
 
 Three visa page files were in the wrong place, and the route imports pointed to the wrong paths.
 
 ### What we did
-| Action | File |
-|--------|------|
-| Moved | `pages/dashboard/VisaSummary.jsx` → `pages/student-dashboard/visa/VisaSummary.jsx` |
-| Moved | `pages/dashboard/VisaRequestForm.jsx` → `pages/student-dashboard/visa/VisaRequestForm.jsx` |
-| Moved | `pages/admin/VisaCases.jsx` → `pages/admin-dashboard/visa/VisaCases.jsx` |
-| Deleted | Empty `pages/dashboard/` and `pages/admin/` directories |
-| Updated | `StudentRoutes.jsx` — fixed lazy import paths |
-| Updated | `AdminRoutes.jsx` — fixed lazy import path |
-| Fixed | All imports inside moved files to use `@/` Vite path aliases |
+
+| Action  | File                                                                                       |
+| ------- | ------------------------------------------------------------------------------------------ |
+| Moved   | `pages/dashboard/VisaSummary.jsx` → `pages/student-dashboard/visa/VisaSummary.jsx`         |
+| Moved   | `pages/dashboard/VisaRequestForm.jsx` → `pages/student-dashboard/visa/VisaRequestForm.jsx` |
+| Moved   | `pages/admin/VisaCases.jsx` → `pages/admin-dashboard/visa/VisaCases.jsx`                   |
+| Deleted | Empty `pages/dashboard/` and `pages/admin/` directories                                    |
+| Updated | `StudentRoutes.jsx` — fixed lazy import paths                                              |
+| Updated | `AdminRoutes.jsx` — fixed lazy import path                                                 |
+| Fixed   | All imports inside moved files to use `@/` Vite path aliases                               |
 
 ---
 
 ## Part 2 — Code Quality Fixes (from full audit)
 
 ### 2a. Toast render loop — `VisaSummary.jsx`
+
 `toast.error(error)` was called directly in the render body, firing on every re-render when `error` was set. Wrapped in `useEffect([error])`.
 
 ### 2b. Duplicate `getStatusColor()` functions
+
 `VisaCaseDetails.jsx` and `VisaCaseResponse.jsx` each defined an identical `getStatusColor()` switch statement. Both were removed and replaced with `<VisaStatusBadge status={...} />` — the shared component that already existed.
 
 ### 2c. Broken `getConsultationById` import (3 files)
+
 `VisaCaseDetails.jsx`, `VisaCaseResponse.jsx`, and `UploadCaseDocuments.jsx` all imported `getConsultationById` from `mockVisaData.js`. This function never existed — it was a stale reference from before the service layer was added. All three were updated to use `getVisaRequestById` from `visaService.js`.
 
 ### 2d. Unused imports in layout files
+
 - `AdminLayout.jsx`: removed unused `Bell`, `ShieldCheck`
 - `StudentDashboardLayout.jsx`: removed unused `Bell`, `MessageSquare`, `Search`
 
 ### 2e. `AdminSettings.jsx` — missing cleanup guard
+
 The async `useEffect` that fetches the user profile had no cleanup, meaning it could call `setState` on an unmounted component. Added `let cancelled = false` guard pattern.
 
 ### 2f. Notes section added to VisaCases admin modal
+
 Added a Notes row to the admin detail modal in `VisaCases.jsx` that renders only when `selectedCase.notes` is non-empty.
 
 ---
@@ -60,43 +297,51 @@ Added a Notes row to the admin detail modal in `VisaCases.jsx` that renders only
 After a full backend readiness audit against the database schema, 8 critical fixes were identified and implemented.
 
 ### Fix 1 — `useApplications()` wrong call signature
+
 **Files:** `Dashboard.jsx`, `MyApplications.jsx`, `ApplicationSubmitForm.jsx`
 **Problem:** All three called `useApplications(user?.id)` but the hook signature is `useApplications({ userId })`.
 **Result:** Students saw 0 applications — the hook received the ID as an unrecognised positional argument and fell through to the "fetch all" branch.
 **Fix:** Changed to `useApplications({ userId: user?.id })`.
 
 ### Fix 2 — AuthContext never stored the JWT token
+
 **File:** `AuthContext.jsx`
 **Problem:** `login()`, `signUp()`, and `loginWithGoogle()` stored the user object in `localStorage` but never stored a JWT token. The axios client in `api/services.js` reads `localStorage.getItem('token')`, which was always `null` — every authenticated API call would fail the moment a real backend was connected.
 **Fix:** Added `_persistSession(result)` helper. When the backend returns `{ token, user }`, the token is stored under `'token'`. `logout()` now also clears `'token'`.
 
 ### Fix 3 — `applicationService` userId filter mismatch
+
 **File:** `applicationService.js`
 **Problem (filter):** `getApplicationsByUserId` filtered by `app.applicant?.identityId === userId`, but student IDs are strings like `"USR-001"` while `identityId` in mock data is a number. Always returned 0 results.
 **Problem (create):** `createApplication` stored `applicant: data.applicant || {}` — an empty object — because the form passes `firstName`, `lastName`, `email` at the top level, not nested under `applicant`.
 **Fix:** Filter now checks both `app.applicant.identityId` and `app.userId`. `createApplication` now builds the `applicant` and `programDetails` objects from top-level form fields.
 
 ### Fix 4 — Department dropdown always empty
+
 **File:** `ApplicationSubmitForm.jsx`
 **Problem:** The form read `selectedProgram?.departments ?? []`, but programs were refactored to use `department_major_ids` — so `departments` was always `undefined` and the dropdown showed "No programs listed."
 **Fix:** Replaced with `getProgramMajors(selectedProgram.id)` which resolves IDs through `MOCK_DEPARTMENT_MAJORS` join table. Dropdown label updated to match the `{ name, language, degree }` shape returned by the helper.
 
 ### Fix 5 — Sync call in edit mode
+
 **File:** `ApplicationSubmitForm.jsx`
 **Problem:** `getApplicationByIdSync(id)` was used to load an application in edit mode — a synchronous localStorage read. This breaks the moment the backend is real.
 **Fix:** Replaced with `getApplicationById(id).then(app => ...)` (async). Fields now map from the DTO shape (`applicant.firstName`, `programDetails.majorName`).
 
 ### Fix 6 — Wrong env variable syntax
+
 **File:** `api/services.js`
 **Problem:** `process.env.REACT_APP_API_URL` is Create React App syntax. This project uses Vite — the variable was always `undefined`, so the base URL fell back to `localhost:5000` with no way to override it via `.env`.
 **Fix:** Changed to `import.meta.env.VITE_API_BASE_URL`.
 
 ### Fix 7 — Programs lost on page refresh
+
 **File:** `usePrograms.js`
 **Problem:** All program CRUD mutated the in-memory `MOCK_PROGRAMS` array directly. Refreshing the page reset everything — admin changes vanished.
 **Fix:** Created `src/services/programService.js` which persists programs to `localStorage` under `'edubridge_programs'`, seeding from `MOCK_PROGRAMS` on first load. `usePrograms.js` was refactored to a thin controller that delegates all reads/writes to the service (same MVC pattern as `applicationService` / `visaService`).
 
 ### Fix 8 — Hardcoded `"0"` visa count on admin dashboard
+
 **File:** `useDashboard.js`
 **Problem:** "Active Visa Cases" stat card was hardcoded to `"0"` with a TODO comment.
 **Fix:** Added `getVisaRequests()` to the parallel `Promise.all` fetch. Count now shows visa cases that are not Approved or Rejected.
@@ -106,7 +351,9 @@ After a full backend readiness audit against the database schema, 8 critical fix
 ## Part 4 — Programs Module — Full MVC Refactor
 
 ### Problem
+
 The program module was not following MVC:
+
 - `usePrograms.js` handled localStorage directly inside the hook (no service layer)
 - `useProgram` (single program) read from in-memory `MOCK_PROGRAMS` array — so after saving a program, the view page showed stale data
 - No `programService.js` existed
@@ -114,6 +361,7 @@ The program module was not following MVC:
 ### What we built
 
 **`src/services/programService.js`** (new file — the Model)
+
 - `getPrograms()` — returns all programs from localStorage, seeds from `MOCK_PROGRAMS` on first load
 - `getProgramById(id)` — used by view and edit pages
 - `createProgram(data)` — auto-generates ID, saves to localStorage
@@ -122,10 +370,12 @@ The program module was not following MVC:
 - All functions are `async` — ready for `fetch()` / `axios` swap
 
 **`usePrograms.js`** (refactored — the Controller)
+
 - `usePrograms()` — list hook, delegates to `programService.getPrograms()`
 - `useProgram(id)` — single hook, now reads from localStorage via `programService.getProgramById()` with proper `cancelled` cleanup guard
 
 ### Additional fixes in the programs module
+
 - `UniversityProgramDetailsPreview` — fixed departments display: falls back to `getProgramMajors(program.id)` when `program.departments` is absent (original mock data uses `department_major_ids`)
 - `ProgramSections.jsx` — `ProgramDepartments` now renders `dept.major ?? dept.name` so both admin-entered rows (`major`) and join-table-resolved rows (`name`) display correctly
 
@@ -134,25 +384,32 @@ The program module was not following MVC:
 ## Part 5 — UI / UX Bugs Fixed
 
 ### DatePicker prop name mismatch
+
 **File:** `src/components/ui/DatePicker.jsx`
 **Problem:** Component was defined with `{ date, setDate }` props but `AdminProgramDetail.jsx` called it with `value` and `onChange`. The date inputs showed empty and threw `TypeError: setDate is not a function` when clicked.
 **Fix:** Component now accepts both APIs — `value`/`onChange` (standard) and `date`/`setDate` (legacy) — making it backwards-compatible with any other callers.
 
 ### Duration & Credits field not updating
+
 **File:** `AdminProgramDetail.jsx` — Departments section
 **Problem:** The "Duration — Credits" input called `updateDepartment` twice (once for `duration`, once for `credits`). Both calls read from the same stale `formData` snapshot, so the second overwrote the first — typing appeared to have no effect.
 **Fix:** Combined both updates into a single `setFormData` call.
 
 ### Sidebar and header showing wrong user name
+
 **Files:** `StudentDashboardLayout.jsx`, `AdminLayout.jsx`
 **Problem:** Both layouts read `user?.name`, but the user object returned by `userService` stores the name as `user.identity.firstName + user.identity.lastName`. `user.name` is always `undefined`, so hardcoded fallbacks (`"Alex Johnson"`, `"Admin User"`) were always shown.
 **Fix:** Added `displayName` computed value in each layout:
+
 ```js
 const displayName =
   user?.name ||
-  [user?.identity?.firstName, user?.identity?.lastName].filter(Boolean).join(" ") ||
+  [user?.identity?.firstName, user?.identity?.lastName]
+    .filter(Boolean)
+    .join(" ") ||
   "Student"; // or "Admin"
 ```
+
 All sidebar text, header button, avatar initials, and dropdown now use `displayName`.
 
 ---
@@ -220,12 +477,14 @@ navigate("/dashboard/visa-status/payment-methods", {
 **Files:** `src/services/visaService.js`, `src/pages/student-dashboard/visa/VisaCaseDetails.jsx`
 
 **Problems found:**
+
 1. `createVisaRequest` never initialised `documents: []` — so `caseData.documents.length` threw `TypeError` when a student clicked into their new case.
 2. The detail page read `caseData.fee` and `caseData.dateBooked` (old mock data names) but the service stores `consultationFee` and `appointmentDate`. New submissions showed "—" and "TBD" correctly after the fix; old mock records continue to work via `||` fallbacks.
 3. `doc.date` — used for display — doesn't exist on new documents. Field is `doc.uploadedAt`. Fixed with fallback: `doc.uploadedAt ?? doc.date`.
 4. `doc.size` was rendered as raw bytes (e.g. `1099375`) instead of formatted KB.
 
 **Fixes:**
+
 ```js
 // visaService.js — createVisaRequest now includes:
 documents: [],
@@ -252,6 +511,7 @@ documents: [],
 **Result:** `localhost:5173/dashboard/.../details/VR-xxx` + `https/https://...` = broken URL.
 
 **Fix 1 — Student side (`VisaCaseDetails.jsx`):** Button replaced with `<a href target="_blank">`. The `href` is normalised before use:
+
 ```jsx
 href={/^https?:\/\//i.test(caseData.meetingLink)
   ? caseData.meetingLink
@@ -259,6 +519,7 @@ href={/^https?:\/\//i.test(caseData.meetingLink)
 ```
 
 **Fix 2 — Admin side (`VisaCases.jsx`):** `handleSaveSchedule` normalises the link before persisting to localStorage so bad URLs are corrected at the source:
+
 ```js
 const rawLink = scheduleData.meetingLink.trim();
 const normalizedLink =
@@ -272,6 +533,7 @@ const normalizedLink =
 **File:** `src/pages/student-dashboard/visa/UploadCaseDocuments.jsx`
 
 **Problem:** The upload form existed and showed a file picker, but `handleSubmit` was:
+
 ```js
 await new Promise(resolve => setTimeout(resolve, 2000)); // fake delay only
 toast.success("Successfully uploaded!");
@@ -291,6 +553,7 @@ Files were never converted, never stored — the "Submitted Documents" section a
    - Navigate back to case details only after the save succeeds
 
 **Document shape stored (identical to application documents):**
+
 ```json
 {
   "id": "vdoc-1773697750378-0.42",
@@ -310,9 +573,11 @@ Files were never converted, never stored — the "Submitted Documents" section a
 **Files:** `src/services/visaService.js`, `src/pages/student-dashboard/visa/VisaCaseDetails.jsx`
 
 ##### Preview
+
 The existing Eye button called `window.open(doc.url, '_blank')`. This fails silently in many browsers when the URL is a `data:` URI (blocked as a security measure).
 
 **Fix:** Convert the base64 data URL → `Blob` → object URL, then open the object URL in a new tab. Object URLs (`blob:` scheme) are not blocked:
+
 ```js
 const handlePreview = (doc) => {
   const [header, b64] = doc.url.split(",");
@@ -329,9 +594,11 @@ const handlePreview = (doc) => {
 The object URL is revoked after 10 seconds (once the browser has loaded the file) to free memory.
 
 ##### Delete
+
 The existing delete handler only did an optimistic in-memory update — **the document came back on page refresh** because localStorage was never updated.
 
 **Fix:**
+
 1. Added `deleteDocumentFromVisaRequest(caseId, docId)` to `visaService.js` — filters the document out of the array and writes back to localStorage.
 2. Updated `handleDeleteDocument` to `await` the service call, then replace `caseData` with the returned updated record (not just filter local state).
 
@@ -342,7 +609,7 @@ export const deleteDocumentFromVisaRequest = async (caseId, docId) => {
   const updated = all.map((r) =>
     r.id === caseId
       ? { ...r, documents: (r.documents ?? []).filter((d) => d.id !== docId) }
-      : r
+      : r,
   );
   writeAll(updated);
   return updated.find((r) => r.id === caseId);
@@ -358,6 +625,7 @@ setCaseData(updated); // whole case replaced, not just filtered state
 #### 6f. Admin — Document Review (VisaCases.jsx admin modal)
 
 The admin detail modal already displayed submitted documents. Two field-name mismatches were fixed:
+
 - `doc.fileId` → `doc.id` (key prop)
 - `doc.fileName` → `doc.name`
 - `doc.uploadDate` → `doc.uploadedAt`
@@ -420,19 +688,19 @@ VisaCases (/admin/visa)
 
 ### Service Functions — visaService.js (complete list)
 
-| Function | Who calls it | What it does |
-|----------|-------------|--------------|
-| `getVisaRequests()` | Admin | All cases |
-| `getVisaRequestsByUserId(userId)` | Student | This student's cases |
-| `getVisaRequestById(id)` | Detail pages | Single case |
-| `createVisaRequest(formData, userId)` | Student form | New case + `documents: []` |
-| `addDocumentsToVisaRequest(caseId, newDocs)` | Upload form | Merge docs, persist |
-| `deleteDocumentFromVisaRequest(caseId, docId)` | Detail page | Remove one doc, persist |
-| `updateVisaRequest(id, formData)` | Student edit | Student-safe update (strips admin fields) |
-| `updateVisaStatus(id, status)` | Admin | Status only |
-| `updateVisaFee(id, fee, feeStatus)` | Admin | Fee only |
-| `updateVisaSchedule(id, schedule)` | Admin | Date, time, link |
-| `deleteVisaRequest(id)` | Admin | Delete whole case |
+| Function                                       | Who calls it | What it does                              |
+| ---------------------------------------------- | ------------ | ----------------------------------------- |
+| `getVisaRequests()`                            | Admin        | All cases                                 |
+| `getVisaRequestsByUserId(userId)`              | Student      | This student's cases                      |
+| `getVisaRequestById(id)`                       | Detail pages | Single case                               |
+| `createVisaRequest(formData, userId)`          | Student form | New case + `documents: []`                |
+| `addDocumentsToVisaRequest(caseId, newDocs)`   | Upload form  | Merge docs, persist                       |
+| `deleteDocumentFromVisaRequest(caseId, docId)` | Detail page  | Remove one doc, persist                   |
+| `updateVisaRequest(id, formData)`              | Student edit | Student-safe update (strips admin fields) |
+| `updateVisaStatus(id, status)`                 | Admin        | Status only                               |
+| `updateVisaFee(id, fee, feeStatus)`            | Admin        | Fee only                                  |
+| `updateVisaSchedule(id, schedule)`             | Admin        | Date, time, link                          |
+| `deleteVisaRequest(id)`                        | Admin        | Delete whole case                         |
 
 ---
 
@@ -451,13 +719,13 @@ VisaCases (/admin/visa)
 
 **What was built:**
 
-| Section | Content |
-|---------|---------|
-| Student info card | Name, email, phone, country of origin, status badge, submission date |
-| Summary cards (4) | Destination (with flag), visa type, status, fee + fee status badge |
-| Appointment section | Scheduled date/time, meeting type, clickable meeting link |
-| Notes | Shown only when `caseData.notes` is non-empty |
-| Documents grid | Paginated (6 per page), preview + download only — **no delete** |
+| Section             | Content                                                              |
+| ------------------- | -------------------------------------------------------------------- |
+| Student info card   | Name, email, phone, country of origin, status badge, submission date |
+| Summary cards (4)   | Destination (with flag), visa type, status, fee + fee status badge   |
+| Appointment section | Scheduled date/time, meeting type, clickable meeting link            |
+| Notes               | Shown only when `caseData.notes` is non-empty                        |
+| Documents grid      | Paginated (6 per page), preview + download only — **no delete**      |
 
 **Document actions (admin):**
 
@@ -468,7 +736,7 @@ VisaCases (/admin/visa)
 **Navigation changes in `VisaCases.jsx`:**
 
 | Button        | Before                  | After                                            |
-|---------------|-------------------------|--------------------------------------------------|
+| ------------- | ----------------------- | ------------------------------------------------ |
 | Eye (view)    | Opened management modal | `navigate('/admin/visa/:id')` → full detail page |
 | Edit (pencil) | Opened add/edit form    | Opens management modal (status + schedule)       |
 
@@ -504,7 +772,7 @@ The user had no idea why it failed — the error gave no actionable guidance.
 
 ```js
 throw new Error(
-  "Browser storage is full. Try uploading smaller files, or delete existing documents to free up space."
+  "Browser storage is full. Try uploading smaller files, or delete existing documents to free up space.",
 );
 ```
 
@@ -525,7 +793,7 @@ throw new Error(
 **After:** Replaced `richColors` with custom `classNames` matching the app's Tailwind palette:
 
 | Toast type       | Background   | Border        | Text          |
-|------------------|--------------|---------------|---------------|
+| ---------------- | ------------ | ------------- | ------------- |
 | Success          | `emerald-50` | `emerald-200` | `emerald-900` |
 | Warning / Delete | `red-50`     | `red-200`     | `red-900`     |
 | Error            | `red-50`     | `red-200`     | `red-900`     |
@@ -563,68 +831,68 @@ AdminVisaCaseDetails (/admin/visa/:id)       [NEW FILE]
 
 ### High Priority — Backend Integration
 
-| Task | Details |
-|------|---------|
-| **Connect real auth API** | `userService.loginUser` → `authAPI.login(email, password)`. Response will be `{ token, user }`. AuthContext is already ready to receive it (`_persistSession` handles the token). |
-| **Connect applications API** | Replace `localStorage` body in `applicationService.js` with `applicationAPI.*` calls from `api/services.js`. The hook and all pages stay unchanged. |
-| **Connect visa API** | Same swap in `visaService.js` → `visaAPI.*`. |
-| **Connect programs API** | Same swap in `programService.js` → `fetch('/api/programs/...')`. |
-| **Connect users API** | Same swap in `userService.js` → `userAPI.*`. |
-| **Create `.env` file** | Add `VITE_API_BASE_URL=https://your-backend.com/api`. The axios client already reads it. |
+| Task                         | Details                                                                                                                                                                           |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Connect real auth API**    | `userService.loginUser` → `authAPI.login(email, password)`. Response will be `{ token, user }`. AuthContext is already ready to receive it (`_persistSession` handles the token). |
+| **Connect applications API** | Replace `localStorage` body in `applicationService.js` with `applicationAPI.*` calls from `api/services.js`. The hook and all pages stay unchanged.                               |
+| **Connect visa API**         | Same swap in `visaService.js` → `visaAPI.*`.                                                                                                                                      |
+| **Connect programs API**     | Same swap in `programService.js` → `fetch('/api/programs/...')`.                                                                                                                  |
+| **Connect users API**        | Same swap in `userService.js` → `userAPI.*`.                                                                                                                                      |
+| **Create `.env` file**       | Add `VITE_API_BASE_URL=https://your-backend.com/api`. The axios client already reads it.                                                                                          |
 
 ### Medium Priority — Feature Completeness
 
-| Task | Details |
-|------|---------|
-| **Student profile settings page** | The student equivalent of `AdminSettings.jsx` — currently missing or incomplete. Should let students edit phone, nationality, gender, DOB and change password. |
-| **Visa document upload** | `UploadCaseDocuments.jsx` exists but needs real file handling (upload to S3 / Cloudinary in production, or Base64 for demo like applications). |
-| **Application detail page for students** | Students can list and delete applications but there's no proper read-only detail view showing all fields, tracker stages, and admin feedback. |
-| **Admin feedback on applications** | Admin can change status but the `sendFeedback` and `requestDocuments` API methods exist and are unused. Wire them to the UI. |
-| **Programs — Departments (join table)** | Currently admins add departments as flat rows stored in `departments[]`. In production, this should create/update `MAJOR` and `DEPARTMENT_MAJOR` records. Plan the form → API mapping. |
-| **Real file download** | Documents stored as Base64 data URLs work for demo. In production, replace with signed S3 URLs. |
+| Task                                     | Details                                                                                                                                                                                |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Student profile settings page**        | The student equivalent of `AdminSettings.jsx` — currently missing or incomplete. Should let students edit phone, nationality, gender, DOB and change password.                         |
+| **Visa document upload**                 | `UploadCaseDocuments.jsx` exists but needs real file handling (upload to S3 / Cloudinary in production, or Base64 for demo like applications).                                         |
+| **Application detail page for students** | Students can list and delete applications but there's no proper read-only detail view showing all fields, tracker stages, and admin feedback.                                          |
+| **Admin feedback on applications**       | Admin can change status but the `sendFeedback` and `requestDocuments` API methods exist and are unused. Wire them to the UI.                                                           |
+| **Programs — Departments (join table)**  | Currently admins add departments as flat rows stored in `departments[]`. In production, this should create/update `MAJOR` and `DEPARTMENT_MAJOR` records. Plan the form → API mapping. |
+| **Real file download**                   | Documents stored as Base64 data URLs work for demo. In production, replace with signed S3 URLs.                                                                                        |
 
 ### Low Priority — Polish & UX
 
-| Task | Details |
-|------|---------|
-| **Form validation** | Add proper validation (Zod or simple custom) to `VisaRequestForm`, `ApplicationSubmitForm`, and the program form. Currently only HTML5 `required` is used. |
-| **Loading skeletons** | Some pages show a spinner, others show nothing while loading. Standardise with `<Skeleton>` components throughout. |
-| **Empty states** | Pages like `MyApplications` and `VisaSummary` need friendly empty state illustrations when a student has no records. |
-| **Notifications** | The bell icon in layouts is commented out. When the backend is ready, wire it to a notifications endpoint. |
-| **Search in admin tables** | `UserManagement`, `ApplicationReview`, and `VisaCases` have search UI but some may not be fully wired. |
-| **Hardcoded background colours** | Both layouts use `bg-[#F8FAFC]`. Replace with Tailwind `bg-slate-50` for consistency. |
-| **Analytics page** | Currently a placeholder. Wire to `analyticsAPI.*` when backend is ready. |
-| **Financial Reports** | Same — placeholder, needs backend. |
-| **Role Management** | Route is commented out (`/admin/roles`). This will be a backend-only concern — implement after auth roles are live. |
+| Task                             | Details                                                                                                                                                    |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Form validation**              | Add proper validation (Zod or simple custom) to `VisaRequestForm`, `ApplicationSubmitForm`, and the program form. Currently only HTML5 `required` is used. |
+| **Loading skeletons**            | Some pages show a spinner, others show nothing while loading. Standardise with `<Skeleton>` components throughout.                                         |
+| **Empty states**                 | Pages like `MyApplications` and `VisaSummary` need friendly empty state illustrations when a student has no records.                                       |
+| **Notifications**                | The bell icon in layouts is commented out. When the backend is ready, wire it to a notifications endpoint.                                                 |
+| **Search in admin tables**       | `UserManagement`, `ApplicationReview`, and `VisaCases` have search UI but some may not be fully wired.                                                     |
+| **Hardcoded background colours** | Both layouts use `bg-[#F8FAFC]`. Replace with Tailwind `bg-slate-50` for consistency.                                                                      |
+| **Analytics page**               | Currently a placeholder. Wire to `analyticsAPI.*` when backend is ready.                                                                                   |
+| **Financial Reports**            | Same — placeholder, needs backend.                                                                                                                         |
+| **Role Management**              | Route is commented out (`/admin/roles`). This will be a backend-only concern — implement after auth roles are live.                                        |
 
 ### Security — Before Going Live
 
-| Task | Details |
-|------|---------|
-| **Remove passwords from localStorage** | `userService` currently stores plain-text passwords in `localStorage` for the mock. This MUST be removed — the real backend handles auth. |
-| **JWT refresh tokens** | The axios interceptor handles 401 → logout. Add a refresh token flow so sessions don't expire mid-use. |
-| **Input sanitisation** | Audit all free-text inputs (notes, descriptions) for XSS risk before rendering as HTML. |
-| **Route protection audit** | Verify all admin routes are wrapped in `<ProtectedRoute allowedRoles={['admin']}>` and all student routes in `allowedRoles={['student']}`. |
+| Task                                   | Details                                                                                                                                    |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Remove passwords from localStorage** | `userService` currently stores plain-text passwords in `localStorage` for the mock. This MUST be removed — the real backend handles auth.  |
+| **JWT refresh tokens**                 | The axios interceptor handles 401 → logout. Add a refresh token flow so sessions don't expire mid-use.                                     |
+| **Input sanitisation**                 | Audit all free-text inputs (notes, descriptions) for XSS risk before rendering as HTML.                                                    |
+| **Route protection audit**             | Verify all admin routes are wrapped in `<ProtectedRoute allowedRoles={['admin']}>` and all student routes in `allowedRoles={['student']}`. |
 
 ---
 
 ## Quick Reference — Key Files
 
-| What you want to change | File to edit |
-|------------------------|-------------|
-| Auth logic (login, logout, session) | `src/context/AuthContext.jsx` |
-| User data / password / profile | `src/services/userService.js` |
-| Application CRUD | `src/services/applicationService.js` |
-| Visa request CRUD | `src/services/visaService.js` |
-| Program CRUD | `src/services/programService.js` |
-| Admin dashboard stats | `src/hooks/useDashboard.js` |
-| Axios base URL / auth header | `src/api/services.js` |
-| Student sidebar & header | `src/pages/student-dashboard/StudentDashboardLayout.jsx` |
-| Admin sidebar & header | `src/pages/admin-dashboard/AdminLayout.jsx` |
-| Student route definitions | `src/routes/StudentRoutes.jsx` |
-| Admin route definitions | `src/routes/AdminRoutes.jsx` |
-| Status badge colours | `src/data/mockVisaData.js` → `VISA_STATUS_CONFIG` |
-| Program majors / join table | `src/data/mockMajors.js` |
+| What you want to change             | File to edit                                             |
+| ----------------------------------- | -------------------------------------------------------- |
+| Auth logic (login, logout, session) | `src/context/AuthContext.jsx`                            |
+| User data / password / profile      | `src/services/userService.js`                            |
+| Application CRUD                    | `src/services/applicationService.js`                     |
+| Visa request CRUD                   | `src/services/visaService.js`                            |
+| Program CRUD                        | `src/services/programService.js`                         |
+| Admin dashboard stats               | `src/hooks/useDashboard.js`                              |
+| Axios base URL / auth header        | `src/api/services.js`                                    |
+| Student sidebar & header            | `src/pages/student-dashboard/StudentDashboardLayout.jsx` |
+| Admin sidebar & header              | `src/pages/admin-dashboard/AdminLayout.jsx`              |
+| Student route definitions           | `src/routes/StudentRoutes.jsx`                           |
+| Admin route definitions             | `src/routes/AdminRoutes.jsx`                             |
+| Status badge colours                | `src/data/mockVisaData.js` → `VISA_STATUS_CONFIG`        |
+| Program majors / join table         | `src/data/mockMajors.js`                                 |
 
 ---
 
@@ -643,6 +911,7 @@ This session completed the MVC architecture for all remaining content types, ove
 **File:** `src/pages/home/pages/Hero.jsx`
 
 The hero section had a curved SVG wave divider at the bottom and a background video that stuttered at the loop point. Both were removed:
+
 - SVG wave `<div>` (with gradient `<path>`) deleted entirely
 - Background video is a known issue (requires video re-encoding for seamless loop) — not fixable in code
 
@@ -655,12 +924,12 @@ The hero section had a curved SVG wave divider at the bottom and a background vi
 
 A new stats section placed directly below the hero shows 4 animated counters that trigger when scrolled into view:
 
-| Stat | Value |
-|------|-------|
+| Stat              | Value   |
+| ----------------- | ------- |
 | Students Enrolled | 10,000+ |
-| Countries Reached | 25+ |
-| Visa Success Rate | 98% |
-| Years Experience | 10+ |
+| Countries Reached | 25+     |
+| Visa Success Rate | 98%     |
+| Years Experience  | 10+     |
 
 Uses `useInView` + `requestAnimationFrame` with easeOutExpo easing. Numbers ≥ 1000 are formatted as `Xk`.
 
@@ -671,6 +940,7 @@ Uses `useInView` + `requestAnimationFrame` with easeOutExpo easing. Numbers ≥ 
 **Files:** `src/pages/home/pages/WhyChoose.jsx`, `src/pages/home/pages/AcademicServices.jsx`
 
 Both sections were rewritten to remove the `useCMSManager`/`FeatureGrid`/`FeatureCard` dependency. The new versions use:
+
 - Inline data arrays with per-item icon, color, and background
 - framer-motion `whileInView` scroll-triggered animations with staggered delays (`i * 0.1s`)
 - `whileHover={{ y: -6, boxShadow: "..." }}` lift effect
@@ -684,6 +954,7 @@ Both sections were rewritten to remove the `useCMSManager`/`FeatureGrid`/`Featur
 **File:** `src/pages/home/pages/Testimonials.jsx` (rewritten)
 
 Replaced the previous testimonials section with a dark navy auto-scrolling carousel:
+
 - Background: `bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900`
 - Auto-advances every 4 seconds, pauses on hover (`onMouseEnter/Leave`)
 - `AnimatePresence` with slide-in (`x: 60`) / slide-out (`x: -60`) transition
@@ -698,6 +969,7 @@ Replaced the previous testimonials section with a dark navy auto-scrolling carou
 **Updated:** `src/pages/home/LandingPage.jsx`
 
 A masonry grid showing the first 6 items from `MOCK_MEDIA` (linked to `/gallery` for full view):
+
 - 3-column CSS `columns` masonry layout
 - Hover overlay with student name, country (MapPin icon), program (GraduationCap icon)
 - Scroll-triggered staggered animations (`delay: i * 0.08`)
@@ -714,34 +986,36 @@ Hero → StatsBar → Partners → WhyChoose → AcademicServices → GalleryTea
 
 **New Model layer (4 service files):**
 
-| File | Storage Key | Seed Data |
-|------|-------------|-----------|
-| `src/services/scholarshipService.js` | `edubridge_scholarships` | `MOCK_SCHOLARSHIPS` |
-| `src/services/postService.js` | `edubridge_posts` | `MOCK_BLOGS` |
-| `src/services/mediaService.js` | `edubridge_media` | `MOCK_MEDIA` |
-| `src/services/branchService.js` | `edubridge_branches` | `branches` from `branches.js` (full schema with coordinates) |
+| File                                 | Storage Key              | Seed Data                                                    |
+| ------------------------------------ | ------------------------ | ------------------------------------------------------------ |
+| `src/services/scholarshipService.js` | `edubridge_scholarships` | `MOCK_SCHOLARSHIPS`                                          |
+| `src/services/postService.js`        | `edubridge_posts`        | `MOCK_BLOGS`                                                 |
+| `src/services/mediaService.js`       | `edubridge_media`        | `MOCK_MEDIA`                                                 |
+| `src/services/branchService.js`      | `edubridge_branches`     | `branches` from `branches.js` (full schema with coordinates) |
 
 Each service follows the `programService.js` pattern: `_read()` with DEV-only seeding, `_save()`, async CRUD (`get`, `getById`, `create`, `update`, `delete`).
 
 **New Controller layer (8 hooks):**
 
-| Hook | Purpose |
-|------|---------|
-| `useScholarships` | Public read for ScholarshipsPage |
-| `useAdminScholarships` | Admin CRUD with toast feedback |
-| `usePosts` | Public read for BlogPage |
-| `useAdminPosts` | Admin CRUD with toast feedback |
-| `useMedia` | Public read for GalleryPage |
-| `useAdminMedia` | Admin CRUD with toast feedback |
+| Hook                    | Purpose                                                                    |
+| ----------------------- | -------------------------------------------------------------------------- |
+| `useScholarships`       | Public read for ScholarshipsPage                                           |
+| `useAdminScholarships`  | Admin CRUD with toast feedback                                             |
+| `usePosts`              | Public read for BlogPage                                                   |
+| `useAdminPosts`         | Admin CRUD with toast feedback                                             |
+| `useMedia`              | Public read for GalleryPage                                                |
+| `useAdminMedia`         | Admin CRUD with toast feedback                                             |
 | `useBranches` (updated) | Replaced in-memory module variable with `branchService` localStorage calls |
-| `useFAQQuestions` | Public read + admin CRUD for FAQ items on ContactPage |
+| `useFAQQuestions`       | Public read + admin CRUD for FAQ items on ContactPage                      |
 
 **Updated CMS pages (admin):**
+
 - `CMSScholarships.jsx` — now uses `useAdminScholarships` (add/edit/remove persisted to localStorage)
 - `CMSPosts.jsx` — now uses `useAdminPosts`
 - `CMSMedia.jsx` — now uses `useAdminMedia`, shows loading skeleton
 
 **Updated public pages:**
+
 - `ScholarshipsPage.jsx` — replaced `fetch(BASE_URL/scholarships)` with `useScholarships()` hook
 - `BlogPage.jsx` — replaced `fetch(BASE_URL/blogs)` with `usePosts()` hook
 - `GalleryPage.jsx` — replaced static `MOCK_MEDIA` import with `useMedia()` hook
@@ -768,6 +1042,7 @@ The 6-tab nav (`flex space-x-8`) overflowed on small screens with no scroll or w
 The FAQ section on ContactPage previously read from a static array in `faqData.js` — admin edits had no effect.
 
 **Architecture:**
+
 ```
 Admin (CMSPollQuestions FAQ Manager tab)
   → useFAQQuestions.add/edit/remove()
@@ -782,6 +1057,7 @@ ContactPage
 ```
 
 **CMSPollQuestions** now has two sub-tabs:
+
 1. **FAQ Manager** (default) — add/edit/delete Q&A pairs that appear live on ContactPage
 2. **Poll Questions** — existing program-specific assessment questions (unchanged)
 
@@ -901,14 +1177,14 @@ The following 12 files were removed entirely:
 
 ### How Each Feature Now Works
 
-| Feature | Public page reads from | Admin page writes to |
-| --- | --- | --- |
-| Blog / News | `MOCK_BLOGS` (mockData.js) | `useState(MOCK_BLOGS)` — session only |
-| Scholarships | `MOCK_SCHOLARSHIPS` (mockData.js) | `useState(MOCK_SCHOLARSHIPS)` — session only |
-| Gallery / Testimonials | `MOCK_MEDIA` (mockData.js) | `useState(MOCK_MEDIA)` — session only |
-| FAQ | `faqs` (faqData.js) | `MOCK_POLL_QUESTIONS` — session only |
-| Branches (public) | `branches` (branches.js) via `useBranches` | — |
-| Branches (admin) | `useBranches` hook state | `useBranches` — session only |
+| Feature                | Public page reads from                     | Admin page writes to                         |
+| ---------------------- | ------------------------------------------ | -------------------------------------------- |
+| Blog / News            | `MOCK_BLOGS` (mockData.js)                 | `useState(MOCK_BLOGS)` — session only        |
+| Scholarships           | `MOCK_SCHOLARSHIPS` (mockData.js)          | `useState(MOCK_SCHOLARSHIPS)` — session only |
+| Gallery / Testimonials | `MOCK_MEDIA` (mockData.js)                 | `useState(MOCK_MEDIA)` — session only        |
+| FAQ                    | `faqs` (faqData.js)                        | `MOCK_POLL_QUESTIONS` — session only         |
+| Branches (public)      | `branches` (branches.js) via `useBranches` | —                                            |
+| Branches (admin)       | `useBranches` hook state                   | `useBranches` — session only                 |
 
 "Session only" means admin edits are in-memory and reset on page refresh. This is intentional — the real persistence will come from a CMS API call when that is integrated.
 
@@ -950,9 +1226,9 @@ Fixed by moving all mutation logic into the hook:
 All delete handlers in `src/pages/admin-dashboard/cms/` were using `window.confirm()` which blocks the JS thread and looks out of place in a modern UI. Replaced with sonner's action toast pattern across all four pages:
 
 ```js
-toast('Delete this item?', {
-  action: { label: 'Delete', onClick: () => remove(id) },
-  cancel: { label: 'Cancel', onClick: () => {} },
+toast("Delete this item?", {
+  action: { label: "Delete", onClick: () => remove(id) },
+  cancel: { label: "Cancel", onClick: () => {} },
 });
 ```
 
@@ -1008,15 +1284,16 @@ src/
 **Problem:** Three CMS admin pages (`CMSScholarships`, `CMSPosts`, `CMSMedia`) each had ~30 lines of copy-pasted state + handlers (useState, useMemo, add/edit/remove helpers) while `useCMSManager` — a hook that centralises exactly this logic — sat unused. Only `CMSLibrary` was using it.
 
 **What we did:**
+
 - Rewrote all three pages to destructure from `useCMSManager(MOCK_DATA, EMPTY, searchKeys)` instead of owning their own state.
 - Removed all inline `useState`, `useMemo`, `toast`, `add/edit/remove` helpers from each file.
 - Removed the `loading ? (...) : (...)` ternary from `CMSMedia` — `loading` was always `false`.
 
-| Page | Hook call | Search keys |
-|------|-----------|-------------|
-| `CMSScholarships` | `useCMSManager(MOCK_SCHOLARSHIPS, EMPTY, ['title', 'location'])` | title, location |
-| `CMSPosts` | `useCMSManager(MOCK_BLOGS, EMPTY, ['title', 'category'])` | title, category |
-| `CMSMedia` | `useCMSManager(MOCK_MEDIA, EMPTY, ['studentName', 'country'])` | studentName, country |
+| Page              | Hook call                                                        | Search keys          |
+| ----------------- | ---------------------------------------------------------------- | -------------------- |
+| `CMSScholarships` | `useCMSManager(MOCK_SCHOLARSHIPS, EMPTY, ['title', 'location'])` | title, location      |
+| `CMSPosts`        | `useCMSManager(MOCK_BLOGS, EMPTY, ['title', 'category'])`        | title, category      |
+| `CMSMedia`        | `useCMSManager(MOCK_MEDIA, EMPTY, ['studentName', 'country'])`   | studentName, country |
 
 Any future change to delete confirmation UX, tag handling, or submit logic only needs to happen in one place: `src/hooks/useCMSManager.js`.
 
@@ -1025,6 +1302,7 @@ Any future change to delete confirmation UX, tag handling, or submit logic only 
 ### Part B — SYSTEM_FILES: fileService.js Pattern
 
 **Problem:** Both `CMSMedia` and `CMSLibrary` used `URL.createObjectURL(file)` to handle image/document uploads. This creates a temporary blob URL that:
+
 - Exists only in the current browser session
 - Cannot be stored in any database
 - Is lost on page refresh
@@ -1032,6 +1310,7 @@ Any future change to delete confirmation UX, tag handling, or submit logic only 
 The real DB has a `SYSTEM_FILES` table (`id INT PK`, `file STRING` path, `user_id FK`). Files should be uploaded to the server, which stores them and returns a path like `/uploads/abc123.jpg`.
 
 **What we did:**
+
 - Created `src/services/fileService.js` — a stub that matches the final API interface today.
 - Both `handleFileUpload` functions in `CMSMedia` and `CMSLibrary` are now `async` and call `uploadFile(file)` from the service.
 - Stub returns `{ id: null, file: blob_url }` — same shape as the real API will return.
@@ -1040,17 +1319,20 @@ The real DB has a `SYSTEM_FILES` table (`id INT PK`, `file STRING` path, `user_i
 ```js
 // fileService.js stub (dev)
 export async function uploadFile(file) {
-  await new Promise(r => setTimeout(r, 200));
+  await new Promise((r) => setTimeout(r, 200));
   return { id: null, file: URL.createObjectURL(file) };
 }
 
 // fileService.js real (when backend is live — only this changes)
 export async function uploadFile(file) {
   const body = new FormData();
-  body.append('file', file);
-  const res = await fetch('/api/files', { method: 'POST', body,
-    headers: { Authorization: `Bearer ${getToken()}` } });
-  if (!res.ok) throw new Error('Upload failed');
+  body.append("file", file);
+  const res = await fetch("/api/files", {
+    method: "POST",
+    body,
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
+  if (!res.ok) throw new Error("Upload failed");
   return res.json(); // { id: 42, file: '/uploads/2026/03/abc123.jpg' }
 }
 ```
@@ -1063,33 +1345,34 @@ export async function uploadFile(file) {
 
 #### USER table — changes made
 
-| Field | Before | After | Notes |
-|-------|--------|-------|-------|
-| `id` | `"USR-001"` (string) | UUID `"00000000-0000-0000-0000-000000000001"` | Architectural decision: UUIDs over DB auto-increment |
-| `username` | missing | `email.split("@")[0]` fallback | DB requires username column |
-| `salt` | missing | `null` | Backend concern — acknowledged |
-| `created_at` | missing | ISO timestamp | Seeded in mock, set on `registerUser` |
-| `updated_at` | missing | ISO timestamp | Set on every `updateUser` and `updatePassword` call |
-| `permissions` | missing | `["all"]` / `["view_own_app", "submit_app"]` | Seeded per role; ROLE_PERMISSION table when backend live |
+| Field         | Before               | After                                         | Notes                                                    |
+| ------------- | -------------------- | --------------------------------------------- | -------------------------------------------------------- |
+| `id`          | `"USR-001"` (string) | UUID `"00000000-0000-0000-0000-000000000001"` | Architectural decision: UUIDs over DB auto-increment     |
+| `username`    | missing              | `email.split("@")[0]` fallback                | DB requires username column                              |
+| `salt`        | missing              | `null`                                        | Backend concern — acknowledged                           |
+| `created_at`  | missing              | ISO timestamp                                 | Seeded in mock, set on `registerUser`                    |
+| `updated_at`  | missing              | ISO timestamp                                 | Set on every `updateUser` and `updatePassword` call      |
+| `permissions` | missing              | `["all"]` / `["view_own_app", "submit_app"]`  | Seeded per role; ROLE_PERMISSION table when backend live |
 
 **Stable seed UUIDs added to mockUsers.js:**
+
 ```js
 export const SEED_USER_IDS = {
-  ADMIN:   "00000000-0000-0000-0000-000000000001",
+  ADMIN: "00000000-0000-0000-0000-000000000001",
   STUDENT: "00000000-0000-0000-0000-000000000002",
 };
 ```
 
 #### IDENTITY table — changes made
 
-| Field | Before | After | Notes |
-|-------|--------|-------|-------|
-| `id` | missing | UUID per identity row | Added to each identity object |
-| `user_id` | missing | `userId` from parent | FK back to USER |
-| `dob` | `date_birth` | `dob` | Renamed in mockUsers.js, userService.js, AdminSettings, StudentSettings, UserManagement |
-| `language` | missing | `"English"` default | DB column |
-| `id_document` | missing | `null` | FK → SYSTEM_FILES — placeholder |
-| camelCase keys | inconsistent | `firstName`, `lastName` kept camelCase | JS convention; service layer translates to `first_name`/`last_name` on real API call |
+| Field          | Before       | After                                  | Notes                                                                                   |
+| -------------- | ------------ | -------------------------------------- | --------------------------------------------------------------------------------------- |
+| `id`           | missing      | UUID per identity row                  | Added to each identity object                                                           |
+| `user_id`      | missing      | `userId` from parent                   | FK back to USER                                                                         |
+| `dob`          | `date_birth` | `dob`                                  | Renamed in mockUsers.js, userService.js, AdminSettings, StudentSettings, UserManagement |
+| `language`     | missing      | `"English"` default                    | DB column                                                                               |
+| `id_document`  | missing      | `null`                                 | FK → SYSTEM_FILES — placeholder                                                         |
+| camelCase keys | inconsistent | `firstName`, `lastName` kept camelCase | JS convention; service layer translates to `first_name`/`last_name` on real API call    |
 
 **Note on `phone`:** `identity.phone` exists in the frontend but has no column in the DB IDENTITY table. You must add `phone VARCHAR(20)` to the IDENTITY table before running migrations.
 
@@ -1099,14 +1382,14 @@ All 4 visa records had `userId: "USR-002"` — updated to `"00000000-0000-0000-0
 
 #### Files changed in this alignment:
 
-| File | Change |
-|------|--------|
-| `src/data/mockUsers.js` | Full rewrite — UUID IDs, SEED_USER_IDS export, all new fields |
-| `src/services/userService.js` | Full rewrite — uuid import, registerUser/loginWithGoogleToken/updateUser all aligned |
-| `src/data/mockVisaData.js` | 4 × `userId: "USR-002"` → UUID |
-| `src/pages/admin-dashboard/AdminSettings.jsx` | `identity?.date_birth` → `identity?.dob` |
-| `src/pages/student-dashboard/settings/StudentSettings.jsx` | `identity?.date_birth` → `identity?.dob` |
-| `src/pages/admin-dashboard/users/UserManagement.jsx` | `identity?.date_birth` → `identity?.dob` (2 occurrences) |
+| File                                                       | Change                                                                               |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `src/data/mockUsers.js`                                    | Full rewrite — UUID IDs, SEED_USER_IDS export, all new fields                        |
+| `src/services/userService.js`                              | Full rewrite — uuid import, registerUser/loginWithGoogleToken/updateUser all aligned |
+| `src/data/mockVisaData.js`                                 | 4 × `userId: "USR-002"` → UUID                                                       |
+| `src/pages/admin-dashboard/AdminSettings.jsx`              | `identity?.date_birth` → `identity?.dob`                                             |
+| `src/pages/student-dashboard/settings/StudentSettings.jsx` | `identity?.date_birth` → `identity?.dob`                                             |
+| `src/pages/admin-dashboard/users/UserManagement.jsx`       | `identity?.date_birth` → `identity?.dob` (2 occurrences)                             |
 
 ---
 
@@ -1118,13 +1401,15 @@ All 4 visa records had `userId: "USR-002"` — updated to `"00000000-0000-0000-0
 
 ```js
 // userService.js
-const user = users.find(u =>
-  u.email.toLowerCase()    === identifier.toLowerCase() ||
-  u.username?.toLowerCase() === identifier.toLowerCase()
+const user = users.find(
+  (u) =>
+    u.email.toLowerCase() === identifier.toLowerCase() ||
+    u.username?.toLowerCase() === identifier.toLowerCase(),
 );
 ```
 
 This mirrors the SQL query the backend will run:
+
 ```sql
 SELECT * FROM user WHERE email = ? OR username = ?
 ```
@@ -1136,11 +1421,17 @@ SELECT * FROM user WHERE email = ? OR username = ?
 #### hasPermission added to AuthContext
 
 ```js
-const hasPermission = useCallback((permissionName) => {
-  if (!user) return false;
-  const perms = user.permissions ?? DEFAULT_ROLE_PERMISSIONS[user.role?.toLowerCase()] ?? [];
-  return perms.includes('all') || perms.includes(permissionName);
-}, [user, DEFAULT_ROLE_PERMISSIONS]);
+const hasPermission = useCallback(
+  (permissionName) => {
+    if (!user) return false;
+    const perms =
+      user.permissions ??
+      DEFAULT_ROLE_PERMISSIONS[user.role?.toLowerCase()] ??
+      [];
+    return perms.includes("all") || perms.includes(permissionName);
+  },
+  [user, DEFAULT_ROLE_PERMISSIONS],
+);
 ```
 
 - Falls back to `DEFAULT_ROLE_PERMISSIONS` so existing sessions without a `permissions` array still work.
@@ -1152,22 +1443,22 @@ const hasPermission = useCallback((permissionName) => {
 
 ### Updated DB Alignment Score — March 18, 2026
 
-| DB Table | Before Session 5 | After Session 6 | Key delta |
-|----------|-----------------|-----------------|-----------|
-| USER | 70% | **90%** | UUID IDs, username, salt, timestamps, permissions |
-| IDENTITY | 65% | **90%** | dob, id, user_id, id_document, language — all added |
-| ROLE | 80% | **85%** | staff role added, description is frontend-only extra |
-| PERMISSION | 0% | **40%** | `hasPermission()` + `DEFAULT_ROLE_PERMISSIONS` stub |
-| ROLE_PERMISSION | 0% | **40%** | default mappings per role seeded in AuthContext |
-| SYSTEM_FILES | 35% | **55%** | `fileService.js` with matching `{ id, file }` shape; `id_document` FK noted on identity |
-| APPLICATION_TRACKER | 60% | 60% | unchanged |
-| FEES | 40% | 40% | string amounts vs float columns — not yet fixed |
-| MAJOR | 70% | 70% | unchanged |
-| INSTITUTION | 30% | 30% | universityName/location shape mismatch — not yet fixed |
-| APPLICATION (finance) | 25% | 25% | unchanged |
-| APPLICATION_SCHEDULE | 0% | 0% | no frontend equivalent |
-| MAJOR_APPSCHEDULE | 0% | 0% | no frontend equivalent |
-| DEPT_MAJOR_APP_TRACKER | 0% | 0% | join table — no frontend equivalent |
+| DB Table               | Before Session 5 | After Session 6 | Key delta                                                                               |
+| ---------------------- | ---------------- | --------------- | --------------------------------------------------------------------------------------- |
+| USER                   | 70%              | **90%**         | UUID IDs, username, salt, timestamps, permissions                                       |
+| IDENTITY               | 65%              | **90%**         | dob, id, user_id, id_document, language — all added                                     |
+| ROLE                   | 80%              | **85%**         | staff role added, description is frontend-only extra                                    |
+| PERMISSION             | 0%               | **40%**         | `hasPermission()` + `DEFAULT_ROLE_PERMISSIONS` stub                                     |
+| ROLE_PERMISSION        | 0%               | **40%**         | default mappings per role seeded in AuthContext                                         |
+| SYSTEM_FILES           | 35%              | **55%**         | `fileService.js` with matching `{ id, file }` shape; `id_document` FK noted on identity |
+| APPLICATION_TRACKER    | 60%              | 60%             | unchanged                                                                               |
+| FEES                   | 40%              | 40%             | string amounts vs float columns — not yet fixed                                         |
+| MAJOR                  | 70%              | 70%             | unchanged                                                                               |
+| INSTITUTION            | 30%              | 30%             | universityName/location shape mismatch — not yet fixed                                  |
+| APPLICATION (finance)  | 25%              | 25%             | unchanged                                                                               |
+| APPLICATION_SCHEDULE   | 0%               | 0%              | no frontend equivalent                                                                  |
+| MAJOR_APPSCHEDULE      | 0%               | 0%              | no frontend equivalent                                                                  |
+| DEPT_MAJOR_APP_TRACKER | 0%               | 0%              | join table — no frontend equivalent                                                     |
 
 **Overall: ~45% → ~55%** (+10 points this session)
 
@@ -1177,15 +1468,15 @@ The 10-point gain came entirely from the USER/IDENTITY/auth layer which was the 
 
 ### What Remains (Prioritised)
 
-| # | Task | Tables affected | Effort |
-|---|------|-----------------|--------|
-| 1 | INSTITUTION: rename `universityName` → `name`, fix `location` shape | INSTITUTION | Medium |
-| 2 | APPLICATION FEES: change string amounts to float in mock data + applicationService | FEES | Small |
-| 3 | Visa request IDs: `"VR-001"` → UUID format | VISA_REQUEST (future table) | Small |
-| 4 | Application IDs: `"APP-xxx"` → UUID format | APPLICATION_TRACKER | Small |
-| 5 | APPLICATION_SCHEDULE: add scheduling concept to frontend | APPLICATION_SCHEDULE | Large |
-| 6 | Use `hasPermission()` in at least one real component (staff role guard) | ROLE_PERMISSION | Medium |
-| 7 | Add `phone VARCHAR(20)` to DB IDENTITY table | IDENTITY | DB migration |
+| #   | Task                                                                               | Tables affected             | Effort       |
+| --- | ---------------------------------------------------------------------------------- | --------------------------- | ------------ |
+| 1   | INSTITUTION: rename `universityName` → `name`, fix `location` shape                | INSTITUTION                 | Medium       |
+| 2   | APPLICATION FEES: change string amounts to float in mock data + applicationService | FEES                        | Small        |
+| 3   | Visa request IDs: `"VR-001"` → UUID format                                         | VISA_REQUEST (future table) | Small        |
+| 4   | Application IDs: `"APP-xxx"` → UUID format                                         | APPLICATION_TRACKER         | Small        |
+| 5   | APPLICATION_SCHEDULE: add scheduling concept to frontend                           | APPLICATION_SCHEDULE        | Large        |
+| 6   | Use `hasPermission()` in at least one real component (staff role guard)            | ROLE_PERMISSION             | Medium       |
+| 7   | Add `phone VARCHAR(20)` to DB IDENTITY table                                       | IDENTITY                    | DB migration |
 
 ---
 
@@ -1204,23 +1495,25 @@ This session addressed the top three remaining alignment items from the Session 
 **Problem:** The DB INSTITUTION table has `name` as its primary identifier column. Every program record in `MOCK_PROGRAMS` used `universityName` — a frontend-invented field name that would silently mismatch when API responses arrive with `name`.
 
 **Changes in `mockData.js`:**
+
 - `universityName` renamed to `name` in all 3 `MOCK_PROGRAMS` records
 - `representative_id: null` added to each program (FK → USER table — the staff contact responsible for this institution)
 
 **Changes in `programService.js`:**
+
 - `createProgram` now explicitly sets `representative_id: data.representative_id ?? null` on new records
 
 **Component updates (read `program.name` instead of `program.universityName`):**
 
-| File | What changed |
-|------|-------------|
-| `AdminProgramDetail.jsx` | `formData.name` (all 5 occurrences) |
-| `ProgramDetail.jsx` | `program.name` (all 4 occurrences) |
-| `UniversityCard.jsx` | `university.name` |
-| `UniversityPrograms.jsx` | column accessor + display + filter |
-| `UniversityProgramDetailsPreview.jsx` | alt + display |
-| `CMSPollQuestions.jsx` | option display + inline badge |
-| `ApplicationSubmitForm.jsx` | dropdown display (`p.name`) + DTO population (`selectedProgram?.name`) |
+| File                                  | What changed                                                           |
+| ------------------------------------- | ---------------------------------------------------------------------- |
+| `AdminProgramDetail.jsx`              | `formData.name` (all 5 occurrences)                                    |
+| `ProgramDetail.jsx`                   | `program.name` (all 4 occurrences)                                     |
+| `UniversityCard.jsx`                  | `university.name`                                                      |
+| `UniversityPrograms.jsx`              | column accessor + display + filter                                     |
+| `UniversityProgramDetailsPreview.jsx` | alt + display                                                          |
+| `CMSPollQuestions.jsx`                | option display + inline badge                                          |
+| `ApplicationSubmitForm.jsx`           | dropdown display (`p.name`) + DTO population (`selectedProgram?.name`) |
 
 **Note:** `programDetails.universityName` in the application DTO (`applicationService.js`, `MOCK_UNIFIED_APPLICATIONS`) is **kept as-is** — it is a descriptive frontend read-model alias, not the raw DB column name, and renaming it would touch every application display component without backend benefit.
 
@@ -1234,6 +1527,7 @@ This session addressed the top three remaining alignment items from the Session 
 
 **Changes in `mockData.js`:**
 All `tuitionFees` rows in all 3 programs updated:
+
 ```js
 // Before:
 { level: "Bachelor's", item: "Entrance Fee", amount: "300,000 KRW" }
@@ -1244,13 +1538,17 @@ All `tuitionFees` rows in all 3 programs updated:
 
 **Changes in `ProgramSections.jsx` (`ProgramTuitionFees`):**
 Amount cell now formats the number:
+
 ```jsx
-{typeof row.amount === 'number'
-  ? `${row.amount.toLocaleString()} ${row.currency ?? ''}`
-  : row.amount}  // fallback for any legacy string values
+{
+  typeof row.amount === "number"
+    ? `${row.amount.toLocaleString()} ${row.currency ?? ""}`
+    : row.amount;
+} // fallback for any legacy string values
 ```
 
 **Changes in `AdminProgramDetail.jsx`:**
+
 - Default new fee row: `{ level: "Bachelor's", item: "", amount: 0, currency: "KRW" }`
 - Amount input changed from `type="text"` → `type="number"`, stores `Number(e.target.value)`
 - Added `currency` select dropdown (KRW / USD / EUR / GBP) next to amount field
@@ -1266,6 +1564,7 @@ Amount cell now formats the number:
 **Visa changes:**
 
 Added `SEED_VISA_IDS` export to `mockVisaData.js` (same pattern as `SEED_USER_IDS`):
+
 ```js
 export const SEED_VISA_IDS = {
   VR001: "20000000-0000-0000-0000-000000000001",
@@ -1278,6 +1577,7 @@ export const SEED_VISA_IDS = {
 All 4 `MOCK_VISA_REQUESTS` records updated to use `SEED_VISA_IDS.VR00x`.
 
 `visaService.js` — `createVisaRequest` now generates:
+
 ```js
 id: uuidv4(),  // was: `VR-${Date.now()}-${Math.random()...}`
 ```
@@ -1285,6 +1585,7 @@ id: uuidv4(),  // was: `VR-${Date.now()}-${Math.random()...}`
 **Application changes:**
 
 `applicationService.js` — removed `generateId()` helper, replaced with:
+
 ```js
 import { v4 as uuidv4 } from "uuid";
 // createApplication:
@@ -1297,22 +1598,22 @@ Seed data `MOCK_UNIFIED_APPLICATIONS` track IDs (`APP-1771461317295-608`, `APP-2
 
 ### Updated DB Alignment Score — March 18, 2026 (Session 7)
 
-| DB Table | Session 6 | Session 7 | Key delta |
-|----------|-----------|-----------|-----------|
-| USER | 90% | 90% | unchanged |
-| IDENTITY | 90% | 90% | unchanged |
-| ROLE | 85% | 85% | unchanged |
-| PERMISSION | 40% | 40% | unchanged |
-| ROLE_PERMISSION | 40% | 40% | unchanged |
-| SYSTEM_FILES | 55% | 55% | unchanged |
-| APPLICATION_TRACKER | 60% | **70%** | trackerId now UUID |
-| FEES | 40% | **65%** | amount → FLOAT, currency field added |
-| MAJOR | 70% | 70% | unchanged |
-| INSTITUTION | 30% | **75%** | `name` aligned, `representative_id` added |
-| APPLICATION (finance) | 25% | 25% | unchanged |
-| APPLICATION_SCHEDULE | 0% | 0% | no frontend equivalent |
-| MAJOR_APPSCHEDULE | 0% | 0% | no frontend equivalent |
-| DEPT_MAJOR_APP_TRACKER | 0% | 0% | join table — no frontend equivalent |
+| DB Table               | Session 6 | Session 7 | Key delta                                 |
+| ---------------------- | --------- | --------- | ----------------------------------------- |
+| USER                   | 90%       | 90%       | unchanged                                 |
+| IDENTITY               | 90%       | 90%       | unchanged                                 |
+| ROLE                   | 85%       | 85%       | unchanged                                 |
+| PERMISSION             | 40%       | 40%       | unchanged                                 |
+| ROLE_PERMISSION        | 40%       | 40%       | unchanged                                 |
+| SYSTEM_FILES           | 55%       | 55%       | unchanged                                 |
+| APPLICATION_TRACKER    | 60%       | **70%**   | trackerId now UUID                        |
+| FEES                   | 40%       | **65%**   | amount → FLOAT, currency field added      |
+| MAJOR                  | 70%       | 70%       | unchanged                                 |
+| INSTITUTION            | 30%       | **75%**   | `name` aligned, `representative_id` added |
+| APPLICATION (finance)  | 25%       | 25%       | unchanged                                 |
+| APPLICATION_SCHEDULE   | 0%        | 0%        | no frontend equivalent                    |
+| MAJOR_APPSCHEDULE      | 0%        | 0%        | no frontend equivalent                    |
+| DEPT_MAJOR_APP_TRACKER | 0%        | 0%        | join table — no frontend equivalent       |
 
 **Overall: ~55% → ~62%** (+7 points this session)
 
@@ -1320,12 +1621,12 @@ Seed data `MOCK_UNIFIED_APPLICATIONS` track IDs (`APP-1771461317295-608`, `APP-2
 
 ### What Remains (Updated)
 
-| # | Task | Tables affected | Effort |
-|---|------|-----------------|--------|
-| 1 | APPLICATION_SCHEDULE: add scheduling concept to frontend | APPLICATION_SCHEDULE | Large |
-| 2 | Use `hasPermission()` in at least one real component (staff role guard) | ROLE_PERMISSION | Medium |
-| 3 | APPLICATION (finance): wire fee fields to APPLICATION_TRACKER on submit | APPLICATION | Medium |
-| 4 | Add `phone VARCHAR(20)` to DB IDENTITY table | IDENTITY | DB migration |
+| #   | Task                                                                    | Tables affected      | Effort       |
+| --- | ----------------------------------------------------------------------- | -------------------- | ------------ |
+| 1   | APPLICATION_SCHEDULE: add scheduling concept to frontend                | APPLICATION_SCHEDULE | Large        |
+| 2   | Use `hasPermission()` in at least one real component (staff role guard) | ROLE_PERMISSION      | Medium       |
+| 3   | APPLICATION (finance): wire fee fields to APPLICATION_TRACKER on submit | APPLICATION          | Medium       |
+| 4   | Add `phone VARCHAR(20)` to DB IDENTITY table                            | IDENTITY             | DB migration |
 
 ---
 
@@ -1340,12 +1641,14 @@ Seed data `MOCK_UNIFIED_APPLICATIONS` track IDs (`APP-1771461317295-608`, `APP-2
 The two layout files were structurally identical — same sidebar chrome, same header, same profile dropdown. The only differences were the nav item arrays and the settings path. Merging them into one `DashboardLayout` eliminates the duplication permanently.
 
 **How it works:**
+
 ```js
 const isAdmin = user?.role === "admin";
 const currentNavItems = isAdmin ? adminNavItems : studentNavItems;
-const settingsPath    = isAdmin ? "/admin/settings" : "/dashboard/profile";
-const portalName      = isAdmin ? "Admin Portal"    : "Student Portal";
+const settingsPath = isAdmin ? "/admin/settings" : "/dashboard/profile";
+const portalName = isAdmin ? "Admin Portal" : "Student Portal";
 ```
+
 - One `useAuth()` call, one sidebar, one header, one profile dropdown.
 - Sidebar swaps nav arrays at runtime — no conditional rendering of entire components.
 - `displayName` priority: `username` → `firstName + lastName` → `"User"` — same safe fallback for both roles.
@@ -1364,7 +1667,7 @@ The `createProgram` function was upgraded to produce a `relationalPayload` objec
 const relationalPayload = {
   institution: {
     id: institutionId,
-    identity_id: data.representative_id || null,  // FK → USER
+    identity_id: data.representative_id || null, // FK → USER
     name: data.name,
     category: "University",
     location: JSON.stringify({ country: data.country, city: data.location }),
@@ -1372,20 +1675,23 @@ const relationalPayload = {
   },
   departments_and_majors: data.departments.map((dept) => ({
     department: { institution_id: institutionId, category: dept.degree },
-    major: { name: dept.major, language: dept.language,
-             requirements: JSON.stringify(data.requiredDocuments) },
+    major: {
+      name: dept.major,
+      language: dept.language,
+      requirements: JSON.stringify(data.requiredDocuments),
+    },
   })),
   fees: data.tuitionFees.map((fee) => ({
     level: fee.level,
-    amount: fee.amount,       // ← now FLOAT (aligned in Session 7)
-    description: fee.item,   // UI "item" → DB "description"
+    amount: fee.amount, // ← now FLOAT (aligned in Session 7)
+    description: fee.item, // UI "item" → DB "description"
     status: data.status,
   })),
   unmapped_frontend_data: {
-    visa_type: data.visaType,        // needs column in INSTITUTION or MAJOR
-    logo_url: data.logo,             // needs logo_id FK → SYSTEM_FILES
+    visa_type: data.visaType, // needs column in INSTITUTION or MAJOR
+    logo_url: data.logo, // needs logo_id FK → SYSTEM_FILES
     application_link: data.applicationLink,
-    schedules: data.timeline,        // needs APPLICATION_SCHEDULE date columns
+    schedules: data.timeline, // needs APPLICATION_SCHEDULE date columns
   },
 };
 ```
@@ -1394,12 +1700,12 @@ The mock frontend still saves the flat `data` object to localStorage for immedia
 
 **ERD flaws surfaced by this mapper:**
 
-| Gap | Required DB change |
-|-----|--------------------|
-| `fees.institution_id` missing | Add `institution_id FK` to FEES table |
-| Institution logo not storable | Add `logo_id FK → SYSTEM_FILES` to INSTITUTION |
-| Visa type has no DB column | Add `visa_type VARCHAR` to INSTITUTION or MAJOR |
-| Timeline dates lost | Add `start_date`, `end_date`, `exam_date`, `result_date` columns to APPLICATION_SCHEDULE |
+| Gap                           | Required DB change                                                                       |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `fees.institution_id` missing | Add `institution_id FK` to FEES table                                                    |
+| Institution logo not storable | Add `logo_id FK → SYSTEM_FILES` to INSTITUTION                                           |
+| Visa type has no DB column    | Add `visa_type VARCHAR` to INSTITUTION or MAJOR                                          |
+| Timeline dates lost           | Add `start_date`, `end_date`, `exam_date`, `result_date` columns to APPLICATION_SCHEDULE |
 
 ---
 
@@ -1497,22 +1803,22 @@ One component, two nav arrays, one role check. ~350 lines of duplicated layout c
 
 ### Final DB Alignment Score — March 19, 2026
 
-| DB Table | Score | Status |
-|----------|-------|--------|
-| USER | **90%** | UUID, username, timestamps, permissions. Salt is backend concern. |
-| IDENTITY | **90%** | dob, id, user_id, id_document FK, language all added. `phone` column still missing from DB schema. |
-| ROLE | **85%** | staff role prepared; description is frontend-extra. |
-| PERMISSION | **40%** | DEFAULT_ROLE_PERMISSIONS stub; real rows come from backend. |
-| ROLE_PERMISSION | **40%** | Fallback mapping seeded; will be replaced by JWT claims. |
-| SYSTEM_FILES | **55%** | fileService.js stub matches `{ id, file }` shape; id_document FK noted. |
-| INSTITUTION | **75%** | `name` aligned, `representative_id` added, DTO mapper built. logo_id + visa_type still missing from DB. |
-| FEES | **65%** | Amount is now FLOAT with currency field. institution_id FK still missing from DB. |
-| APPLICATION_TRACKER | **70%** | trackerId is UUID. applicant DTO is joined view (correct). |
-| MAJOR | **70%** | department_major_ids pattern correct; join table write is backend concern. |
-| APPLICATION (finance) | **25%** | No fee record created on application submit yet. |
-| APPLICATION_SCHEDULE | **0%** | No frontend equivalent yet. |
-| MAJOR_APPSCHEDULE | **0%** | Join table — no frontend equivalent yet. |
-| DEPT_MAJOR_APP_TRACKER | **0%** | Join table — no frontend equivalent yet. |
+| DB Table               | Score   | Status                                                                                                  |
+| ---------------------- | ------- | ------------------------------------------------------------------------------------------------------- |
+| USER                   | **90%** | UUID, username, timestamps, permissions. Salt is backend concern.                                       |
+| IDENTITY               | **90%** | dob, id, user_id, id_document FK, language all added. `phone` column still missing from DB schema.      |
+| ROLE                   | **85%** | staff role prepared; description is frontend-extra.                                                     |
+| PERMISSION             | **40%** | DEFAULT_ROLE_PERMISSIONS stub; real rows come from backend.                                             |
+| ROLE_PERMISSION        | **40%** | Fallback mapping seeded; will be replaced by JWT claims.                                                |
+| SYSTEM_FILES           | **55%** | fileService.js stub matches `{ id, file }` shape; id_document FK noted.                                 |
+| INSTITUTION            | **75%** | `name` aligned, `representative_id` added, DTO mapper built. logo_id + visa_type still missing from DB. |
+| FEES                   | **65%** | Amount is now FLOAT with currency field. institution_id FK still missing from DB.                       |
+| APPLICATION_TRACKER    | **70%** | trackerId is UUID. applicant DTO is joined view (correct).                                              |
+| MAJOR                  | **70%** | department_major_ids pattern correct; join table write is backend concern.                              |
+| APPLICATION (finance)  | **25%** | No fee record created on application submit yet.                                                        |
+| APPLICATION_SCHEDULE   | **0%**  | No frontend equivalent yet.                                                                             |
+| MAJOR_APPSCHEDULE      | **0%**  | Join table — no frontend equivalent yet.                                                                |
+| DEPT_MAJOR_APP_TRACKER | **0%**  | Join table — no frontend equivalent yet.                                                                |
 
 **Overall: ~62%** — The entire user/auth/identity layer, all UUID IDs, the program/institution shape, and all fee amounts are now backend-ready. The remaining gap is dominated by join tables and the financial application flow, both of which require backend work before the frontend can wire them.
 
@@ -1520,20 +1826,20 @@ One component, two nav arrays, one role check. ~350 lines of duplicated layout c
 
 ### Next Priority Tasks
 
-| # | Task | Effort | Status |
-|---|------|--------|--------|
-| 1 | Add `institution_id` FK to DB FEES table | DB migration | ⏳ Pending |
-| 2 | Add `logo_id` FK + `visa_type` column to DB INSTITUTION | DB migration | ⏳ Pending |
-| 3 | Add date columns to APPLICATION_SCHEDULE | DB migration | ⏳ Pending |
-| 4 | Add `phone VARCHAR(20)` to IDENTITY table | DB migration | ⏳ Pending |
-| 5 | Wire APPLICATION fee record creation on `createApplication` | Medium | ✅ Done (Session 8) |
-| 6 | Use `hasPermission()` in at least one live UI component | Medium | ✅ Done (Session 8) |
-| 7 | Connect real auth API (`userService.loginUser` → `authAPI.login`) | Large | ⏳ Pending |
-| 8 | **Translation audit** — scan all pages for hardcoded strings not in translation files | Medium | ⏳ Tomorrow |
-| 9 | Add missing translation keys for new home sections (StatsBar, GalleryTeaser, Testimonials cards) | Small | ⏳ Tomorrow |
-| 10 | Fix untranslated strings in `sw/translation.json` (`resources.scholarships`, `services.items.scholarships/study_abroad`) | Small | ⏳ Tomorrow |
-| 11 | APPLICATION_SCHEDULE: add scheduling UI to program form (start/exam/result dates) | Large | ⏳ Pending |
-| 12 | Expose fee fields in `ApplicationSubmitForm.jsx` so students populate the fee block | Small | ⏳ Pending |
+| #   | Task                                                                                                                     | Effort       | Status              |
+| --- | ------------------------------------------------------------------------------------------------------------------------ | ------------ | ------------------- |
+| 1   | Add `institution_id` FK to DB FEES table                                                                                 | DB migration | ⏳ Pending          |
+| 2   | Add `logo_id` FK + `visa_type` column to DB INSTITUTION                                                                  | DB migration | ⏳ Pending          |
+| 3   | Add date columns to APPLICATION_SCHEDULE                                                                                 | DB migration | ⏳ Pending          |
+| 4   | Add `phone VARCHAR(20)` to IDENTITY table                                                                                | DB migration | ⏳ Pending          |
+| 5   | Wire APPLICATION fee record creation on `createApplication`                                                              | Medium       | ✅ Done (Session 8) |
+| 6   | Use `hasPermission()` in at least one live UI component                                                                  | Medium       | ✅ Done (Session 8) |
+| 7   | Connect real auth API (`userService.loginUser` → `authAPI.login`)                                                        | Large        | ⏳ Pending          |
+| 8   | **Translation audit** — scan all pages for hardcoded strings not in translation files                                    | Medium       | ⏳ Tomorrow         |
+| 9   | Add missing translation keys for new home sections (StatsBar, GalleryTeaser, Testimonials cards)                         | Small        | ⏳ Tomorrow         |
+| 10  | Fix untranslated strings in `sw/translation.json` (`resources.scholarships`, `services.items.scholarships/study_abroad`) | Small        | ⏳ Tomorrow         |
+| 11  | APPLICATION_SCHEDULE: add scheduling UI to program form (start/exam/result dates)                                        | Large        | ⏳ Pending          |
+| 12  | Expose fee fields in `ApplicationSubmitForm.jsx` so students populate the fee block                                      | Small        | ⏳ Pending          |
 
 ---
 
@@ -1562,12 +1868,12 @@ In `registerUser` and `loginWithGoogleToken`, the profile was built like this:
 
 ```js
 // BROKEN
-const uid = userCredential.user.uid;  // e.g. "XyZ8abc..."
+const uid = userCredential.user.uid; // e.g. "XyZ8abc..."
 
 const profile = {
   // uid was NOT stored as a field in the document body
   identity: {
-    id: uuidv4(),  // "550e8400-..." — random, unrelated to uid above
+    id: uuidv4(), // "550e8400-..." — random, unrelated to uid above
   },
 };
 
@@ -1700,6 +2006,7 @@ User clicks Google button
 ```
 
 For this hybrid approach to work, **all three** of the following had to be true simultaneously:
+
 1. Firebase Auth had Google provider enabled in the Firebase console
 2. `VITE_GOOGLE_CLIENT_ID` in `.env` was the exact same OAuth 2.0 client ID registered in the Firebase Auth Google provider settings
 3. The app's domain was in Firebase's authorized domains list
@@ -1748,13 +2055,13 @@ export const loginWithGoogle = async () => {
 
 ### Files Before vs After
 
-| File | Before | After |
-|------|--------|-------|
-| `userService.js` | `signInWithCredential` + manual `GoogleAuthProvider.credential(idToken)` | `signInWithPopup` with a fresh `GoogleAuthProvider` instance |
-| `AuthContext.jsx` | `loginWithGoogle(credential)` — took a token arg | `loginWithGoogle()` — no args |
-| `SignInPage.jsx` | `<GoogleLogin onSuccess={...} onError={...} />` from `@react-oauth/google` | Plain `<button>` calling `loginWithGoogle()` |
-| `SignUpPage.jsx` | Same as SignInPage | Same fix |
-| `main.jsx` | Wrapped app in `<GoogleOAuthProvider clientId={...}>` | Wrapper removed entirely |
+| File              | Before                                                                     | After                                                        |
+| ----------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `userService.js`  | `signInWithCredential` + manual `GoogleAuthProvider.credential(idToken)`   | `signInWithPopup` with a fresh `GoogleAuthProvider` instance |
+| `AuthContext.jsx` | `loginWithGoogle(credential)` — took a token arg                           | `loginWithGoogle()` — no args                                |
+| `SignInPage.jsx`  | `<GoogleLogin onSuccess={...} onError={...} />` from `@react-oauth/google` | Plain `<button>` calling `loginWithGoogle()`                 |
+| `SignUpPage.jsx`  | Same as SignInPage                                                         | Same fix                                                     |
+| `main.jsx`        | Wrapped app in `<GoogleOAuthProvider clientId={...}>`                      | Wrapper removed entirely                                     |
 
 ---
 
@@ -1811,7 +2118,7 @@ await runTransaction(db, async (transaction) => {
     throw new Error(`Username "${desiredUsername}" is already taken.`);
   }
 
-  transaction.set(usernameRef, { uid });           // claim the username
+  transaction.set(usernameRef, { uid }); // claim the username
   transaction.set(doc(db, "users", uid), profile); // write the user profile
 });
 ```
@@ -1836,6 +2143,7 @@ The same transaction pattern was applied to the admin `createUser` function.
 6 existing users had no `/usernames` document. A temporary migration page was built at `/admin/migrate-usernames`, run once, and then deleted along with its utility script and route.
 
 **Users migrated:**
+
 - Kurube
 - Krube
 - niyomukizaesperance7
@@ -1847,6 +2155,11 @@ All 6 now have a `/usernames` document in Firestore. New signups are covered by 
 
 ---
 
+### Notice:
+
+**Regarding the authentication with google using firebase for deployed version(https://sensational-otter-aef2c9.netlify.app/)**: Currently it can't works because that same domain isn't registered inside the firebase google auth system.
+Fix is — add your Netlify domain to Firebase Console → Authentication → Settings → Authorized domains.
+
 ## Next Session — March 27, 2026
 
 ### Application Submission Migration: localStorage → Firebase
@@ -1855,13 +2168,13 @@ All 6 now have a `/usernames` document in Firestore. New signups are covered by 
 
 **Known problems with current state:**
 
-| Problem | Effect |
-|---------|--------|
-| Student submits on Chrome | Admin opens Firefox → sees nothing |
-| Browser data cleared | All applications gone permanently |
-| Student uses a different device | Their own submissions are invisible |
-| File uploads | Stored as Base64 — a 5MB file becomes ~7MB of text in storage |
-| localStorage size limit | ~5–10MB total, easily hit with a few file uploads |
+| Problem                         | Effect                                                        |
+| ------------------------------- | ------------------------------------------------------------- |
+| Student submits on Chrome       | Admin opens Firefox → sees nothing                            |
+| Browser data cleared            | All applications gone permanently                             |
+| Student uses a different device | Their own submissions are invisible                           |
+| File uploads                    | Stored as Base64 — a 5MB file becomes ~7MB of text in storage |
+| localStorage size limit         | ~5–10MB total, easily hit with a few file uploads             |
 
 **Plan:**
 
@@ -1874,7 +2187,7 @@ All 6 now have a `/usernames` document in Firestore. New signups are covered by 
    - Update `ApplicationSubmitForm.jsx` upload handler
 
 **Files to change:**
+
 - `src/services/applicationService.js` — full rewrite
 - `src/pages/student-dashboard/applications/ApplicationSubmitForm.jsx` — file upload handler
 - `src/data/mockData.js` — seed data no longer needed once Firestore is live
-

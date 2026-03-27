@@ -75,13 +75,16 @@ export default function AppTracker() {
   };
 
   const handleToggleStage = (index) => {
+    // If a later stage is already completed, this stage cannot be unchecked (no going back)
+    const laterStageCompleted = editStages.slice(index + 1).some(s => s.completed);
+    if (laterStageCompleted && editStages[index].completed) return;
+
     const newStages = [...editStages];
     newStages[index].completed = !newStages[index].completed;
-    // Auto-fill date if just completed
     if (newStages[index].completed) {
       newStages[index].date = new Date().toISOString().split('T')[0];
     } else {
-       newStages[index].date = null;
+      newStages[index].date = null;
     }
     setEditStages(newStages);
   };
@@ -212,82 +215,112 @@ export default function AppTracker() {
       </div>
 
       {/* Editing Modal */}
-      {editingApp && (
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Update App Tracker" size="md">
-           <div className="space-y-6">
-              
+      {editingApp && (() => {
+        // An application is fully enrolled when every stage is completed —
+        // this is a terminal state, no further changes are allowed.
+        const isFullyEnrolled = editingApp.trackerStages?.every(s => s.completed) ?? false;
+
+        return (
+          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Update App Tracker" size="md">
+            <div className="space-y-6">
+
+              {/* Enrolled banner */}
+              {isFullyEnrolled && (
+                <div className="flex items-center gap-2.5 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                  <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+                  <p className="text-xs font-medium text-emerald-800">
+                    This application has been fully enrolled. No further changes can be made.
+                  </p>
+                </div>
+              )}
+
               {/* Header Info */}
               <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
                 <div>
-                   <p className="text-xs text-slate-500 font-mono mb-1">{editingApp.trackerId}</p>
-                   <p className="text-sm font-bold text-slate-900">{editingApp.applicant?.firstName} {editingApp.applicant?.lastName}</p>
+                  <p className="text-xs text-slate-500 font-mono mb-1">{editingApp.trackerId}</p>
+                  <p className="text-sm font-bold text-slate-900">{editingApp.applicant?.firstName} {editingApp.applicant?.lastName}</p>
                 </div>
                 <div className="text-right">
-                   <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">Status</p>
-                   <select
-                     value={editStatus}
-                     onChange={(e) => setEditStatus(e.target.value)}
-                     className="text-sm bg-white border border-slate-300 text-slate-800 rounded-lg px-3 py-1.5 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
-                   >
-                     {['Pending','Reviewing','Needs Changes','Approved','Rejected'].map(s => (
-                       <option key={s} value={s}>{s}</option>
-                     ))}
-                   </select>
+                  <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">Status</p>
+                  <select
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value)}
+                    disabled={isFullyEnrolled}
+                    className="text-sm bg-white border border-slate-300 text-slate-800 rounded-lg px-3 py-1.5 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {['Pending','Reviewing','Needs Changes','Approved','Rejected'].map(s => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
               {/* Tracker Stages Toggle */}
               <div>
-                 <h4 className="text-sm font-bold text-slate-900 mb-3">Tracker Stages Progression</h4>
-                 <div className="space-y-2 border border-slate-200 rounded-xl p-2 bg-white">
-                    {editStages.map((stage, idx) => (
-                      <div 
-                        key={idx} 
-                        onClick={() => handleToggleStage(idx)}
-                        className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all border outline-none 
+                <h4 className="text-sm font-bold text-slate-900 mb-3">Tracker Stages Progression</h4>
+                <div className="space-y-2 border border-slate-200 rounded-xl p-2 bg-white">
+                  {editStages.map((stage, idx) => {
+                    const laterCompleted = editStages.slice(idx + 1).some(s => s.completed);
+                    const cannotUncheck = stage.completed && laterCompleted;
+                    const isDisabled = isFullyEnrolled || cannotUncheck;
+
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => !isDisabled && handleToggleStage(idx)}
+                        className={`group flex items-center justify-between p-3 rounded-lg transition-all border outline-none
+                          ${isDisabled ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}
                           ${stage.completed ? 'bg-blue-50 border-blue-200 hover:bg-blue-100' : 'bg-white border-transparent hover:bg-slate-50'}
                         `}
                       >
-                         <div className="flex items-center gap-3">
-                            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border transition-colors
-                               ${stage.completed ? 'bg-blue-500 border-blue-500 text-white' : 'bg-white border-slate-300 text-transparent'}
-                            `}>
-                               <CheckCircle2 size={12} strokeWidth={3} className="text-current" />
-                            </div>
-                            <span className={`text-sm font-medium transition-colors ${stage.completed ? 'text-blue-900' : 'text-slate-600'}`}>
-                               {stage.stage}
-                            </span>
-                         </div>
-                         <span className="text-xs text-slate-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                           Toggle
-                         </span>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border transition-colors
+                            ${stage.completed ? 'bg-blue-500 border-blue-500 text-white' : 'bg-white border-slate-300 text-transparent'}
+                          `}>
+                            <CheckCircle2 size={12} strokeWidth={3} className="text-current" />
+                          </div>
+                          <span className={`text-sm font-medium transition-colors ${stage.completed ? 'text-blue-900' : 'text-slate-600'}`}>
+                            {stage.stage}
+                          </span>
+                        </div>
+                        {!isDisabled && (
+                          <span className="text-xs text-slate-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                            Toggle
+                          </span>
+                        )}
                       </div>
-                    ))}
-                 </div>
-                 <p className="text-[10px] text-slate-500 mt-2 ml-1 text-center">Click a stage to mark it as completed or incomplete.</p>
+                    );
+                  })}
+                </div>
+                <p className="text-[10px] text-slate-500 mt-2 ml-1 text-center">
+                  {isFullyEnrolled
+                    ? "This application has reached its final stage."
+                    : "Click a stage to mark it as completed. Completed stages cannot be undone."}
+                </p>
               </div>
 
               {/* Action Buttons */}
               <div className="flex justify-end gap-3 pt-2">
-                 <button 
-                   onClick={() => setIsModalOpen(false)}
-                   disabled={isSaving}
-                   className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors disabled:opacity-50"
-                 >
-                   Cancel
-                 </button>
-                 <button 
-                   onClick={handleSaveApp}
-                   disabled={isSaving}
-                   className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-70"
-                 >
-                   {isSaving && <Loader2 size={14} className="animate-spin" />}
-                   Save Changes
-                 </button>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  disabled={isSaving}
+                  className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveApp}
+                  disabled={isSaving || isFullyEnrolled}
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSaving && <Loader2 size={14} className="animate-spin" />}
+                  Save Changes
+                </button>
               </div>
-           </div>
-        </Modal>
-      )}
+            </div>
+          </Modal>
+        );
+      })()}
 
     </div>
   );

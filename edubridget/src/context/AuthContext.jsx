@@ -1,6 +1,13 @@
 // src/context/AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
+import { onAuthStateChanged, signOut as firebaseSignOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
 import * as userService from "../services/userService";
@@ -19,7 +26,14 @@ export const AuthProvider = ({ children }) => {
         // Auth knows WHO is logged in — Firestore has the full profile
         const snapshot = await getDoc(doc(db, "users", firebaseUser.uid));
         if (snapshot.exists()) {
-          setUser({ id: firebaseUser.uid, ...snapshot.data() });
+          const profile = snapshot.data();
+          if (profile.status === "Inactive") {
+            // Account was deactivated after login — kill the session immediately
+            await firebaseSignOut(auth);
+            setUser(null);
+          } else {
+            setUser({ id: firebaseUser.uid, ...profile });
+          }
         } else {
           // Auth account exists but no Firestore profile (edge case)
           setUser(null);
@@ -52,42 +66,66 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = useCallback(async () => {
-    await signOut(auth); // Firebase clears its own session
+    await firebaseSignOut(auth); // Firebase clears its own session
     setUser(null);
   }, []);
 
-  const updateProfile = useCallback(async (formData) => {
-    const updatedUser = await userService.updateUser(user.id, formData);
-    setUser((prev) => ({ ...prev, ...updatedUser }));
-    return updatedUser;
-  }, [user]);
+  const updateProfile = useCallback(
+    async (formData) => {
+      const updatedUser = await userService.updateUser(user.id, formData);
+      setUser((prev) => ({ ...prev, ...updatedUser }));
+      return updatedUser;
+    },
+    [user],
+  );
 
   // ── Permission checking ────────────────────────────────────────────────────
-  const DEFAULT_ROLE_PERMISSIONS = useMemo(() => ({
-    admin:   ["all"],
-    student: ["view_own_app", "submit_app", "edit_profile"],
-    staff:   ["view_apps", "update_app_status"],
-  }), []);
+  const DEFAULT_ROLE_PERMISSIONS = useMemo(
+    () => ({
+      admin: ["all"],
+      student: ["view_own_app", "submit_app", "edit_profile"],
+      staff: ["view_apps", "update_app_status"],
+    }),
+    [],
+  );
 
-  const hasPermission = useCallback((permissionName) => {
-    if (!user) return false;
-    const perms = user.permissions ?? DEFAULT_ROLE_PERMISSIONS[user.role?.toLowerCase()] ?? [];
-    return perms.includes("all") || perms.includes(permissionName);
-  }, [user, DEFAULT_ROLE_PERMISSIONS]);
+  const hasPermission = useCallback(
+    (permissionName) => {
+      if (!user) return false;
+      const perms =
+        user.permissions ??
+        DEFAULT_ROLE_PERMISSIONS[user.role?.toLowerCase()] ??
+        [];
+      return perms.includes("all") || perms.includes(permissionName);
+    },
+    [user, DEFAULT_ROLE_PERMISSIONS],
+  );
 
-  const value = useMemo(() => ({
-    user,
-    loading,
-    login,
-    loginWithGoogle,
-    signUp,
-    logout,
-    updateProfile,
-    hasPermission,
-    isAuthenticated: !!user,
-    isAdmin: user?.role === "admin",
-    isStudent: user?.role === "student",
-  }), [user, loading, login, loginWithGoogle, signUp, logout, updateProfile, hasPermission]);
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      login,
+      loginWithGoogle,
+      signUp,
+      logout,
+      updateProfile,
+      hasPermission,
+      isAuthenticated: !!user,
+      isAdmin: user?.role === "admin",
+      isStudent: user?.role === "student",
+    }),
+    [
+      user,
+      loading,
+      login,
+      loginWithGoogle,
+      signUp,
+      logout,
+      updateProfile,
+      hasPermission,
+    ],
+  );
 
   return (
     <AuthContext.Provider value={value}>

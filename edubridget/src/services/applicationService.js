@@ -1,76 +1,54 @@
 // src/services/applicationService.js
-import { MOCK_UNIFIED_APPLICATIONS } from "../data/mockData";
 import { v4 as uuidv4 } from "uuid";
+import {
+  collection,
+  getDocs,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  query,
+  where,
+} from "firebase/firestore";
+import { db, auth } from "../firebase/config";
 
-const STORAGE_KEY = "edubridge_applications";
-
-// Simulate network latency
-const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Internal synchronous read — seeds mock data in development only.
-const _getApps = () => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) {
-      // Seed mock data only in development — production starts empty.
-      if (import.meta.env.DEV) {
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify(MOCK_UNIFIED_APPLICATIONS),
-        );
-        return MOCK_UNIFIED_APPLICATIONS;
-      }
-      return [];
-    }
-    return JSON.parse(data);
-  } catch {
-    return import.meta.env.DEV ? MOCK_UNIFIED_APPLICATIONS : [];
-  }
-};
-
-const _saveApps = (apps) =>
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
-
-// ── Read ────────────────────────────────────────────────────────────────────
+// ── Read ─────────────────────────────────────────────────────────────────────
 
 export const getApplications = async () => {
-  await delay();
-  return _getApps();
+  const snapshot = await getDocs(collection(db, "applications"));
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
 };
 
 export const getApplicationsByUserId = async (userId) => {
-  await delay();
-  const id = String(userId);
-  return _getApps().filter(
-    (app) =>
-      String(app.applicant?.identityId) === id || String(app.userId) === id,
+  const q = query(
+    collection(db, "applications"),
+    where("userId", "==", userId),
   );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
 };
 
 export const getApplicationById = async (id) => {
-  await delay();
-  // Changed app.id to app.trackerId
-  return _getApps().find((app) => app.trackerId === id) || null;
+  const snapshot = await getDoc(doc(db, "applications", id));
+  if (!snapshot.exists()) return null;
+  return { id: snapshot.id, ...snapshot.data() };
 };
 
-export const getApplicationByIdSync = (id) =>
-  _getApps().find((app) => app.trackerId === id) || null;
-
-// ── Write ────────────────────────────────────────────────────────────────────
+// ── Write ─────────────────────────────────────────────────────────────────────
 
 export const createApplication = async (data) => {
-  await delay();
-  const apps = _getApps();
+  const uid = auth.currentUser?.uid;
+  if (!uid) throw new Error("You must be logged in to submit an application.");
 
-  // Build the new DTO structure when a student applies
+  const trackerId = uuidv4();
   const newApp = {
-    trackerId: uuidv4(),
-    applicationId: Math.floor(Math.random() * 10000), // Simulated DB auto-increment
+    trackerId,
     submissionDate: new Date().toISOString(),
     status: "Pending",
-    userId: data.userId || null, // top-level for quick filtering
+    userId: uid,
     applicant: data.applicant || {
-      identityId: data.userId || null,
+      identityId: uid,
       firstName: data.firstName || "",
       lastName: data.lastName || "",
       email: data.email || "",
@@ -98,50 +76,36 @@ export const createApplication = async (data) => {
     },
   };
 
-  apps.push(newApp);
-  _saveApps(apps);
+  await setDoc(doc(db, "applications", trackerId), newApp);
   return newApp;
 };
 
 export const updateApplication = async (id, data) => {
-  await delay();
-  const apps = _getApps();
-  const idx = apps.findIndex((app) => app.trackerId === id);
-  if (idx === -1) throw new Error("Application not found");
-
-  const { status, trackerStages, ...safeData } = data; // Prevent student from changing status/stages
-  apps[idx] = { ...apps[idx], ...safeData };
-  _saveApps(apps);
-  return apps[idx];
+  const ref = doc(db, "applications", id);
+  // Strip status and trackerStages — students cannot change these
+  const { status, trackerStages, ...safeData } = data;
+  await updateDoc(ref, safeData);
+  const updated = await getDoc(ref);
+  return { id: updated.id, ...updated.data() };
 };
 
-/** Admin-only status update. */
+/** Admin-only: update application status */
 export const updateApplicationStatus = async (id, status) => {
-  await delay();
-  const apps = _getApps();
-  const idx = apps.findIndex((app) => app.trackerId === id);
-  if (idx === -1) throw new Error("Application not found");
-
-  apps[idx].status = status;
-  _saveApps(apps);
-  return apps[idx];
+  const ref = doc(db, "applications", id);
+  await updateDoc(ref, { status });
+  const updated = await getDoc(ref);
+  return { id: updated.id, ...updated.data() };
 };
 
-/** NEW: Admin-only Tracker Stages update. */
+/** Admin-only: update tracker stages */
 export const updateTrackerStages = async (id, stages) => {
-  await delay();
-  const apps = _getApps();
-  const idx = apps.findIndex((app) => app.trackerId === id);
-  if (idx === -1) throw new Error("Application not found");
-
-  apps[idx].trackerStages = stages;
-  _saveApps(apps);
-  return apps[idx];
+  const ref = doc(db, "applications", id);
+  await updateDoc(ref, { trackerStages: stages });
+  const updated = await getDoc(ref);
+  return { id: updated.id, ...updated.data() };
 };
 
 export const deleteApplication = async (id) => {
-  await delay();
-  const apps = _getApps().filter((app) => app.trackerId !== id);
-  _saveApps(apps);
+  await deleteDoc(doc(db, "applications", id));
   return true;
 };
