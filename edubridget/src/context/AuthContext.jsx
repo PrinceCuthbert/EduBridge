@@ -39,8 +39,8 @@ export const AuthProvider = ({ children }) => {
     return result;
   }, []);
 
-  const loginWithGoogle = useCallback(async (credential) => {
-    const result = await userService.loginWithGoogleToken(credential);
+  const loginWithGoogle = useCallback(async () => {
+    const result = await userService.loginWithGoogle();
     setUser(result);
     return result;
   }, []);

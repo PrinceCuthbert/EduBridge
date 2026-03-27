@@ -34,8 +34,7 @@ const createCustomIcon = (isHeadOffice = false) => {
         className={`w-10 h-10 rounded-full ${isHeadOffice ? "bg-accent" : "bg-primary"} 
                     shadow-lg flex items-center justify-center border-4 border-white
                     transform -translate-y-1/2`}
-        style={{ position: "relative" }}
-      >
+        style={{ position: "relative" }}>
         <MapPin className="h-5 w-5 text-white" fill="white" />
       </div>
       {isHeadOffice && (
@@ -55,6 +54,19 @@ const createCustomIcon = (isHeadOffice = false) => {
   });
 };
 
+/** Normalises the two coordinate shapes we may receive:
+ *  - Firestore plain object: { lat, lng }
+ *  - Firestore GeoPoint (serialised): { _lat, _long } or { latitude, longitude }
+ *  Returns [lat, lng] numbers or null if invalid.
+ */
+const getLatLng = (coords) => {
+  if (!coords) return null;
+  const lat = coords.latitude ?? coords._lat ?? coords.lat;
+  const lng = coords.longitude ?? coords._long ?? coords.lng;
+  if (typeof lat !== "number" || typeof lng !== "number") return null;
+  return [lat, lng];
+};
+
 /**
  * Component to handle map flying and auto-popup
  * Separated for clean architecture
@@ -66,17 +78,16 @@ const MapController = ({ selectedBranch, branches, onMarkerClick }) => {
   useEffect(() => {
     if (!selectedBranch || !selectedBranch.coordinates) return;
 
-    const geo = selectedBranch.coordinates;
-    const lat = geo.latitude ?? geo._lat ?? geo.lat;
-    const lng = geo.longitude ?? geo._long ?? geo.lng;
-
-    if (typeof lat !== "number" || typeof lng !== "number") {
+    const pos = getLatLng(selectedBranch.coordinates);
+    if (!pos) {
       console.warn(
         "[MapController] invalid selectedBranch coordinates",
         selectedBranch,
       );
       return;
     }
+
+    const [lat, lng] = pos;
 
     // Smooth fly to selected branch
     map.flyTo([lat, lng], 13, {
@@ -98,75 +109,74 @@ const MapController = ({ selectedBranch, branches, onMarkerClick }) => {
 
   return (
     <>
-      {branches.map((branch) => (
-        <Marker
-          key={branch.country}
-          position={[branch.coordinates._lat, branch.coordinates._long]}
-          icon={createCustomIcon(branch.isHeadOffice)}
-          ref={(ref) => {
-            if (ref) markersRef.current[branch.country] = ref;
-          }}
-          eventHandlers={{
-            click: () => {
-              onMarkerClick(branch);
-            },
-          }}
-        >
-          <Popup className="custom-popup" maxWidth={300}>
-            <div className="p-2">
-              {/* Header */}
-              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-200">
-                <span className="text-2xl">{branch.flag}</span>
-                <div>
-                  <h3 className="font-bold text-lg text-slate-900">
-                    {branch.city}
-                  </h3>
-                  <p className="text-xs text-slate-500">{branch.country}</p>
-                </div>
-                {branch.isHeadOffice && (
-                  <div className="ml-auto bg-accent/10 text-accent px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                    <Building2 className="h-3 w-3" />
-                    HQ
+      {branches
+        .filter((b) => getLatLng(b.coordinates))
+        .map((branch) => (
+          <Marker
+            key={branch.country}
+            position={getLatLng(branch.coordinates)}
+            icon={createCustomIcon(branch.isHeadOffice)}
+            ref={(ref) => {
+              if (ref) markersRef.current[branch.country] = ref;
+            }}
+            eventHandlers={{
+              click: () => {
+                onMarkerClick(branch);
+              },
+            }}>
+            <Popup className="custom-popup" maxWidth={300}>
+              <div className="p-2">
+                {/* Header */}
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-200">
+                  <span className="text-2xl">{branch.flag}</span>
+                  <div>
+                    <h3 className="font-bold text-lg text-slate-900">
+                      {branch.city}
+                    </h3>
+                    <p className="text-xs text-slate-500">{branch.country}</p>
                   </div>
-                )}
+                  {branch.isHeadOffice && (
+                    <div className="ml-auto bg-accent/10 text-accent px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                      <Building2 className="h-3 w-3" />
+                      HQ
+                    </div>
+                  )}
+                </div>
+
+                {/* Essential Info Only - SIMPLIFIED */}
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-700">{branch.address}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-primary flex-shrink-0" />
+                    <a
+                      href={`tel:${branch.phone}`}
+                      className="text-primary hover:underline">
+                      {branch.phone}
+                    </a>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-primary flex-shrink-0" />
+                    <a
+                      href={`mailto:${branch.email}`}
+                      className="text-primary hover:underline text-xs">
+                      {branch.email}
+                    </a>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-primary flex-shrink-0" />
+                    <span className="text-slate-700">{branch.hours}</span>
+                  </div>
+                </div>
               </div>
-
-              {/* Essential Info Only - SIMPLIFIED */}
-              <div className="space-y-2 text-sm">
-                <div className="flex items-start gap-2">
-                  <MapPin className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-slate-700">{branch.address}</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-primary flex-shrink-0" />
-                  <a
-                    href={`tel:${branch.phone}`}
-                    className="text-primary hover:underline"
-                  >
-                    {branch.phone}
-                  </a>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-primary flex-shrink-0" />
-                  <a
-                    href={`mailto:${branch.email}`}
-                    className="text-primary hover:underline text-xs"
-                  >
-                    {branch.email}
-                  </a>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-primary flex-shrink-0" />
-                  <span className="text-slate-700">{branch.hours}</span>
-                </div>
-              </div>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+            </Popup>
+          </Marker>
+        ))}
     </>
   );
 };
@@ -185,9 +195,10 @@ const InteractiveMap = ({
   className = "",
 }) => {
   // Smart center logic: selected branch or East Africa region
-  const mapCenter = selectedBranch?.coordinates
-    ? [selectedBranch.coordinates._lat, selectedBranch.coordinates._long]
-    : [defaultCenter._lat, defaultCenter._long];
+  const mapCenter =
+    getLatLng(selectedBranch?.coordinates) ??
+    getLatLng(defaultCenter) ??
+    [-1.9441, 30.0619];
 
   const initialZoom = selectedBranch ? 13 : defaultZoom;
 
@@ -209,8 +220,7 @@ const InteractiveMap = ({
         zoom={initialZoom}
         scrollWheelZoom={true}
         className="h-full w-full rounded-2xl shadow-lift z-10 relative"
-        style={{ minHeight: "450px" }}
-      >
+        style={{ minHeight: "450px" }}>
         {/* Layer Control - Toggle between Street and Satellite */}
         <LayersControl position="topright">
           {/* Street Map (Default) */}

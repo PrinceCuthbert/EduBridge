@@ -9,39 +9,45 @@ import {
   deleteDoc,
   doc,
   setDoc,
+  query,
+  where,
+  runTransaction,
 } from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithCredential,
+  signInWithPopup,
 } from "firebase/auth";
 import { db, auth } from "../firebase/config";
 
 // ── Authentication (Firebase Auth + Firestore profile) ────────────────────────
 
 export const registerUser = async (userData) => {
-  // Step 1: Create the account in Firebase Auth (handles password securely)
+  const desiredUsername = userData.username || userData.email.split("@")[0];
+
+  // Step 1: Create Firebase Auth account first to get the uid
   const userCredential = await createUserWithEmailAndPassword(
     auth,
     userData.email,
-    userData.password
+    userData.password,
   );
   const uid = userCredential.user.uid;
 
-  // Step 2: Build the profile — no password stored here, Firestore is public data only
   const roleName = userData.role || "student";
   const now = new Date().toISOString();
   const profile = {
+    uid,
     email: userData.email,
-    username: userData.username || userData.email.split("@")[0],
+    username: desiredUsername,
     role: roleName,
     status: "Active",
     created_at: now,
     updated_at: now,
-    permissions: roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
+    permissions:
+      roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
     identity: {
-      id: uuidv4(),
+      id: uid,
       firstName: userData.firstName,
       lastName: userData.lastName,
       nationality: userData.nationality || null,
@@ -54,16 +60,51 @@ export const registerUser = async (userData) => {
     avatar: `https://ui-avatars.com/api/?name=${userData.firstName}+${userData.lastName}&background=random`,
   };
 
-  // Step 3: Save profile to Firestore using Firebase Auth uid as the document ID
-  // setDoc (not addDoc) lets us control the document ID — uid links Auth ↔ Firestore
-  await setDoc(doc(db, "users", uid), profile);
+  try {
+    // Step 2: Atomically claim the username and write the user profile.
+    // runTransaction guarantees no two users can claim the same username simultaneously.
+    await runTransaction(db, async (transaction) => {
+      const usernameRef = doc(db, "usernames", desiredUsername);
+      const usernameSnap = await transaction.get(usernameRef);
+
+      if (usernameSnap.exists()) {
+        throw new Error(`Username "${desiredUsername}" is already taken. Please choose another.`);
+      }
+
+      transaction.set(usernameRef, { uid });            // claim the username
+      transaction.set(doc(db, "users", uid), profile);  // write the user profile
+    });
+  } catch (err) {
+    // Transaction failed — delete the Auth account so it doesn't orphan
+    await userCredential.user.delete();
+    throw err;
+  }
 
   return { id: uid, ...profile };
 };
 
-export const loginUser = async (email, password) => {
+export const loginUser = async (identifier, password) => {
+  // If identifier is not an email, look up the email by username in Firestore first
+  let email = identifier;
+  const isEmail = identifier.includes("@");
+
+  if (!isEmail) {
+    const q = query(
+      collection(db, "users"),
+      where("username", "==", identifier),
+    );
+    const result = await getDocs(q);
+
+    if (result.empty) throw new Error("No account found with that username.");
+    email = result.docs[0].data().email;
+  }
+
   // Firebase Auth verifies the password — we never touch it in Firestore
-  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  const userCredential = await signInWithEmailAndPassword(
+    auth,
+    email,
+    password,
+  );
   const uid = userCredential.user.uid;
 
   // Fetch the full profile from Firestore using the uid
@@ -73,10 +114,10 @@ export const loginUser = async (email, password) => {
   return { id: uid, ...snapshot.data() };
 };
 
-export const loginWithGoogleToken = async (credential) => {
-  // Exchange the Google JWT for a Firebase Auth credential
-  const googleCredential = GoogleAuthProvider.credential(credential);
-  const userCredential = await signInWithCredential(auth, googleCredential);
+export const loginWithGoogle = async () => {
+  // Firebase opens the Google OAuth popup directly — no third-party token exchange needed
+  const provider = new GoogleAuthProvider();
+  const userCredential = await signInWithPopup(auth, provider);
   const uid = userCredential.user.uid;
   const firebaseUser = userCredential.user;
 
@@ -93,15 +134,17 @@ export const loginWithGoogleToken = async (credential) => {
     const now = new Date().toISOString();
 
     const profile = {
+      uid: uid,
       email: firebaseUser.email,
       username: firebaseUser.email.split("@")[0],
       role: roleName,
       status: "Active",
       created_at: now,
       updated_at: now,
-      permissions: roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
+      permissions:
+        roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
       identity: {
-        id: uuidv4(),
+        id: uid,
         firstName: firebaseUser.displayName?.split(" ")[0] || "",
         lastName: firebaseUser.displayName?.split(" ").slice(1).join(" ") || "",
         nationality: null,
@@ -123,23 +166,11 @@ export const loginWithGoogleToken = async (credential) => {
 
 // ── Admin CRUD (Firestore) ────────────────────────────────────────────────────
 
-// localStorage version:
-// export const getUsers = async () => {
-//   const users = _getUsersDB();
-//   return users.map(({ password, salt, ...u }) => u);
-// };
 export const getUsers = async () => {
   const snapshot = await getDocs(collection(db, "users"));
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
-// localStorage version:
-// export const getUserById = async (id) => {
-//   const users = _getUsersDB();
-//   const user = users.find((u) => u.id === id);
-//   if (!user) throw new Error("User not found");
-//   return user;
-// };
 export const getUserById = async (id) => {
   const ref = doc(db, "users", id);
   const snapshot = await getDoc(ref);
@@ -147,23 +178,23 @@ export const getUserById = async (id) => {
   return { id: snapshot.id, ...snapshot.data() };
 };
 
-// localStorage version:
-// export const createUser = async (formData) => {
-//   return registerUser({ ...formData, phoneNumber: formData.phone });
-// };
 export const createUser = async (formData) => {
+  const desiredUsername = formData.username || formData.email.split("@")[0];
+  const newId = uuidv4();
   const roleName = formData.role || "student";
   const now = new Date().toISOString();
   const newUser = {
+    uid: newId,
     email: formData.email,
-    username: formData.email.split("@")[0],
+    username: desiredUsername,
     role: roleName,
     status: formData.status || "Active",
     created_at: now,
     updated_at: now,
-    permissions: roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
+    permissions:
+      roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
     identity: {
-      id: uuidv4(),
+      id: newId,
       firstName: formData.firstName,
       lastName: formData.lastName,
       nationality: formData.nationality || null,
@@ -175,12 +206,22 @@ export const createUser = async (formData) => {
     },
     avatar: `https://ui-avatars.com/api/?name=${formData.firstName}+${formData.lastName}&background=random`,
   };
-  const docRef = await addDoc(collection(db, "users"), newUser);
-  return { id: docRef.id, ...newUser };
+
+  await runTransaction(db, async (transaction) => {
+    const usernameRef = doc(db, "usernames", desiredUsername);
+    const usernameSnap = await transaction.get(usernameRef);
+
+    if (usernameSnap.exists()) {
+      throw new Error(`Username "${desiredUsername}" is already taken.`);
+    }
+
+    transaction.set(usernameRef, { uid: newId });
+    transaction.set(doc(db, "users", newId), newUser);
+  });
+
+  return { id: newId, ...newUser };
 };
 
-// localStorage version:
-// export const updateUser = async (id, formData) => { ... localStorage logic ... };
 export const updateUser = async (id, formData) => {
   const ref = doc(db, "users", id);
   const snapshot = await getDoc(ref);
@@ -194,7 +235,8 @@ export const updateUser = async (id, formData) => {
     role: roleName,
     status: formData.status || existing.status,
     updated_at: new Date().toISOString(),
-    permissions: roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
+    permissions:
+      roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
     identity: {
       ...existing.identity,
       firstName: formData.firstName || existing.identity.firstName,
@@ -211,8 +253,6 @@ export const updateUser = async (id, formData) => {
   return { id, ...existing, ...updates };
 };
 
-// localStorage version:
-// export const deleteUser = async (id) => { ... filter localStorage ... };
 export const deleteUser = async (id) => {
   await deleteDoc(doc(db, "users", id));
   return true;
@@ -220,5 +260,7 @@ export const deleteUser = async (id) => {
 
 // updatePassword will be migrated to Firebase Auth's updatePassword() in a later step
 export const updatePassword = async (id, currentPassword, newPassword) => {
-  throw new Error("Password update will be available after full Firebase Auth migration.");
+  throw new Error(
+    "Password update will be available after full Firebase Auth migration.",
+  );
 };
