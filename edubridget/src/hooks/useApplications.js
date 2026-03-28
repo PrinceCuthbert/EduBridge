@@ -1,99 +1,107 @@
 // src/hooks/useApplications.js
-import { useState, useCallback, useEffect } from "react";
-import * as appService from "../services/applicationService";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getApplications,
+  getApplicationsByUserId,
+  getApplicationById,
+  createApplication,
+  updateApplication,
+  updateApplicationStatus,
+  updateTrackerStages,
+  deleteApplication,
+} from "../services/applicationService";
 
 export function useApplications({ userId = null, trackerId = null } = {}) {
-  const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
 
-  const fetchApplications = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      let data;
-      // 1. If we provided a trackerId, fetch just that one application
-      if (trackerId) {
-        const app = await appService.getApplicationById(trackerId);
-        data = app ? [app] : [];
-      }
-      // 2. If we provided a userId, fetch all applications for that student
-      else if (userId) {
-        data = await appService.getApplicationsByUserId(userId);
-      }
-      // 3. Otherwise, fetch all applications (for Admin List/Tracker views)
-      else {
-        data = await appService.getApplications();
-      }
-      setApplications(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [userId, trackerId]);
+  // ── Queries (3 modes) ───────────────────────────────────────────────────────
 
-  useEffect(() => {
-    fetchApplications();
-  }, [fetchApplications]);
+  // Mode 1: single application detail (AdminApplicationReview, ApplicationPreview)
+  const singleQuery = useQuery({
+    queryKey: ["applications", trackerId],
+    queryFn: () => getApplicationById(trackerId),
+    enabled: !!trackerId,
+  });
 
-  const createApplication = useCallback(
-    async (data) => {
-      const newApp = await appService.createApplication(data);
-      await fetchApplications();
-      return newApp;
-    },
-    [fetchApplications],
-  );
+  // Mode 2: student's own applications list
+  const userQuery = useQuery({
+    queryKey: ["applications", "user", userId],
+    queryFn: () => getApplicationsByUserId(userId),
+    enabled: !!userId && !trackerId,
+  });
 
-  const updateApplication = useCallback(
-    async (id, data) => {
-      const updated = await appService.updateApplication(id, data);
-      await fetchApplications();
-      return updated;
-    },
-    [fetchApplications],
-  );
+  // Mode 3: all applications (admin list / dashboard)
+  const allQuery = useQuery({
+    queryKey: ["applications"],
+    queryFn: getApplications,
+    enabled: !userId && !trackerId,
+  });
 
-  const updateStatus = useCallback(
-    async (id, status) => {
-      const updated = await appService.updateApplicationStatus(id, status);
-      await fetchApplications();
-      return updated;
-    },
-    [fetchApplications],
-  );
+  // ── Derived state ───────────────────────────────────────────────────────────
 
-  const updateTrackerStages = useCallback(
-    async (id, stages) => {
-      const updated = await appService.updateTrackerStages(id, stages);
-      await fetchApplications();
-      return updated;
-    },
-    [fetchApplications],
-  );
+  const activeQuery = trackerId ? singleQuery : userId ? userQuery : allQuery;
 
-  const deleteApplication = useCallback(
-    async (id) => {
-      await appService.deleteApplication(id);
-      await fetchApplications();
-    },
-    [fetchApplications],
-  );
+  const applications = trackerId
+    ? singleQuery.data
+      ? [singleQuery.data]
+      : []
+    : (activeQuery.data ?? []);
 
-  // Derived state: Extract the single item for detail pages
-  const singleApplication = applications.length > 0 ? applications[0] : null;
+  const singleApplication = trackerId ? (singleQuery.data ?? null) : null;
+
+  // ── Cache invalidation helper ───────────────────────────────────────────────
+
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["applications"] });
+    if (trackerId)
+      queryClient.invalidateQueries({ queryKey: ["applications", trackerId] });
+    if (userId)
+      queryClient.invalidateQueries({
+        queryKey: ["applications", "user", userId],
+      });
+  };
+
+  // ── Mutations ───────────────────────────────────────────────────────────────
+
+  const createMutation = useMutation({
+    mutationFn: createApplication,
+    onSuccess: invalidate,
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => updateApplication(id, data),
+    onSuccess: invalidate,
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ id, status }) => updateApplicationStatus(id, status),
+    onSuccess: invalidate,
+  });
+
+  const updateTrackerStagesMutation = useMutation({
+    mutationFn: ({ id, stages }) => updateTrackerStages(id, stages),
+    onSuccess: invalidate,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteApplication,
+    onSuccess: invalidate,
+  });
+
+  // ── Public API (identical to previous hook interface) ───────────────────────
 
   return {
     applications,
     singleApplication,
-    loading,
-    error,
-    fetchApplications,
-    createApplication,
-    updateApplication,
-    updateStatus,
-    updateTrackerStages,
-    deleteApplication,
+    loading: activeQuery.isLoading,
+    error: activeQuery.error?.message ?? null,
+    fetchApplications: invalidate,
+    createApplication: (data) => createMutation.mutateAsync(data),
+    updateApplication: (id, data) => updateMutation.mutateAsync({ id, data }),
+    updateStatus: (id, status) =>
+      updateStatusMutation.mutateAsync({ id, status }),
+    updateTrackerStages: (id, stages) =>
+      updateTrackerStagesMutation.mutateAsync({ id, stages }),
+    deleteApplication: (id) => deleteMutation.mutateAsync(id),
   };
 }

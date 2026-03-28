@@ -1,8 +1,6 @@
 // src/services/userService.js
-import { v4 as uuidv4 } from "uuid";
 import {
   collection,
-  addDoc,
   getDocs,
   getDoc,
   updateDoc,
@@ -13,13 +11,20 @@ import {
   where,
   runTransaction,
 } from "firebase/firestore";
+import { initializeApp, deleteApp } from "firebase/app";
+
 import {
+  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  updatePassword as firebaseUpdatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
 } from "firebase/auth";
-import { db, auth } from "../firebase/config";
+
+import { db, auth, firebaseConfig } from "../firebase/config";
 
 // ── Authentication (Firebase Auth + Firestore profile) ────────────────────────
 
@@ -68,11 +73,13 @@ export const registerUser = async (userData) => {
       const usernameSnap = await transaction.get(usernameRef);
 
       if (usernameSnap.exists()) {
-        throw new Error(`Username "${desiredUsername}" is already taken. Please choose another.`);
+        throw new Error(
+          `Username "${desiredUsername}" is already taken. Please choose another.`,
+        );
       }
 
-      transaction.set(usernameRef, { uid });            // claim the username
-      transaction.set(doc(db, "users", uid), profile);  // write the user profile
+      transaction.set(usernameRef, { uid }); // claim the username
+      transaction.set(doc(db, "users", uid), profile); // write the user profile
     });
   } catch (err) {
     // Transaction failed — delete the Auth account so it doesn't orphan
@@ -111,7 +118,14 @@ export const loginUser = async (identifier, password) => {
   const snapshot = await getDoc(doc(db, "users", uid));
   if (!snapshot.exists()) throw new Error("User profile not found");
 
-  return { id: uid, ...snapshot.data() };
+  const profile = snapshot.data();
+  if (profile.status === "Inactive") {
+    await userCredential.user.getIdToken(); // ensure auth is fresh before signing out
+    await auth.signOut();
+    throw new Error("Your account has been deactivated. Please contact support.");
+  }
+
+  return { id: uid, ...profile };
 };
 
 export const loginWithGoogle = async () => {
@@ -161,7 +175,13 @@ export const loginWithGoogle = async () => {
     return { id: uid, ...profile };
   }
 
-  return { id: uid, ...snapshot.data() };
+  const profile = snapshot.data();
+  if (profile.status === "Inactive") {
+    await auth.signOut();
+    throw new Error("Your account has been deactivated. Please contact support.");
+  }
+
+  return { id: uid, ...profile };
 };
 
 // ── Admin CRUD (Firestore) ────────────────────────────────────────────────────
@@ -179,12 +199,34 @@ export const getUserById = async (id) => {
 };
 
 export const createUser = async (formData) => {
+  if (!formData.password) throw new Error("An initial password is required.");
+
   const desiredUsername = formData.username || formData.email.split("@")[0];
-  const newId = uuidv4();
   const roleName = formData.role || "student";
   const now = new Date().toISOString();
+
+  // ── Step 1: Create Firebase Auth account in a secondary app instance ─────────
+  // Using a secondary app prevents signing out the currently logged-in admin.
+  const secondaryApp = initializeApp(firebaseConfig, "adminCreateUser");
+  const secondaryAuth = getAuth(secondaryApp);
+  let uid;
+
+  try {
+    const credential = await createUserWithEmailAndPassword(
+      secondaryAuth,
+      formData.email,
+      formData.password,
+    );
+    uid = credential.user.uid; // real Firebase Auth UID
+  } finally {
+    // Always clean up the secondary app — whether creation succeeded or failed
+    await secondaryAuth.signOut();
+    await deleteApp(secondaryApp);
+  }
+
+  // ── Step 2: Write the Firestore profile using the real UID ───────────────────
   const newUser = {
-    uid: newId,
+    uid,
     email: formData.email,
     username: desiredUsername,
     role: roleName,
@@ -194,7 +236,7 @@ export const createUser = async (formData) => {
     permissions:
       roleName === "admin" ? ["all"] : ["view_own_app", "submit_app"],
     identity: {
-      id: newId,
+      id: uid,
       firstName: formData.firstName,
       lastName: formData.lastName,
       nationality: formData.nationality || null,
@@ -210,16 +252,14 @@ export const createUser = async (formData) => {
   await runTransaction(db, async (transaction) => {
     const usernameRef = doc(db, "usernames", desiredUsername);
     const usernameSnap = await transaction.get(usernameRef);
-
     if (usernameSnap.exists()) {
       throw new Error(`Username "${desiredUsername}" is already taken.`);
     }
-
-    transaction.set(usernameRef, { uid: newId });
-    transaction.set(doc(db, "users", newId), newUser);
+    transaction.set(usernameRef, { uid });
+    transaction.set(doc(db, "users", uid), newUser);
   });
 
-  return { id: newId, ...newUser };
+  return { id: uid, ...newUser };
 };
 
 export const updateUser = async (id, formData) => {
@@ -258,9 +298,15 @@ export const deleteUser = async (id) => {
   return true;
 };
 
-// updatePassword will be migrated to Firebase Auth's updatePassword() in a later step
 export const updatePassword = async (id, currentPassword, newPassword) => {
-  throw new Error(
-    "Password update will be available after full Firebase Auth migration.",
-  );
+  const currentUser = auth.currentUser;
+  if (!currentUser) throw new Error("You must be logged in to change your password.");
+
+  // Firebase requires re-authentication before sensitive operations.
+  // If the user logged in a long time ago, this refreshes their session.
+  const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
+  await reauthenticateWithCredential(currentUser, credential);
+
+  await firebaseUpdatePassword(currentUser, newPassword);
+  return true;
 };

@@ -75,7 +75,9 @@ function SignInPage() {
         replace: true,
       });
     } catch (err) {
-      toast.error(err.message || "Failed to sign in with Google. Please try again.");
+      toast.error(
+        err.message || "Failed to sign in with Google. Please try again.",
+      );
     }
   };
 
@@ -248,7 +250,11 @@ function SignInPage() {
                     type="button"
                     onClick={handleGoogleSignIn}
                     className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-slate-300 rounded-lg bg-white hover:bg-slate-50 transition-colors text-slate-700 font-medium text-sm">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                    <img
+                      src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                      alt="Google"
+                      className="w-5 h-5"
+                    />
                     Sign in with Google
                   </button>
                 </div>

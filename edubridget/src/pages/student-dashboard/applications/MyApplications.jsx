@@ -113,12 +113,31 @@ export default function MyApplications() {
       className: "px-6 py-4 text-center",
       render: (app) => {
         const isOpen = expandedApp === app.trackerId;
+        const stages = app.trackerStages || [];
+        // Lock editing once the application has progressed past "Submitted"
+        // (i.e. "Under Review" or any later stage is completed — decision is in progress)
+        const isLocked = stages.some((s, i) => i >= 1 && s.completed);
+
         return (
           <div className="flex items-center justify-center gap-2">
             <button onClick={() => navigate(`/dashboard/applications/${app.trackerId}`)} className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors" title="View Details">
               <Eye size={16} />
             </button>
-            <button onClick={() => navigate(`/dashboard/applications/edit/${app.trackerId}?edit=true`)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="Edit Application">
+            <button
+              onClick={() => {
+                if (isLocked) {
+                  toast.info("Your application is currently under review. No changes can be made at this stage.");
+                  return;
+                }
+                navigate(`/dashboard/applications/edit/${app.trackerId}?edit=true`);
+              }}
+              className={`p-1.5 rounded transition-colors ${
+                isLocked
+                  ? "text-slate-200 cursor-not-allowed"
+                  : "text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+              }`}
+              title={isLocked ? "Application is under review — editing disabled" : "Edit Application"}
+            >
               <Edit size={16} />
             </button>
             <button onClick={() => handleDelete(app)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Delete Application">
