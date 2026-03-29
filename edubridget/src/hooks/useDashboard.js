@@ -5,34 +5,28 @@ import { getApplications } from '../services/applicationService';
 import { getVisaRequests } from '../services/visaService';
 import { Users, FileText, Plane, Award } from 'lucide-react';
 import { toast } from 'sonner';
+import { useQueries } from '@tanstack/react-query';
 
 export function useDashboard() {
-  const [data, setData] = useState({ users: [], applications: [], visaCases: [] });
-  const [loading, setLoading] = useState(true);
+  const results = useQueries({
+    queries: [
+      { queryKey: ['users'], queryFn: getUsers },
+      { queryKey: ['applications'], queryFn: getApplications },
+      { queryKey: ['visaCases'], queryFn: getVisaRequests },
+    ],
+  });
 
-  const fetchDashboardData = async () => {
-    setLoading(true);
-    try {
-      const [usersRes, appsRes, visaRes] = await Promise.all([
-        getUsers(),
-        getApplications(),
-        getVisaRequests(),
-      ]);
-      setData({ users: usersRes, applications: appsRes, visaCases: visaRes });
-    } catch (error) {
-      toast.error("Failed to load dashboard statistics");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
+  const [usersResult, appsResult, visaResult] = results;
+  
+  const users = usersResult.data || [];
+  const applications = appsResult.data || [];
+  const visaCases = visaResult.data || [];
+  
+  const loading = results.some(result => result.isLoading);
+  const error = results.find(result => result.error)?.error;
 
   // 1. Calculate Stat Cards Dynamically
   const stats = useMemo(() => {
-    const { users, applications, visaCases } = data;
     const pendingApps = applications.filter(a => a.status === 'Pending').length;
     const activeVisa = visaCases.filter(v => v.status !== 'Approved' && v.status !== 'Rejected').length;
 
@@ -66,19 +60,24 @@ export function useDashboard() {
         bg: "bg-indigo-50"
       }
     ];
-  }, [data]);
+  }, [users, applications, visaCases]);
 
   // 2. Extract Recent Applications
   const recentApplications = useMemo(() => {
-    return [...data.applications]
+    return [...applications]
       .sort((a, b) => new Date(b.submissionDate) - new Date(a.submissionDate))
       .slice(0, 4); // Get the 4 newest
-  }, [data.applications]);
+  }, [applications]);
+
+  const refresh = () => {
+    results.forEach(result => result.refetch());
+  };
 
   return { 
     stats, 
     recentApplications, 
     loading, 
-    refresh: fetchDashboardData 
+    error,
+    refresh
   };
 }

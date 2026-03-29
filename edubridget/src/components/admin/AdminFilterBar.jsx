@@ -8,17 +8,19 @@ export default function AdminFilterBar({
   filterOptions = [],
   activeFilter,
   onFilterChange,
-  secondaryActions // For export buttons etc.
+  secondaryActions, // For export buttons etc.
 }) {
   return (
     // CHANGED CONTAINER STYLES:
     // Added 'transition-all focus-within:border-blue-400 focus-within:shadow-md'
     // This makes the whole box glow gently when typing, instead of a harsh black line on the text.
-    <div className="bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-blue-400 focus-within:shadow-md flex flex-col xl:flex-row items-center gap-2">
-      
+    <div className="bg-white p-1 rounded-xl border border-slate-200 shadow-sm transition-all focus-within:border-blue-400 focus-within:shadow-md flex flex-col xl:flex-row items-center gap-2">
       <div className="relative flex-1 group w-full">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search size={16} className="text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+          <Search
+            size={16}
+            className="text-slate-400 group-focus-within:text-blue-500 transition-colors"
+          />
         </div>
         <input
           type="text"
@@ -52,12 +54,8 @@ export default function AdminFilterBar({
           ))}
         </div>
       )}
-      
-      {secondaryActions && (
-        <div className="flex pl-2">
-            {secondaryActions}
-        </div>
-      )}
+
+      {secondaryActions && <div className="flex pl-2">{secondaryActions}</div>}
     </div>
   );
 }

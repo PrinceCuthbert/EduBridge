@@ -1,13 +1,33 @@
-import React from "react";
-import { FileText } from "lucide-react";
+import React, { useState } from "react";
+import { FileText, ChevronLeft, ChevronRight } from "lucide-react";
 
-export default function AdminTable({ 
-  columns, 
-  data, 
-  isLoading, 
-  emptyState, 
-  onRowClick 
+export default function AdminTable({
+  columns,
+  data,
+  isLoading,
+  emptyState,
+  onRowClick,
+  itemsPerPage = 3,
 }) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const goToPage = (page) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
   return (
     // CHANGED: rounded-[2.5rem] -> rounded-xl
     // CHANGED: shadow-2xl -> shadow-sm
@@ -18,7 +38,10 @@ export default function AdminTable({
             {/* CHANGED: Removed tracking-[0.25em], uppercase. Reduced py-7 -> py-3 */}
             <tr className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500">
               {columns.map((col, index) => (
-                <th key={index} className={`px-6 py-3 whitespace-nowrap ${col.className || ''}`}>
+                <th
+                  key={index}
+                  className={`px-6 py-3 whitespace-nowrap ${col.className || ""}`}
+                >
                   {col.header}
                 </th>
               ))}
@@ -34,18 +57,21 @@ export default function AdminTable({
                   </td>
                 </tr>
               ))
-            ) : data.length > 0 ? (
-              data.map((item, rowIndex) => (
-                <tr 
-                  key={item.id || rowIndex} 
+            ) : paginatedData.length > 0 ? (
+              paginatedData.map((item, rowIndex) => (
+                <tr
+                  key={item.id || rowIndex}
                   onClick={() => onRowClick && onRowClick(item)}
                   // CHANGED: hover:bg-[#F8FAFC] -> hover:bg-slate-50
                   // CHANGED: duration-500 -> duration-150 (snappier feel)
-                  className={`hover:bg-slate-50 transition-colors duration-150 group ${onRowClick ? 'cursor-pointer' : ''}`}
+                  className={`hover:bg-slate-50 transition-colors duration-150 group ${onRowClick ? "cursor-pointer" : ""}`}
                 >
                   {columns.map((col, colIndex) => (
                     // CHANGED: px-10 py-7 -> px-6 py-4 (Standard density)
-                    <td key={colIndex} className={`px-6 py-4 ${col.className || ''}`}>
+                    <td
+                      key={colIndex}
+                      className={`px-6 py-4 ${col.className || ""}`}
+                    >
                       {col.render(item)}
                     </td>
                   ))}
@@ -61,7 +87,9 @@ export default function AdminTable({
                         <FileText size={24} className="text-slate-400" />
                       </div>
                       {/* CHANGED: font-serif -> font-sans */}
-                      <h4 className="text-sm font-semibold text-slate-900 mb-1">No records found</h4>
+                      <h4 className="text-sm font-semibold text-slate-900 mb-1">
+                        No records found
+                      </h4>
                       <p className="text-sm text-slate-500">
                         There are no records to display at the moment.
                       </p>
@@ -73,6 +101,56 @@ export default function AdminTable({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {data.length > 0 && (
+        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+          <div className="text-sm text-slate-600">
+            Showing <span className="font-semibold">{startIndex + 1}</span> to{" "}
+            <span className="font-semibold">
+              {Math.min(startIndex + itemsPerPage, data.length)}
+            </span>{" "}
+            of <span className="font-semibold">{data.length}</span> results
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              className="p-2 rounded-lg border border-slate-200 text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors"
+            >
+              <ChevronLeft size={18} />
+            </button>
+
+            {/* Page Numbers */}
+            <div className="flex gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => goToPage(page)}
+                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white"
+                        : "border border-slate-200 text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ),
+              )}
+            </div>
+
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-lg border border-slate-200 text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
