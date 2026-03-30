@@ -1,5 +1,7 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../../firebase/config";
 import {
   ArrowLeft,
   Save,
@@ -32,8 +34,8 @@ export default function AdminProgramDetail() {
   const {
     addProgram,
     updateProgram,
-    loading: saveLoading,
-  } = usePrograms(false);
+    saving: saveLoading,
+  } = usePrograms();
 
   // Use Form hook for local state management
   const {
@@ -45,9 +47,16 @@ export default function AdminProgramDetail() {
     addTimelineStep,
     updateTimeline,
     removeTimeline,
-    addTuitionFee,
-    updateTuitionFee,
-    removeTuitionFee,
+    addFeeGroup,
+    removeFeeGroup,
+    updateFeeGroup,
+    addFeeColumn,
+    removeFeeColumn,
+    updateFeeColumn,
+    addFeeRow,
+    removeFeeRow,
+    updateFeeRowItem,
+    updateFeeCell,
     addDocCategory,
     updateDocCategory,
     removeDocCategory,
@@ -65,20 +74,33 @@ export default function AdminProgramDetail() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Sanitize data to prevent typos like trailing spaces or lowercase characters
+    let applicationFileUrl = formData.applicationFile;
+
+    // If the admin picked a new File (not already a URL string), upload it first
+    if (formData.applicationFile instanceof File) {
+      const fileRef = ref(
+        storage,
+        `programs/application-forms/${Date.now()}_${formData.applicationFile.name}`,
+      );
+      const snapshot = await uploadBytes(fileRef, formData.applicationFile, {
+        contentDisposition: `attachment; filename="${formData.applicationFile.name}"`,
+      });
+      applicationFileUrl = await getDownloadURL(snapshot.ref);
+    }
+
     const sanitizedData = {
       ...formData,
       visaType: formData.visaType.trim().toUpperCase(),
+      applicationFile: applicationFileUrl ?? null,
     };
 
-    // Log the payload for debugging (Runs on both Create and Edit)
     console.log("Submitting Program Payload:", sanitizedData);
 
     if (isNew) {
       const created = await addProgram(sanitizedData);
       if (created) navigate("/admin/programs");
     } else {
-      const ok = await updateProgram(Number(id), sanitizedData);
+      const ok = await updateProgram(String(id), sanitizedData);
       if (ok) navigate("/admin/programs");
     }
   };
@@ -589,176 +611,6 @@ export default function AdminProgramDetail() {
             </div>
           </AdminCard>
 
-          {/* ── Tuition Fees ─────────────────────────────────────────── */}
-          <AdminCard
-            title="Tuition Fees"
-            action={
-              <button
-                onClick={addTuitionFee}
-                className="text-blue-600 hover:text-blue-700 text-xs font-medium uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 hover:bg-blue-50 rounded-lg transition-all">
-                <Plus size={14} /> Add Row
-              </button>
-            }>
-            {formData.tuitionFees?.length > 0 && (
-              <div className="hidden sm:grid grid-cols-[160px_1fr_160px_80px_40px] gap-2 mb-2 px-1">
-                {["Level", "Item", "Amount", "Currency", ""].map((h) => (
-                  <span
-                    key={h}
-                    className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    {h}
-                  </span>
-                ))}
-              </div>
-            )}
-            <div className="space-y-2">
-              {(formData.tuitionFees || []).map((fee, idx) => (
-                <div
-                  key={idx}
-                  className="bg-slate-50 rounded-xl border border-slate-100 p-3 space-y-2">
-                  {/* Level + Item */}
-                  <div className="grid grid-cols-[100px_1fr] gap-2">
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">
-                        Level
-                      </span>
-                      <select
-                        value={fee.level}
-                        onChange={(e) =>
-                          updateTuitionFee(idx, "level", e.target.value)
-                        }
-                        className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none">
-                        {[
-                          "Bachelor's",
-                          "Master's",
-                          "Ph.D",
-                          "Th.D",
-                          "Th.M",
-                          "M.Div",
-                          "Certificate",
-                        ].map((l) => (
-                          <option key={l}>{l}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">
-                        Fee Item
-                      </span>
-                      <input
-                        type="text"
-                        placeholder="e.g. Entrance Fee"
-                        value={fee.item}
-                        onChange={(e) =>
-                          updateTuitionFee(idx, "item", e.target.value)
-                        }
-                        className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none"
-                      />
-                    </div>
-                  </div>
-                  {/* Amount + Currency + delete */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">
-                        Amount
-                      </span>
-                      <input
-                        type="number"
-                        min={0}
-                        placeholder="e.g. 2500000"
-                        value={fee.amount}
-                        onChange={(e) =>
-                          updateTuitionFee(
-                            idx,
-                            "amount",
-                            Number(e.target.value),
-                          )
-                        }
-                        className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none"
-                      />
-                    </div>
-                    <div className="w-24">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">
-                        Currency
-                      </span>
-                      <select
-                        value={fee.currency ?? "KRW"}
-                        onChange={(e) =>
-                          updateTuitionFee(idx, "currency", e.target.value)
-                        }
-                        className="w-full bg-white px-2 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none">
-                        {["KRW", "USD", "EUR", "GBP"].map((c) => (
-                          <option key={c}>{c}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <button
-                      onClick={() => removeTuitionFee(idx)}
-                      className="mt-5 self-end p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-              {(!formData.tuitionFees || formData.tuitionFees.length === 0) && (
-                <div className="py-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                  <p className="text-slate-400 font-medium text-sm">
-                    No fee rows yet. Click "Add Row".
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Tags & Status still here in sidebar? Move them */}
-            <div className="border-t border-slate-100 pt-4 mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className={labelClassName}>Tags (comma separated)</label>
-                <input
-                  type="text"
-                  value={(formData.tags || []).join(", ")}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      tags: e.target.value
-                        .split(",")
-                        .map((t) => t.trim())
-                        .filter(Boolean),
-                    })
-                  }
-                  className={inputClassName}
-                  placeholder="e.g. ON SALE, BEST, NEW"
-                />
-              </div>
-              <div>
-                <label className={labelClassName}>Status</label>
-                <div className="relative">
-                  <select
-                    value={formData.status}
-                    onChange={(e) =>
-                      setFormData({ ...formData, status: e.target.value })
-                    }
-                    className={`${inputClassName} appearance-none cursor-pointer`}>
-                    <option value="Active">Active</option>
-                    <option value="Draft">Draft</option>
-                    <option value="Archived">Archived</option>
-                  </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                    <svg
-                      width="10"
-                      height="10"
-                      viewBox="0 0 12 12"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round">
-                      <path d="M2.5 4.5L6 8L9.5 4.5" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </AdminCard>
-
           {/* Application Form */}
           <AdminCard title="Application Form">
             <div className="space-y-4">
@@ -866,6 +718,182 @@ export default function AdminProgramDetail() {
           </AdminCard>
         </div>
       </div>
+
+      {/* ── Tuition Fees — full width below the grid ──────────────────────── */}
+      <AdminCard
+        title="Tuition Fees"
+        subtitle="Build fee tables — grouped, named, and comparison-ready"
+        action={
+          <button
+            type="button"
+            onClick={addFeeGroup}
+            className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 hover:bg-blue-700">
+            <Plus size={14} /> Add Fee Group
+          </button>
+        }>
+        <div className="space-y-8">
+          {(formData.tuitionFees || []).length === 0 && (
+            <div className="py-10 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+              <p className="text-slate-400 font-medium text-sm">
+                No fee groups yet. Click "Add Fee Group" to start.
+              </p>
+            </div>
+          )}
+          {(formData.tuitionFees || []).map((group, gIdx) => (
+            <div
+              key={gIdx}
+              className="border border-slate-200 rounded-2xl p-6 bg-white shadow-sm space-y-6">
+              {/* Group Header */}
+              <div className="flex flex-col md:flex-row gap-4 justify-between border-b border-slate-100 pb-4">
+                <div className="flex-1">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">
+                    Fee Group Name
+                  </label>
+
+                  <input
+                    value={group.groupName}
+                    onChange={(e) =>
+                      updateFeeGroup(gIdx, "groupName", e.target.value)
+                    }
+                    className="w-full text-lg font-bold bg-transparent outline-none border-b border-transparent focus:border-blue-500 transition-colors"
+                    placeholder="e.g. Master's Programs"
+                  />
+                </div>
+                <div className="flex items-end gap-2">
+                  <div className="w-28">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">
+                      Currency
+                    </label>
+                    <select
+                      value={group.currency}
+                      onChange={(e) =>
+                        updateFeeGroup(gIdx, "currency", e.target.value)
+                      }
+                      className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                      {["KRW", "USD", "EUR", "GBP"].map((c) => (
+                        <option key={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeFeeGroup(gIdx)}
+                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mb-0.5"
+                    title="Remove group">
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Column Tags */}
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase mb-2 block">
+                  Degree Tracks / Columns
+                </label>
+                <div className="flex flex-wrap gap-2 items-center">
+                  {(group.columns || []).map((col, cIdx) => (
+                    <div
+                      key={cIdx}
+                      className="flex items-center gap-1 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full">
+                      <input
+                        value={col}
+                        onChange={(e) =>
+                          updateFeeColumn(gIdx, cIdx, e.target.value)
+                        }
+                        className="bg-transparent text-xs font-semibold text-blue-700 w-24 outline-none"
+                        placeholder="Track name"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeFeeColumn(gIdx, cIdx)}
+                        className="text-blue-300 hover:text-red-500 transition-colors ml-1">
+                        <XCircle size={12} />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addFeeColumn(gIdx)}
+                    className="text-xs border-2 border-dashed border-slate-200 px-3 py-1 rounded-full text-slate-400 hover:border-blue-400 hover:text-blue-500 flex items-center gap-1 transition-colors">
+                    <Plus size={12} /> Add Column
+                  </button>
+                </div>
+              </div>
+
+              {/* Matrix Table */}
+              {group.columns.length > 0 && (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50">
+                        <th className="p-3 text-[10px] font-bold text-slate-500 uppercase rounded-l-lg border-y border-l w-1/3">
+                          Fee Item
+                        </th>
+                        {group.columns.map((col, cIdx) => (
+                          <th
+                            key={cIdx}
+                            className="p-3 text-[10px] font-bold text-slate-500 uppercase border-y text-center whitespace-nowrap">
+                            {col || `Column ${cIdx + 1}`}
+                          </th>
+                        ))}
+                        <th className="p-3 border-y border-r rounded-r-lg w-10" />
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {(group.rows || []).map((row, rIdx) => (
+                        <tr key={rIdx}>
+                          <td className="p-2">
+                            <input
+                              value={row.item}
+                              onChange={(e) =>
+                                updateFeeRowItem(gIdx, rIdx, e.target.value)
+                              }
+                              className="w-full p-2 border border-slate-200 rounded-lg text-sm focus:border-blue-400 outline-none"
+                              placeholder="e.g. Admission Fee"
+                            />
+                          </td>
+                          {(row.amounts || []).map((amt, cIdx) => (
+                            <td key={cIdx} className="p-2">
+                              <input
+                                type="number"
+                                min={0}
+                                value={amt}
+                                onChange={(e) =>
+                                  updateFeeCell(
+                                    gIdx,
+                                    rIdx,
+                                    cIdx,
+                                    Number(e.target.value),
+                                  )
+                                }
+                                className="w-full p-2 border border-slate-200 rounded-lg text-sm text-right font-mono focus:border-blue-400 outline-none"
+                              />
+                            </td>
+                          ))}
+                          <td className="p-2 text-center">
+                            <button
+                              type="button"
+                              onClick={() => removeFeeRow(gIdx, rIdx)}
+                              className="text-slate-300 hover:text-red-500 transition-colors">
+                              <Trash2 size={14} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <button
+                    type="button"
+                    onClick={() => addFeeRow(gIdx)}
+                    className="mt-3 text-xs text-blue-600 font-semibold hover:underline flex items-center gap-1">
+                    <Plus size={13} /> Add Row
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </AdminCard>
     </div>
   );
 }

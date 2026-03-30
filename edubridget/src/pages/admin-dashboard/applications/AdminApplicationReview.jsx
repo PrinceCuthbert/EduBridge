@@ -2,9 +2,10 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, Mail, Phone, Calendar, Download, Hash,
+  ArrowLeft, Mail, Phone, Calendar, Download, Eye, X, Hash,
   GraduationCap, AlertCircle, CheckCircle, XCircle, Clock, Loader2,
 } from "lucide-react";
+import mammoth from "mammoth";
 import { toast } from "sonner";
 import StatusBadge from "../../../components/shared/StatusBadge";
 import { useApplications } from "../../../hooks/useApplications";
@@ -45,11 +46,57 @@ function formatFileSize(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+const DIRECT_PREVIEW = [".pdf", ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"];
+
 export default function AdminApplicationReview() {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const { hasPermission } = useAuth();
+
+  const [docxPreview, setDocxPreview] = useState({ open: false, html: "", name: "", loading: false });
+
+  const handleDownload = async (doc) => {
+    try {
+      const res = await fetch(doc.url);
+      if (!res.ok) throw new Error("fetch failed");
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = doc.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      window.open(doc.url, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const handlePreview = async (doc) => {
+    const name = doc.name?.toLowerCase() ?? "";
+    if (DIRECT_PREVIEW.some((ext) => name.endsWith(ext))) {
+      window.open(doc.url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    if (name.endsWith(".docx") || name.endsWith(".doc")) {
+      setDocxPreview({ open: true, html: "", name: doc.name, loading: true });
+      try {
+        const res = await fetch(doc.url);
+        const arrayBuffer = await res.arrayBuffer();
+        const { value: html } = await mammoth.convertToHtml({ arrayBuffer });
+        setDocxPreview({ open: true, html, name: doc.name, loading: false });
+      } catch {
+        setDocxPreview({ open: false, html: "", name: "", loading: false });
+        toast.error("Could not preview — downloading instead.");
+        handleDownload(doc);
+      }
+      return;
+    }
+    toast.info("This file type can't be previewed — downloading instead.");
+    handleDownload(doc);
+  };
   const canUpdateStatus = hasPermission("update_app_status");
 
   const {
@@ -109,6 +156,7 @@ export default function AdminApplicationReview() {
   ).toUpperCase() || "?";
 
   return (
+    <>
     <div className="max-w-6xl mx-auto space-y-5 pb-16 animate-in fade-in duration-500">
 
       {/* ── Back + Breadcrumb ── */}
@@ -257,13 +305,22 @@ export default function AdminApplicationReview() {
                         </div>
                       </div>
                       {doc.url ? (
-                        <a
-                          href={doc.url}
-                          download={doc.name}
-                          className="ml-2 p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-100 rounded-md transition-colors shrink-0"
-                          title="Download">
-                          <Download size={14} />
-                        </a>
+                        <div className="flex items-center gap-1 ml-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handlePreview(doc)}
+                            className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
+                            title="Preview">
+                            <Eye size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDownload(doc)}
+                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-100 rounded-md transition-colors"
+                            title="Download">
+                            <Download size={14} />
+                          </button>
+                        </div>
                       ) : (
                         <span className="ml-2 p-1.5 text-slate-200 shrink-0 cursor-not-allowed">
                           <Download size={14} />
@@ -340,5 +397,38 @@ export default function AdminApplicationReview() {
         </div>
       </div>
     </div>
+
+    {/* Docx Preview Modal */}
+    {docxPreview.open && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+        onClick={() => setDocxPreview({ open: false, html: "", name: "", loading: false })}>
+        <div
+          className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden"
+          onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 shrink-0">
+            <p className="font-semibold text-slate-900 truncate pr-4">{docxPreview.name}</p>
+            <button
+              onClick={() => setDocxPreview({ open: false, html: "", name: "", loading: false })}
+              className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors shrink-0">
+              <X size={18} className="text-slate-500" />
+            </button>
+          </div>
+          <div className="overflow-y-auto p-6">
+            {docxPreview.loading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 size={32} className="animate-spin text-slate-400" />
+              </div>
+            ) : (
+              <div
+                className="prose prose-slate max-w-none text-sm"
+                dangerouslySetInnerHTML={{ __html: docxPreview.html }}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

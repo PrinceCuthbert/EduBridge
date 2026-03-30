@@ -1,28 +1,21 @@
 export const MOCK_PROGRAMS = [
-  // --- Program 1 ---
+  // --- Program 1: Daegu Arts University ---
   {
     id: 1,
-    publisher_id: 1, // PROGRAM.publisher_id → PUBLISHERS table (Publisher: "TM EduBridge")
-    representative_id: null, // FK → USER table (staff contact for this institution)
+    publisher_id: 1,
+    representative_id: null,
     name: "Daegu Arts University",
     visaType: "D-2",
     tags: ["ON SALE", "BEST"],
     country: "South Korea",
     location: "Chilgok County, Daegu",
     description:
-      "Daegu Arts University (DGAU), located in Chilgok County near Daegu, South Korea, is a private institution specialized in fine arts, design, and practical art education. It focuses on fostering creative professionals through industry-tailored curricula and student-oriented support programs.",
+      "Daegu Arts University (DGAU) specializes in fine arts and design...",
     logo: "https://ui-avatars.com/api/?name=Daegu+Arts&background=E11D48&color=fff&size=128",
     images: [
       "https://placehold.co/600x400/1e40af/ffffff/png?text=Daegu+Arts+University&font=roboto",
-      "https://placehold.co/600x400/2563eb/ffffff/png?text=Campus+View&font=roboto",
     ],
-    // REFACTORED (Priority 2): departments[] replaced with department_major_ids[]
-    // These IDs reference MOCK_DEPARTMENT_MAJORS in mockMajors.js
-    // Old: departments: [{ language, degree, major, duration, credits, languageRequirement }, ...]
-    // New: resolve with getProgramMajors(1) from mockMajors.js
-    // Backend: GET /api/programs/1/majors
     department_major_ids: [1, 2, 3, 4, 5, 6],
-    // Structured timeline: each row = one application stage
     timeline: [
       {
         stage: "Stage 1",
@@ -31,53 +24,27 @@ export const MOCK_PROGRAMS = [
         examDate: "2025-12-26",
         resultDate: "2026-01-12",
       },
-      {
-        stage: "Stage 2",
-        registrationStart: "2025-12-24",
-        registrationEnd: "2025-12-30",
-        examDate: "2026-01-05",
-        resultDate: "2026-01-12",
-      },
-      {
-        stage: "Registration",
-        registrationStart: "2026-01-29",
-        registrationEnd: "2026-02-02",
-        examDate: "—",
-        resultDate: "—",
-      },
     ],
-    // Tuition fees per degree level
+    // RESTRUCTURED: Matrix Model
     tuitionFees: [
       {
-        level: "Bachelor's",
-        item: "Entrance Fee (one-time)",
-        amount: 300000,
+        groupName: "Bachelor's Programs",
         currency: "KRW",
-      },
-      {
-        level: "Bachelor's",
-        item: "Tuition (per semester)",
-        amount: 2500000,
-        currency: "KRW",
+        columns: ["Standard Track"],
+        rows: [
+          { item: "Entrance Fee (one-time)", amounts: [300000] },
+          { item: "Tuition (per semester)", amounts: [2500000] },
+        ],
       },
     ],
-    // Categorized required documents
     requiredDocuments: [
       {
         category: "All Applicants",
         items: [
-          "Application (prescribed form)",
-          "Photograph (3cm x 4cm) — 2 copies",
-          "Resume (prescribed form)",
+          "Application Form",
           "Copy of Passport",
-          "Certificate of High School Graduation",
-          "Official Academic Transcripts (all years)",
-          "Pledge for Expense Payment",
+          "High School Graduation Certificate",
         ],
-      },
-      {
-        category: "References",
-        items: ["Letter of Reference (one from Korea, one from home country)"],
       },
     ],
     status: "Active",
@@ -85,22 +52,18 @@ export const MOCK_PROGRAMS = [
     applicationFile: null,
   },
 
-  // --- Program 2 ---
+  // --- Program 2: Tongmyong University ---
   {
     id: 2,
-    publisher_id: 1, // PROGRAM.publisher_id → PUBLISHERS.id
-    representative_id: null,
+    publisher_id: 1,
     name: "Tongmyong University",
     visaType: "D-4",
     tags: ["NEW", "ON SALE"],
     country: "South Korea",
     location: "Busan",
     description:
-      "Leading university in Busan with strong industry connections and practical training programs.",
+      "Leading university in Busan with strong industry connections...",
     logo: "https://ui-avatars.com/api/?name=Tongmyong&background=2563EB&color=fff&size=128",
-    images: [],
-    // REFACTORED (Priority 2): resolve with getProgramMajors(2) from mockMajors.js
-    // Backend: GET /api/programs/2/majors
     department_major_ids: [7, 8, 9],
     timeline: [
       {
@@ -110,54 +73,32 @@ export const MOCK_PROGRAMS = [
         examDate: "2025-09-10",
         resultDate: "2025-09-15",
       },
-      {
-        stage: "Stage 2",
-        registrationStart: "2025-09-01",
-        registrationEnd: "2025-09-20",
-        examDate: "2025-09-28",
-        resultDate: "2025-09-30",
-      },
     ],
+    // RESTRUCTURED: Matrix Model with multiple Groups
     tuitionFees: [
       {
-        level: "Certificate",
-        item: "Entrance Fee (one-time)",
-        amount: 200000,
+        groupName: "Language Certificate",
         currency: "KRW",
+        columns: ["D-4 Track"],
+        rows: [
+          { item: "Entrance Fee", amounts: [200000] },
+          { item: "Tuition Fee", amounts: [1800000] },
+        ],
       },
       {
-        level: "Certificate",
-        item: "Tuition (per semester)",
-        amount: 1800000,
+        groupName: "Bachelor's Programs",
         currency: "KRW",
-      },
-      {
-        level: "Bachelor's",
-        item: "Entrance Fee (one-time)",
-        amount: 300000,
-        currency: "KRW",
-      },
-      {
-        level: "Bachelor's",
-        item: "Tuition (per semester)",
-        amount: 2200000,
-        currency: "KRW",
+        columns: ["General Track"],
+        rows: [
+          { item: "Entrance Fee", amounts: [300000] },
+          { item: "Tuition Fee", amounts: [2200000] },
+        ],
       },
     ],
     requiredDocuments: [
       {
         category: "All Applicants",
-        items: [
-          "Completed Application Form",
-          "Copy of Passport",
-          "Official Academic Transcripts",
-          "Bank Balance Certificate (USD 20,000+)",
-          "Study Plan",
-        ],
-      },
-      {
-        category: "English Track",
-        items: ["TOEFL / IELTS Score Certificate"],
+        items: ["Completed Application Form", "Bank Balance Certificate"],
       },
     ],
     status: "Active",
@@ -166,84 +107,48 @@ export const MOCK_PROGRAMS = [
     applicationLink: null,
   },
 
-  // --- Program 3 ---
+  // --- Program 3: Seoul Women's University ---
   {
     id: 3,
-    publisher_id: 1, // PROGRAM.publisher_id → PUBLISHERS.id
-    representative_id: null,
+    publisher_id: 1,
     name: "Seoul Women's University",
     visaType: "D-2",
     tags: ["BEST"],
     country: "South Korea",
     location: "Nowon-gu, Seoul",
     description:
-      "Prestigious women's university in Seoul focusing on leadership and innovation.",
+      "Prestigious women's university focusing on leadership and innovation.",
     logo: "https://ui-avatars.com/api/?name=SWU&background=D946EF&color=fff&size=128",
-    images: [],
-    // REFACTORED (Priority 2): resolve with getProgramMajors(3) from mockMajors.js
-    // Backend: GET /api/programs/3/majors
     department_major_ids: [10, 11, 12],
     timeline: [
       {
-        stage: "Stage 1",
+        stage: "Regular Enrollment",
         registrationStart: "2025-10-01",
         registrationEnd: "2025-10-20",
         examDate: "2025-10-27",
         resultDate: "2025-11-05",
       },
-      {
-        stage: "Stage 2",
-        registrationStart: "2025-10-25",
-        registrationEnd: "2025-11-05",
-        examDate: "2025-11-15",
-        resultDate: "2025-11-20",
-      },
     ],
+    // RESTRUCTURED: Multi-Track Matrix (Example for your UI design)
     tuitionFees: [
       {
-        level: "Bachelor's",
-        item: "Entrance Fee (one-time)",
-        amount: 400000,
+        groupName: "Master's Programs",
         currency: "KRW",
-      },
-      {
-        level: "Bachelor's",
-        item: "Tuition (per semester)",
-        amount: 2800000,
-        currency: "KRW",
-      },
-      {
-        level: "Master's",
-        item: "Entrance Fee (one-time)",
-        amount: 500000,
-        currency: "KRW",
-      },
-      {
-        level: "Master's",
-        item: "Tuition (per semester)",
-        amount: 3200000,
-        currency: "KRW",
+        columns: ["M.Div", "M.A"],
+        rows: [
+          { item: "Application Fee", amounts: [100000, 100000] },
+          { item: "Admission Fee", amounts: [150000, 150000] },
+          { item: "Tuition Fee", amounts: [2750000, 2750000] },
+          { item: "Scholarship [Reduction]", amounts: [900000, 625000] },
+        ],
       },
     ],
     requiredDocuments: [
       {
         category: "All Applicants",
-        items: [
-          "Completed Application Form",
-          "Copy of Passport",
-          "Official Academic Transcripts",
-          "Bank Balance Certificate (USD 20,000+)",
-          "Study Plan / Personal Statement",
-        ],
+        items: ["Completed Application", "Study Plan"],
       },
-      {
-        category: "English Track",
-        items: ["TOEFL / IELTS Score Certificate"],
-      },
-      {
-        category: "Korean Track",
-        items: ["TOPIK Certificate (Level 4 minimum)"],
-      },
+      { category: "Language", items: ["TOPIK Certificate"] },
     ],
     status: "Active",
     applicationLink: null,

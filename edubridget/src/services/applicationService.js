@@ -44,6 +44,7 @@ export const createApplication = async (data) => {
   const trackerId = uuidv4();
   const newApp = {
     trackerId,
+    programId: data.programId || "",
     submissionDate: new Date().toISOString(),
     status: "Pending",
     userId: uid,
