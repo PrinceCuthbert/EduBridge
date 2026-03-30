@@ -1,7 +1,79 @@
 # EduBridge — Developer Log
 
-**Last updated:** March 27, 2026
-**Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix) · March 17 session 4 (full MVC for CMS content types, UI/UX landing page overhaul, FAQ MVC connection) · March 18 session 5 (DB alignment audit, CMS content architecture decision, hook/page cleanup, bug fixes) · March 18–19 sessions 6–8 (full DB alignment sprint, DashboardLayout consolidation, Institution DTO mapper) · March 26 session 9 (Firebase auth bug fix — UUID mismatch breaking sign-in) · March 27 session 10 (deployed domain auth fix, usernames collection refactor decision) · March 27 session 11 (applicationService Firestore migration, useApplications React Query rewrite, admin createUser secondary app fix, inactive user enforcement) · March 27 session 12 (password change, AdminApplicationReview UI polish, application edit lock, tracker enrolled lock, terminal status lock)
+**Last updated:** March 31, 2026
+**Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix) · March 17 session 4 (full MVC for CMS content types, UI/UX landing page overhaul, FAQ MVC connection) · March 18 session 5 (DB alignment audit, CMS content architecture decision, hook/page cleanup, bug fixes) · March 18–19 sessions 6–8 (full DB alignment sprint, DashboardLayout consolidation, Institution DTO mapper) · March 26 session 9 (Firebase auth bug fix — UUID mismatch breaking sign-in) · March 27 session 10 (deployed domain auth fix, usernames collection refactor decision) · March 27 session 11 (applicationService Firestore migration, useApplications React Query rewrite, admin createUser secondary app fix, inactive user enforcement) · March 27 session 12 (password change, AdminApplicationReview UI polish, application edit lock, tracker enrolled lock, terminal status lock) · March 30 session 13 (branches CRUD completed on Firestore, stats card bugs fixed, progress.md report created) · March 30–31 session 16 (Firebase Storage wired up, application file uploads migrated, document preview/download overhaul, mammoth.js .docx preview, bug fixes)
+
+---
+
+## Session 16 — March 31, 2026
+
+### 1. Firebase Storage — initialized and wired up
+
+`firebase/storage` was not previously initialized. Added `getStorage(app)` to `config.js` and exported `storage`. The `storageBucket` env var was already present — the SDK just wasn't called.
+
+### 2. `AdminProgramDetail.jsx` — `applicationFile` upload fixed
+
+**Bug:** Saving a program with an uploaded application form file threw `FirebaseError: Unsupported field value: a custom File object`. Firestore cannot store binary File objects — only plain JSON values.
+
+**Fix:** `handleSubmit` now checks `instanceof File` before calling Firestore. If a new file was picked, it is uploaded to Firebase Storage at `programs/application-forms/{timestamp}_{filename}` first, and the returned download URL string is stored in Firestore instead.
+
+**Also fixed:** `addFeeGroup`, `removeFeeGroup`, `updateFeeGroup` were defined in `useProgramForm` but missing from its `return` object — so the "Add Fee Group" button was calling `undefined`. Added all three to the return.
+
+### 3. `ApplicationSubmitForm.jsx` — document uploads migrated to Firebase Storage
+
+**Bug:** Submitting an application with two Word documents (~800 KB combined) hit Firestore's 1 MB document limit because files were Base64-encoded and embedded directly in the document (Base64 adds ~33% overhead).
+
+**Fix:** Replaced `fileToBase64` with `uploadFileToStorage` — each file is uploaded to `applications/{userId}/{timestamp}_{filename}` in Firebase Storage. Only the download URL is stored in Firestore, keeping the application document tiny regardless of file count/size.
+
+**Also changed:**
+- Removed `MAX_FILE_SIZE` (10 MB) limit — Firebase Storage free tier supports any file size within the 5 GB bucket cap
+- Removed `ACCEPTED_TYPES` restriction — all file types now accepted
+- UI hint updated to "Any file type accepted"
+
+### 4. Submission date — locked to server time
+
+`submissionDate` was a user-editable date picker — a student could backdate their application. Removed it from form state entirely. The date is now computed with `new Date().toISOString().split("T")[0]` inside `handleSubmit` at the exact moment of submission, injected into both create and update payloads. UI shows a read-only formatted display (`March 31, 2026` style) with `cursor-not-allowed`.
+
+### 5. Application edit mode — university & department pre-fill fixed
+
+**Bug:** Opening an application in edit mode always showed empty University and Department dropdowns.
+
+**Root cause 1:** `createApplication` in `applicationService.js` built `newApp` with an explicit field list and never included `programId` — so it was silently dropped on creation and `app.programId` was always `undefined` on re-load.
+
+**Root cause 2:** The edit-mode `setForm` was falling back through several stale field paths (`app.programDetails?.universityName`, `app.firstName`, etc.) from the old localStorage shape, none of which matched the Firestore document structure.
+
+**Fix:**
+- Added `programId: data.programId || ""` to `newApp` in `createApplication`
+- Simplified the edit-mode field mapping to read directly from the Firestore shape: `app.programId`, `app.programDetails.majorName`, `app.applicant.*`
+
+### 6. Department dropdown — fixed for Firestore programs
+
+`ApplicationSubmitForm.jsx` was calling `getProgramMajors(selectedUniversityProgram.id)` — a mock join table that uses integer IDs. All programs now have UUID string IDs in Firestore, so the join table never matched and the dropdown was always empty.
+
+**Fix:** Removed the `mockMajors` import entirely. `availableDepartments` now reads `selectedUniversityProgram?.departments ?? []` directly from the Firestore program object. Label render updated from `dept.name` → `dept.major` to match the Firestore department shape.
+
+### 7. `ProgramDetail.jsx` — Q&A tab removed, logo fallback, download fix
+
+- **Q&A tab removed** — tab bar and conditional stripped; details render directly in the card
+- **Logo fallback** — added `logoError` state; if no logo URL or image fails to load, shows a rounded box with the first 2 letters of the university name
+- **Download Form button** — was using `document.createElement("a")` + `click()` which navigates the current tab for cross-origin URLs (Firebase Storage). Changed to `window.open(url, "_blank")` — file opens in new tab, user stays on current page
+- **Submit Documents button** — already wired to `navigate(/dashboard/applications/submit/${id})` via the `"submit"` case in `handleApply`; confirmed working
+
+### 8. Document actions — eye + download on ApplicationPreview & AdminApplicationReview
+
+Both the student view (`ApplicationPreview.jsx`) and admin view (`AdminApplicationReview.jsx`) previously used `<a href={doc.url} download={doc.name}>`. The `download` attribute is **ignored by browsers for cross-origin URLs** (Firebase Storage is hosted on `firebasestorage.googleapis.com`) — the browser navigated the current tab instead of downloading.
+
+**New behaviour:**
+- **Eye icon (green)** — opens file for preview. PDFs and images open directly in new tab. `.docx`/`.doc` files are fetched as `ArrayBuffer`, converted to HTML by `mammoth.js`, and rendered in an inline modal with a loading spinner. All other types trigger a download with an info toast.
+- **Download icon (blue)** — `fetch(url)` → `blob()` → `URL.createObjectURL()` → `<a download>` forces a true local save. Falls back to `window.open` if fetch fails (CORS not yet configured).
+
+**mammoth.js** installed (`npm install mammoth`) — converts `.docx` binary to HTML entirely client-side, no external server involved.
+
+**Note:** Fetch-based downloads require Firebase Storage CORS to be configured. One-time setup:
+```bash
+echo '[{"origin":["*"],"method":["GET"],"maxAgeSeconds":3600}]' > cors.json
+gsutil cors set cors.json gs://your-bucket.appspot.com
+```
 
 ---
 
@@ -50,6 +122,7 @@ Remove the `usernames` collection and replace the transaction with a `where("use
 Replaced the entire localStorage-based `applicationService.js` with Firestore equivalents. All exported function signatures kept identical so `useApplications.js`, `useDashboard.js`, and all call sites required zero changes.
 
 **What changed:**
+
 - `getApplications()` → `getDocs(collection(db, "applications"))`
 - `getApplicationsByUserId(id)` → `query(..., where("userId", "==", id))`
 - `getApplicationById(id)` → `getDoc(doc(db, "applications", id))`
@@ -70,6 +143,7 @@ Replaced the entire localStorage-based `applicationService.js` with Firestore eq
 Replaced `useState` + `useCallback` + `useEffect` with React Query (`useQuery` + `useMutation` + `useQueryClient`). Same pattern as the reference `useBranches.js`.
 
 **3 query modes driven by params:**
+
 - `["applications"]` — all applications, enabled when no params (admin list/dashboard)
 - `["applications", "user", userId]` — student's own applications, enabled when `userId` is set
 - `["applications", trackerId]` — single application detail, enabled when `trackerId` is set
@@ -94,6 +168,7 @@ Replaced `useState` + `useCallback` + `useEffect` with React Query (`useQuery` +
 Any time a fake ID (`uuidv4()` or `Math.random()`) was generated on the frontend and stored as a user or document identifier, it created a mismatch with the real UID that Firebase Auth assigns. The document would exist in Firestore under the fake ID, but every subsequent Auth-based lookup used the real UID — so the document was effectively invisible.
 
 This manifested as:
+
 - Sign-in succeeding but user profile not loading (session broken)
 - `getApplicationsByUserId` returning empty results for real users
 - Admin-created users unable to log in at all
@@ -115,7 +190,9 @@ const secondaryApp = initializeApp(firebaseConfig, "adminCreateUser");
 const secondaryAuth = getAuth(secondaryApp);
 
 const credential = await createUserWithEmailAndPassword(
-  secondaryAuth, email, password
+  secondaryAuth,
+  email,
+  password,
 );
 const uid = credential.user.uid; // real Firebase Auth UID
 
@@ -154,6 +231,7 @@ The secondary app is completely isolated — it has its own auth state, signs in
 Replaced the `updatePassword` placeholder (which threw a "not yet implemented" error) with a real Firebase Auth implementation.
 
 **How it works:**
+
 1. Re-authenticates the user with their current password using `reauthenticateWithCredential` + `EmailAuthProvider.credential` — Firebase requires this before any sensitive operation
 2. Calls `firebaseUpdatePassword(currentUser, newPassword)` to update in Firebase Auth
 3. The `id` param is preserved for signature compatibility but `auth.currentUser` is used directly — consistent with the UID sourcing rule established in session 11
@@ -182,8 +260,9 @@ In `MyApplications.jsx`, the Edit button now checks the application's tracker st
 **Condition:** `stages.some((s, i) => i >= 1 && s.completed)` — any stage after "Submitted" is done (i.e. the application has moved to "Under Review" or beyond).
 
 **Behaviour when locked:**
+
 - Button is visually grayed out (`text-slate-200 cursor-not-allowed`)
-- Clicking shows a `toast.info`: *"Your application is currently under review. No changes can be made at this stage."*
+- Clicking shows a `toast.info`: _"Your application is currently under review. No changes can be made at this stage."_
 - Navigation to the edit form is blocked entirely
 
 ---
@@ -197,7 +276,8 @@ Three layers of protection added to the `AppTracker.jsx` update modal:
 **Fully enrolled detection:** `editingApp.trackerStages.every(s => s.completed)` — once all stages including "Enrolled" are saved and complete, the modal enters a locked state.
 
 **Locked modal state:**
-- Green banner: *"This application has been fully enrolled. No further changes can be made."*
+
+- Green banner: _"This application has been fully enrolled. No further changes can be made."_
 - All stage toggles: `cursor-not-allowed opacity-70`, click is no-op
 - Status dropdown: `disabled`
 - Save button: `disabled cursor-not-allowed`
@@ -209,26 +289,74 @@ Three layers of protection added to the `AppTracker.jsx` update modal:
 
 Once an application is set to "Approved" or "Rejected", no further status changes are allowed.
 
-**Guard in `handleStatusChange`:** If `app.status` is a terminal status, fires `toast.warning` — *"This application has already been finalised and cannot be changed."* — with a description directing to a system administrator. Returns before any Firestore write.
+**Guard in `handleStatusChange`:** If `app.status` is a terminal status, fires `toast.warning` — _"This application has already been finalised and cannot be changed."_ — with a description directing to a system administrator. Returns before any Firestore write.
 
 **Visual lock in Status Management panel:**
+
 - Coloured banner shown: green for Approved, red for Rejected
 - All non-active status buttons: `text-slate-300 border-slate-100 cursor-not-allowed`
 - Active status button (current terminal state): still shows bold/dark so the decision is clearly visible
 
 ---
 
+## Session 13 — March 30, 2026
+
+### 1. Branches CRUD — completed on Firestore
+
+`useBranches.js` previously only had `fetchBranches` (read) and `createBranchMutation`. The Edit and Delete buttons in `BranchManagement.jsx` were calling `updateBranch` and `deleteBranch` which were never exported from the hook — both were silently broken.
+
+**What was added to `useBranches.js`:**
+
+- `updateBranchMutation` → `updateDoc(doc(db, "branches", id), data)` + cache invalidation
+- `deleteBranchMutation` → `deleteDoc(doc(db, "branches", id))` + cache invalidation
+- `submitting` flag exported (combines `createBranchMutation.isPending || updateBranchMutation.isPending`)
+- Removed unused `MOCK_BRANCHES` import — branches are now always read from Firestore
+
+**`BranchManagement.jsx` updated:**
+
+- Destructures `updateBranch`, `deleteBranch`, `submitting` from the hook — Edit and Delete now work
+- Removed unused `useEffect` import
+
+**Note on architecture:** Branches intentionally skip a separate `branchService.js` — all Firestore logic lives directly in the hook. This is a conscious exception; all other data domains use a service layer. Not worth adding a service file for what is currently three simple one-liner Firestore calls.
+
+---
+
+### 2. Stats card bugs fixed — `BranchManagement.jsx`
+
+Two silent bugs in the stats cards:
+
+| Card           | Bug                                                                                        | Fix                                             |
+| -------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| Active Centers | `b.status == true` — comparing string `"Active"` against boolean `true`, always returned 0 | `b.status === "Active"`                         |
+| Total Staff    | `b.staffCount` — field doesn't exist, the data model uses `b.staff`                        | `b.staff \|\| 0` (with fallback to prevent NaN) |
+
+The card display also updated to pluralise "Staff Member/s" correctly using a conditional (`branch.staff === 1 ? "" : "s"`).
+
+---
+
+### 3. `docs/progress.md` created
+
+A new progress report document was created at `docs/progress.md`. It contains:
+
+- Deep-dive of Friday's commit (`f9fdbb7`) changes
+- Firebase connection overview with per-domain breakdown (~40% overall)
+- Prioritised list of what to migrate next
+- 18 edge cases to test across auth, applications, React Query cache, and user management
+
+---
+
 ## Pending / Future Tasks
 
-| Priority | Task | Notes |
-|---|---|---|
-| High | Firebase Security Rules — custom claims for admin role | `request.auth.token.role == 'admin'` requires Admin SDK to set custom claims on auth tokens. Without this, admin Firestore rules never match. Needs a Cloud Function. |
-| High | visaService.js → Firestore migration | Still on localStorage. Same pattern as applicationService migration. |
-| Medium | Password change guard for Google users | Detect `auth.currentUser.providerData[0].providerId === 'google.com'` and show message instead of attempting re-auth with email/password |
-| Medium | programService.js → Firestore migration | Still uses localStorage + `Math.random()` IDs |
-| Medium | Admin createUser → Cloud Function (Phase 3) | Current secondary app workaround works but a Cloud Function using Admin SDK is the proper long-term solution |
-| Low | usernames collection refactor | Decision pending — remove `usernames` collection and replace transaction with query-based uniqueness check. See Session 10. |
-| Low | deleteUser — delete Firebase Auth account | Current `deleteUser` only deletes the Firestore profile, not the Firebase Auth account. The Auth account becomes orphaned. Needs Admin SDK or a Cloud Function. |
+| Priority | Task                                                   | Notes                                                                                                                                                                 |
+| -------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| High     | Firebase Security Rules — custom claims for admin role | `request.auth.token.role == 'admin'` requires Admin SDK to set custom claims on auth tokens. Without this, admin Firestore rules never match. Needs a Cloud Function. |
+| High     | `visaService.js` → Firestore migration                 | Still on localStorage. Same pattern as applicationService migration.                                                                                                  |
+| High     | `programService.js` → Firestore migration              | Still uses localStorage + `Math.random()` IDs. Next in queue.                                                                                                         |
+| High     | `usePrograms.js` → React Query                         | Currently uses `useState/useEffect`. Migrate after programService.                                                                                                    |
+| Medium   | Password change guard for Google users                 | Detect `auth.currentUser.providerData[0].providerId === 'google.com'` and show message instead of attempting re-auth with email/password                              |
+| Medium   | Admin createUser → Cloud Function (Phase 3)            | Current secondary app workaround works but a Cloud Function using Admin SDK is the proper long-term solution                                                          |
+| Low      | usernames collection refactor                          | Decision pending — remove `usernames` collection and replace transaction with query-based uniqueness check. See Session 10.                                           |
+| Low      | deleteUser — delete Firebase Auth account              | Current `deleteUser` only deletes the Firestore profile, not the Firebase Auth account. The Auth account becomes orphaned. Needs Admin SDK or a Cloud Function.       |
 
 ---
 

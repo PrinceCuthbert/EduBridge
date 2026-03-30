@@ -1,47 +1,54 @@
 // src/hooks/useBranches.js
-// CMS content — state initialised from static data until a headless CMS is integrated.
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { MOCK_BRANCHES as STATIC_BRANCHES } from "../data/branches";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 const fetchBranches = async () => {
   const snapshot = await getDocs(collection(db, "branches"));
-  const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  return data;
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
 };
 
 export function useBranches() {
   const queryClient = useQueryClient();
 
-  const { data: branches = [], isLoading, isError, error, status } = useQuery({
+  const { data: branches = [], isLoading, isError, error } = useQuery({
     queryKey: ["branches"],
     queryFn: fetchBranches,
-    onError: (err) => {
-      console.error("[useBranches] onError", err);
-    },
   });
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["branches"] });
 
   const createBranchMutation = useMutation({
     mutationFn: (newBranch) => addDoc(collection(db, "branches"), newBranch),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["branches"] });
-      toast.success("Branch created");
-    },
-    onError: (err) => {
-      toast.error("Failed to create branch");
-      console.error(err);
-    },
+    onSuccess: () => { invalidate(); toast.success("Branch created"); },
+    onError: () => toast.error("Failed to create branch"),
+  });
+
+  const updateBranchMutation = useMutation({
+    mutationFn: ({ id, data }) => updateDoc(doc(db, "branches", id), data),
+    onSuccess: () => { invalidate(); toast.success("Branch updated"); },
+    onError: () => toast.error("Failed to update branch"),
+  });
+
+  const deleteBranchMutation = useMutation({
+    mutationFn: (id) => deleteDoc(doc(db, "branches", id)),
+    onSuccess: () => { invalidate(); toast.success("Branch deleted"); },
+    onError: () => toast.error("Failed to delete branch"),
   });
 
   const createBranch = (data) => createBranchMutation.mutate(data);
+  const updateBranch = (id, data) => updateBranchMutation.mutate({ id, data });
+  const deleteBranch = (id) => deleteBranchMutation.mutate(id);
 
   return {
     branches,
     isLoading,
     isError,
     error,
+    submitting: createBranchMutation.isPending || updateBranchMutation.isPending,
     createBranch,
+    updateBranch,
+    deleteBranch,
   };
 }

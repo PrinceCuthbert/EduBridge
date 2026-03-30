@@ -21,9 +21,9 @@ export default function ProgramDetail({
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { program, loading, error } = useProgram(Number(id));
+  const { program, loading, error } = useProgram(id);
   const { isAuthenticated } = useAuth();
-  const [activeTab, setActiveTab] = useState("details");
+  const [logoError, setLogoError] = useState(false);
 
   /*
     Unified apply handler
@@ -51,22 +51,17 @@ export default function ProgramDetail({
 
       if (type === "file" || (type === "default" && program.applicationFile)) {
         const file = type === "file" ? payload : program.applicationFile;
-        // Handle file download logic
-        const link = document.createElement("a");
-        if (typeof file === "string") {
-          link.href = file;
-          link.download = file.split("/").pop();
-        } else if (file instanceof File || file instanceof Blob) {
-          link.href = URL.createObjectURL(file);
-          link.download = file.name;
-        } else {
-          console.error("Unknown file type", file);
-          toast.error("Error accessing file");
+        const url =
+          typeof file === "string"
+            ? file
+            : file instanceof File || file instanceof Blob
+              ? URL.createObjectURL(file)
+              : null;
+        if (!url) {
+          toast.error("No application form available");
           return;
         }
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        window.open(url, "_blank", "noopener,noreferrer");
         toast.success("Downloading application form...");
         return;
       }
@@ -173,15 +168,21 @@ export default function ProgramDetail({
                 </Badge>
               </div>
 
-              <div className="w-32 h-32 mx-auto mb-6 relative flex items-center justify-center">
-                <img
-                  src={program.logo}
-                  alt={program.name}
-                  className="max-w-full max-h-full object-contain"
-                  onError={(e) => {
-                    e.target.src = "https://placehold.co/128x128?text=Logo";
-                  }}
-                />
+              <div className="w-32 h-32 mx-auto mb-6 flex items-center justify-center">
+                {program.logo && !logoError ? (
+                  <img
+                    src={program.logo}
+                    alt={program.name}
+                    className="max-w-full max-h-full object-contain"
+                    onError={() => setLogoError(true)}
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-2xl bg-blue-100 flex items-center justify-center">
+                    <span className="text-4xl font-bold text-blue-600 tracking-tight">
+                      {program.name.slice(0, 2).toUpperCase()}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <h1 className="text-3xl font-bold text-slate-900 mb-1">
@@ -208,41 +209,18 @@ export default function ProgramDetail({
               </p>
             </div>
 
-            {/* Tabs */}
+            {/* Details */}
             <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm print:border-none print:shadow-none">
-              <div className="flex border-b border-slate-200 print:hidden">
-                <button
-                  onClick={() => setActiveTab("details")}
-                  className={`flex-1 py-4 text-sm font-semibold transition-colors ${activeTab === "details" ? "border-b-2 border-slate-900 text-slate-900" : "text-slate-500 hover:bg-slate-50"}`}>
-                  Details
-                </button>
-                <button
-                  onClick={() => setActiveTab("qa")}
-                  className={`flex-1 py-4 text-sm font-semibold transition-colors ${activeTab === "qa" ? "border-b-2 border-slate-900 text-slate-900" : "text-slate-500 hover:bg-slate-50"}`}>
-                  Q&A (0)
-                </button>
-              </div>
-
               <div className="p-6 sm:p-8 space-y-10">
-                {activeTab === "details" ? (
-                  <>
-                    <ProgramDepartments departments={program.departments} />
-                    <ProgramTimeline timeline={program.timeline} />
-                    <ProgramTuitionFees tuitionFees={program.tuitionFees} />
-                    <ProgramRequirements
-                      documents={program.requiredDocuments}
-                    />
-                    <ProgramApplication
-                      applicationLink={program.applicationLink}
-                      applicationFile={program.applicationFile}
-                      onApply={handleApply}
-                    />
-                  </>
-                ) : (
-                  <div className="text-center py-12 text-slate-500">
-                    <p>No questions yet.</p>
-                  </div>
-                )}
+                <ProgramDepartments departments={program.departments} />
+                <ProgramTimeline timeline={program.timeline} />
+                <ProgramTuitionFees tuitionFees={program.tuitionFees} />
+                <ProgramRequirements documents={program.requiredDocuments} />
+                <ProgramApplication
+                  applicationLink={program.applicationLink}
+                  applicationFile={program.applicationFile}
+                  onApply={handleApply}
+                />
               </div>
             </div>
           </div>
@@ -288,7 +266,9 @@ export default function ProgramDetail({
                       <Button
                         variant="outline"
                         className="w-full border-slate-200"
-                        onClick={() => handleApply("file")}>
+                        onClick={() =>
+                          handleApply("file", program.applicationFile)
+                        }>
                         Download Form
                       </Button>
                       <Button

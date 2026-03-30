@@ -1,145 +1,89 @@
 // src/hooks/usePrograms.js
 //
-// Controller layer for programs — delegates all storage to programService.js.
-// Mirrors useApplications.js / useVisaConsultations.js.
+// Server-state hooks for programs — React Query for all Firestore reads/writes.
+// useProgramForm below is pure local UI state and is unchanged.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import * as programService from "../services/programService";
 
-// ── List hook (admin list page + apply form) ──────────────────────────────────
-// usePrograms - Server State to save changes for the databaseFunctions like updateProgram or deleteProgram
-// actually make the API call (or in this case, call programService.js).
-// When the Admin clicks the main "Save Changes" button, the updateProgram
-// function takes the entire finalized Local State and permanently saves it to the database.
+// ── List hook ─────────────────────────────────────────────────────────────────
 
-export function usePrograms(fetchOnMount = true) {
-  const [programs, setPrograms] = useState([]);
-  const [loading, setLoading] = useState(fetchOnMount);
-  const [error, setError] = useState(null);
+export function usePrograms() {
+  const queryClient = useQueryClient();
 
-  const fetchPrograms = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await programService.getPrograms();
-      setPrograms(data);
-    } catch (err) {
-      setError(err.message);
-      toast.error("Failed to load programs");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const {
+    data: programs = [],
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ["programs"],
+    queryFn: programService.getPrograms,
+  });
 
-  useEffect(() => {
-    if (fetchOnMount) fetchPrograms();
-  }, [fetchOnMount, fetchPrograms]);
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: ["programs"] });
 
-  const addProgram = useCallback(
-    async (data) => {
-      try {
-        setLoading(true);
-        const created = await programService.createProgram(data);
-        await fetchPrograms(); // re-sync list
-        toast.success("Program added successfully");
-        return created;
-      } catch (err) {
-        toast.error("Failed to add program");
-        return null;
-      } finally {
-        setLoading(false);
-      }
+  const addMutation = useMutation({
+    mutationFn: (data) => programService.createProgram(data),
+    onSuccess: (created) => {
+      invalidate();
+      toast.success("Program added successfully");
+      return created;
     },
-    [fetchPrograms],
-  );
+    onError: () => toast.error("Failed to add program"),
+  });
 
-  const updateProgram = useCallback(
-    async (id, data) => {
-      try {
-        setLoading(true);
-        await programService.updateProgram(id, data);
-        await fetchPrograms();
-        toast.success("Program updated successfully");
-        return true;
-      } catch (err) {
-        toast.error("Failed to update program");
-        return false;
-      } finally {
-        setLoading(false);
-      }
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => programService.updateProgram(id, data),
+    onSuccess: () => {
+      invalidate();
+      toast.success("Program updated successfully");
     },
-    [fetchPrograms],
-  );
+    onError: () => toast.error("Failed to update program"),
+  });
 
-  const deleteProgram = useCallback(async (id) => {
-    try {
-      await programService.deleteProgram(id);
-      setPrograms((prev) => prev.filter((p) => p.id !== id));
-      toast.success("Program deleted successfully");
-      return true;
-    } catch (err) {
-      toast.error("Failed to delete program");
-      return false;
-    }
-  }, []);
+  const deleteMutation = useMutation({
+    mutationFn: (id) => programService.deleteProgram(id),
+    onSuccess: () => {
+      invalidate();
+      toast.success("Program deleted");
+    },
+    onError: () => toast.error("Failed to delete program"),
+  });
 
   return {
     programs,
     loading,
-    error,
-    refresh: fetchPrograms,
-    addProgram,
-    updateProgram,
-    deleteProgram,
+    error: error?.message ?? null,
+    addProgram: (data) => addMutation.mutateAsync(data),
+    updateProgram: (id, data) => updateMutation.mutateAsync({ id, data }),
+    deleteProgram: (id) => deleteMutation.mutate(id),
+    saving: addMutation.isPending || updateMutation.isPending,
   };
 }
 
-// ── Single-program hook (detail / view pages) ─────────────────────────────────
+// ── Single-program hook ───────────────────────────────────────────────────────
 
 export function useProgram(id) {
-  const [program, setProgram] = useState(null);
-  const [loading, setLoading] = useState(!!id);
-  const [error, setError] = useState(null);
+  const {
+    data: program = null,
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ["programs", id],
+    queryFn: () => programService.getProgramById(String(id)),
+    enabled: !!id,
+  });
 
-  useEffect(() => {
-    if (!id) return;
-    let cancelled = false;
-
-    const fetch = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const found = await programService.getProgramById(id);
-        if (cancelled) return;
-        if (found) {
-          setProgram(found);
-        } else {
-          setError(new Error("Program not found"));
-        }
-      } catch (err) {
-        if (!cancelled) setError(err);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    fetch();
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
-
-  return { program, loading, error };
+  return {
+    program,
+    loading,
+    error: error?.message ?? null,
+  };
 }
-
-// ── Form State Hook (Extracts UI logic into the Controller) Local State):
-// Functions like updateDepartment or removeTimeline ONLY modify
-// the data currently sitting in the user's browser
-// memory while they are typing. If the Admin clicks "Remove Row",
-// the row disappears from the screen, but nothing has happened in the database yet.
-// If they refresh the page, the row comes back.───────────────────
 
 export function useProgramForm(fetchedProgram) {
   const [formData, setFormData] = useState({
@@ -247,26 +191,110 @@ export function useProgramForm(fetchedProgram) {
     }));
   };
 
-  // ── Tuition Fees CRUD ──
-  const addTuitionFee = () => {
+  // ── Tuition Fee Groups CRUD (grouped matrix model) ──
+  // Shape: [{ groupName, currency, columns: string[], rows: [{ item, amounts: number[] }] }]
+
+  const addFeeGroup = () => {
     setFormData((prev) => ({
       ...prev,
       tuitionFees: [
         ...(prev.tuitionFees || []),
-        { level: "Bachelor's", item: "", amount: 0, currency: "KRW" },
+        {
+          groupName: "",
+          currency: "KRW",
+          columns: ["Default track"],
+          rows: [],
+        },
       ],
     }));
   };
-  const updateTuitionFee = (index, field, value) => {
-    const updated = [...(formData.tuitionFees || [])];
-    updated[index] = { ...updated[index], [field]: value };
-    setFormData({ ...formData, tuitionFees: updated });
-  };
-  const removeTuitionFee = (index) => {
+
+  const removeFeeGroup = (gIdx) => {
     setFormData((prev) => ({
       ...prev,
-      tuitionFees: (prev.tuitionFees || []).filter((_, i) => i !== index),
+      tuitionFees: (prev.tuitionFees || []).filter((_, i) => i !== gIdx),
     }));
+  };
+
+  const updateFeeGroup = (gIdx, field, value) => {
+    const updated = [...(formData.tuitionFees || [])];
+    updated[gIdx] = { ...updated[gIdx], [field]: value };
+    setFormData({ ...formData, tuitionFees: updated });
+  };
+
+  const addFeeColumn = (gIdx) => {
+    const updated = [...(formData.tuitionFees || [])];
+    const group = { ...updated[gIdx] };
+    group.columns = [...group.columns, ""];
+    group.rows = group.rows.map((row) => ({
+      ...row,
+      amounts: [...row.amounts, 0],
+    }));
+    updated[gIdx] = group;
+    setFormData({ ...formData, tuitionFees: updated });
+  };
+
+  const removeFeeColumn = (gIdx, cIdx) => {
+    const updated = [...(formData.tuitionFees || [])];
+    const group = { ...updated[gIdx] };
+    group.columns = group.columns.filter((_, i) => i !== cIdx);
+    group.rows = group.rows.map((row) => ({
+      ...row,
+      amounts: row.amounts.filter((_, i) => i !== cIdx),
+    }));
+    updated[gIdx] = group;
+    setFormData({ ...formData, tuitionFees: updated });
+  };
+
+  const updateFeeColumn = (gIdx, cIdx, value) => {
+    const updated = [...(formData.tuitionFees || [])];
+    const group = { ...updated[gIdx] };
+    const cols = [...group.columns];
+    cols[cIdx] = value;
+    group.columns = cols;
+    updated[gIdx] = group;
+    setFormData({ ...formData, tuitionFees: updated });
+  };
+
+  const addFeeRow = (gIdx) => {
+    const updated = [...(formData.tuitionFees || [])];
+    const group = { ...updated[gIdx] };
+    group.rows = [
+      ...group.rows,
+      { item: "", amounts: new Array(group.columns.length).fill(0) },
+    ];
+    updated[gIdx] = group;
+    setFormData({ ...formData, tuitionFees: updated });
+  };
+
+  const removeFeeRow = (gIdx, rIdx) => {
+    const updated = [...(formData.tuitionFees || [])];
+    const group = { ...updated[gIdx] };
+    group.rows = group.rows.filter((_, i) => i !== rIdx);
+    updated[gIdx] = group;
+    setFormData({ ...formData, tuitionFees: updated });
+  };
+
+  const updateFeeRowItem = (gIdx, rIdx, value) => {
+    const updated = [...(formData.tuitionFees || [])];
+    const group = { ...updated[gIdx] };
+    const rows = [...group.rows];
+    rows[rIdx] = { ...rows[rIdx], item: value };
+    group.rows = rows;
+    updated[gIdx] = group;
+    setFormData({ ...formData, tuitionFees: updated });
+  };
+
+  const updateFeeCell = (gIdx, rIdx, cIdx, value) => {
+    const updated = [...(formData.tuitionFees || [])];
+    const group = { ...updated[gIdx] };
+    const rows = [...group.rows];
+    const amounts = [...rows[rIdx].amounts];
+    amounts[cIdx] = value;
+    rows[rIdx] = { ...rows[rIdx], amounts };
+    group.rows = rows;
+    updated[gIdx] = group;
+    setFormData({ ...formData, tuitionFees: updated });
   };
 
   // ── Required Documents CRUD ──
@@ -323,9 +351,18 @@ export function useProgramForm(fetchedProgram) {
     addTimelineStep,
     updateTimeline,
     removeTimeline,
-    addTuitionFee,
-    updateTuitionFee,
-    removeTuitionFee,
+    // NEW MATRIX FUNCTIONS
+    addFeeGroup,
+    removeFeeGroup,
+    updateFeeGroup,
+    addFeeColumn,
+    removeFeeColumn,
+    updateFeeColumn,
+    addFeeRow,
+    removeFeeRow,
+    updateFeeRowItem,
+    updateFeeCell,
+    // DOCUMENT FUNCTIONS
     addDocCategory,
     updateDocCategory,
     removeDocCategory,

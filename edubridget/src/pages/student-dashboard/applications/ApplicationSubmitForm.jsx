@@ -4,13 +4,11 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { usePrograms } from "../../../hooks/usePrograms";
 import { useApplications } from "../../../hooks/useApplications";
 import { getApplicationById } from "../../../services/applicationService";
-import { getProgramMajors } from "../../../data/mockMajors";
 import { useAuth } from "../../../context/AuthContext";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../../../firebase/config";
 import { Upload, X, FileText, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-
-const ACCEPTED_TYPES = ".pdf,.doc,.docx,.zip,.jpg,.jpeg,.png";
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
 const inputCls =
   "w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-400";
@@ -35,7 +33,6 @@ export default function ApplicationSubmitForm() {
     lastName: "",
     phone: "",
     email: user?.email ?? "",
-    submissionDate: new Date().toISOString().split("T")[0],
   });
   const [existingDocs, setExistingDocs] = useState([]);
   const [newFiles, setNewFiles] = useState([]);
@@ -49,17 +46,12 @@ export default function ApplicationSubmitForm() {
       if (app) {
         setExistingApp(app);
         setForm({
-          programId: app.programDetails?.universityName
-            ? (app.programId ?? "")
-            : (app.programId ?? ""),
-          departmentName:
-            app.programDetails?.majorName ?? app.departmentName ?? "",
-          firstName: app.applicant?.firstName ?? app.firstName ?? "",
-          lastName: app.applicant?.lastName ?? app.lastName ?? "",
-          phone: app.applicant?.phone ?? app.phone ?? "",
-          email: app.applicant?.email ?? app.email ?? user?.email ?? "",
-          submissionDate:
-            app.submissionDate ?? new Date().toISOString().split("T")[0],
+          programId: app.programId ?? "",
+          departmentName: app.programDetails?.majorName ?? "",
+          firstName: app.applicant?.firstName ?? "",
+          lastName: app.applicant?.lastName ?? "",
+          phone: app.applicant?.phone ?? "",
+          email: app.applicant?.email ?? user?.email ?? "",
         });
         setExistingDocs(app.documents ?? []);
       } else {
@@ -81,26 +73,15 @@ export default function ApplicationSubmitForm() {
     }));
   };
 
-  // Resolve the majors for the selected program using the join table.
-  // Backend swap: replace getProgramMajors(id) with GET /api/programs/:id/majors
   const selectedUniversityProgram = programs.find(
     (p) => String(p.id) === String(form.programId),
   );
-  const availableDepartments = selectedUniversityProgram
-    ? getProgramMajors(selectedUniversityProgram.id)
-    : [];
+  const availableDepartments = selectedUniversityProgram?.departments ?? [];
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const valid = files.filter((f) => {
-      if (f.size > MAX_FILE_SIZE) {
-        toast.error(`${f.name} exceeds the 10 MB limit`);
-        return false;
-      }
-      return true;
-    });
-    setNewFiles((prev) => [...prev, ...valid]);
-    e.target.value = ""; // reset so same file can be re-added after removal
+    setNewFiles((prev) => [...prev, ...files]);
+    e.target.value = "";
   };
 
   const removeNewFile = (idx) =>
@@ -108,21 +89,12 @@ export default function ApplicationSubmitForm() {
   const removeExistingDoc = (docId) =>
     setExistingDocs((prev) => prev.filter((d) => d.id !== docId));
 
-  // Convert a File object to a persistent Base64 data URL.
-  // Unlike URL.createObjectURL(), a data: URL survives page refreshes and
-  // works in any browser session — which means the admin can download it too.
-
-  // Trade - off to be aware of: Base64 encoding increases file size by ~33 %.
-  // For a localStorage - based demo this is fine, but in production you'd
-  // upload files directly to S3 / Cloudinary instead and store just the resulting URL.
-
-  const fileToBase64 = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result); // "data:<mime>;base64,<data>"
-      reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
-      reader.readAsDataURL(file);
-    });
+  const uploadFileToStorage = async (file) => {
+    const path = `applications/${user?.id}/${Date.now()}_${file.name}`;
+    const fileRef = ref(storage, path);
+    const snapshot = await uploadBytes(fileRef, file);
+    return getDownloadURL(snapshot.ref);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -134,22 +106,24 @@ export default function ApplicationSubmitForm() {
         (p) => String(p.id) === String(form.programId),
       );
 
-      // Encode every file as Base64 so the URL is a self-contained string
-      // that persists in localStorage and is readable by any session (e.g. admin).
+      // Upload each file to Firebase Storage and store the download URL
       const newDocuments = await Promise.all(
         newFiles.map(async (file) => ({
           id: `doc-${Date.now()}-${Math.random()}`,
           name: file.name,
           type: file.type,
           size: file.size,
-          url: await fileToBase64(file),
+          url: await uploadFileToStorage(file),
           uploadedAt: new Date().toISOString(),
         })),
       );
 
+      const today = new Date().toISOString().split("T")[0];
+
       if (isEditMode) {
         await updateApplication(id, {
           ...form,
+          submissionDate: today,
           documents: [...existingDocs, ...newDocuments],
           universityName: selectedProgram?.name ?? "",
           programName: form.departmentName,
@@ -159,6 +133,7 @@ export default function ApplicationSubmitForm() {
         await createApplication({
           ...form,
           userId: String(user?.id),
+          submissionDate: today,
           universityName: selectedProgram?.name ?? "",
           programName: form.departmentName,
           documents: newDocuments,
@@ -238,11 +213,11 @@ export default function ApplicationSubmitForm() {
                   className={inputCls}>
                   <option value="">Select a department…</option>
                   {availableDepartments.map((dept, i) => {
-                    // dept shape from getProgramMajors: { name, language, degree, ... }
+                    // dept shape from Firestore: { degree, major, language, ... }
                     const label =
                       typeof dept === "string"
                         ? dept
-                        : `${dept.degree} — ${dept.name} (${dept.language})`;
+                        : `${dept.degree} — ${dept.major} (${dept.language})`;
                     const value = typeof dept === "string" ? dept : label;
                     return (
                       <option key={i} value={value}>
@@ -305,12 +280,13 @@ export default function ApplicationSubmitForm() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Submission Date</label>
-              <input
-                type="date"
-                value={form.submissionDate}
-                onChange={set("submissionDate")}
-                className={inputCls}
-              />
+              <div className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-500 bg-slate-50 cursor-not-allowed select-none">
+                {new Date().toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </div>
             </div>
             <div>
               <label className={labelCls}>Student Email</label>
@@ -378,12 +354,11 @@ export default function ApplicationSubmitForm() {
                 Click to upload or drag &amp; drop
               </p>
               <p className="text-xs text-slate-400 mt-1">
-                PDF, DOCX, ZIP, Images (max 10 MB each)
+                Any file type accepted
               </p>
               <input
                 type="file"
                 multiple
-                accept={ACCEPTED_TYPES}
                 onChange={handleFileChange}
                 className="hidden"
               />

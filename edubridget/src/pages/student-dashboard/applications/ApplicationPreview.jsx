@@ -1,11 +1,14 @@
 ﻿// src/pages/student-dashboard/applications/ApplicationPreview.jsx
 // Student read-only view of a single application
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Download,
+  Eye,
+  X,
+  Loader2,
   Mail,
   Phone,
   Calendar,
@@ -15,6 +18,8 @@ import {
   Circle,
   Clock,
 } from "lucide-react";
+import mammoth from "mammoth";
+import { toast } from "sonner";
 import { useApplications } from "../../../hooks/useApplications";
 import StatusBadge from "../../../components/shared/StatusBadge";
 
@@ -127,12 +132,60 @@ function formatFileSize(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+const DIRECT_PREVIEW = [".pdf", ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"];
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function ApplicationPreview() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { singleApplication: app, loading } = useApplications({ trackerId: id });
+
+  const [docxPreview, setDocxPreview] = useState({ open: false, html: "", name: "", loading: false });
+
+  const handleDownload = async (doc) => {
+    try {
+      const res = await fetch(doc.url);
+      if (!res.ok) throw new Error("fetch failed");
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = doc.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      // CORS fallback — opens in new tab; browser auto-downloads non-renderable types
+      window.open(doc.url, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const handlePreview = async (doc) => {
+    const name = doc.name?.toLowerCase() ?? "";
+    if (DIRECT_PREVIEW.some((ext) => name.endsWith(ext))) {
+      window.open(doc.url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    if (name.endsWith(".docx") || name.endsWith(".doc")) {
+      setDocxPreview({ open: true, html: "", name: doc.name, loading: true });
+      try {
+        const res = await fetch(doc.url);
+        const arrayBuffer = await res.arrayBuffer();
+        const { value: html } = await mammoth.convertToHtml({ arrayBuffer });
+        setDocxPreview({ open: true, html, name: doc.name, loading: false });
+      } catch {
+        setDocxPreview({ open: false, html: "", name: "", loading: false });
+        toast.error("Could not preview — downloading instead.");
+        handleDownload(doc);
+      }
+      return;
+    }
+    // All other types — just download
+    toast.info("This file type can't be previewed — downloading instead.");
+    handleDownload(doc);
+  };
 
   if (loading) {
     return (
@@ -180,6 +233,7 @@ export default function ApplicationPreview() {
     (applicant.firstName?.[0] ?? "") + (applicant.lastName?.[0] ?? "");
 
   return (
+    <>
     <div className="max-w-3xl mx-auto space-y-5 pb-16 animate-in fade-in duration-500">
       {/* ── Back + Breadcrumb ── */}
       <div className="flex items-center gap-2">
@@ -365,13 +419,22 @@ export default function ApplicationPreview() {
                     </div>
                   </div>
                   {doc.url ? (
-                    <a
-                      href={doc.url}
-                      download={doc.name}
-                      className="ml-2 p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-100 rounded-md transition-colors shrink-0"
-                      title="Download">
-                      <Download size={14} />
-                    </a>
+                    <div className="flex items-center gap-1 ml-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handlePreview(doc)}
+                        className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
+                        title="Preview">
+                        <Eye size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDownload(doc)}
+                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-100 rounded-md transition-colors"
+                        title="Download">
+                        <Download size={14} />
+                      </button>
+                    </div>
                   ) : (
                     <span className="ml-2 p-1.5 text-slate-200 shrink-0 cursor-not-allowed">
                       <Download size={14} />
@@ -384,5 +447,38 @@ export default function ApplicationPreview() {
         )}
       </div>
     </div>
+
+    {/* Docx Preview Modal */}
+    {docxPreview.open && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+        onClick={() => setDocxPreview({ open: false, html: "", name: "", loading: false })}>
+        <div
+          className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden"
+          onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 shrink-0">
+            <p className="font-semibold text-slate-900 truncate pr-4">{docxPreview.name}</p>
+            <button
+              onClick={() => setDocxPreview({ open: false, html: "", name: "", loading: false })}
+              className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors shrink-0">
+              <X size={18} className="text-slate-500" />
+            </button>
+          </div>
+          <div className="overflow-y-auto p-6">
+            {docxPreview.loading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 size={32} className="animate-spin text-slate-400" />
+              </div>
+            ) : (
+              <div
+                className="prose prose-slate max-w-none text-sm"
+                dangerouslySetInnerHTML={{ __html: docxPreview.html }}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
