@@ -26,6 +26,18 @@ import { getCountryFlag } from "@/data/mockVisaData";
 import { getVisaRequestById } from "@/services/visaService";
 import VisaStatusBadge from "@/components/visa/VisaStatusBadge";
 
+// ── Proxy URL helper ───────────────────────────────────────
+function toProxyUrl(downloadUrl) {
+  try {
+    const url = new URL(downloadUrl);
+    const match = url.pathname.match(/\/o\/(.+)$/);
+    if (!match) return downloadUrl;
+    return `/storage-proxy/${match[1]}${url.search}`;
+  } catch {
+    return downloadUrl;
+  }
+}
+
 // ── Initials avatar ───────────────────────────────────────────
 function InitialsAvatar({ name, size = 48 }) {
   const initials = name
@@ -97,28 +109,28 @@ export default function AdminVisaCaseDetails() {
     fetchCase();
   }, [id, navigate]);
 
-  // Preview: base64 → Blob URL → new tab
+  // Preview: open file through the storage proxy in a new tab.
   const handlePreview = (doc) => {
-    try {
-      const [header, b64] = doc.url.split(",");
-      const mime = header.match(/:(.*?);/)[1];
-      const bytes = atob(b64);
-      const arr = new Uint8Array(bytes.length);
-      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
-      const blobUrl = URL.createObjectURL(new Blob([arr], { type: mime }));
-      const tab = window.open(blobUrl, "_blank");
-      if (tab) setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-    } catch {
-      toast.error("Could not preview this file.");
-    }
+    window.open(toProxyUrl(doc.url), "_blank", "noopener,noreferrer");
   };
 
-  // Download: trigger browser download via <a>
-  const handleDownload = (doc) => {
-    const a = document.createElement("a");
-    a.href = doc.url;
-    a.download = doc.name;
-    a.click();
+  // Download: fetch blob via proxy → force local save.
+  const handleDownload = async (doc) => {
+    try {
+      const res = await fetch(toProxyUrl(doc.url));
+      if (!res.ok) throw new Error("fetch failed");
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = doc.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      window.open(toProxyUrl(doc.url), "_blank", "noopener,noreferrer");
+    }
   };
 
   if (loading) {

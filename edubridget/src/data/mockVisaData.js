@@ -59,13 +59,9 @@ export const VISA_TYPES = [
 
 // ── Supported destination countries ──────────────────────────
 export const VISA_COUNTRIES = [
-  { code: "CA", name: "Canada" },
-  { code: "US", name: "USA" },
-  { code: "GB", name: "UK" },
-  { code: "AU", name: "Australia" },
-  { code: "DE", name: "Germany" },
-  { code: "FR", name: "France" },
   { code: "KR", name: "South Korea" },
+  { code: "CA", name: "Canada" },
+  { code: "AU", name: "Australia" },
 ];
 
 // ── Meeting formats ───────────────────────────────────────────
@@ -74,7 +70,7 @@ export const MEETING_TYPES = ["Video Call", "In-Person", "Phone Call"];
 // ── Helper: country code → flag emoji ────────────────────────
 // Used by VisaSummary table and VisaCases table.
 export const getCountryFlag = (code) => {
-  if (!code) return "🌍";
+  if (!code) return "";
   return code
     .toUpperCase()
     .split("")
@@ -89,104 +85,104 @@ export const getCountryFlag = (code) => {
 //    id, userId, status, submissionDate, ...visa-specific fields
 // ─────────────────────────────────────────────────────────────
 // Stable seed UUIDs — same pattern as SEED_USER_IDS in mockUsers.js
-export const SEED_VISA_IDS = {
-  VR001: "20000000-0000-0000-0000-000000000001",
-  VR002: "20000000-0000-0000-0000-000000000002",
-  VR003: "20000000-0000-0000-0000-000000000003",
-  VR004: "20000000-0000-0000-0000-000000000004",
-};
+// export const SEED_VISA_IDS = {
+//   VR001: "20000000-0000-0000-0000-000000000001",
+//   VR002: "20000000-0000-0000-0000-000000000002",
+//   VR003: "20000000-0000-0000-0000-000000000003",
+//   VR004: "20000000-0000-0000-0000-000000000004",
+// };
 
-export const MOCK_VISA_REQUESTS = [
-  {
-    id: SEED_VISA_IDS.VR001,
-    userId: "00000000-0000-0000-0000-000000000002", // links to USER table
-    // ── Form fields (from VisaRequestForm) ──
-    fullName: "John Kariuki",
-    email: "john.k@email.com",
-    phone: "+254 712 000 001",
-    countryOfOrigin: "Kenya",
-    destination: "Canada",
-    countryCode: "CA",
-    visaType: "Study Visa",
-    preferredDate: "2024-02-15",
-    meetingType: "Video Call",
-    notes: "Need help with student permit requirements.",
-    // ── System-generated fields ──
-    status: "In Progress",
-    submissionDate: "2024-02-10",
-    // ── Admin-only fields (student never sets these) ──
-    consultationFee: "$150",
-    feeStatus: "Paid",
-    appointmentDate: "2024-02-15",
-    appointmentTime: "10:00",
-    meetingLink: "https://zoom.us/j/example",
-    adminNotes: "",
-  },
-  {
-    id: SEED_VISA_IDS.VR002,
-    userId: "00000000-0000-0000-0000-000000000002",
-    fullName: "John Kariuki",
-    email: "john.k@email.com",
-    phone: "+254 712 000 001",
-    countryOfOrigin: "Kenya",
-    destination: "UK",
-    countryCode: "GB",
-    visaType: "Work Visa",
-    preferredDate: "2024-02-18",
-    meetingType: "In-Person",
-    notes: "",
-    status: "Approved",
-    submissionDate: "2024-02-12",
-    consultationFee: "$200",
-    feeStatus: "Paid",
-    appointmentDate: "2024-02-18",
-    appointmentTime: "14:00",
-    meetingLink: "",
-    adminNotes: "All documents verified.",
-  },
-  {
-    id: SEED_VISA_IDS.VR003,
-    userId: "00000000-0000-0000-0000-000000000002",
-    fullName: "John Kariuki",
-    email: "john.k@email.com",
-    phone: "+254 712 000 001",
-    countryOfOrigin: "Kenya",
-    destination: "USA",
-    countryCode: "US",
-    visaType: "General Visit",
-    preferredDate: "2024-02-20",
-    meetingType: "Video Call",
-    notes: "Tourist trip, 2 weeks.",
-    status: "Pending Documents",
-    submissionDate: "2024-02-14",
-    consultationFee: "$100",
-    feeStatus: "Unpaid",
-    appointmentDate: "",
-    appointmentTime: "",
-    meetingLink: "",
-    adminNotes: "",
-  },
-  // ── Extra records (other students — visible to admin only) ──
-  {
-    id: SEED_VISA_IDS.VR004,
-    userId: "00000000-0000-0000-0000-000000000002",
-    fullName: "Sarah Wanjiku",
-    email: "sarah.w@email.com",
-    phone: "+254 722 000 002",
-    countryOfOrigin: "Kenya",
-    destination: "Australia",
-    countryCode: "AU",
-    visaType: "Study Visa",
-    preferredDate: "2024-02-12",
-    meetingType: "Video Call",
-    notes: "",
-    status: "New",
-    submissionDate: "2024-02-08",
-    consultationFee: "",
-    feeStatus: "Unpaid",
-    appointmentDate: "",
-    appointmentTime: "",
-    meetingLink: "",
-    adminNotes: "",
-  },
-];
+// export const MOCK_VISA_REQUESTS = [
+//   {
+//     id: SEED_VISA_IDS.VR001,
+//     userId: "00000000-0000-0000-0000-000000000002", // links to USER table
+//     // ── Form fields (from VisaRequestForm) ──
+//     fullName: "John Kariuki",
+//     email: "john.k@email.com",
+//     phone: "+254 712 000 001",
+//     countryOfOrigin: "Kenya",
+//     destination: "Canada",
+//     countryCode: "CA",
+//     visaType: "Study Visa",
+//     preferredDate: "2024-02-15",
+//     meetingType: "Video Call",
+//     notes: "Need help with student permit requirements.",
+//     // ── System-generated fields ──
+//     status: "In Progress",
+//     submissionDate: "2024-02-10",
+//     // ── Admin-only fields (student never sets these) ──
+//     consultationFee: "$150",
+//     feeStatus: "Paid",
+//     appointmentDate: "2024-02-15",
+//     appointmentTime: "10:00",
+//     meetingLink: "https://zoom.us/j/example",
+//     adminNotes: "",
+//   },
+//   {
+//     id: SEED_VISA_IDS.VR002,
+//     userId: "00000000-0000-0000-0000-000000000002",
+//     fullName: "John Kariuki",
+//     email: "john.k@email.com",
+//     phone: "+254 712 000 001",
+//     countryOfOrigin: "Kenya",
+//     destination: "UK",
+//     countryCode: "GB",
+//     visaType: "Work Visa",
+//     preferredDate: "2024-02-18",
+//     meetingType: "In-Person",
+//     notes: "",
+//     status: "Approved",
+//     submissionDate: "2024-02-12",
+//     consultationFee: "$200",
+//     feeStatus: "Paid",
+//     appointmentDate: "2024-02-18",
+//     appointmentTime: "14:00",
+//     meetingLink: "",
+//     adminNotes: "All documents verified.",
+//   },
+//   {
+//     id: SEED_VISA_IDS.VR003,
+//     userId: "00000000-0000-0000-0000-000000000002",
+//     fullName: "John Kariuki",
+//     email: "john.k@email.com",
+//     phone: "+254 712 000 001",
+//     countryOfOrigin: "Kenya",
+//     destination: "USA",
+//     countryCode: "US",
+//     visaType: "General Visit",
+//     preferredDate: "2024-02-20",
+//     meetingType: "Video Call",
+//     notes: "Tourist trip, 2 weeks.",
+//     status: "Pending Documents",
+//     submissionDate: "2024-02-14",
+//     consultationFee: "$100",
+//     feeStatus: "Unpaid",
+//     appointmentDate: "",
+//     appointmentTime: "",
+//     meetingLink: "",
+//     adminNotes: "",
+//   },
+//   // ── Extra records (other students — visible to admin only) ──
+//   {
+//     id: SEED_VISA_IDS.VR004,
+//     userId: "00000000-0000-0000-0000-000000000002",
+//     fullName: "Sarah Wanjiku",
+//     email: "sarah.w@email.com",
+//     phone: "+254 722 000 002",
+//     countryOfOrigin: "Kenya",
+//     destination: "Australia",
+//     countryCode: "AU",
+//     visaType: "Study Visa",
+//     preferredDate: "2024-02-12",
+//     meetingType: "Video Call",
+//     notes: "",
+//     status: "New",
+//     submissionDate: "2024-02-08",
+//     consultationFee: "",
+//     feeStatus: "Unpaid",
+//     appointmentDate: "",
+//     appointmentTime: "",
+//     meetingLink: "",
+//     adminNotes: "",
+//   },
+// ];

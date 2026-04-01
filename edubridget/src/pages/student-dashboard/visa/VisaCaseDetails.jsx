@@ -27,6 +27,20 @@ import {
 } from "@/services/visaService";
 import VisaStatusBadge from "@/components/visa/VisaStatusBadge";
 
+// ── Proxy URL Helper ─────────────────────────────────────────
+// Rewrites a Firebase Storage download URL to go through the
+// local/Netlify proxy so fetch() is same-origin (no CORS block).
+function toProxyUrl(downloadUrl) {
+  try {
+    const url = new URL(downloadUrl);
+    const match = url.pathname.match(/\/o\/(.+)$/);
+    if (!match) return downloadUrl;
+    return `/storage-proxy/${match[1]}${url.search}`;
+  } catch {
+    return downloadUrl;
+  }
+}
+
 export default function VisaCaseDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -63,25 +77,32 @@ export default function VisaCaseDetails() {
     fetchCaseData();
   }, [id, navigate]);
 
-  // Preview: convert base64 data URL → Blob → object URL → new tab.
-  // Using a Blob avoids browsers blocking direct data: URL navigation.
+  // Preview: open file through the storage proxy in a new tab.
+  // Firebase Storage URLs are plain HTTPS — open via proxy so same-origin.
   const handlePreview = (doc) => {
+    window.open(toProxyUrl(doc.url), "_blank", "noopener,noreferrer");
+  };
+
+  // Download: fetch blob via proxy then trigger a local save.
+  const handleDownload = async (doc) => {
     try {
-      const [header, b64] = doc.url.split(",");
-      const mime = header.match(/:(.*?);/)[1];
-      const bytes = atob(b64);
-      const arr = new Uint8Array(bytes.length);
-      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
-      const blobUrl = URL.createObjectURL(new Blob([arr], { type: mime }));
-      const tab = window.open(blobUrl, "_blank");
-      // Revoke the object URL after the tab has had time to load it
-      if (tab) setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+      const res = await fetch(toProxyUrl(doc.url));
+      if (!res.ok) throw new Error("fetch failed");
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = doc.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
     } catch {
-      toast.error("Could not preview this file.");
+      window.open(toProxyUrl(doc.url), "_blank", "noopener,noreferrer");
     }
   };
 
-  // Delete: call the service (persists to localStorage) then update local state.
+  // Delete: call the service (persists to Firestore) then update local state.
   const handleDeleteDocument = (docId) => {
     toast.warning("Delete this document?", {
       description: "This action cannot be undone.",

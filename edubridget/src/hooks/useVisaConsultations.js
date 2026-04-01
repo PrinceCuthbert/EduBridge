@@ -4,16 +4,13 @@
 //  WHO USES THIS: student pages only.
 //  (VisaSummary.jsx, VisaRequestForm.jsx)
 //
-//  WHY TWO HOOKS (this one + useAdminVisaCases)?
-//  Same reason applicationService strips status on student update:
-//  separation stops a student from ever calling admin operations
-//  even by mistake. When the backend is live, these two hooks
-//  will hit different API endpoints with different JWT roles.
+//  Migrated from useState/useEffect to React Query.
+//  Same public API as before — call sites unchanged.
 //
-//  MIRRORS: useApplications.js — same shape, same naming pattern.
+//  Query key: ["visaCases", "user", userId]
 // ─────────────────────────────────────────────────────────────
 
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getVisaRequestsByUserId,
   createVisaRequest,
@@ -22,74 +19,64 @@ import {
 } from "../services/visaService";
 
 /**
- * @param {string} userId - from AuthContext (e.g. "student_01")
- *
- * Returns:
- *   consultations  - array of this student's requests
- *   loading        - true while fetching
- *   error          - error message string or null
- *   fetchConsultations  - manual refetch
- *   submitRequest       - create a new request
- *   editRequest         - update an existing request
- *   cancelRequest       - delete a request
+ * @param {string} userId - Firebase Auth UID from AuthContext
  */
 export const useVisaConsultations = (userId) => {
-  const [consultations, setConsultations] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
+  const queryKey = ["visaCases", "user", userId];
 
-  // ── Fetch ─────────────────────────────────────────────────
-  const fetchConsultations = useCallback(async () => {
-    if (!userId) return;
+  // ── Fetch student's own cases ─────────────────────────────
+  const {
+    data: consultations = [],
+    isLoading: loading,
+    error: queryError,
+    refetch: fetchConsultations,
+  } = useQuery({
+    queryKey,
+    queryFn: () => getVisaRequestsByUserId(userId),
+    enabled: !!userId,
+  });
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const data = await getVisaRequestsByUserId(userId);
-      setConsultations(data);
-    } catch (err) {
-      setError("Failed to load your consultations. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    fetchConsultations();
-  }, [fetchConsultations]);
+  const error = queryError ? "Failed to load your consultations. Please try again." : null;
 
   // ── Submit new request ────────────────────────────────────
+  const submitMutation = useMutation({
+    mutationFn: (formData) => createVisaRequest(formData, userId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
+  });
+
   const submitRequest = async (formData) => {
     try {
-      const created = await createVisaRequest(formData, userId);
-      // Optimistic update: add to local state immediately
-      setConsultations((prev) => [...prev, created]);
-      return created;
-    } catch (err) {
+      return await submitMutation.mutateAsync(formData);
+    } catch {
       throw new Error("Failed to submit request. Please try again.");
     }
   };
 
   // ── Edit existing request ─────────────────────────────────
+  const editMutation = useMutation({
+    mutationFn: ({ id, formData }) => updateVisaRequest(id, formData),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
+  });
+
   const editRequest = async (id, formData) => {
     try {
-      const updated = await updateVisaRequest(id, formData);
-      setConsultations((prev) =>
-        prev.map((c) => (c.id === id ? updated : c))
-      );
-      return updated;
-    } catch (err) {
+      return await editMutation.mutateAsync({ id, formData });
+    } catch {
       throw new Error("Failed to update request. Please try again.");
     }
   };
 
   // ── Cancel / delete request ───────────────────────────────
+  const cancelMutation = useMutation({
+    mutationFn: (id) => deleteVisaRequest(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
+  });
+
   const cancelRequest = async (id) => {
     try {
-      await deleteVisaRequest(id);
-      setConsultations((prev) => prev.filter((c) => c.id !== id));
-    } catch (err) {
+      await cancelMutation.mutateAsync(id);
+    } catch {
       throw new Error("Failed to cancel request. Please try again.");
     }
   };
