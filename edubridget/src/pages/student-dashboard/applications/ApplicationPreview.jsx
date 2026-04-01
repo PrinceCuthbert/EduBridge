@@ -1,4 +1,4 @@
-﻿// src/pages/student-dashboard/applications/ApplicationPreview.jsx
+// src/pages/student-dashboard/applications/ApplicationPreview.jsx
 // Student read-only view of a single application
 
 import React, { useState } from "react";
@@ -22,6 +22,20 @@ import mammoth from "mammoth";
 import { toast } from "sonner";
 import { useApplications } from "../../../hooks/useApplications";
 import StatusBadge from "../../../components/shared/StatusBadge";
+
+// ─── Proxy URL Helper ─────────────────────────────────────────────────────────
+// Rewrites a Firebase Storage download URL to go through the local/Netlify proxy
+// so the browser sees a same-origin request — no CORS headers needed on the bucket.
+function toProxyUrl(downloadUrl) {
+  try {
+    const url = new URL(downloadUrl);
+    const match = url.pathname.match(/\/o\/(.+)$/);
+    if (!match) return downloadUrl;
+    return `/storage-proxy/${match[1]}${url.search}`;
+  } catch {
+    return downloadUrl;
+  }
+}
 
 // ─── Tracker Stage Progress ───────────────────────────────────────────────────
 
@@ -141,11 +155,14 @@ export default function ApplicationPreview() {
   const navigate = useNavigate();
   const { singleApplication: app, loading } = useApplications({ trackerId: id });
 
-  const [docxPreview, setDocxPreview] = useState({ open: false, html: "", name: "", loading: false });
+  // type: "pdf" | "image" | "docx" | null
+  const CLOSE_PREVIEW = { open: false, type: null, url: "", html: "", name: "", loading: false };
+  const [filePreview, setFilePreview] = useState(CLOSE_PREVIEW);
 
   const handleDownload = async (doc) => {
     try {
-      const res = await fetch(doc.url);
+      // Fetch via proxy — same-origin, no CORS block
+      const res = await fetch(toProxyUrl(doc.url));
       if (!res.ok) throw new Error("fetch failed");
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
@@ -157,32 +174,42 @@ export default function ApplicationPreview() {
       document.body.removeChild(a);
       URL.revokeObjectURL(blobUrl);
     } catch {
-      // CORS fallback — opens in new tab; browser auto-downloads non-renderable types
       window.open(doc.url, "_blank", "noopener,noreferrer");
     }
   };
 
   const handlePreview = async (doc) => {
     const name = doc.name?.toLowerCase() ?? "";
-    if (DIRECT_PREVIEW.some((ext) => name.endsWith(ext))) {
-      window.open(doc.url, "_blank", "noopener,noreferrer");
+
+    // PDF — render in iframe via proxy
+    if (name.endsWith(".pdf")) {
+      setFilePreview({ open: true, type: "pdf", url: toProxyUrl(doc.url), html: "", name: doc.name, loading: false });
       return;
     }
+
+    // Images — render via <img> (img src never blocked by CORS)
+    if ([".jpg",".jpeg",".png",".gif",".webp",".svg"].some((ext) => name.endsWith(ext))) {
+      setFilePreview({ open: true, type: "image", url: doc.url, html: "", name: doc.name, loading: false });
+      return;
+    }
+
+    // DOCX — mammoth conversion via proxy
     if (name.endsWith(".docx") || name.endsWith(".doc")) {
-      setDocxPreview({ open: true, html: "", name: doc.name, loading: true });
+      setFilePreview({ open: true, type: "docx", url: "", html: "", name: doc.name, loading: true });
       try {
-        const res = await fetch(doc.url);
+        const res = await fetch(toProxyUrl(doc.url));
         const arrayBuffer = await res.arrayBuffer();
         const { value: html } = await mammoth.convertToHtml({ arrayBuffer });
-        setDocxPreview({ open: true, html, name: doc.name, loading: false });
+        setFilePreview({ open: true, type: "docx", url: "", html, name: doc.name, loading: false });
       } catch {
-        setDocxPreview({ open: false, html: "", name: "", loading: false });
+        setFilePreview(CLOSE_PREVIEW);
         toast.error("Could not preview — downloading instead.");
         handleDownload(doc);
       }
       return;
     }
-    // All other types — just download
+
+    // Everything else — download
     toast.info("This file type can't be previewed — downloading instead.");
     handleDownload(doc);
   };
@@ -448,34 +475,53 @@ export default function ApplicationPreview() {
       </div>
     </div>
 
-    {/* Docx Preview Modal */}
-    {docxPreview.open && (
+    {/* File Preview Modal — pdf / image / docx */}
+    {filePreview.open && (
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-        onClick={() => setDocxPreview({ open: false, html: "", name: "", loading: false })}>
+        onClick={() => setFilePreview(CLOSE_PREVIEW)}>
         <div
-          className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden"
+          className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
           onClick={(e) => e.stopPropagation()}>
+
+          {/* Modal header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 shrink-0">
-            <p className="font-semibold text-slate-900 truncate pr-4">{docxPreview.name}</p>
+            <p className="font-semibold text-slate-900 truncate pr-4">{filePreview.name}</p>
             <button
-              onClick={() => setDocxPreview({ open: false, html: "", name: "", loading: false })}
+              onClick={() => setFilePreview(CLOSE_PREVIEW)}
               className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors shrink-0">
               <X size={18} className="text-slate-500" />
             </button>
           </div>
-          <div className="overflow-y-auto p-6">
-            {docxPreview.loading ? (
-              <div className="flex items-center justify-center py-16">
-                <Loader2 size={32} className="animate-spin text-slate-400" />
-              </div>
-            ) : (
+
+          {/* Modal body */}
+          {filePreview.loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 size={32} className="animate-spin text-slate-400" />
+            </div>
+          ) : filePreview.type === "pdf" ? (
+            <iframe
+              src={filePreview.url}
+              title={filePreview.name}
+              className="w-full flex-1 border-0"
+              style={{ minHeight: "70vh" }}
+            />
+          ) : filePreview.type === "image" ? (
+            <div className="overflow-auto p-6 flex items-center justify-center">
+              <img
+                src={filePreview.url}
+                alt={filePreview.name}
+                className="max-w-full max-h-[72vh] object-contain rounded-lg shadow"
+              />
+            </div>
+          ) : (
+            <div className="overflow-y-auto p-6">
               <div
                 className="prose prose-slate max-w-none text-sm"
-                dangerouslySetInnerHTML={{ __html: docxPreview.html }}
+                dangerouslySetInnerHTML={{ __html: filePreview.html }}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     )}

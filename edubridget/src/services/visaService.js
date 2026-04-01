@@ -1,106 +1,80 @@
 // ─────────────────────────────────────────────────────────────
 //  src/services/visaService.js
-//
-//  WHY THIS FILE EXISTS:
-//  Single source of truth for ALL visa request CRUD.
-//  Mirrors applicationService.js — same pattern, same rules.
-//
-//  THE ONE RULE:
-//  No page, no hook, no component ever touches localStorage
-//  directly. They all go through this file.
-//
-//  BACKEND SWAP (future):
-//  Every function already returns a Promise.
-//  To go live, replace the localStorage body with fetch().
-//  Example at the bottom of this file.
-// ─────────────────────────────────────────────────────────────
 
-import { MOCK_VISA_REQUESTS } from "../data/mockVisaData";
-import { v4 as uuidv4 } from "uuid";
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  arrayUnion,
+} from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../firebase/config";
 
-const STORAGE_KEY = "edubridge_visa_requests";
+const COLLECTION = "visaCases";
 
-// ── Seed localStorage on first load ──────────────────────────
-// Same trick as applicationService.js.
-// If the key doesn't exist yet, write the mock records so the
-// UI has something to show on a fresh browser session.
-// ── Internal read/write helpers ───────────────────────────────
-const readAll = () => {
-  // Seed mock data only in development — production starts empty.
-  if (import.meta.env.DEV && !localStorage.getItem(STORAGE_KEY)) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_VISA_REQUESTS));
-  }
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [];
-};
-
-const writeAll = (records) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-  } catch (err) {
-    // DOMException: QuotaExceededError — browser storage is full
-    if (
-      err instanceof DOMException &&
-      (err.name === "QuotaExceededError" ||
-        err.name === "NS_ERROR_DOM_QUOTA_REACHED")
-    ) {
-      throw new Error(
-        "Browser storage is full. Try uploading smaller files, or delete existing documents to free up space.",
-      );
-    }
-    throw err;
-  }
-};
+// ── Internal helper ────────────────────────────────────────────
+// Maps a Firestore DocumentSnapshot to a plain object with `id`.
+const snapToData = (snap) => ({ id: snap.id, ...snap.data() });
 
 // ─────────────────────────────────────────────────────────────
 //  PUBLIC API
-//  Every function is async — ready for real fetch() calls.
+//  Every function is async — same signatures as before.
 // ─────────────────────────────────────────────────────────────
 
 /**
- * Return ALL visa requests.
- * Used by: admin dashboard (VisaCases.jsx)
+ * Return ALL visa cases.
+ * Used by: admin dashboard (VisaCases.jsx, useAdminVisaCases)
  */
 export const getVisaRequests = async () => {
-  return readAll();
+  const snap = await getDocs(collection(db, COLLECTION));
+  return snap.docs.map(snapToData);
 };
 
 /**
- * Return only the requests belonging to one student.
- * Used by: student dashboard (VisaSummary.jsx)
+ * Return only the cases belonging to one student.
+ * Used by: student dashboard (VisaSummary, useVisaConsultations)
  *
- * @param {string} userId - from AuthContext (e.g. "student_01")
+ * @param {string} userId - Firebase Auth UID
  */
 export const getVisaRequestsByUserId = async (userId) => {
-  return readAll().filter((r) => r.userId === userId);
+  const q = query(collection(db, COLLECTION), where("userId", "==", userId));
+  const snap = await getDocs(q);
+  return snap.docs.map(snapToData);
 };
 
 /**
- * Return a single request by its ID.
- * Used by: detail pages, edit forms.
+ * Return a single case by its Firestore document ID.
+ * Used by: detail pages, upload form.
  *
  * @param {string} id
  * @returns {object|null}
  */
 export const getVisaRequestById = async (id) => {
-  return readAll().find((r) => r.id === id) ?? null;
+  const snap = await getDoc(doc(db, COLLECTION, id));
+  return snap.exists() ? snapToData(snap) : null;
 };
 
 /**
  * Student submits a new visa consultation request.
  *
  * What this function does that the caller does NOT:
- *  - Generates a unique ID
+ *  - Generates a unique Firestore document ID
  *  - Sets status to "New" (student cannot choose their own status)
- *  - Sets submissionDate to today
- *  - Strips any admin-only fields (fee, adminNotes, meetingLink)
- *    the form might accidentally send
+ *  - Sets submissionDate to today (server-side moment)
+ *  - Strips any admin-only fields the form might accidentally send
  *
  * @param {object} formData - fields from VisaRequestForm
- * @param {string} userId   - from AuthContext
+ * @param {string} userId   - Firebase Auth UID from AuthContext
  */
 export const createVisaRequest = async (formData, userId) => {
-  const all = readAll();
+  // Auto-generate a Firestore doc ID (no uuidv4 needed)
+  const newRef = doc(collection(db, COLLECTION));
 
   const newRequest = {
     // ── Student-submitted fields ──
@@ -116,13 +90,11 @@ export const createVisaRequest = async (formData, userId) => {
     notes: formData.notes ?? "",
 
     // ── System-generated (never from form) ──
-    id: uuidv4(),
     userId,
     status: "New",
     submissionDate: new Date().toISOString().split("T")[0],
 
     // ── Admin-only fields — always empty on creation ──
-    // Admin fills these in later via updateVisaFee / updateVisaStatus.
     consultationFee: "",
     feeStatus: "Unpaid",
     appointmentDate: "",
@@ -134,164 +106,145 @@ export const createVisaRequest = async (formData, userId) => {
     documents: [],
   };
 
-  writeAll([...all, newRequest]);
-  return newRequest;
+  await setDoc(newRef, newRequest);
+  return { id: newRef.id, ...newRequest };
 };
 
 /**
  * Student edits their own request (before it is reviewed).
  *
  * SECURITY: strips status, fee, and all admin-only fields.
- * A student cannot elevate their own status by editing the payload.
- * Same protection as applicationService.js → updateApplication().
+ * A student cannot elevate their own status by editing.
  *
  * @param {string} id
  * @param {object} formData
  */
 export const updateVisaRequest = async (id, formData) => {
-  const all = readAll();
-
   // Destructure out admin fields so they can never be overwritten
   const {
-    status,           // strip — admin only
-    consultationFee,  // strip — admin only
-    feeStatus,        // strip — admin only
-    appointmentDate,  // strip — admin only
-    appointmentTime,  // strip — admin only
-    meetingLink,      // strip — admin only
-    adminNotes,       // strip — admin only
-    userId,           // strip — cannot change ownership
-    id: _id,          // strip — cannot change identity
-    submissionDate,   // strip — cannot change original date
-    ...studentFields  // only these are allowed through
+    status,
+    consultationFee,
+    feeStatus,
+    appointmentDate,
+    appointmentTime,
+    meetingLink,
+    adminNotes,
+    userId,
+    id: _id,
+    submissionDate,
+    documents,
+    ...studentFields
   } = formData;
 
-  const updated = all.map((r) =>
-    r.id === id ? { ...r, ...studentFields } : r
-  );
+  const ref_ = doc(db, COLLECTION, id);
+  await updateDoc(ref_, studentFields);
 
-  writeAll(updated);
-  return updated.find((r) => r.id === id);
+  // Return the updated document
+  const snap = await getDoc(ref_);
+  return snapToData(snap);
 };
 
 /**
- * Admin updates the status of a request.
+ * Admin updates the status of a case.
  * ONLY changes the status field — nothing else.
  *
  * @param {string} id
- * @param {string} status - must be a key in VISA_STATUS_CONFIG
+ * @param {string} status
  */
 export const updateVisaStatus = async (id, status) => {
-  const all = readAll();
-  const updated = all.map((r) => (r.id === id ? { ...r, status } : r));
-  writeAll(updated);
-  return updated.find((r) => r.id === id);
+  const ref_ = doc(db, COLLECTION, id);
+  await updateDoc(ref_, { status });
+  const snap = await getDoc(ref_);
+  return snapToData(snap);
 };
 
 /**
- * Admin records the consultation fee and marks payment status.
- * Separate from updateVisaStatus because fee is verified externally
- * (admin checks a bank transfer, M-Pesa, etc.) then updates here.
+ * Admin records the consultation fee and payment status.
  *
  * @param {string} id
  * @param {string} consultationFee  - e.g. "$150"
  * @param {string} feeStatus        - "Paid" | "Unpaid"
  */
 export const updateVisaFee = async (id, consultationFee, feeStatus) => {
-  const all = readAll();
-  const updated = all.map((r) =>
-    r.id === id ? { ...r, consultationFee, feeStatus } : r
-  );
-  writeAll(updated);
-  return updated.find((r) => r.id === id);
+  const ref_ = doc(db, COLLECTION, id);
+  await updateDoc(ref_, { consultationFee, feeStatus });
+  const snap = await getDoc(ref_);
+  return snapToData(snap);
 };
 
 /**
- * Admin schedules the meeting (date, time, type, link).
- * Separate function because scheduling is one specific admin action.
+ * Admin schedules the meeting.
  *
  * @param {string} id
  * @param {{ appointmentDate, appointmentTime, meetingType, meetingLink }} schedule
  */
 export const updateVisaSchedule = async (id, schedule) => {
-  const all = readAll();
-  const updated = all.map((r) =>
-    r.id === id
-      ? {
-          ...r,
-          appointmentDate: schedule.appointmentDate,
-          appointmentTime: schedule.appointmentTime,
-          meetingType: schedule.meetingType,
-          meetingLink: schedule.meetingLink,
-        }
-      : r
-  );
-  writeAll(updated);
-  return updated.find((r) => r.id === id);
+  const ref_ = doc(db, COLLECTION, id);
+  await updateDoc(ref_, {
+    appointmentDate: schedule.appointmentDate,
+    appointmentTime: schedule.appointmentTime,
+    meetingType: schedule.meetingType,
+    meetingLink: schedule.meetingLink,
+  });
+  const snap = await getDoc(ref_);
+  return snapToData(snap);
+};
+
+/**
+ * Upload a single file to Firebase Storage and return its download URL.
+ * Path: visaCases/{userId}/{timestamp}_{filename}
+ *
+ * @param {File}   file
+ * @param {string} userId - Firebase Auth UID
+ * @returns {Promise<string>} download URL
+ */
+export const uploadVisaDocument = async (file, userId) => {
+  const path = `visaCases/${userId}/${Date.now()}_${file.name}`;
+  const storageRef = ref(storage, path);
+  await uploadBytes(storageRef, file);
+  return getDownloadURL(storageRef);
 };
 
 /**
  * Student adds documents to their case.
- * Merges new documents into the existing documents array — never overwrites.
+ * Each doc object must already have a `url` (Firebase Storage download URL).
+ * Uses Firestore arrayUnion — no read needed before write.
  *
- * @param {string} id       - visa request ID
- * @param {Array}  newDocs  - array of { id, name, type, size, url, uploadedAt }
+ * @param {string} id       - visa case ID
+ * @param {Array}  newDocs  - array of { id, name, type, size, url, uploadedAt, status }
  */
 export const addDocumentsToVisaRequest = async (id, newDocs) => {
-  const all = readAll();
-  const updated = all.map((r) =>
-    r.id === id
-      ? { ...r, documents: [...(r.documents ?? []), ...newDocs] }
-      : r
-  );
-  writeAll(updated);
-  return updated.find((r) => r.id === id);
+  const ref_ = doc(db, COLLECTION, id);
+  await updateDoc(ref_, { documents: arrayUnion(...newDocs) });
+  const snap = await getDoc(ref_);
+  return snapToData(snap);
 };
 
 /**
  * Student deletes a single document from their case.
- * Only removes the document — all other fields stay unchanged.
  *
- * @param {string} caseId - visa request ID
+ * @param {string} caseId - visa case ID
  * @param {string} docId  - document ID to remove
  */
 export const deleteDocumentFromVisaRequest = async (caseId, docId) => {
-  const all = readAll();
-  const updated = all.map((r) =>
-    r.id === caseId
-      ? { ...r, documents: (r.documents ?? []).filter((d) => d.id !== docId) }
-      : r
-  );
-  writeAll(updated);
-  return updated.find((r) => r.id === caseId);
+  const ref_ = doc(db, COLLECTION, caseId);
+  const snap = await getDoc(ref_);
+  if (!snap.exists()) return null;
+
+  const data = snapToData(snap);
+  const filtered = (data.documents ?? []).filter((d) => d.id !== docId);
+  await updateDoc(ref_, { documents: filtered });
+
+  // Return updated case
+  const updated = await getDoc(ref_);
+  return snapToData(updated);
 };
 
 /**
- * Admin deletes a case.
+ * Admin deletes a case entirely.
  *
  * @param {string} id
  */
 export const deleteVisaRequest = async (id) => {
-  const all = readAll();
-  writeAll(all.filter((r) => r.id !== id));
+  await deleteDoc(doc(db, COLLECTION, id));
 };
-
-// ─────────────────────────────────────────────────────────────
-//  FUTURE BACKEND SWAP — example
-//
-//  Before (localStorage):
-//  export const getVisaRequests = async () => {
-//    return readAll();
-//  };
-//
-//  After (real API):
-//  export const getVisaRequests = async () => {
-//    const res = await fetch("/api/visa-requests", {
-//      headers: { Authorization: `Bearer ${getToken()}` },
-//    });
-//    if (!res.ok) throw new Error("Failed to fetch visa requests");
-//    return res.json();
-//  };
-//
-//  The hooks and pages never change — they already await everything.
-// ─────────────────────────────────────────────────────────────

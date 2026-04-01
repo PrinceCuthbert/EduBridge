@@ -1,7 +1,7 @@
 # EduBridge — Developer Log
 
 **Last updated:** March 31, 2026
-**Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix) · March 17 session 4 (full MVC for CMS content types, UI/UX landing page overhaul, FAQ MVC connection) · March 18 session 5 (DB alignment audit, CMS content architecture decision, hook/page cleanup, bug fixes) · March 18–19 sessions 6–8 (full DB alignment sprint, DashboardLayout consolidation, Institution DTO mapper) · March 26 session 9 (Firebase auth bug fix — UUID mismatch breaking sign-in) · March 27 session 10 (deployed domain auth fix, usernames collection refactor decision) · March 27 session 11 (applicationService Firestore migration, useApplications React Query rewrite, admin createUser secondary app fix, inactive user enforcement) · March 27 session 12 (password change, AdminApplicationReview UI polish, application edit lock, tracker enrolled lock, terminal status lock) · March 30 session 13 (branches CRUD completed on Firestore, stats card bugs fixed, progress.md report created) · March 30–31 session 16 (Firebase Storage wired up, application file uploads migrated, document preview/download overhaul, mammoth.js .docx preview, bug fixes)
+**Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix) · March 17 session 4 (full MVC for CMS content types, UI/UX landing page overhaul, FAQ MVC connection) · March 18 session 5 (DB alignment audit, CMS content architecture decision, hook/page cleanup, bug fixes) · March 18–19 sessions 6–8 (full DB alignment sprint, DashboardLayout consolidation, Institution DTO mapper) · March 26 session 9 (Firebase auth bug fix — UUID mismatch breaking sign-in) · March 27 session 10 (deployed domain auth fix, usernames collection refactor decision) · March 27 session 11 (applicationService Firestore migration, useApplications React Query rewrite, admin createUser secondary app fix, inactive user enforcement) · March 27 session 12 (password change, AdminApplicationReview UI polish, application edit lock, tracker enrolled lock, terminal status lock) · March 30 session 13 (branches CRUD completed on Firestore, stats card bugs fixed, progress.md report created) · March 30–31 session 16 (Firebase Storage wired up, application file uploads migrated, document preview/download overhaul, mammoth.js .docx preview, CORS solved via Vite+Netlify reverse-proxy, unified in-app file preview modal for PDF/image/docx)
 
 ---
 
@@ -69,11 +69,135 @@ Both the student view (`ApplicationPreview.jsx`) and admin view (`AdminApplicati
 
 **mammoth.js** installed (`npm install mammoth`) — converts `.docx` binary to HTML entirely client-side, no external server involved.
 
-**Note:** Fetch-based downloads require Firebase Storage CORS to be configured. One-time setup:
-```bash
-echo '[{"origin":["*"],"method":["GET"],"maxAgeSeconds":3600}]' > cors.json
-gsutil cors set cors.json gs://your-bucket.appspot.com
+---
+
+### 9. Firebase Storage CORS — solved via reverse-proxy (no bucket access required)
+
+#### The problem
+
+After wiring up file uploads and the download/preview buttons, every `fetch()` call to a Firebase Storage URL failed with:
+
 ```
+Access to fetch at 'https://firebasestorage.googleapis.com/...' from origin
+'http://localhost:5174' has been blocked by CORS policy:
+No 'Access-Control-Allow-Origin' header is present on the requested resource.
+```
+
+CORS is a browser security rule: any `fetch()` or `XMLHttpRequest` that crosses origins (different domain) is blocked unless the **server** responds with an `Access-Control-Allow-Origin` header. Firebase Storage does not add those headers by default — you have to configure it explicitly on the bucket with `gsutil cors set`.
+
+#### Why the normal fix didn't work
+
+The standard fix is a one-liner:
+
+```bash
+gsutil cors set cors.json gs://edubridge-5da54.firebasestorage.app
+```
+
+But this requires the `storage.buckets.update` IAM permission on the Firebase project (`edubridge-5da54`). The developer account only has access to a separate GCP project (`edubridge-486912`), not the Firebase project that owns the bucket:
+
+```
+AccessDeniedException: 403 [account]@gmail.com does not have
+storage.buckets.update access to the Google Cloud Storage bucket.
+```
+
+The Google Cloud Shell + `gsutil` route hit the same wall. The Firebase Storage SDK (`getBlob()` / `getBytes()`) was also tried — it internally also makes XHR requests, which are equally subject to CORS, confirmed by the browser:
+
+```
+AdminApplicationReview.jsx:109  GET https://firebasestorage.googleapis.com/...
+net::ERR_FAILED 200 (OK)
+```
+
+CORS cannot be bypassed with JavaScript. The server must send the header, or the request must appear same-origin to the browser.
+
+#### The solution — reverse-proxy
+
+The browser only enforces CORS for cross-origin requests. If the request goes to the **same domain** as the app, the browser allows it unconditionally. A proxy intercepts the request server-side and forwards it to Firebase Storage — the browser never talks to Firebase directly.
+
+**Dev (Vite `server.proxy`):**
+
+```js
+// vite.config.js
+server: {
+  proxy: {
+    '/storage-proxy': {
+      target: 'https://firebasestorage.googleapis.com',
+      changeOrigin: true,
+      rewrite: (path) =>
+        path.replace(/^\/storage-proxy/, '/v0/b/edubridge-5da54.firebasestorage.app/o'),
+    },
+  },
+},
+```
+
+**Production (Netlify edge redirect — status 200 = transparent proxy):**
+
+```toml
+# netlify.toml — must be BEFORE the SPA catch-all /*
+[[redirects]]
+  from = "/storage-proxy/*"
+  to   = "https://firebasestorage.googleapis.com/v0/b/edubridge-5da54.firebasestorage.app/o/:splat"
+  status = 200
+  force  = true
+```
+
+**In the React code — `toProxyUrl()` helper:**
+
+```js
+// Rewrites a Firebase Storage download URL to go through the local/Netlify proxy.
+// Browser sees a same-origin request → no CORS check.
+function toProxyUrl(downloadUrl) {
+  try {
+    const url   = new URL(downloadUrl);
+    const match = url.pathname.match(/\/o\/(.+)$/);
+    if (!match) return downloadUrl;
+    return `/storage-proxy/${match[1]}${url.search}`;
+  } catch {
+    return downloadUrl;
+  }
+}
+
+// Usage:
+const res  = await fetch(toProxyUrl(doc.url)); // same-origin → no CORS error
+const blob = await res.blob();
+```
+
+**Why this works:**
+- `doc.url` is e.g. `https://firebasestorage.googleapis.com/v0/b/bucket/o/path?alt=media&token=...`
+- `toProxyUrl()` extracts the encoded object path (`path?alt=media&token=...`) and returns `/storage-proxy/path?alt=media&token=...`
+- The browser sends `GET /storage-proxy/...` to `localhost:5174` (same origin)
+- Vite (dev) / Netlify (prod) receives it and proxies it to Firebase Storage
+- Firebase returns the file with a `200 OK` — no CORS headers needed because the browser never saw the Firebase URL
+
+**Files changed:** `vite.config.js`, `netlify.toml`, `ApplicationPreview.jsx`, `AdminApplicationReview.jsx`.
+
+---
+
+### 10. Document preview — unified in-app modal for all file types
+
+**Before:** The Eye icon opened files in a new tab for PDFs and images (`window.open(doc.url, "_blank")`). Only `.docx` files rendered inside the app.
+
+**After:** All previewable files render inside the same in-app modal:
+
+| File type | How it renders in the modal |
+|-----------|-----------------------------|
+| `.pdf` | `<iframe src={toProxyUrl(doc.url)}>` — Chrome/Firefox built-in PDF viewer, full-height, via proxy |
+| Images (`.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`, `.svg`) | `<img src={doc.url}>` — images do not trigger CORS on `<img>` tags, no proxy needed |
+| `.docx` / `.doc` | Fetched as `ArrayBuffer` via proxy → converted to HTML by `mammoth.js` → rendered as styled HTML |
+| Everything else | `toast.info` + downloads the file |
+
+**State shape:** `docxPreview` replaced with a unified `filePreview`:
+
+```js
+// type: "pdf" | "image" | "docx" | null
+const CLOSE_PREVIEW = { open: false, type: null, url: "", html: "", name: "", loading: false };
+const [filePreview, setFilePreview] = useState(CLOSE_PREVIEW);
+```
+
+**Why `<img>` doesn't need the proxy:** The `<img src>` attribute is a passive load — the browser does not apply CORS to it unless the image is consumed by a `canvas` or `fetch`. Direct display via `<img>` always works regardless of CORS headers.
+
+**Why `<iframe>` needs the proxy for PDFs:** Cross-origin `<iframe>` PDFs can be blocked or render blank in some browser/security configurations. Routing through the proxy makes the URL same-origin, ensuring Chrome's built-in PDF viewer renders it reliably in every environment.
+
+**Applied to both:** `ApplicationPreview.jsx` (student view) and `AdminApplicationReview.jsx` (admin review view).
 
 ---
 

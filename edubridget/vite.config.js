@@ -90,4 +90,19 @@ export default defineConfig({
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
   },
+  // Dev server proxy: forwards /storage-proxy/* to Firebase Storage.
+  // The browser hits localhost (same-origin) → no CORS block.
+  server: {
+    proxy: {
+      '/storage-proxy': {
+        target: 'https://firebasestorage.googleapis.com',
+        changeOrigin: true,
+        rewrite: (path) =>
+          path.replace(
+            /^\/storage-proxy/,
+            '/v0/b/edubridge-5da54.firebasestorage.app/o'
+          ),
+      },
+    },
+  },
 })

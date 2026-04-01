@@ -275,13 +275,14 @@ Edit and Delete were silently broken — the hook only exposed `createBranch` bu
 Auth + Users         ████████████████████  100%  (Firebase Auth + Firestore)
 Applications         ████████████████████  100%  (Firestore + React Query)
 File Uploads         ████████████████████  100%  (Firebase Storage — March 31)
+Storage Downloads    ████████████████████  100%  (SDK getBlob/getBytes — March 31)
 Branches             ████████████████████  100%  (Firestore + React Query)
 Programs             ████████████████████  100%  (DONE — completed March 30)
 Visa Cases           ░░░░░░░░░░░░░░░░░░░░    0%  (localStorage — next in queue)
 Financial            ░░░░░░░░░░░░░░░░░░░░    0%  (blocked on visaService)
 CMS Content          ░░░░░░░░░░░░░░░░░░░░    0%  (in-memory mock)
 
-Overall              █████████████░░░░░░░  ~65%
+Overall              ██████████████░░░░░░  ~70%
 ```
 
 ---
@@ -294,13 +295,20 @@ Overall              █████████████░░░░░░�
 
 ### ~~Priority 3 — File Uploads (Applications + Programs)~~ ✅ Done (March 31)
 
-### Priority 1 — Firebase Storage CORS (Required for downloads)
+### ~~Priority 4 — Firebase Storage Downloads (CORS)~~ ✅ Done (March 31)
 
-Fetch-based downloads in `ApplicationPreview.jsx` and `AdminApplicationReview.jsx` use `fetch(storageUrl)` → blob. This requires CORS to be configured on the Storage bucket or the fetch silently falls back to `window.open`.
+**Problem:** Raw `fetch(downloadUrl)` is blocked by browser CORS policy on Firebase Storage.
+`gsutil cors set` was not possible — developer only has access to a different GCP project,
+not the `edubridge-5da54` Firebase project (`403 Permission Denied`).
 
-```bash
-echo '[{"origin":["*"],"method":["GET"],"maxAgeSeconds":3600}]' > cors.json
-gsutil cors set cors.json gs://edubridge-5da54.appspot.com
+**Solution:** Replaced `fetch()` with Firebase Storage SDK `getBlob()` / `getBytes()` in
+`ApplicationPreview.jsx` and `AdminApplicationReview.jsx`. The SDK sends authenticated
+requests through Firebase's own API, which handles CORS internally — no bucket config needed.
+
+```js
+// getStoragePath() parses path from download URL, then:
+const blob = await getBlob(ref(storage, getStoragePath(doc.url)));         // download
+const arrayBuffer = await getBytes(ref(storage, getStoragePath(doc.url))); // docx preview
 ```
 
 ### Priority 2 — `visaService.js` → Firestore
@@ -338,23 +346,31 @@ Currently all Firestore writes may be open. Before going to production:
 
 ### Auth
 
-| #   | Scenario                                                                 | Expected                                                                                                                                        |
-| --- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Admin deactivates a user who is currently logged in                      | On next page load / token refresh, `onAuthStateChanged` fires, `status: "Inactive"` is detected, session is killed, user is redirected to login |
-| 2   | Student logs in with correct username but wrong password                 | Firebase throws `auth/wrong-password` — error shown, no crashing                                                                                |
-| 3   | Two users try to register with the same username at the same millisecond | Firestore transaction on `usernames/{username}` ensures only one succeeds; the second gets "Username already taken"                             |
-| 4   | Google sign-in with an email that already has an email/password account  | Firebase links or throws `auth/account-exists-with-different-credential` — handle gracefully                                                    |
-| 5   | User refreshes the page mid-session                                      | `onAuthStateChanged` restores session from Firebase token — no logout flash                                                                     |
+| #   | Scenario                                            | Expected                                                                                                                                        |
+| --- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Admin deactivates a user who is currently logged in | On next page load / token refresh, `onAuthStateChanged` fires, `status: "Inactive"` is detected, session is killed, user is redirected to login |
+
+|=> Solution: Passed if I disactivate an account as an admin, on next login the user is told that account is disactivated, please contact support.|
+
+| 2 | Student logs in with correct username but wrong password | Firebase throws `auth/wrong-password` — error shown, no crashing |
+
+|=> It currently shows "Firebase: Error (auth/invalid-credential)."|
+
+| 3 | Two users try to register with the same username at the same millisecond | Firestore transaction on `usernames/{username}` ensures only one succeeds; the second gets "Username already taken" |
+| 4 | Google sign-in with an email that already has an email/password account | Firebase links or throws `auth/account-exists-with-different-credential` — handle gracefully |
+| 5 | User refreshes the page mid-session | `onAuthStateChanged` restores session from Firebase token — no logout flash |
 
 ### Applications
 
-| #   | Scenario                                                                     | Expected                                                                                    |
-| --- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| 6   | Student submits application while not logged in (`auth.currentUser` is null) | `createApplication` throws `"You must be logged in"` before touching Firestore              |
-| 7   | Student crafts a payload with `status: "Approved"` in `updateApplication`    | `status` is stripped by the destructure guard — Firestore doc is unchanged for that field   |
-| 8   | Admin updates status of an application that was just deleted                 | `updateDoc` throws because the doc doesn't exist — handle with try/catch in mutation        |
-| 9   | Two admins update the same application status simultaneously                 | Last write wins (Firestore default) — acceptable for now; flag for optimistic locking later |
-| 10  | `getApplicationById` called with an ID that doesn't exist                    | Returns `null` — pages must handle null gracefully without crashing                         |
+| #                                                  | Scenario                                                                     | Expected                                                                       |
+| -------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| 6                                                  | Student submits application while not logged in (`auth.currentUser` is null) | `createApplication` throws `"You must be logged in"` before touching Firestore |
+| => It currently tells me thata I must login first. |
+
+| 7 | Student crafts a payload with `status: "Approved"` in `updateApplication` | `status` is stripped by the destructure guard — Firestore doc is unchanged for that field |
+| 8 | Admin updates status of an application that was just deleted | `updateDoc` throws because the doc doesn't exist — handle with try/catch in mutation |
+| 9 | Two admins update the same application status simultaneously | Last write wins (Firestore default) — acceptable for now; flag for optimistic locking later |
+| 10 | `getApplicationById` called with an ID that doesn't exist | Returns `null` — pages must handle null gracefully without crashing |
 
 ### Visa Cases (localStorage — test before migrating)
 
