@@ -134,17 +134,16 @@ export default function GalleryPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative max-w-5xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl">
+              className="relative w-[92vw] md:w-[85vw] max-w-5xl h-[85vh] md:h-[80vh] bg-white rounded-[2rem] overflow-hidden shadow-2xl flex flex-col md:flex-row">
               {/* Close Button */}
               <button
                 onClick={() => setActiveImage(null)}
-                className="absolute top-4 right-4 z-20 p-3 bg-slate-900/80 hover:bg-slate-900 rounded-full text-white transition-colors backdrop-blur-sm">
-                <X className="h-6 w-6" />
+                className="absolute top-4 right-4 z-20 p-2 md:p-3 bg-slate-900/60 hover:bg-slate-900/90 md:bg-slate-100 md:hover:bg-slate-200 rounded-full text-white md:text-slate-600 md:hover:text-slate-900 transition-all backdrop-blur-md border border-white/20 md:border-transparent cursor-pointer">
+                <X className="h-5 w-5 md:h-6 md:w-6" />
               </button>
 
-              <div className="grid md:grid-cols-2">
-                {/* Image Section with Watermark */}
-                <div className="relative h-[400px] md:h-[600px] bg-slate-100">
+              {/* Image Section with Watermark */}
+              <div className="relative w-full md:w-1/2 h-[45%] md:h-full bg-slate-100 flex-shrink-0">
                   <img
                     src={activeImage.image}
                     alt={activeImage.studentName}
@@ -207,12 +206,12 @@ export default function GalleryPage() {
                 </div>
 
                 {/* Content Section */}
-                <div className="p-8 md:p-10 flex flex-col justify-center bg-white">
-                  <div className="mb-6">
-                    <h2 className="text-3xl font-bold text-slate-900 mb-2 font-serif">
+                <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-white overflow-y-auto">
+                  <div className="mb-6 pt-2 md:pt-0">
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 font-serif leading-tight">
                       {activeImage.studentName}
                     </h2>
-                    <p className="text-primary font-semibold text-lg mb-2">
+                    <p className="text-primary font-semibold text-base md:text-lg mb-2">
                       {activeImage.university}
                     </p>
                     <div className="flex items-center text-slate-500 text-sm gap-1">
@@ -221,25 +220,24 @@ export default function GalleryPage() {
                     </div>
                   </div>
 
-                  <div className="relative pl-6 mb-6 border-l-4 border-primary/20">
-                    <p className="text-slate-600 text-base leading-relaxed italic">
+                  <div className="relative pl-5 md:pl-6 mb-6 border-l-4 border-primary/20">
+                    <p className="text-slate-600 text-sm md:text-base leading-relaxed italic">
                       "{activeImage.testimony}"
                     </p>
                   </div>
 
-                  <div className="space-y-3">
-                    <p className="text-xs text-slate-500 uppercase tracking-wide font-bold">
+                  <div className="space-y-3 mt-auto md:mt-0">
+                    <p className="text-[10px] md:text-xs text-slate-500 uppercase tracking-wide font-bold">
                       {t("gallery_page.program_label")}
                     </p>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl border border-primary/20">
-                      <GraduationCap className="h-5 w-5" />
-                      <span className="font-semibold">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-primary/10 text-primary rounded-xl border border-primary/20">
+                      <GraduationCap className="h-4 w-4 md:h-5 md:w-5" />
+                      <span className="font-semibold text-sm md:text-base">
                         {activeImage.program}
                       </span>
                     </div>
                   </div>
                 </div>
-              </div>
             </motion.div>
           </motion.div>
         )}
