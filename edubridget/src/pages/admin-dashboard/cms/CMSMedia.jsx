@@ -1,10 +1,9 @@
-import { Plus, Edit, Trash2, Image as ImageIcon } from "lucide-react";
+import { Plus, Edit, Trash2, Image as ImageIcon, Loader2 } from "lucide-react";
 import Modal from "../../../components/Modal";
-import { MOCK_MEDIA } from "../../../data/mockData";
+import { mediaService } from "../../../services/cmsService";
 import AdminPageHeader from "../../../components/admin/AdminPageHeader";
 import AdminFilterBar from "../../../components/admin/AdminFilterBar";
 import { useCMSManager } from "../../../hooks/useCMSManager";
-import { uploadFile } from "../../../services/fileService";
 
 const EMPTY = {
   studentName: "",
@@ -18,6 +17,8 @@ const EMPTY = {
 export default function CMSMedia() {
   const {
     items: media,
+    isLoading,
+    isPending,
     searchQuery,
     setSearchQuery,
     isModalOpen,
@@ -29,15 +30,14 @@ export default function CMSMedia() {
     handleEdit,
     handleDelete,
     handleSubmit,
-  } = useCMSManager(MOCK_MEDIA, EMPTY, ["studentName", "country"]);
+  } = useCMSManager(mediaService, 'media', EMPTY, ["studentName", "country"]);
 
   const fd = (k, v) => setFormData((p) => ({ ...p, [k]: v }));
 
-  const handleFileUpload = async (e) => {
+  const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const { file: path } = await uploadFile(file);
-    fd("image", path);
+    fd("image", file);
   };
 
   return (
@@ -54,6 +54,11 @@ export default function CMSMedia() {
         onSearchChange={setSearchQuery}
       />
 
+      {isLoading && (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 size={32} className="animate-spin text-slate-400" />
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {media.map((item) => (
           <div
@@ -202,7 +207,7 @@ export default function CMSMedia() {
                 <div className="relative w-24 h-24 bg-white rounded-lg overflow-hidden border border-slate-200 flex-shrink-0 group cursor-pointer">
                   {formData.image ? (
                     <img
-                      src={formData.image}
+                      src={formData.image instanceof File ? URL.createObjectURL(formData.image) : formData.image}
                       alt="Preview"
                       className="w-full h-full object-cover"
                     />
@@ -228,7 +233,7 @@ export default function CMSMedia() {
                   <input
                     type="text"
                     placeholder="https://example.com/image.jpg"
-                    value={formData.image}
+                    value={formData.image instanceof File ? formData.image.name : (formData.image || '')}
                     onChange={(e) => fd("image", e.target.value)}
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:border-blue-500 outline-none"
                   />
@@ -258,8 +263,9 @@ export default function CMSMedia() {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm">
-              {editingItem ? "Update Story" : "Publish Story"}
+              disabled={isPending}
+              className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
+              {isPending ? 'Saving…' : editingItem ? "Update Story" : "Publish Story"}
             </button>
           </div>
         </form>

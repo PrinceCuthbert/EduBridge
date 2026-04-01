@@ -1,7 +1,246 @@
 # EduBridge — Developer Log
 
-**Last updated:** March 31, 2026
-**Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix) · March 17 session 4 (full MVC for CMS content types, UI/UX landing page overhaul, FAQ MVC connection) · March 18 session 5 (DB alignment audit, CMS content architecture decision, hook/page cleanup, bug fixes) · March 18–19 sessions 6–8 (full DB alignment sprint, DashboardLayout consolidation, Institution DTO mapper) · March 26 session 9 (Firebase auth bug fix — UUID mismatch breaking sign-in) · March 27 session 10 (deployed domain auth fix, usernames collection refactor decision) · March 27 session 11 (applicationService Firestore migration, useApplications React Query rewrite, admin createUser secondary app fix, inactive user enforcement) · March 27 session 12 (password change, AdminApplicationReview UI polish, application edit lock, tracker enrolled lock, terminal status lock) · March 30 session 13 (branches CRUD completed on Firestore, stats card bugs fixed, progress.md report created) · March 30–31 session 16 (Firebase Storage wired up, application file uploads migrated, document preview/download overhaul, mammoth.js .docx preview, CORS solved via Vite+Netlify reverse-proxy, unified in-app file preview modal for PDF/image/docx)
+**Last updated:** April 1, 2026
+**Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix) · March 17 session 4 (full MVC for CMS content types, UI/UX landing page overhaul, FAQ MVC connection) · March 18 session 5 (DB alignment audit, CMS content architecture decision, hook/page cleanup, bug fixes) · March 18–19 sessions 6–8 (full DB alignment sprint, DashboardLayout consolidation, Institution DTO mapper) · March 26 session 9 (Firebase auth bug fix — UUID mismatch breaking sign-in) · March 27 session 10 (deployed domain auth fix, usernames collection refactor decision) · March 27 session 11 (applicationService Firestore migration, useApplications React Query rewrite, admin createUser secondary app fix, inactive user enforcement) · March 27 session 12 (password change, AdminApplicationReview UI polish, application edit lock, tracker enrolled lock, terminal status lock) · March 30 session 13 (branches CRUD completed on Firestore, stats card bugs fixed, progress.md report created) · March 30–31 session 16 (Firebase Storage wired up, application file uploads migrated, document preview/download overhaul, mammoth.js .docx preview, CORS solved via Vite+Netlify reverse-proxy, unified in-app file preview modal for PDF/image/docx) · March 31 session 17 (visaService full Firestore + Storage migration, React Query hooks for student/admin, fee management UI, storage proxy extended to visa docs) · April 1 session 18 (CMS Firestore migration — generic cmsService factory, useCMSManager rewrite with TanStack Query, public pages connected: scholarships pagination + gallery/teaser live data)
+
+---
+
+## Session 18 — April 1, 2026
+
+### 1. `cmsService.js` — Generic Firestore CRUD Factory (NEW FILE)
+
+Created `src/services/cmsService.js` — a single factory function `createCmsService(collectionName)` that returns typed Firestore CRUD operations for any collection. Eliminates the need for per-collection service files.
+
+```js
+export const createCmsService = (collectionName) => ({
+  getAll:  async () => { /* getDocs → { id, ...data }[] */ },
+  create:  async (data) => { /* addDoc + serverTimestamp */ },
+  update:  async (id, data) => { /* updateDoc + serverTimestamp */ },
+  delete:  async (id) => { /* deleteDoc */ },
+});
+```
+
+**Debug logging:** every write prints `[cmsService] CREATE/UPDATE/DELETE → collectionName(/id)` with the full payload to the browser console before hitting Firestore. `serverTimestamp()` appears as `___PRIVATE_ServerTimestampFieldValueImpl` in the console log — this is normal. Firestore replaces the sentinel with the real server timestamp on write; on subsequent reads it comes back as a proper `Timestamp` object.
+
+**Named instances exported:**
+
+| Export | Firestore Collection |
+|---|---|
+| `scholarshipService` | `scholarships` |
+| `blogService` | `blogs` |
+| `mediaService` | `media` |
+
+---
+
+### 2. `useCMSManager.js` — Rewritten with TanStack Query
+
+Hook signature changed:
+
+```diff
+- useCMSManager(initialData, defaultFormData, searchKeys)
++ useCMSManager(service, collectionKey, defaultFormData, searchKeys)
+```
+
+| Concern | Before | After |
+|---|---|---|
+| Data source | `useState(initialData)` — in-memory, resets on refresh | `useQuery` → live Firestore via service |
+| Writes | Mutated local state array directly | `useMutation` × 3 (create / update / delete) |
+| Cache sync | Manual `setItems(...)` | `queryClient.invalidateQueries([collectionKey])` |
+| Loading | Hardcoded `false` | `isLoading` from `useQuery` |
+| Save state | None | `isPending` — true while any mutation is in flight |
+
+New return values: `isLoading`, `isPending`. All existing return values (`items`, `searchQuery`, `setSearchQuery`, `isModalOpen`, `setIsModalOpen`, `formData`, `setFormData`, `editingItem`, `handleAdd`, `handleEdit`, `handleDelete`, `handleSubmit`) are preserved — pages required no JSX changes.
+
+`handleDelete` UX unchanged: sonner toast with an action button — delete only fires if the admin clicks Confirm.
+
+---
+
+### 3. CMS Admin Pages — Wired to Firestore (3 files, 2-line change each)
+
+| File | Old data source | New data source |
+|---|---|---|
+| `CMSScholarships.jsx` | `useCMSManager(MOCK_SCHOLARSHIPS, ...)` | `useCMSManager(scholarshipService, 'scholarships', ...)` |
+| `CMSPosts.jsx` | `useCMSManager(MOCK_BLOGS, ...)` | `useCMSManager(blogService, 'blogs', ...)` |
+| `CMSMedia.jsx` | `useCMSManager(MOCK_MEDIA, ...)` | `useCMSManager(mediaService, 'media', ...)` |
+
+All three pages also received:
+- `isLoading` → passed to `AdminTable` (skeleton rows while Firestore loads) — or a `Loader2` spinner for CMSMedia's card grid
+- `isPending` → submit button shows **"Saving…"** and is `disabled` during in-flight writes, preventing double-submits
+
+All JSX (columns, modals, forms) is untouched.
+
+---
+
+### 4. `ScholarshipsPage.jsx` — Public Page Connected to Firestore
+
+The public `/scholarships` page previously read from `MOCK_SCHOLARSHIPS`. Now reads from the same `scholarships` Firestore collection as the admin CMS.
+
+**Cache strategy:** `staleTime: 0` set intentionally only on this page. The global `staleTime: 5 * 60 * 1000` (5 min) applies to the admin view to avoid unnecessary reads. When the admin mutates, `invalidateQueries(['scholarships'])` marks the cache stale — the public page refetches on next visit.
+
+**Pagination added:** client-side, 6 items per page (`ITEMS_PER_PAGE = 6`). Numbered page buttons + prev/next arrows rendered via `Array.from({ length: totalPages })`. `goToPage()` scrolls to top on navigation. Pagination only renders when `totalPages > 1`.
+
+**Tags safety:** `scholarship.tags.map(...)` → `(scholarship.tags || []).map(...)` — prevents crash on documents that have no `tags` field (e.g. early entries added before the field was standardised).
+
+---
+
+### 5. `GalleryPage.jsx` + `GalleryTeaser.jsx` — Media Connected to Firestore
+
+Both the full Gallery page (`/gallery`) and the home-page teaser section now read from the `media` Firestore collection managed at `/admin/cms/media`.
+
+| File | Items shown | Loading state |
+|---|---|---|
+| `GalleryPage.jsx` | All documents — masonry grid + lightbox | Animated pulse skeleton (6 alternating-height blocks matching the masonry layout) |
+| `GalleryTeaser.jsx` | `allMedia.slice(0, 6)` — first 6 only | Animated pulse skeleton (6 blocks) |
+
+Both use `queryKey: ['media']` and `staleTime: 0`. The fetch is **deduplicated** by React Query — if the home page loads first and the user navigates to `/gallery`, the data is served from cache and no second network request is made. Same applies in the reverse order.
+
+`GalleryPage.jsx` includes an **empty state** (graduation cap icon + hint to use the admin CMS) rendered when the collection has zero documents.
+
+**Field mapping from Firestore → display:**
+
+| Field | Where used |
+|---|---|
+| `image` | Card photo, lightbox photo |
+| `studentName` | Hover overlay title, lightbox heading |
+| `country` | Location chip on hover + lightbox |
+| `university` | Lightbox subheading |
+| `program` | Hover overlay + lightbox badge |
+| `testimony` | Lightbox quote block |
+
+---
+
+## Session 17 — March 31, 2026
+
+### 1. `visaService.js` — Full Firestore + Firebase Storage Migration
+
+**Before:** All visa data was read/written from `localStorage` using `readAll()` / `writeAll()` helpers and seeded with `MOCK_VISA_REQUESTS`. Data was lost on every new session, incognito window, or different device.
+
+**After:** Every operation goes through Firestore (`visaCases` collection) and Firebase Storage. Persistent across all sessions and devices.
+
+| Function                          | Before                              | After                                                           |
+| --------------------------------- | ----------------------------------- | --------------------------------------------------------------- |
+| `getVisaRequests()`               | `readAll()` from localStorage       | `getDocs(collection(db, "visaCases"))`                          |
+| `getVisaRequestsByUserId()`       | `.filter()` on localStorage array   | Firestore `query(..., where("userId", "==", userId))`           |
+| `getVisaRequestById()`            | `.find()` on localStorage array     | `getDoc(doc(db, "visaCases", id))`                              |
+| `createVisaRequest()`             | push to localStorage, `uuidv4()` ID | `setDoc(newRef, newCase)` — auto-generated Firestore doc ID     |
+| `updateVisaRequest()`             | splice + save to localStorage       | `updateDoc(ref, safeData)` — admin fields stripped              |
+| `updateVisaStatus()`              | mutate localStorage item            | `updateDoc(ref, { status })`                                    |
+| `updateVisaFee()`                 | mutate localStorage item            | `updateDoc(ref, { consultationFee, feeStatus })`                |
+| `updateVisaSchedule()`            | mutate localStorage item            | `updateDoc(ref, schedule)`                                      |
+| `uploadVisaDocument()`            | N/A — no file persistence           | `uploadBytes()` → `visaCases/{userId}/{timestamp}_{filename}`   |
+| `addDocumentsToVisaRequest()`     | N/A                                 | `arrayUnion(...newDocs)` on Firestore `documents` array         |
+| `deleteDocumentFromVisaRequest()` | N/A                                 | `arrayRemove` on `documents` array + re-fetch                   |
+| `deleteVisaRequest()`             | `.filter()` + save                  | `deleteDoc(doc(db, "visaCases", id))`                           |
+
+**Removed:** `STORAGE_KEY`, `readAll()`, `writeAll()`, `MOCK_VISA_REQUESTS` import, `uuidv4` — completely gone.
+
+**Added:** `snapToData()` helper — `(snap) => ({ id: snap.id, ...snap.data() })`. Same pattern as `applicationService.js`.
+
+**Security preserved:** `updateVisaRequest()` destructures only safe student-editable fields. Admin-only fields (`consultationFee`, `feeStatus`, `meetingDate`, `meetingTime`, `meetingType`, `meetingLink`, `adminNotes`) are stripped before any `updateDoc` call.
+
+---
+
+### 2. `useVisaConsultations.js` — React Query Rewrite (Student)
+
+Replaced `useState/useEffect` with `useQuery` + `useMutation`.
+
+- **Query key:** `["visaCases", "user", userId]` — scoped to the logged-in user
+- **`enabled: !!userId`** — query does not fire until auth resolves
+- **Mutations:** `submitRequest`, `editRequest`, `cancelRequest`
+- All mutations invalidate `["visaCases"]` so admin list stays in sync automatically
+
+---
+
+### 3. `useAdminVisaCases.js` — React Query Rewrite (Admin)
+
+Admin-only hook. Exposes operations the student hook intentionally hides.
+
+- **Query key:** `["visaCases"]` — all cases, no user filter
+- **Mutations:** `addCase`, `setStatus`, `setFee`, `setSchedule`, `removeCase`
+- Each mutation calls a **targeted update** (only the relevant fields changed per call)
+
+---
+
+### 4. `VisaCases.jsx` — Consultation Fee Management UI
+
+New fee section added to the admin case details modal:
+
+- **Amount** — free text input (e.g. `$150`)
+- **Payment Status** — Paid / Unpaid toggle (emerald / amber)
+- **Save Fee** button — isolated from schedule and status saves, calls `setFee()` from the hook
+
+---
+
+### 5. `UploadCaseDocuments.jsx` — Firebase Storage Upload
+
+Student document upload form now uploads each file to `visaCases/{userId}/{timestamp}_{filename}` via `uploadVisaDocument()`, then appends metadata to the Firestore case via `addDocumentsToVisaRequest()`. Documents survive page refreshes and are device-agnostic.
+
+---
+
+### 6. `VisaCaseDetails.jsx` — Student Visa Case Detail Page
+
+Full detail view for a student's individual visa case. Built to consume the new Firestore-backed service.
+
+**Sections:**
+- **4 summary cards** — Destination (with flag emoji), Visa Type, Status badge, empty slot reserved for admin response
+- **Appointment card** — shows booking date/time, meeting type, and a **Join Meeting** button that only renders when `meetingLink` is set. Link is sanitised on render (adds `https://` if no protocol present)
+- **Documents section** — grid of all uploaded documents with status badges (Verified / Received / Pending), Preview (eye) and Download icons, and a per-document **Delete** action with toast confirmation before calling `deleteDocumentFromVisaRequest()`
+- **Pagination** — 6 documents per page, previous/next + numbered buttons
+- **Upload Documents** button — navigates to `UploadCaseDocuments` route
+
+**Data flow:** Fetches via `getVisaRequestById(id)` directly from Firestore. Preview and download route through `toProxyUrl()` — same CORS pattern as application documents.
+
+---
+
+### 7. `AdminVisaCaseDetails.jsx` — Admin Read-Only Visa Detail Page
+
+Standalone full-page view for admins to inspect a visa case. Separate from the inline edit modal in `VisaCases.jsx`.
+
+**Sections:**
+- **Student info card** — `InitialsAvatar` component (generates coloured initials from name, supports `sm`/`md`/`lg` sizes), full name, email, phone, country flag, submission date
+- **4 summary cards** — Destination, Visa Type, Status badge, Consultation Fee with Paid/Unpaid badge
+- **Appointment section** — date, time, meeting type, clickable meeting link if present
+- **Student notes** — displayed if the student provided notes on submission
+- **Documents section** — same grid layout as student view, Preview/Download only (no Delete), paginated at 6 per page
+
+**Key decision:** This page is read-only. Edits go through the modal in `VisaCases.jsx`, keeping the two concerns separate.
+
+---
+
+### 8. `UploadCaseDocuments.jsx` — Firebase Storage Upload
+
+Student document upload form now uploads each file to `visaCases/{userId}/{timestamp}_{filename}` via `uploadVisaDocument()`, then appends metadata to the Firestore case via `addDocumentsToVisaRequest()`. Documents survive page refreshes and are device-agnostic.
+
+**Document object shape written to Firestore:**
+```js
+{
+  id: `vdoc-${Date.now()}-${randomString}`,
+  name: file.name,
+  type: file.type,
+  size: file.size,
+  url: downloadUrl,       // Firebase Storage URL
+  uploadedAt: new Date().toISOString(),
+  status: "Received",
+}
+```
+
+---
+
+### 9. Storage Proxy — Visa Documents Covered Automatically
+
+The `/storage-proxy/` rules in `vite.config.js` and `netlify.toml` (added in Session 16) already cover all Firebase Storage URLs — including visa documents. `toProxyUrl()` in `VisaCaseDetails.jsx` and `AdminVisaCaseDetails.jsx` routes preview and download requests through the same proxy. No new config required.
+
+---
+
+### 10. `Dashboard.jsx` — Student Dashboard Data Integration
+
+The student landing page was wired up to real application data from Firestore via `useApplications()`.
+
+**What changed:**
+- **Stats cards** now compute live from real data using `useMemo` — Total Applications, Pending, Approved, and a "Study Abroad Ready" count (approved + active visa)
+- **Recent Applications feed** — sorted by `submissionDate` descending, shows each application with university name, major, formatted date, and a `StatusBadge` component
+- **Empty states** with CTA buttons ("Submit your first application") shown when no data exists
+- Added `StatusBadge` and `formatDate` imports — consistent with the rest of the dashboard
 
 ---
 

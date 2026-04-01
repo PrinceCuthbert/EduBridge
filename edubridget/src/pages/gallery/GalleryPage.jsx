@@ -3,11 +3,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, MapPin, GraduationCap } from "lucide-react";
 import OptimizedImage from "@/components/OptimizedImage";
 import { useTranslation } from "react-i18next";
-import { MOCK_MEDIA } from "@/data/mockData";
+import { useQuery } from "@tanstack/react-query";
+import { mediaService } from "@/services/cmsService";
 
 export default function GalleryPage() {
   const { t } = useTranslation();
-  const galleryItems = MOCK_MEDIA;
+
+  const { data: galleryItems = [], isLoading } = useQuery({
+    queryKey: ['media'],
+    queryFn: mediaService.getAll,
+    staleTime: 0,
+  });
+
   const [activeImage, setActiveImage] = useState(null);
   const modalRef = useRef(null);
 
@@ -51,7 +58,30 @@ export default function GalleryPage() {
       {/* Masonry Grid Gallery */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-6">
+
+          {/* Loading skeleton */}
+          {isLoading && (
+            <div className="columns-1 md:columns-2 lg:columns-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="break-inside-avoid mb-6">
+                  <div className="rounded-2xl bg-slate-200 animate-pulse" style={{ height: i % 2 === 0 ? '260px' : '340px' }} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!isLoading && galleryItems.length === 0 && (
+            <div className="text-center py-20 text-slate-400">
+              <GraduationCap className="h-12 w-12 mx-auto mb-4 opacity-30" />
+              <p className="text-lg font-medium">No stories yet</p>
+              <p className="text-sm mt-1">Add student success stories from the admin CMS.</p>
+            </div>
+          )}
+
+          {/* Gallery grid */}
+          {!isLoading && galleryItems.length > 0 && (
+            <div className="columns-1 md:columns-2 lg:columns-3 gap-6">
             {galleryItems.map((item) => (
               <motion.div
                 key={item.id}
@@ -83,7 +113,8 @@ export default function GalleryPage() {
                 </div>
               </motion.div>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 

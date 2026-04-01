@@ -111,8 +111,15 @@ export default function VisaCases() {
     meetingType: "Zoom",
     meetingLink: "",
   });
-  const [feeData, setFeeData] = useState({ consultationFee: "", feeStatus: "Unpaid" });
+  const [feeData, setFeeData] = useState({
+    consultationFee: "",
+    feeStatus: "Unpaid",
+  });
   const [savingStatus, setSavingStatus] = useState(null);
+  const approvedCount = cases.filter((c) => c.status === "Approved").length;
+  const totalCases = cases.length;
+  const percentage =
+    totalCases > 0 ? Math.round((approvedCount / totalCases) * 100) : 0;
 
   // ── Stats (derived from cases, not stored in state) ──────
   const stats = useMemo(
@@ -123,7 +130,7 @@ export default function VisaCases() {
         icon: Globe,
         color: "text-blue-600",
         bg: "bg-blue-50",
-        trend: "+12%",
+        trend: `${cases.filter((c) => c.status === "Approved").length} approved`,
       },
       {
         label: "Active Review",
@@ -133,7 +140,7 @@ export default function VisaCases() {
         icon: Search,
         color: "text-amber-600",
         bg: "bg-amber-50",
-        trend: `${cases.filter((c) => c.status === "New").length} new`,
+        // trend: `${cases.filter((c) => c.status === "New").length} new`,
       },
       {
         label: "Approved",
@@ -141,7 +148,7 @@ export default function VisaCases() {
         icon: Globe,
         color: "text-emerald-600",
         bg: "bg-emerald-50",
-        trend: "98% rate",
+        trend: `${approvedCount}/${totalCases} (${percentage}% approved)`,
       },
     ],
     [cases],
@@ -235,7 +242,9 @@ export default function VisaCases() {
       // browsers treat it as a relative path and append it to the current URL.
       const rawLink = scheduleData.meetingLink.trim();
       const normalizedLink =
-        rawLink && !/^https?:\/\//i.test(rawLink) ? `https://${rawLink}` : rawLink;
+        rawLink && !/^https?:\/\//i.test(rawLink)
+          ? `https://${rawLink}`
+          : rawLink;
       const updated = await setSchedule(selectedCase.id, {
         ...scheduleData,
         meetingLink: normalizedLink,
@@ -250,7 +259,11 @@ export default function VisaCases() {
   const handleSaveFee = async () => {
     if (!selectedCase) return;
     try {
-      const updated = await setFee(selectedCase.id, feeData.consultationFee, feeData.feeStatus);
+      const updated = await setFee(
+        selectedCase.id,
+        feeData.consultationFee,
+        feeData.feeStatus,
+      );
       setSelectedCase(updated);
       toast.success("Fee updated.");
     } catch (err) {
@@ -694,21 +707,32 @@ export default function VisaCases() {
             <div className="bg-emerald-50/50 border border-emerald-100 p-5 rounded-xl space-y-4">
               <div className="flex items-center gap-2">
                 <DollarSign size={18} className="text-emerald-600" />
-                <h4 className="text-sm font-bold text-slate-900">Consultation Fee</h4>
+                <h4 className="text-sm font-bold text-slate-900">
+                  Consultation Fee
+                </h4>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">Amount</label>
+                  <label className="text-xs font-medium text-slate-700">
+                    Amount
+                  </label>
                   <input
                     type="text"
                     placeholder="e.g. $150"
                     value={feeData.consultationFee}
-                    onChange={(e) => setFeeData({ ...feeData, consultationFee: e.target.value })}
+                    onChange={(e) =>
+                      setFeeData({
+                        ...feeData,
+                        consultationFee: e.target.value,
+                      })
+                    }
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-emerald-500"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-700">Payment Status</label>
+                  <label className="text-xs font-medium text-slate-700">
+                    Payment Status
+                  </label>
                   <div className="flex gap-2">
                     {["Unpaid", "Paid"].map((s) => (
                       <button
@@ -858,9 +882,13 @@ export default function VisaCases() {
                           <FileText size={14} />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-slate-900 truncate">{doc.name}</p>
+                          <p className="text-sm font-medium text-slate-900 truncate">
+                            {doc.name}
+                          </p>
                           <p className="text-[10px] text-slate-400">
-                            {doc.size ? `${(doc.size / 1024).toFixed(1)} KB` : ""}
+                            {doc.size
+                              ? `${(doc.size / 1024).toFixed(1)} KB`
+                              : ""}
                             {doc.size && doc.status ? " • " : ""}
                             {doc.status}
                           </p>
@@ -868,7 +896,13 @@ export default function VisaCases() {
                       </div>
                       <div className="flex items-center gap-1 shrink-0 ml-2 border-l border-slate-100 pl-2">
                         <button
-                          onClick={() => window.open(doc.url, "_blank", "noopener,noreferrer")}
+                          onClick={() =>
+                            window.open(
+                              doc.url,
+                              "_blank",
+                              "noopener,noreferrer",
+                            )
+                          }
                           className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="Preview">
                           <Eye size={14} />
@@ -884,7 +918,11 @@ export default function VisaCases() {
                               a.click();
                               URL.revokeObjectURL(a.href);
                             } catch {
-                              window.open(doc.url, "_blank", "noopener,noreferrer");
+                              window.open(
+                                doc.url,
+                                "_blank",
+                                "noopener,noreferrer",
+                              );
                             }
                           }}
                           className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"

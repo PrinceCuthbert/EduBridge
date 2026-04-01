@@ -1,6 +1,6 @@
-import { Plus, Edit, Trash2, FileText, Calendar } from 'lucide-react';
+import { Plus, Edit, Trash2, FileText, Calendar, Image as ImageIcon } from 'lucide-react';
 import Modal from '../../../components/Modal';
-import { MOCK_BLOGS } from '../../../data/mockData';
+import { blogService } from '../../../services/cmsService';
 import AdminPageHeader from "../../../components/admin/AdminPageHeader";
 import AdminTable from "../../../components/admin/AdminTable";
 import AdminFilterBar from "../../../components/admin/AdminFilterBar";
@@ -11,14 +11,22 @@ const EMPTY = { title: '', date: new Date().toISOString().split('T')[0], categor
 export default function CMSPosts() {
   const {
     items: posts,
+    isLoading,
+    isPending,
     searchQuery, setSearchQuery,
     isModalOpen, setIsModalOpen,
     formData, setFormData,
     editingItem,
     handleAdd, handleEdit, handleDelete, handleSubmit,
-  } = useCMSManager(MOCK_BLOGS, EMPTY, ['title', 'category']);
+  } = useCMSManager(blogService, 'blogs', EMPTY, ['title', 'category']);
 
   const fd = (k, v) => setFormData((p) => ({ ...p, [k]: v }));
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    fd("image", file);
+  };
 
   const columns = [
     {
@@ -70,7 +78,7 @@ export default function CMSPosts() {
         primaryAction={{ label: "Create Post", icon: Plus, onClick: handleAdd }}
       />
       <AdminFilterBar searchPlaceholder="Search posts by title or category..." searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      <AdminTable columns={columns} data={posts} isLoading={false} />
+      <AdminTable columns={columns} data={posts} isLoading={isLoading} />
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingItem ? 'Edit Post' : 'Create New Post'} size="lg">
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -101,10 +109,43 @@ export default function CMSPosts() {
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-slate-700">Image URL</label>
-              <input type="text" value={formData.image} onChange={e => fd('image', e.target.value)}
-                className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900"
-                placeholder="https://..." />
+              <label className="text-sm font-medium text-slate-700">Cover Image</label>
+              <div className="flex gap-4 items-start p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                <div className="relative w-24 h-24 bg-white rounded-lg overflow-hidden border border-slate-200 flex-shrink-0 group cursor-pointer">
+                  {formData.image ? (
+                    <img
+                      src={formData.image instanceof File ? URL.createObjectURL(formData.image) : formData.image}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                      <ImageIcon size={24} />
+                    </div>
+                  )}
+                  <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white text-xs font-medium">
+                    Change
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                    />
+                  </label>
+                </div>
+                <div className="flex-1 space-y-2">
+                  <p className="text-sm text-slate-600">
+                    Upload a photo or paste a URL.
+                  </p>
+                  <input
+                    type="text"
+                    placeholder="https://example.com/image.jpg"
+                    value={formData.image instanceof File ? formData.image.name : (formData.image || '')}
+                    onChange={(e) => fd("image", e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:border-blue-500 outline-none"
+                  />
+                </div>
+              </div>
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-slate-700">Author</label>
@@ -130,7 +171,7 @@ export default function CMSPosts() {
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
             <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm">{editingItem ? 'Update Post' : 'Publish Post'}</button>
+            <button type="submit" disabled={isPending} className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">{isPending ? 'Saving…' : editingItem ? 'Update Post' : 'Publish Post'}</button>
           </div>
         </form>
       </Modal>

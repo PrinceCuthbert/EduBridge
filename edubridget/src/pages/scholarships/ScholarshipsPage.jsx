@@ -1,16 +1,36 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { GraduationCap, Calendar, DollarSign, Globe, ChevronRight, BookOpen } from "lucide-react";
+import { GraduationCap, Calendar, DollarSign, Globe, ChevronRight, ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import AnimatedCounter from "@/components/AnimatedCounter";
-import { MOCK_SCHOLARSHIPS } from "@/data/mockData";
+import { useQuery } from "@tanstack/react-query";
+import { scholarshipService } from "@/services/cmsService";
+
+const ITEMS_PER_PAGE = 6;
 
 const ScholarshipsPage = () => {
   const { t } = useTranslation();
-  const scholarships = MOCK_SCHOLARSHIPS;
-  const loading = false;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { data: allScholarships = [], isLoading: loading } = useQuery({
+    queryKey: ['scholarships'],
+    queryFn: scholarshipService.getAll,
+    staleTime: 0, // Always fetch fresh — this is public-facing content
+  });
+
+  const totalPages = Math.ceil(allScholarships.length / ITEMS_PER_PAGE);
+  const scholarships = allScholarships.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const goToPage = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -110,7 +130,7 @@ const ScholarshipsPage = () => {
                       </div>
 
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {scholarship.tags.map(tag => (
+                        {(scholarship.tags || []).map(tag => (
                           <span key={tag} className="text-xs bg-slate-50 text-slate-500 px-2 py-1 rounded border border-slate-100">
                             {tag}
                           </span>
@@ -127,12 +147,46 @@ const ScholarshipsPage = () => {
             </div>
             )}
             
-            <div className="mt-12 text-center">
-              <Button size="lg" className="bg-primary hover:bg-primary-dark text-white">
-                <BookOpen className="mr-2 h-4 w-4" />
-                {t('scholarships_page.view_all')}
-              </Button>
-            </div>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-12 flex items-center justify-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="border-slate-200 text-slate-600 hover:border-primary hover:text-primary disabled:opacity-40"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => goToPage(page)}
+                    className={
+                      currentPage === page
+                        ? 'bg-primary text-white border-primary hover:bg-primary/90 min-w-[36px]'
+                        : 'border-slate-200 text-slate-600 hover:border-primary hover:text-primary min-w-[36px]'
+                    }
+                  >
+                    {page}
+                  </Button>
+                ))}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="border-slate-200 text-slate-600 hover:border-primary hover:text-primary disabled:opacity-40"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         </section>
 

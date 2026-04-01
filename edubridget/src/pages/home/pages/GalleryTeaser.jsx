@@ -2,12 +2,19 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, MapPin, GraduationCap } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { MOCK_MEDIA } from "@/data/mockData";
-
-const preview = MOCK_MEDIA.slice(0, 6);
+import { useQuery } from "@tanstack/react-query";
+import { mediaService } from "@/services/cmsService";
 
 export default function GalleryTeaser() {
   const { t } = useTranslation();
+
+  const { data: allMedia = [], isLoading } = useQuery({
+    queryKey: ['media'],
+    queryFn: mediaService.getAll,
+    staleTime: 0,
+  });
+
+  const preview = allMedia.slice(0, 6);
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,7 +48,15 @@ export default function GalleryTeaser() {
 
         {/* Masonry grid */}
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-5">
-          {preview.map((item, i) => (
+          {/* Loading skeleton */}
+          {isLoading && Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="break-inside-avoid mb-5">
+              <div className="rounded-2xl bg-slate-200 animate-pulse" style={{ height: i % 2 === 0 ? '220px' : '300px' }} />
+            </div>
+          ))}
+
+          {/* Live Firestore items */}
+          {!isLoading && preview.map((item, i) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, y: 30 }}

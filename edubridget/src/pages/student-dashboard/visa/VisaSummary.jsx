@@ -1,14 +1,5 @@
 // ─────────────────────────────────────────────────────────────
 //  src/pages/dashboard/VisaSummary.jsx
-//
-//  BEFORE vs AFTER:
-//  Before: had its own getStatusColor(), getStatusIcon(),
-//          getCurrentUserConsultations() call, inline loading state.
-//  After:  zero data logic — just imports hook + badge and renders.
-//
-//  This file's only job: describe what the student dashboard
-//  LOOKS LIKE. Not what data looks like, not how it's fetched.
-// ─────────────────────────────────────────────────────────────
 
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -43,7 +34,6 @@ export default function VisaSummary() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 max-w-7xl mx-auto pb-12">
-
       {/* Header */}
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-serif text-slate-900 tracking-tight">
@@ -83,8 +73,7 @@ export default function VisaSummary() {
               </div>
               <Badge
                 variant="secondary"
-                className="bg-slate-100 text-slate-600 font-normal text-[10px] px-1.5 py-0 h-5"
-              >
+                className="bg-slate-100 text-slate-600 font-normal text-[10px] px-1.5 py-0 h-5">
                 Most Recent
               </Badge>
             </div>
@@ -108,8 +97,7 @@ export default function VisaSummary() {
           <Button
             onClick={() => navigate("/dashboard/visa-status/request")}
             size="sm"
-            className="bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium h-9 gap-2"
-          >
+            className="bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium h-9 gap-2">
             <Plus size={14} />
             New Request
           </Button>
@@ -140,8 +128,7 @@ export default function VisaSummary() {
             <Button
               onClick={() => navigate("/dashboard/visa-status/request")}
               size="sm"
-              className="mt-4 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm text-xs h-8"
-            >
+              className="mt-4 bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm text-xs h-8">
               <Plus size={14} className="mr-1.5" />
               Start Request
             </Button>
@@ -177,10 +164,11 @@ export default function VisaSummary() {
                     <tr
                       key={req.id}
                       onClick={() =>
-                        navigate(`/dashboard/visa-status/summary/details/${req.id}`)
+                        navigate(
+                          `/dashboard/visa-status/summary/details/${req.id}`,
+                        )
                       }
-                      className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
-                    >
+                      className="hover:bg-slate-50/50 transition-colors group cursor-pointer">
                       {/* Destination */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -225,12 +213,11 @@ export default function VisaSummary() {
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(
-                              `/dashboard/visa-status/summary/details/${req.id}`
+                              `/dashboard/visa-status/summary/details/${req.id}`,
                             );
                           }}
                           className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                          title="View Details"
-                        >
+                          title="View Details">
                           <Eye size={16} />
                         </button>
                       </td>
