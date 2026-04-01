@@ -59,6 +59,15 @@
   [headers.values]
     Cache-Control = "public, max-age=604800"
 
+# Storage proxy: forwards /storage-proxy/* to Firebase Storage bucket.
+# Allows fetch()-based downloads without CORS headers on the bucket.
+# Must come BEFORE the SPA catch-all below.
+[[redirects]]
+  from = "/storage-proxy/*"
+  to = "https://firebasestorage.googleapis.com/v0/b/edubridge-5da54.firebasestorage.app/o/:splat"
+  status = 200
+  force = true
+
 # Redirects for SPA routing
 [[redirects]]
   from = "/*"

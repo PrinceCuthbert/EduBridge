@@ -2,13 +2,15 @@
 //  src/hooks/useAdminVisaCases.js
 //
 //  WHO USES THIS: admin pages only.
-//  (VisaCases.jsx, VisaCaseDetail.jsx)
+//  (VisaCases.jsx)
 //
-//  This hook exposes every admin operation.
-//  Student hook (useVisaConsultations) does NOT have these.
+//  Migrated from useState/useEffect to React Query.
+//  Same public API as before — call sites unchanged.
+//
+//  Query key: ["visaCases"]
 // ─────────────────────────────────────────────────────────────
 
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getVisaRequests,
   createVisaRequest,
@@ -18,91 +20,93 @@ import {
   deleteVisaRequest,
 } from "../services/visaService";
 
-/**
- * Returns:
- *   cases            - all visa requests across all students
- *   loading          - true while fetching
- *   error            - error string or null
- *   fetchCases       - manual refetch
- *   addCase          - admin creates a case manually
- *   setStatus        - update status only
- *   setFee           - record fee + payment status
- *   setSchedule      - set appointment date/time/link
- *   removeCase       - delete a case
- */
 export const useAdminVisaCases = () => {
-  const [cases, setCases] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
+  const queryKey = ["visaCases"];
 
-  // ── Fetch all ─────────────────────────────────────────────
-  const fetchCases = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getVisaRequests();
-      setCases(data);
-    } catch (err) {
-      setError("Failed to load cases.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // ── Fetch all cases ───────────────────────────────────────
+  const {
+    data: cases = [],
+    isLoading: loading,
+    error: queryError,
+    refetch: fetchCases,
+  } = useQuery({
+    queryKey,
+    queryFn: getVisaRequests,
+  });
 
-  useEffect(() => {
-    fetchCases();
-  }, [fetchCases]);
+  const error = queryError ? "Failed to load cases." : null;
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey });
 
   // ── Admin creates a case manually ─────────────────────────
+  const addCaseMutation = useMutation({
+    mutationFn: (formData) =>
+      createVisaRequest(formData, formData.userId ?? "admin_created"),
+    onSuccess: invalidate,
+  });
+
   const addCase = async (formData) => {
     try {
-      const created = await createVisaRequest(formData, formData.userId ?? "admin_created");
-      setCases((prev) => [...prev, created]);
-      return created;
-    } catch (err) {
+      return await addCaseMutation.mutateAsync(formData);
+    } catch {
       throw new Error("Failed to add case.");
     }
   };
 
   // ── Update status only ────────────────────────────────────
+  const statusMutation = useMutation({
+    mutationFn: ({ id, status }) => updateVisaStatus(id, status),
+    onSuccess: invalidate,
+  });
+
   const setStatus = async (id, status) => {
     try {
-      const updated = await updateVisaStatus(id, status);
-      setCases((prev) => prev.map((c) => (c.id === id ? updated : c)));
-      return updated;
-    } catch (err) {
+      return await statusMutation.mutateAsync({ id, status });
+    } catch {
       throw new Error("Failed to update status.");
     }
   };
 
   // ── Record fee ────────────────────────────────────────────
+  const feeMutation = useMutation({
+    mutationFn: ({ id, consultationFee, feeStatus }) =>
+      updateVisaFee(id, consultationFee, feeStatus),
+    onSuccess: invalidate,
+  });
+
   const setFee = async (id, consultationFee, feeStatus) => {
     try {
-      const updated = await updateVisaFee(id, consultationFee, feeStatus);
-      setCases((prev) => prev.map((c) => (c.id === id ? updated : c)));
-      return updated;
-    } catch (err) {
+      return await feeMutation.mutateAsync({ id, consultationFee, feeStatus });
+    } catch {
       throw new Error("Failed to update fee.");
     }
   };
 
   // ── Schedule meeting ──────────────────────────────────────
+  const scheduleMutation = useMutation({
+    mutationFn: ({ id, schedule }) => updateVisaSchedule(id, schedule),
+    onSuccess: invalidate,
+  });
+
   const setSchedule = async (id, schedule) => {
     try {
-      const updated = await updateVisaSchedule(id, schedule);
-      setCases((prev) => prev.map((c) => (c.id === id ? updated : c)));
-      return updated;
-    } catch (err) {
+      return await scheduleMutation.mutateAsync({ id, schedule });
+    } catch {
       throw new Error("Failed to save schedule.");
     }
   };
 
   // ── Delete case ───────────────────────────────────────────
+  const removeMutation = useMutation({
+    mutationFn: (id) => deleteVisaRequest(id),
+    onSuccess: invalidate,
+  });
+
   const removeCase = async (id) => {
     try {
-      await deleteVisaRequest(id);
-      setCases((prev) => prev.filter((c) => c.id !== id));
-    } catch (err) {
+      await removeMutation.mutateAsync(id);
+    } catch {
       throw new Error("Failed to delete case.");
     }
   };

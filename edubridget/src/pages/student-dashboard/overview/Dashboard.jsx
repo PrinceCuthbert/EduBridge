@@ -1,8 +1,10 @@
 ﻿import React, { useMemo } from 'react';
-import { FileText, Plane, BookOpen, Globe, User, PlusCircle, ArrowRight, BarChart3 } from 'lucide-react';
+import { FileText, Plane, BookOpen, Globe, User, PlusCircle, ArrowRight, BarChart3, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useApplications } from '../../../hooks/useApplications';
+import StatusBadge from '../../../components/shared/StatusBadge';
+import { formatDate } from '../../../utils/formatDate';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -10,6 +12,12 @@ export default function Dashboard() {
 
   const pendingCount  = useMemo(() => applications.filter(a => a.status === 'Pending').length, [applications]);
   const approvedCount = useMemo(() => applications.filter(a => a.status === 'Approved').length, [applications]);
+
+  const recentApplications = useMemo(() =>
+    [...applications]
+      .sort((a, b) => new Date(b.submissionDate) - new Date(a.submissionDate))
+      .slice(0, 4),
+  [applications]);
 
   const stats = [
     { label: "Total Applications", value: applications.length, icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
@@ -85,18 +93,41 @@ export default function Dashboard() {
               <Link to="/dashboard/applications" className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline">View All</Link>
             </div>
             
-            {/* Empty State */}
-            <div className="flex-1 flex flex-col items-center justify-center py-8 text-center border-t border-dashed border-slate-100">
-              <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-3 text-slate-300">
-                <FileText size={24} />
+            {recentApplications.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center py-8 text-center border-t border-dashed border-slate-100">
+                <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-3 text-slate-300">
+                  <FileText size={24} />
+                </div>
+                <h4 className="text-slate-900 font-medium text-sm mb-1">No applications yet</h4>
+                <p className="text-slate-500 text-xs max-w-xs leading-relaxed">Applications will appear here once you start applying to university programs.</p>
+                <Link to="/dashboard/programs" className="mt-4 px-4 py-2 bg-slate-900 text-white text-xs font-medium rounded-lg hover:bg-slate-800 transition-colors">
+                  Start Application
+                </Link>
               </div>
-              <h4 className="text-slate-900 font-medium text-sm mb-1">No applications yet</h4>
-              <p className="text-slate-500 text-xs max-w-xs leading-relaxed">Applications will appear here once you start applying to university programs.</p>
-              
-              <Link to="/dashboard/programs" className="mt-4 px-4 py-2 bg-slate-900 text-white text-xs font-medium rounded-lg hover:bg-slate-800 transition-colors">
-                Start Application
-              </Link>
-            </div>
+            ) : (
+              <div className="divide-y divide-slate-100 border-t border-slate-100">
+                {recentApplications.map((app) => (
+                  <Link
+                    key={app.trackerId}
+                    to={`/dashboard/applications/${app.trackerId}`}
+                    className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
+                        {app.programDetails?.universityName}
+                      </p>
+                      <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                        <Clock size={11} /> {formatDate(app.submissionDate)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <StatusBadge status={app.status} />
+                      <ArrowRight size={14} className="text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Study Abroad Progress */}

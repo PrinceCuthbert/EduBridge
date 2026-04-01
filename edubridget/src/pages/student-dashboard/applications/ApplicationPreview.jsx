@@ -1,11 +1,14 @@
-﻿// src/pages/student-dashboard/applications/ApplicationPreview.jsx
+// src/pages/student-dashboard/applications/ApplicationPreview.jsx
 // Student read-only view of a single application
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Download,
+  Eye,
+  X,
+  Loader2,
   Mail,
   Phone,
   Calendar,
@@ -15,8 +18,24 @@ import {
   Circle,
   Clock,
 } from "lucide-react";
+import mammoth from "mammoth";
+import { toast } from "sonner";
 import { useApplications } from "../../../hooks/useApplications";
 import StatusBadge from "../../../components/shared/StatusBadge";
+
+// ─── Proxy URL Helper ─────────────────────────────────────────────────────────
+// Rewrites a Firebase Storage download URL to go through the local/Netlify proxy
+// so the browser sees a same-origin request — no CORS headers needed on the bucket.
+function toProxyUrl(downloadUrl) {
+  try {
+    const url = new URL(downloadUrl);
+    const match = url.pathname.match(/\/o\/(.+)$/);
+    if (!match) return downloadUrl;
+    return `/storage-proxy/${match[1]}${url.search}`;
+  } catch {
+    return downloadUrl;
+  }
+}
 
 // ─── Tracker Stage Progress ───────────────────────────────────────────────────
 
@@ -127,12 +146,73 @@ function formatFileSize(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+const DIRECT_PREVIEW = [".pdf", ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"];
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function ApplicationPreview() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { singleApplication: app, loading } = useApplications({ trackerId: id });
+
+  // type: "pdf" | "image" | "docx" | null
+  const CLOSE_PREVIEW = { open: false, type: null, url: "", html: "", name: "", loading: false };
+  const [filePreview, setFilePreview] = useState(CLOSE_PREVIEW);
+
+  const handleDownload = async (doc) => {
+    try {
+      // Fetch via proxy — same-origin, no CORS block
+      const res = await fetch(toProxyUrl(doc.url));
+      if (!res.ok) throw new Error("fetch failed");
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = doc.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      window.open(doc.url, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const handlePreview = async (doc) => {
+    const name = doc.name?.toLowerCase() ?? "";
+
+    // PDF — render in iframe via proxy
+    if (name.endsWith(".pdf")) {
+      setFilePreview({ open: true, type: "pdf", url: toProxyUrl(doc.url), html: "", name: doc.name, loading: false });
+      return;
+    }
+
+    // Images — render via <img> (img src never blocked by CORS)
+    if ([".jpg",".jpeg",".png",".gif",".webp",".svg"].some((ext) => name.endsWith(ext))) {
+      setFilePreview({ open: true, type: "image", url: doc.url, html: "", name: doc.name, loading: false });
+      return;
+    }
+
+    // DOCX — mammoth conversion via proxy
+    if (name.endsWith(".docx") || name.endsWith(".doc")) {
+      setFilePreview({ open: true, type: "docx", url: "", html: "", name: doc.name, loading: true });
+      try {
+        const res = await fetch(toProxyUrl(doc.url));
+        const arrayBuffer = await res.arrayBuffer();
+        const { value: html } = await mammoth.convertToHtml({ arrayBuffer });
+        setFilePreview({ open: true, type: "docx", url: "", html, name: doc.name, loading: false });
+      } catch {
+        setFilePreview(CLOSE_PREVIEW);
+        toast.error("Could not preview — downloading instead.");
+        handleDownload(doc);
+      }
+      return;
+    }
+
+    // Everything else — download
+    toast.info("This file type can't be previewed — downloading instead.");
+    handleDownload(doc);
+  };
 
   if (loading) {
     return (
@@ -180,6 +260,7 @@ export default function ApplicationPreview() {
     (applicant.firstName?.[0] ?? "") + (applicant.lastName?.[0] ?? "");
 
   return (
+    <>
     <div className="max-w-3xl mx-auto space-y-5 pb-16 animate-in fade-in duration-500">
       {/* ── Back + Breadcrumb ── */}
       <div className="flex items-center gap-2">
@@ -365,13 +446,22 @@ export default function ApplicationPreview() {
                     </div>
                   </div>
                   {doc.url ? (
-                    <a
-                      href={doc.url}
-                      download={doc.name}
-                      className="ml-2 p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-100 rounded-md transition-colors shrink-0"
-                      title="Download">
-                      <Download size={14} />
-                    </a>
+                    <div className="flex items-center gap-1 ml-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handlePreview(doc)}
+                        className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
+                        title="Preview">
+                        <Eye size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDownload(doc)}
+                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-100 rounded-md transition-colors"
+                        title="Download">
+                        <Download size={14} />
+                      </button>
+                    </div>
                   ) : (
                     <span className="ml-2 p-1.5 text-slate-200 shrink-0 cursor-not-allowed">
                       <Download size={14} />
@@ -384,5 +474,57 @@ export default function ApplicationPreview() {
         )}
       </div>
     </div>
+
+    {/* File Preview Modal — pdf / image / docx */}
+    {filePreview.open && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+        onClick={() => setFilePreview(CLOSE_PREVIEW)}>
+        <div
+          className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
+          onClick={(e) => e.stopPropagation()}>
+
+          {/* Modal header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 shrink-0">
+            <p className="font-semibold text-slate-900 truncate pr-4">{filePreview.name}</p>
+            <button
+              onClick={() => setFilePreview(CLOSE_PREVIEW)}
+              className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors shrink-0">
+              <X size={18} className="text-slate-500" />
+            </button>
+          </div>
+
+          {/* Modal body */}
+          {filePreview.loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 size={32} className="animate-spin text-slate-400" />
+            </div>
+          ) : filePreview.type === "pdf" ? (
+            <iframe
+              src={filePreview.url}
+              title={filePreview.name}
+              className="w-full flex-1 border-0"
+              style={{ minHeight: "70vh" }}
+            />
+          ) : filePreview.type === "image" ? (
+            <div className="overflow-auto p-6 flex items-center justify-center">
+              <img
+                src={filePreview.url}
+                alt={filePreview.name}
+                className="max-w-full max-h-[72vh] object-contain rounded-lg shadow"
+              />
+            </div>
+          ) : (
+            <div className="overflow-y-auto p-6">
+              <div
+                className="prose prose-slate max-w-none text-sm"
+                dangerouslySetInnerHTML={{ __html: filePreview.html }}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+    </>
   );
 }

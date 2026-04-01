@@ -277,45 +277,61 @@ export function ProgramTimeline({ timeline }) {
 export function ProgramTuitionFees({ tuitionFees }) {
   if (!tuitionFees || tuitionFees.length === 0) return null;
 
-  // Group by level
-  const grouped = tuitionFees.reduce((acc, row) => {
-    if (!acc[row.level]) acc[row.level] = [];
-    acc[row.level].push(row);
-    return acc;
-  }, {});
-
   return (
     <section>
       <SectionHeader icon={Banknote} title="Tuition Fees" />
 
-      <div className="space-y-3">
-        {Object.entries(grouped).map(([level, rows]) => (
-          <div
-            key={level}
-            className="border border-slate-200 rounded-xl overflow-hidden">
-            {/* Level badge header */}
+      <div className="space-y-6">
+        {tuitionFees.map((group, gIdx) => (
+          <div key={gIdx} className="border border-slate-200 rounded-xl overflow-hidden">
+            {/* Group header */}
             <div className="px-4 py-2.5 bg-gradient-to-r from-slate-50 to-white border-b border-slate-200 flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 uppercase tracking-wider">
-                <GraduationCap size={12} className="text-blue-500" />
-                {level}
+              <GraduationCap size={13} className="text-blue-500 shrink-0" />
+              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                {group.groupName || "Fee Group"}
               </span>
+              {group.currency && (
+                <span className="ml-auto text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                  {group.currency}
+                </span>
+              )}
             </div>
-            <table className="w-full text-sm">
-              <tbody className="divide-y divide-slate-100">
-                {rows.map((row, idx) => (
-                  <tr
-                    key={idx}
-                    className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-4 py-3 text-slate-600">{row.item}</td>
-                    <td className="px-4 py-3 text-slate-900 font-bold text-right tabular-nums">
-                      {typeof row.amount === "number"
-                        ? `${row.amount.toLocaleString()} ${row.currency ?? ""}`
-                        : row.amount}
-                    </td>
+
+            {/* Matrix table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100">
+                    <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 w-1/3">
+                      Item
+                    </th>
+                    {(group.columns || []).map((col, cIdx) => (
+                      <th
+                        key={cIdx}
+                        className="px-4 py-2.5 text-right text-xs font-semibold text-slate-500 whitespace-nowrap">
+                        {col}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {(group.rows || []).map((row, rIdx) => (
+                    <tr key={rIdx} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-4 py-3 text-slate-600">{row.item}</td>
+                      {(row.amounts || []).map((amt, aIdx) => (
+                        <td
+                          key={aIdx}
+                          className="px-4 py-3 text-slate-900 font-bold text-right tabular-nums whitespace-nowrap">
+                          {isNaN(Number(amt))
+                            ? amt
+                            : `${Number(amt).toLocaleString()} ${group.currency ?? ""}`}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         ))}
       </div>

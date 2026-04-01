@@ -29,6 +29,7 @@ import {
   FileText,
   Download,
   Search,
+  DollarSign,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -110,6 +111,7 @@ export default function VisaCases() {
     meetingType: "Zoom",
     meetingLink: "",
   });
+  const [feeData, setFeeData] = useState({ consultationFee: "", feeStatus: "Unpaid" });
   const [savingStatus, setSavingStatus] = useState(null);
 
   // ── Stats (derived from cases, not stored in state) ──────
@@ -182,6 +184,10 @@ export default function VisaCases() {
       meetingType: caseItem.meetingType ?? "Zoom",
       meetingLink: caseItem.meetingLink ?? "",
     });
+    setFeeData({
+      consultationFee: caseItem.consultationFee ?? "",
+      feeStatus: caseItem.feeStatus ?? "Unpaid",
+    });
     setIsDetailsOpen(true);
   };
 
@@ -236,6 +242,17 @@ export default function VisaCases() {
       });
       setSelectedCase(updated);
       toast.success("Meeting scheduled. Student will see the join link.");
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const handleSaveFee = async () => {
+    if (!selectedCase) return;
+    try {
+      const updated = await setFee(selectedCase.id, feeData.consultationFee, feeData.feeStatus);
+      setSelectedCase(updated);
+      toast.success("Fee updated.");
     } catch (err) {
       toast.error(err.message);
     }
@@ -673,6 +690,53 @@ export default function VisaCases() {
               </div>
             </div>
 
+            {/* Fee management */}
+            <div className="bg-emerald-50/50 border border-emerald-100 p-5 rounded-xl space-y-4">
+              <div className="flex items-center gap-2">
+                <DollarSign size={18} className="text-emerald-600" />
+                <h4 className="text-sm font-bold text-slate-900">Consultation Fee</h4>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-700">Amount</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. $150"
+                    value={feeData.consultationFee}
+                    onChange={(e) => setFeeData({ ...feeData, consultationFee: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-emerald-500"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-700">Payment Status</label>
+                  <div className="flex gap-2">
+                    {["Unpaid", "Paid"].map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setFeeData({ ...feeData, feeStatus: s })}
+                        className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all border ${
+                          feeData.feeStatus === s
+                            ? s === "Paid"
+                              ? "bg-emerald-600 text-white border-emerald-600"
+                              : "bg-amber-500 text-white border-amber-500"
+                            : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                        }`}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end pt-1">
+                <button
+                  onClick={handleSaveFee}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                  Save Fee
+                </button>
+              </div>
+            </div>
+
             {/* Scheduler */}
             <div className="bg-blue-50/50 border border-blue-100 p-5 rounded-xl space-y-4">
               <div className="flex items-center gap-2">
@@ -777,6 +841,62 @@ export default function VisaCases() {
                 </button>
               </div>
             </div>
+
+            {/* Documents */}
+            {(selectedCase.documents ?? []).length > 0 && (
+              <div className="space-y-3">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Submitted Documents ({selectedCase.documents.length})
+                </p>
+                <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                  {selectedCase.documents.map((doc) => (
+                    <div
+                      key={doc.id}
+                      className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="p-1.5 bg-slate-50 text-slate-400 rounded-lg shrink-0">
+                          <FileText size={14} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-slate-900 truncate">{doc.name}</p>
+                          <p className="text-[10px] text-slate-400">
+                            {doc.size ? `${(doc.size / 1024).toFixed(1)} KB` : ""}
+                            {doc.size && doc.status ? " • " : ""}
+                            {doc.status}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0 ml-2 border-l border-slate-100 pl-2">
+                        <button
+                          onClick={() => window.open(doc.url, "_blank", "noopener,noreferrer")}
+                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Preview">
+                          <Eye size={14} />
+                        </button>
+                        <button
+                          onClick={async () => {
+                            try {
+                              const res = await fetch(doc.url);
+                              const blob = await res.blob();
+                              const a = document.createElement("a");
+                              a.href = URL.createObjectURL(blob);
+                              a.download = doc.name;
+                              a.click();
+                              URL.revokeObjectURL(a.href);
+                            } catch {
+                              window.open(doc.url, "_blank", "noopener,noreferrer");
+                            }
+                          }}
+                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Download">
+                          <Download size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <button
               onClick={() => setIsDetailsOpen(false)}

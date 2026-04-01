@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useState } from "react";
 import {
   Plus,
   Building,
@@ -44,19 +44,27 @@ export default function BranchManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [formData, setFormData] = useState(initialFormState);
 
-  const { branches, isLoading, isError, createBranch } = useBranches();
+  const {
+    branches,
+    isLoading,
+    isError,
+    submitting,
+    createBranch,
+    updateBranch,
+    deleteBranch,
+  } = useBranches();
 
   const stats = [
     {
       label: "Active Centers",
-      value: branches.filter((b) => b.status == true).length,
+      value: branches.filter((b) => b.status === "Active").length,
       icon: Building,
       color: "text-blue-600",
       bg: "bg-blue-50",
     },
     {
       label: "Total Staff",
-      value: branches.reduce((sum, b) => sum + b.staffCount, 0),
+      value: branches.reduce((sum, b) => sum + (b.staff || 0), 0),
       icon: Users,
       color: "text-indigo-600",
       bg: "bg-indigo-50",
@@ -162,8 +170,7 @@ export default function BranchManagement() {
               // CHANGED: rounded-3xl -> rounded-xl, simplified border/shadow
               <div
                 key={branch.id}
-                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden group"
-              >
+                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden group">
                 {/* Status Badge */}
                 <div className="absolute top-4 right-4">
                   <span
@@ -171,8 +178,7 @@ export default function BranchManagement() {
                       branch.status == true
                         ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                         : "bg-amber-50 text-amber-700 border-amber-200"
-                    }`}
-                  >
+                    }`}>
                     {branch.status ? "Active" : "Coming Soon"}
                   </span>
                 </div>
@@ -226,7 +232,7 @@ export default function BranchManagement() {
                         <Users size={14} />
                       </div>
                       <span className="text-sm text-slate-700">
-                        {branch.staffCount} Staff Members
+                        {`${branch.staff ?? 0} Staff Member${branch.staff === 1 ? "" : "s"}`}
                       </span>
                     </div>
                   </div>
@@ -254,15 +260,13 @@ export default function BranchManagement() {
                     <button
                       onClick={() => handleEditBranch(branch)}
                       className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="Edit"
-                    >
+                      title="Edit">
                       <Edit size={16} />
                     </button>
                     <button
                       onClick={() => handleDeleteBranch(branch.id, branch.name)}
                       className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete"
-                    >
+                      title="Delete">
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -275,8 +279,7 @@ export default function BranchManagement() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingBranch ? "Edit Branch" : "Register Branch"}
-        size="lg"
-      >
+        size="lg">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* OPERATIONAL INFO */}
           <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
@@ -286,8 +289,7 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-name"
-                className="text-sm font-medium text-slate-700"
-              >
+                className="text-sm font-medium text-slate-700">
                 Branch Name
               </label>
               <input
@@ -305,8 +307,7 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-location"
-                className="text-sm font-medium text-slate-700"
-              >
+                className="text-sm font-medium text-slate-700">
                 Location
               </label>
               <input
@@ -325,8 +326,7 @@ export default function BranchManagement() {
             <div className="md:col-span-2 space-y-1.5">
               <label
                 htmlFor="branch-address"
-                className="text-sm font-medium text-slate-700"
-              >
+                className="text-sm font-medium text-slate-700">
                 Address
               </label>
               <input
@@ -345,8 +345,7 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-phone"
-                className="text-sm font-medium text-slate-700"
-              >
+                className="text-sm font-medium text-slate-700">
                 Phone
               </label>
               <input
@@ -363,8 +362,7 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-email"
-                className="text-sm font-medium text-slate-700"
-              >
+                className="text-sm font-medium text-slate-700">
                 Email
               </label>
               <input
@@ -382,8 +380,7 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-hours"
-                className="text-sm font-medium text-slate-700"
-              >
+                className="text-sm font-medium text-slate-700">
                 Hours
               </label>
               <input
@@ -402,8 +399,7 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-staff"
-                className="text-sm font-medium text-slate-700"
-              >
+                className="text-sm font-medium text-slate-700">
                 Staff Count
               </label>
               <input
@@ -425,8 +421,7 @@ export default function BranchManagement() {
             <div className="space-y-1.5">
               <label
                 htmlFor="branch-status"
-                className="text-sm font-medium text-slate-700"
-              >
+                className="text-sm font-medium text-slate-700">
                 Status
               </label>
               <select
@@ -436,8 +431,7 @@ export default function BranchManagement() {
                 onChange={(e) =>
                   setFormData({ ...formData, status: e.target.value })
                 }
-                className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none"
-              >
+                className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none">
                 <option value="Active">Active</option>
                 <option value="Coming Soon">Coming Soon</option>
                 <option value="Closed">Closed</option>
@@ -447,8 +441,7 @@ export default function BranchManagement() {
             <div className="md:col-span-2 space-y-1.5">
               <label
                 htmlFor="branch-manager"
-                className="text-sm font-medium text-slate-700"
-              >
+                className="text-sm font-medium text-slate-700">
                 Branch Manager
               </label>
               <input
@@ -522,8 +515,7 @@ export default function BranchManagement() {
               />
               <label
                 htmlFor="isHeadOffice"
-                className="text-sm font-medium text-slate-700"
-              >
+                className="text-sm font-medium text-slate-700">
                 Mark as Head Office
               </label>
             </div>
@@ -594,14 +586,12 @@ export default function BranchManagement() {
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
-            >
+              className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm"
-            >
+              className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm">
               {editingBranch ? "Save Changes" : "Register Branch"}
             </button>
           </div>

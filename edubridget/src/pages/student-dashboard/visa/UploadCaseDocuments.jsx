@@ -17,20 +17,14 @@ import { getCountryFlag } from "@/data/mockVisaData";
 import {
   getVisaRequestById,
   addDocumentsToVisaRequest,
+  uploadVisaDocument,
 } from "@/services/visaService";
-
-// Convert a File object to a base64 data URL (same helper as ApplicationSubmitForm)
-const fileToBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
-    reader.readAsDataURL(file);
-  });
+import { useAuth } from "@/context/AuthContext";
 
 export default function UploadCaseDocuments() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [caseData, setCaseData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -65,35 +59,7 @@ export default function UploadCaseDocuments() {
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
-
-    const validFiles = files.filter((file) => {
-      const validTypes = [
-        "application/pdf",
-        "image/jpeg",
-        "image/png",
-        "image/jpg",
-      ];
-      if (!validTypes.includes(file.type)) {
-        toast.error(
-          `${file.name} is not a valid file type. Only PDF, JPG, and PNG are allowed.`,
-        );
-        return false;
-      }
-
-      // Keep files small enough to fit in localStorage (base64 adds ~33% overhead).
-      // 2MB raw → ~2.7MB base64 — safe for most sessions.
-      const maxSize = 2 * 1024 * 1024; // 2MB
-      if (file.size > maxSize) {
-        toast.error(`${file.name} is too large. Maximum file size is 2MB.`, {
-          description: "Files are stored in your browser — keep them small.",
-        });
-        return false;
-      }
-
-      return true;
-    });
-
-    setSelectedFiles((prevFiles) => [...prevFiles, ...validFiles]);
+    setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
   };
 
   const removeFile = (index) => {
@@ -119,15 +85,15 @@ export default function UploadCaseDocuments() {
     try {
       setUploading(true);
 
-      // Encode every file as a base64 data URL so it persists in localStorage
-      // and is readable by any session (e.g. admin) — same pattern as ApplicationSubmitForm.
+      // Upload each file to Firebase Storage and build document objects
+      // with download URLs — same pattern as ApplicationSubmitForm.jsx.
       const newDocuments = await Promise.all(
         selectedFiles.map(async (file) => ({
-          id: `vdoc-${Date.now()}-${Math.random()}`,
+          id: `vdoc-${Date.now()}-${Math.random().toString(36).slice(2)}`,
           name: file.name,
           type: file.type,
           size: file.size,
-          url: await fileToBase64(file),
+          url: await uploadVisaDocument(file, user?.id),
           uploadedAt: new Date().toISOString(),
           status: "Received",
         })),
@@ -247,7 +213,7 @@ export default function UploadCaseDocuments() {
                       Click to upload or drag and drop
                     </p>
                     <p className="text-xs text-slate-400">
-                      PDF, JPG, PNG up to 2MB
+                      All file types accepted
                     </p>
                   </label>
                 </div>
