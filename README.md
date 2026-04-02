@@ -1,6 +1,6 @@
-# 🌉 TMEDUBRIDGE
+# 🌉 EduBridge
 
-> **EduBridge** is my flagship project, designed to transform access to learning for students around the world. It’s not just an app—it's a mission. From global resources to real-time classes and scholarship support, EduBridge offers a unified, beautiful experience built with modern React.js.
+> **EduBridge** is my flagship project, designed to transform access to learning for students around the world. It’s not just an app—it's a mission. From global resources to real-time classes and scholarship support, EduBridge offers a unified, beautiful experience built with modern React.js and Firebase.
 
 ---
 
@@ -12,7 +12,7 @@ Today's learners need more than just content—they need **access**, **support**
 - 🎓 Helping learners find and apply for **scholarships**, with **admin-guided support throughout the process**  
 - 💬 Enabling **real-time interaction** with teachers and administrators via live classes and messaging  
 - 🇰🇷 Offering **Korean language learning**, taught directly by the **platform’s founders**  
-- 🤝 Supporting **direct, student–lecturer and admin–student communication** for applications and research review
+- 🤝 Supporting **direct, student–lecturer and admin–student communication** for applications, visa cases, and research review
 
 EduBridge was built with the belief that **learning should be borderless**—and beautiful.
 
@@ -20,12 +20,12 @@ EduBridge was built with the belief that **learning should be borderless**—and
 
 ## 💡 My Role
 
-I led the full **frontend architecture, UI design, and integration** of EduBridge. Every interaction, every page, and every layout was carefully crafted to ensure:
+I led the full **frontend architecture, UI design, backend integration, and state management** of EduBridge. Every interaction, every page, and every scalable backend call was carefully crafted to ensure:
 
 - ✅ Intuitive navigation
 - ✅ Responsive and accessible design
-- ✅ Minimal learning curve for first-time users
-- ✅ Clean, scalable codebase
+- ✅ Real-time data syncing via Firebase
+- ✅ Clean, scalable MVVM codebase
 
 ---
 
@@ -33,54 +33,51 @@ I led the full **frontend architecture, UI design, and integration** of EduBridg
 
 | Feature | Description |
 |--------|-------------|
-| 📁 **Global Learning Hub** | Access categorized academic content from universities worldwide |
-| 🎯 **Scholarship Tracker** | Smart filters to find scholarships by country, field, and eligibility |
-| 🧑‍💼 **Admin–User Application Support** | Admins communicate directly with users to assist in scholarship applications, academic research review, and institutional matching |
+| 📁 **Universal Document Previewer** | Natively renders PDFs, DOCX, and image files safely within the app using proxied storage buckets. |
+| 🎯 **Visa & Scholarship Tracking** | Complete pipeline to track scholarships and visa cases via admin-dashboard and student portals. |
+| 🧑‍💼 **Admin & Student Portals** | Role-based architecture. Admins communicate directly with users to assist in scholarship applications. |
 | 📺 **Live Class Interface** | WebRTC/WebSockets-enabled virtual classroom with real-time tools |
 | 🧠 **Korean Learning Module** | Taught directly by platform owners; includes gamified lessons, audio, quizzes, and certification readiness |
 | 💬 **Chat & Notifications** | Real-time messaging with file sharing and announcement system |
-| 📊 **Progress Dashboard** | Track learning goals, completion rates, and class history |
+| 📊 **Dynamic Data Dashboards** | Full global CMS integrations for blogs, scholarships, applications, and financial analytics. |
 
 ---
 
-## 🛠️ Tech Stack (Frontend-Oriented)
+## 🛠️ Tech Stack (Full-Stack Architecture)
 
-- ⚛️ **React.js** – Component-based SPA with hooks (useState, useEffect, useContext)
-- 🎨 **HTML5 & CSS3** – Semantic markup, clean layout, and scalable stylesheets
-- 📱 **Responsive Design** – Fully mobile-first with Flexbox/Grid
-- 🔌 **REST API Integration** – Async data flow with Axios
-- 🔄 **Real-Time Support** – WebSockets & WebRTC for live classes and messaging
-- ⚙️ **Developer Tools** – Vite (or CRA), ESLint, Prettier, Git, GitHub
+- ⚛️ **React.js** – Component-based SPA with custom hooks.
+- 🔥 **Firebase Suite** – Complete backend integration (Authentication, live Firestore CRUD, Firebase Storage uploads).
+- 🔄 **TanStack React Query** – Advanced global server state management, caching, and optimistic UI updates.
+- 🎨 **TailwindCSS & Framer Motion** – Utility-first CSS, beautiful UI layouts, and buttery smooth animations.
+- 🔌 **REST API & Storage Proxy** – Async data flow passing through secure reverse-proxies to defeat CORS.
+- ⚙️ **Vite Framework** – Lightning fast developer tooling, bundling, and environment handling.
 
 ---
 
-## 🎯 Frontend UX Focus
+## 🎯 UX & Architectural Focus
 
 EduBridge prioritizes:
 - ✨ **Simplicity** – Clean interface with intuitive calls-to-action  
 - 📲 **Responsiveness** – Works beautifully on all screen sizes  
-- 🌗 **Theming** – Optional light/dark mode  
 - ♿ **Accessibility** – Keyboard nav, alt tags, and semantic labels  
-- 💡 **Speed** – Optimized assets, lazy loading, and minimized JS for performance
+- 💡 **Speed** – Optimized assets, staleTime caching with React Query, and minimized JS for maximum network performance.
 
 ---
 
 ## 📌 What Makes This Stand Out
 
-- ✅ Built 100% from scratch, including **UI/UX design, logic, and styling**
-- ✅ Reflects **real-world educational workflows and support systems**
-- ✅ Platform-led Korean language teaching builds **trust and authenticity**
-- ✅ Admins play an active role in guiding learners, making EduBridge **human-focused and personalized**
-- ✅ Designed with **AI recruiter algorithms and humans** in mind: accessibility, performance, clarity
+- ✅ Built 100% from scratch, including **UI/UX design, database modeling, logic, and styling**
+- ✅ Features **real-world educational workflows** like consultation fee tracking and multi-stage university applications.
+- ✅ Custom headless CMS implementation to easily drive dynamic Blog, Scholarship, and Gallery media components.
+- ✅ Designed with highly secure backend structures (Admin-only route guarding, inactive-user token expulsions, etc).
 
 ---
 
 ## 👨‍💻 Future Improvements
 
-- [ ] Add authentication and role-based dashboards (Admin, Learner, Instructor)
-- [ ] Add Firebase or Supabase for backend + real-time DB
-- [ ] Integrate payment module for premium classes
-- [ ] Expand multi-language support beyond Korean
+- [ ] Implement backend serverless functions via Firebase Cloud Functions for heavier computing triggers.
+- [ ] Expand multi-language support beyond Korean via i18n localization grids.
+- [ ] Add strict server-side Firebase Security Rules for production deployment.
 
 ---
 ## 🌟 Let’s Connect
@@ -89,13 +86,12 @@ If you're a **recruiter**, **fellow developer**, or **open-source enthusiast** l
 
 > _I don’t just build interfaces—I craft experiences._
 
-- 📫 **Email**: - 📫 **Email**: [ishimweprincecuthbert@gmail.com](https://mail.google.com/mail/?view=cm&fs=1&to=ishimweprincecuthbert@gmail.com)
-
+- 📫 **Email**: [ishimweprincecuthbert@gmail.com](https://mail.google.com/mail/?view=cm&fs=1&to=ishimweprincecuthbert@gmail.com)
 - 🐦 **Instagram**: [prince_cuthbert](https://instagram.com/prince_cuthbert)  
-- 🌐 **Portfolio**: *https://princecuthbert.netlify.app/*  
-- 📁 **Live Demo**: *Coming soon*
+- 🌐 **Portfolio**: [https://princecuthbert.netlify.app/](https://princecuthbert.netlify.app/)  
+- 📁 **Live Demo**: _Coming soon_
 
 ---
 
-_© 2025 EduBridge – Designed and developed by Ishimwe Prince Cuthbert._
+_© 2026 EduBridge – Designed and developed by Ishimwe Prince Cuthbert._
 
