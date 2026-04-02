@@ -48,9 +48,6 @@ const RoleManagement = lazy(
 const FinancialReports = lazy(
   () => import("../pages/admin-dashboard/finance/FinancialReports"),
 );
-const Analytics = lazy(
-  () => import("../pages/admin-dashboard/analytics/Analytics"),
-);
 const VisaCases = lazy(() => import("../pages/admin-dashboard/visa/VisaCases"));
 const AdminVisaCaseDetails = lazy(
   () => import("../pages/admin-dashboard/visa/AdminVisaCaseDetails"),
@@ -119,7 +116,6 @@ export default function AdminRoutes() {
         <Route path="scholarships" element={<ScholarshipManager />} />
         <Route path="branches" element={<BranchManagement />} />
         <Route path="finance" element={<FinancialReports />} />
-        {/* <Route path="analytics" element={<Analytics />} /> */}
         <Route path="communications" element={<Communications />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>

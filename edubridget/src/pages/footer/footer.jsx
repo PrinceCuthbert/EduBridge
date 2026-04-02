@@ -29,8 +29,8 @@ const Footer = () => {
   const socialLinks = t("footer.social_links", { returnObjects: true });
 
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-20 pb-10">
-      <div className="container mx-auto px-6">
+    <footer className="bg-slate-900 text-slate-300 pt-12 pb-8 sm:pt-16 md:pt-20 sm:pb-10">
+      <div className="container mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-16">
           {/* Branding Section */}
           <div className="space-y-6 md:col-span-2 lg:col-span-1">
@@ -144,15 +144,16 @@ const Footer = () => {
             <p className="text-slate-400 mb-6 leading-relaxed">
               {t("footer.newsletter.description")}
             </p>
-            <div className="relative">
+            <div className="flex flex-col gap-2 sm:block sm:relative">
               <input
                 type="email"
                 placeholder={t("footer.newsletter.placeholder")}
                 aria-label={t("footer.newsletter.placeholder")}
-                className="w-full bg-slate-800 border-none rounded-2xl py-4 px-6 focus:ring-2 focus:ring-primary transition-all text-white placeholder:text-slate-500"
+                className="w-full bg-slate-800 border-none rounded-2xl py-4 px-4 sm:px-6 sm:pr-14 focus:ring-2 focus:ring-primary transition-all text-white placeholder:text-slate-500"
               />
               <button
-                className="absolute right-2 top-2 bottom-2 bg-primary text-white rounded-xl px-4 hover:bg-primary-dark transition-all"
+                type="button"
+                className="sm:absolute sm:right-2 sm:top-1/2 sm:-translate-y-1/2 w-full sm:w-auto min-h-[44px] sm:min-h-0 flex items-center justify-center bg-primary text-white rounded-xl px-4 py-3 sm:py-0 sm:bottom-auto hover:bg-primary-dark transition-all shrink-0"
                 aria-label="Subscribe">
                 <Send size={18} />
               </button>

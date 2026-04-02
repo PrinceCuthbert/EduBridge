@@ -28,8 +28,6 @@ const ScholarshipsPage = lazy(
 const GalleryPage = lazy(() => import("../pages/gallery/GalleryPage"));
 const PartnersPage = lazy(() => import("../pages/partners/PartnersPage"));
 const BlogPage = lazy(() => import("../pages/blog/BlogPage"));
-// const CoursesPage = lazy(() => import("../pages/coursesPage/coursesPage"));
-// const MembershipPage = lazy(() => import("../pages/membership/MembershipPage"));
 const ComingSoonPage = lazy(() => import("../pages/ComingSoonPage"));
 
 export default function PublicRoutes() {
@@ -60,9 +58,6 @@ export default function PublicRoutes() {
         <Route path="blogs" element={<BlogPage />} />
         <Route path="blogs/:id" element={<BlogDetailsPage />} />
 
-        {/* Placeholders */}
-        {/* <Route path="coursesPage" element={<CoursesPage />} />
-        <Route path="membershipPage" element={<MembershipPage />} /> */}
         <Route path="coming-soon" element={<ComingSoonPage />} />
 
         {/* Auth */}

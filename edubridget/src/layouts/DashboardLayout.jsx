@@ -298,8 +298,8 @@ export default function DashboardLayout() {
                 className={isSidebarCollapsed ? "rotate-180" : ""}
               />
             </button>
-            <div className="hidden sm:flex flex-col">
-              <h2 className="text-slate-900 font-bold text-lg leading-tight">
+            <div className="flex flex-col min-w-0 flex-1 pr-2">
+              <h2 className="text-slate-900 font-bold text-sm sm:text-lg leading-tight truncate">
                 {currentNavItems.find((i) => i.path === location.pathname)
                   ?.label || "Dashboard"}
               </h2>
@@ -374,7 +374,7 @@ export default function DashboardLayout() {
         </header>
 
         {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#F8FAFC]">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 xs:p-4 sm:p-6 bg-[#F8FAFC] pb-safe">
           <div className="max-w-6xl mx-auto h-full">
             <Outlet />
           </div>
