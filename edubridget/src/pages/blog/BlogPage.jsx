@@ -6,18 +6,20 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import OptimizedImage from "@/components/OptimizedImage";
 import { useTranslation } from "react-i18next";
-import { MOCK_BLOGS } from "@/data/mockData";
+import { useBlogs } from "@/hooks/useBlogs";
 
 const ITEMS_PER_PAGE = 6;
 
 export default function BlogPage() {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const blogs = MOCK_BLOGS;
-  const loading = false;
+  const { data: rawBlogs = [], isLoading: loading } = useBlogs();
+
+  // Sort newest first
+  const blogs = [...rawBlogs].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
   // Pagination Logic
-  const totalPages = Math.ceil(blogs.length / ITEMS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(blogs.length / ITEMS_PER_PAGE));
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentBlogs = blogs.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 

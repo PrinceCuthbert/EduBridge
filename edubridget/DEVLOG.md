@@ -1,5 +1,32 @@
 # EduBridge — Developer Log
 
+
+
+## April 2, 2026 - Document Preview & Blog Migration
+**Branch:** `frontendPhaseI`
+
+Today’s session focused on resolving complex file preview behaviors and replacing the last remaining mock data flows for the public-facing content with live Firestore functionality.
+
+### 1. Avatar Image Uploads (Profile Settings)
+* Added a custom Firebase Storage upload function in `userService.js` (`uploadUserAvatar`).
+* Adjusted user interface in the Profile Settings module (`StudentSettings.jsx` and `AdminSettings.jsx`) to allow image uploads up to 10MB instead of 2MB per user request.
+* Re-syncs profile data upon uploading so that the Header reflects avatar changes in real-time.
+
+### 2. Universal Document Previewer
+* The system originally relied on inline `<iframe>` elements to bypass downloading PDFs and images inside `AdminApplicationReview` and `VisaCaseDetails`.
+* This was fundamentally flawed and led to unmaintainable logic scattered throughout.
+* **Solution**: Developed a universal, robust modal component `<DocumentPreviewModal />`.
+* **Stack**: `react-pdf` for threading PDFs natively, standard `<img>` handling for static image rendering, and `mammoth.js` stringification for `.docx` translation.
+* Wired up Firebase's storage URLs using a proxy wrapping utility (`toProxyUrl`) to safely pass CORS restrictions naturally without relying heavily on bucket infrastructure permission limits.
+* Deployed this universally to replace the inline previewing methods across Visa and Application documents simultaneously.
+
+### 3. CMS Blog Frontend Migration
+* Created a lightweight `useBlogs.js` hook utilizing TanStack React Query to fetch public blogs with a global `5-minute` staleTime to aggressively limit database calls for front-end users.
+* Cleaned out `BlogPage.jsx` logic to replace flat `MOCK_BLOGS` JSON rendering with dynamic slicing of the fetched query.
+* Transitioned `BlogDetailsPage.jsx` completely to consume the global fetch query by ID matching strings to map correctly to document identifiers inside the Firestore.
+* Dropped all remaining `.json`/mock imports, pushing the project past the 90% Firebase threshold mark.
+
+
 **Last updated:** April 1, 2026
 **Sessions:** March 16 (audit + MVC refactor) · March 17 session 2 (visa flow, document upload/preview/delete, bug fixes) · March 17 session 3 (admin visa detail page, UI polish, storage fix) · March 17 session 4 (full MVC for CMS content types, UI/UX landing page overhaul, FAQ MVC connection) · March 18 session 5 (DB alignment audit, CMS content architecture decision, hook/page cleanup, bug fixes) · March 18–19 sessions 6–8 (full DB alignment sprint, DashboardLayout consolidation, Institution DTO mapper) · March 26 session 9 (Firebase auth bug fix — UUID mismatch breaking sign-in) · March 27 session 10 (deployed domain auth fix, usernames collection refactor decision) · March 27 session 11 (applicationService Firestore migration, useApplications React Query rewrite, admin createUser secondary app fix, inactive user enforcement) · March 27 session 12 (password change, AdminApplicationReview UI polish, application edit lock, tracker enrolled lock, terminal status lock) · March 30 session 13 (branches CRUD completed on Firestore, stats card bugs fixed, progress.md report created) · March 30–31 session 16 (Firebase Storage wired up, application file uploads migrated, document preview/download overhaul, mammoth.js .docx preview, CORS solved via Vite+Netlify reverse-proxy, unified in-app file preview modal for PDF/image/docx) · March 31 session 17 (visaService full Firestore + Storage migration, React Query hooks for student/admin, fee management UI, storage proxy extended to visa docs) · April 1 session 18 (CMS Firestore migration — generic cmsService factory, useCMSManager rewrite with TanStack Query, public pages connected: scholarships pagination + gallery/teaser live data)
 

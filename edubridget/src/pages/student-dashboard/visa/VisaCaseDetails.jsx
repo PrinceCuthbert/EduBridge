@@ -26,6 +26,7 @@ import {
   deleteDocumentFromVisaRequest,
 } from "@/services/visaService";
 import VisaStatusBadge from "@/components/visa/VisaStatusBadge";
+import DocumentPreviewModal from "@/components/shared/DocumentPreviewModal";
 
 // ── Proxy URL Helper ─────────────────────────────────────────
 // Rewrites a Firebase Storage download URL to go through the
@@ -48,6 +49,7 @@ export default function VisaCaseDetails() {
   const [caseData, setCaseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [previewDoc, setPreviewDoc] = useState(null);
   const documentsPerPage = 6;
 
   useEffect(() => {
@@ -77,10 +79,8 @@ export default function VisaCaseDetails() {
     fetchCaseData();
   }, [id, navigate]);
 
-  // Preview: open file through the storage proxy in a new tab.
-  // Firebase Storage URLs are plain HTTPS — open via proxy so same-origin.
   const handlePreview = (doc) => {
-    window.open(toProxyUrl(doc.url), "_blank", "noopener,noreferrer");
+    setPreviewDoc(doc);
   };
 
   // Download: fetch blob via proxy then trigger a local save.
@@ -472,6 +472,12 @@ export default function VisaCaseDetails() {
           </div>
         )}
       </div>
+
+      <DocumentPreviewModal 
+        isOpen={!!previewDoc} 
+        document={previewDoc} 
+        onClose={() => setPreviewDoc(null)} 
+      />
     </div>
   );
 }

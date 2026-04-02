@@ -1,24 +1,21 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
   AreaChart, Area,
 } from "recharts";
 import {
-  DollarSign, FileText, TrendingDown, Download,
+  DollarSign, FileText, TrendingDown,
   RefreshCw, CreditCard, TrendingUp, Clock,
 } from "lucide-react";
 import AdminPageHeader from "../../../components/admin/AdminPageHeader";
 import AdminCard from "../../../components/admin/AdminCard";
-import AdminTable from "../../../components/admin/AdminTable";
 import {
-  getFinancialStats,
-  getRevenueByMonth,
-  getApplicationsByMonth,
-  getVisitorsByMonth,
-  getRecentTransactions,
-} from "../../../services/financialService";
-import { exportToCSV, formatDataForExport } from "../../../utils/exportHelpers";
+  useFinancialStats,
+  useRevenueByMonth,
+  useApplicationsByMonth,
+  useVisitorsByMonth,
+} from "../../../hooks/useFinancials";
 
 // ── Chart colour palette ──────────────────────────────────────
 const COLORS = {
@@ -30,7 +27,7 @@ const COLORS = {
   sky:     "#0ea5e9",
 };
 
-const PIE_COLORS = [COLORS.blue, COLORS.emerald, COLORS.rose, COLORS.amber, COLORS.violet, COLORS.sky];
+const PIE_COLORS = [COLORS.emerald, COLORS.blue, COLORS.sky, COLORS.rose, COLORS.amber, COLORS.violet];
 
 // ── Custom Recharts tooltip ───────────────────────────────────
 const ChartTooltip = ({ active, payload, label, prefix = "", suffix = "" }) => {
@@ -62,7 +59,7 @@ const StatCard = ({ label, value, change, trendUp, icon: Icon, color, bg, loadin
       </div>
       {change && (
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${
-          trendUp ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-600"
+          trendUp ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
         }`}>
           {trendUp ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
           {change}
@@ -101,22 +98,6 @@ const ChartSkeleton = ({ height = 280 }) => (
   </div>
 );
 
-// ── Transaction status badge ──────────────────────────────────
-const TxBadge = ({ status }) => {
-  const styles = {
-    Paid:     "bg-emerald-50 text-emerald-700 border-emerald-200",
-    Unpaid:   "bg-amber-50 text-amber-700 border-amber-200",
-    Refunded: "bg-blue-50 text-blue-700 border-blue-200",
-    Failed:   "bg-rose-50 text-rose-700 border-rose-200",
-    Pending:  "bg-slate-50 text-slate-600 border-slate-200",
-  };
-  return (
-    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wide ${styles[status] || styles.Pending}`}>
-      {status}
-    </span>
-  );
-};
-
 // ── Custom Pie label ──────────────────────────────────────────
 const renderPieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
   if (percent < 0.05) return null;
@@ -136,40 +117,22 @@ const renderPieLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, n
 // ═════════════════════════════════════════════════════════════
 
 export default function FinancialReports() {
-  const [stats, setStats]           = useState(null);
-  const [revenueData, setRevenue]   = useState([]);
-  const [appsData, setApps]         = useState([]);
-  const [visitorsData, setVisitors] = useState([]);
-  const [transactions, setTxns]     = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [timeFilter, setTimeFilter] = useState("all");
 
-  const loadAll = useCallback(async (showRefresh = false) => {
-    if (showRefresh) setRefreshing(true);
-    else setLoading(true);
-    try {
-      const [s, rev, apps, vis, txns] = await Promise.all([
-        getFinancialStats(),
-        getRevenueByMonth(),
-        getApplicationsByMonth(),
-        getVisitorsByMonth(),
-        getRecentTransactions(12),
-      ]);
-      setStats(s);
-      setRevenue(rev);
-      setApps(apps);
-      setVisitors(vis);
-      setTxns(txns);
-    } catch (err) {
-      console.error("Financial data error:", err);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
+  const { data: stats, isLoading: statsLoading, refetch: refetchStats, isFetching: statsFetching } = useFinancialStats();
+  const { data: revenueData = [], isLoading: revLoading, refetch: refetchRev, isFetching: revFetching } = useRevenueByMonth();
+  const { data: appsData = [], isLoading: appsLoading, refetch: refetchApps, isFetching: appsFetching } = useApplicationsByMonth();
+  const { data: visitorsData = [], isLoading: visLoading, refetch: refetchVis, isFetching: visFetching } = useVisitorsByMonth();
 
-  useEffect(() => { loadAll(); }, [loadAll]);
+  const loading = statsLoading || revLoading || appsLoading || visLoading;
+  const refreshing = statsFetching || revFetching || appsFetching || visFetching;
+
+  const loadAll = () => {
+    refetchStats();
+    refetchRev();
+    refetchApps();
+    refetchVis();
+  };
 
   // Filter chart data by time range
   const filteredRevenue = timeFilter === "all" ? revenueData : revenueData.slice(-parseInt(timeFilter));
@@ -177,78 +140,30 @@ export default function FinancialReports() {
   const filteredVisitors = timeFilter === "all" ? visitorsData : visitorsData.slice(-parseInt(timeFilter));
 
   // Donut data: sum each status across all months
-  const donutData = (() => {
-    const totals = {};
-    appsData.forEach((m) => {
-      ["New", "Approved", "Rejected", "Pending Documents", "In Progress"].forEach((s) => {
-        totals[s] = (totals[s] || 0) + (m[s] || 0);
-      });
-    });
-    return Object.entries(totals)
-      .filter(([, v]) => v > 0)
-      .map(([name, value]) => ({ name, value }));
-  })();
-
-  // Export handler
-  const handleExport = () => {
-    const rows = transactions.map((t) => ({
-      ID: t.id,
-      Type: t.type,
-      Student: t.studentName,
-      Destination: t.destination,
-      Amount: t.amountFormatted,
-      Status: t.status,
-      Date: t.date,
-    }));
-    exportToCSV(rows, `financial-report-${new Date().toISOString().slice(0, 10)}.csv`);
+  const statusTotals = {
+    Pending: 0,
+    Reviewing: 0,
+    "Needs Changes": 0,
+    Approved: 0,
+    Rejected: 0,
   };
 
-  // Table columns
-  const txColumns = [
-    {
-      header: "Student / Type",
-      render: (row) => (
-        <div>
-          <p className="text-sm font-semibold text-slate-800">{row.studentName}</p>
-          <p className="text-xs text-slate-400">{row.type}</p>
-        </div>
-      ),
-    },
-    {
-      header: "Destination",
-      render: (row) => (
-        <span className="text-sm text-slate-600">{row.destination || "—"}</span>
-      ),
-    },
-    {
-      header: "Amount",
-      className: "text-right",
-      render: (row) => (
-        <span className="text-sm font-bold text-slate-900">{row.amountFormatted}</span>
-      ),
-    },
-    {
-      header: "Status",
-      className: "text-center",
-      render: (row) => <TxBadge status={row.status} />,
-    },
-    {
-      header: "Date",
-      className: "text-right",
-      render: (row) => (
-        <span className="text-xs text-slate-400 font-mono">
-          {row.date ? new Date(row.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
-        </span>
-      ),
-    },
-  ];
+  appsData.forEach((m) => {
+    Object.keys(statusTotals).forEach((s) => {
+      statusTotals[s] = (statusTotals[s] || 0) + (m[s] || 0);
+    });
+  });
+
+  const donutData = Object.entries(statusTotals)
+    .filter(([, v]) => v > 0)
+    .map(([name, value]) => ({ name, value }));
 
   const kpiCards = stats
     ? [
         {
-          label: "Total Revenue",
+          label: "Current Revenue from Visa Consultation",
           value: stats.formatted.totalRevenue,
-          change: "+18%",
+          change: "Total paid",
           trendUp: true,
           icon: DollarSign,
           color: "text-emerald-600",
@@ -257,7 +172,7 @@ export default function FinancialReports() {
         {
           label: "Total Transactions",
           value: stats.totalTransactions.toString(),
-          change: "+12%",
+          change: "Paid transactions",
           trendUp: true,
           icon: FileText,
           color: "text-blue-600",
@@ -266,7 +181,7 @@ export default function FinancialReports() {
         {
           label: "Avg. Consultation Fee",
           value: stats.formatted.avgFee,
-          change: "+8%",
+          change: "Per paid case",
           trendUp: true,
           icon: CreditCard,
           color: "text-violet-600",
@@ -275,7 +190,7 @@ export default function FinancialReports() {
         {
           label: "Pending Fees",
           value: stats.pendingCount.toString(),
-          change: `${stats.refundCount} refund${stats.refundCount !== 1 ? "s" : ""}`,
+          change: "Unpaid invoices",
           trendUp: false,
           icon: Clock,
           color: "text-amber-600",
@@ -283,7 +198,7 @@ export default function FinancialReports() {
         },
       ]
     : Array.from({ length: 4 }).map((_, i) => ({
-        label: ["Total Revenue", "Transactions", "Avg. Fee", "Pending"][i],
+        label: ["Current Revenue", "Transactions", "Avg. Fee", "Pending"][i],
         value: "—",
         icon: [DollarSign, FileText, CreditCard, Clock][i],
         color: ["text-emerald-600", "text-blue-600", "text-violet-600", "text-amber-600"][i],
@@ -296,12 +211,6 @@ export default function FinancialReports() {
       <AdminPageHeader
         title="Financial Reports"
         subtitle="Visa consultation revenue, application trends, and platform analytics."
-        primaryAction={{
-          label: "Export CSV",
-          icon: Download,
-          onClick: handleExport,
-          rotateIcon: false,
-        }}
       />
 
       {/* ── Time filter + refresh ───────────────────────────────── */}
@@ -326,7 +235,7 @@ export default function FinancialReports() {
           ))}
         </div>
         <button
-          onClick={() => loadAll(true)}
+          onClick={loadAll}
           disabled={refreshing}
           className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-50"
         >
@@ -378,7 +287,7 @@ export default function FinancialReports() {
 
         {/* Donut Chart — Applications by Status */}
         <AdminCard
-          title="Applications by Status"
+          title="Uni. Apps by Status"
           className="lg:col-span-2"
           action={
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">
@@ -391,44 +300,50 @@ export default function FinancialReports() {
               <div className="w-40 h-40 rounded-full border-8 border-slate-100 animate-pulse" />
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
-                <Pie
-                  data={donutData}
-                  cx="50%"
-                  cy="45%"
-                  innerRadius={60}
-                  outerRadius={95}
-                  paddingAngle={3}
-                  dataKey="value"
-                  labelLine={false}
-                  label={renderPieLabel}
-                  animationBegin={0}
-                  animationDuration={800}
-                >
-                  {donutData.map((_, index) => (
-                    <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Legend
-                  iconType="circle"
-                  iconSize={8}
-                  formatter={(value, entry) => (
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}>
-                      {value} <span style={{ color: "#0f172a" }}>({entry.payload.value})</span>
-                    </span>
-                  )}
-                />
-                <Tooltip content={<ChartTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
+            <>
+              <ResponsiveContainer width="100%" height={230}>
+                <PieChart>
+                  <Pie
+                    data={donutData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={95}
+                    paddingAngle={3}
+                    dataKey="value"
+                    labelLine={false}
+                    label={renderPieLabel}
+                    animationBegin={0}
+                    animationDuration={800}
+                  >
+                    {donutData.map((entry, index) => {
+                       let c = PIE_COLORS[index % PIE_COLORS.length];
+                       if (entry.name === "Approved") c = COLORS.emerald;
+                       if (entry.name === "Pending") c = COLORS.sky;
+                       if (entry.name === "Reviewing") c = COLORS.blue;
+                       if (entry.name === "Needs Changes") c = COLORS.amber;
+                       if (entry.name === "Rejected") c = COLORS.rose;
+                       return <Cell key={index} fill={c} />;
+                    })}
+                  </Pie>
+                  <Tooltip content={<ChartTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-4 text-xs font-semibold text-slate-600">
+                <span>Pending ({statusTotals.Pending})</span>
+                <span>Reviewing ({statusTotals.Reviewing})</span>
+                <span>Needs Changes ({statusTotals["Needs Changes"]})</span>
+                <span>Approved ({statusTotals.Approved})</span>
+                <span>Rejected ({statusTotals.Rejected})</span>
+              </div>
+            </>
           )}
         </AdminCard>
       </div>
 
       {/* ── Row 2: Applications per Month (stacked bars) ─────────── */}
       <AdminCard
-        title="Applications per Month — Breakdown"
+        title="Uni. Apps Timeline"
         action={
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">
             By Status
@@ -445,11 +360,11 @@ export default function FinancialReports() {
               <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip content={<ChartTooltip />} cursor={{ fill: "#f8fafc" }} />
               <Legend iconType="circle" iconSize={8} formatter={(v) => <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b" }}>{v}</span>} />
-              <Bar dataKey="New"               name="New"               stackId="a" fill={COLORS.blue}    radius={[0, 0, 0, 0]} />
-              <Bar dataKey="In Progress"       name="In Progress"       stackId="a" fill={COLORS.amber}   radius={[0, 0, 0, 0]} />
-              <Bar dataKey="Pending Documents" name="Pending Documents" stackId="a" fill={COLORS.sky}     radius={[0, 0, 0, 0]} />
-              <Bar dataKey="Approved"          name="Approved"          stackId="a" fill={COLORS.emerald} radius={[0, 0, 0, 0]} />
-              <Bar dataKey="Rejected"          name="Rejected"          stackId="a" fill={COLORS.rose}    radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Pending"       name="Pending"       stackId="a" fill={COLORS.sky}     radius={[0, 0, 0, 0]} />
+              <Bar dataKey="Reviewing"     name="Reviewing"     stackId="a" fill={COLORS.blue}    radius={[0, 0, 0, 0]} />
+              <Bar dataKey="Needs Changes" name="Needs Changes" stackId="a" fill={COLORS.amber}   radius={[0, 0, 0, 0]} />
+              <Bar dataKey="Approved"      name="Approved"      stackId="a" fill={COLORS.emerald} radius={[0, 0, 0, 0]} />
+              <Bar dataKey="Rejected"      name="Rejected"      stackId="a" fill={COLORS.rose}    radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -460,7 +375,7 @@ export default function FinancialReports() {
         title="Platform Visitors per Month"
         action={
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">
-            Simulated Analytics
+            Live Analytics
           </span>
         }
       >
@@ -494,23 +409,6 @@ export default function FinancialReports() {
         )}
       </AdminCard>
 
-      {/* ── Recent Transactions Table ───────────────────────────── */}
-      <div className="space-y-4">
-        <div className="px-1 flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Recent Transactions</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Visa consultation fees + processing fee records</p>
-          </div>
-          <span className="text-[10px] font-bold text-slate-400 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full uppercase tracking-wide">
-            {transactions.length} records
-          </span>
-        </div>
-        <AdminTable
-          columns={txColumns}
-          data={transactions}
-          isLoading={loading}
-        />
-      </div>
     </div>
   );
 }

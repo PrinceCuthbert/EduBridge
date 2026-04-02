@@ -7,7 +7,7 @@ import {
 import { toast } from 'sonner';
 import { useAuth } from '../../../context/AuthContext';
 import Modal from '../../../components/Modal';
-import { getUserById, updateUser, updatePassword } from '../../../services/userService';
+import { getUserById, updateUser, updatePassword, uploadUserAvatar } from '../../../services/userService';
 
 export default function StudentSettings() {
   const { user, updateProfile } = useAuth();
@@ -16,6 +16,7 @@ export default function StudentSettings() {
   const [isSaving, setIsSaving]               = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // --- Profile Data — maps 1:1 to USER + IDENTITY tables ---
   const EMPTY = {
@@ -73,6 +74,27 @@ export default function StudentSettings() {
       toast.error(err.message || 'Failed to update profile.');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image must be less than 10MB");
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    try {
+      const newUrl = await uploadUserAvatar(user.id, file);
+      await updateProfile({ ...profileData, avatar: newUrl }); 
+      toast.success("Profile photo updated!");
+    } catch (error) {
+      toast.error(error.message || "Failed to upload image.");
+    } finally {
+      setIsUploadingAvatar(false);
     }
   };
 
@@ -143,10 +165,26 @@ export default function StudentSettings() {
 
           {/* Avatar + Name */}
           <div className="flex items-center gap-4 mb-8">
-            <img
-              src={user?.avatar || `https://ui-avatars.com/api/?name=${profileData.firstName}+${profileData.lastName}&background=0F172A&color=fff`}
-              alt="Profile" className="w-16 h-16 rounded-full object-cover"
-            />
+            <div className="relative group shrink-0">
+              <img
+                src={user?.avatar || `https://ui-avatars.com/api/?name=${profileData.firstName}+${profileData.lastName}&background=0F172A&color=fff`}
+                alt="Profile" 
+                className={`w-16 h-16 rounded-full object-cover transition-opacity ${isUploadingAvatar ? 'opacity-50' : 'group-hover:opacity-90'}`}
+              />
+              
+              {isUploadingAvatar && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Loader2 size={24} className="animate-spin text-blue-600" />
+                </div>
+              )}
+
+              {isEditing && !isUploadingAvatar && (
+                <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer bg-slate-900/40 rounded-full opacity-0 hover:opacity-100 transition-opacity">
+                  <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+                  <span className="text-white text-[9px] uppercase font-bold tracking-wider text-center pt-1">Edit</span>
+                </label>
+              )}
+            </div>
             <div className="flex-1">
               {isEditing ? (
                 <div className="flex gap-3 mb-1">

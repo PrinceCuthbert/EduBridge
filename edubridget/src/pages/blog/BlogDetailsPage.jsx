@@ -3,26 +3,36 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, User, Clock, Share2 } from 'lucide-react';
-import { blogs } from '../../data/blogs';
+import { ArrowLeft, Calendar, User, Clock, Share2, Loader2 } from 'lucide-react';
+import { useBlogs } from '../../hooks/useBlogs';
 
 export default function BlogDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [blog, setBlog] = useState(null);
 
+  const { data: blogs = [], isLoading } = useBlogs();
+
   useEffect(() => {
-    // Simulate finding the blog from the "database"
-    const foundBlog = blogs.find(b => b.id === parseInt(id));
+    // Firestore ids are strings
+    const foundBlog = blogs.find(b => b.id === id);
     if (foundBlog) {
       setBlog(foundBlog);
-    } else {
-      // Handle not found
+    } else if (!isLoading && blogs.length > 0) {
       navigate('/blogs');
     }
     // Scroll to top when loading a new blog
     window.scrollTo(0, 0);
-  }, [id, navigate]);
+  }, [id, navigate, blogs, isLoading]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center">
+        <Loader2 className="animate-spin text-blue-600 mb-4" size={40} />
+        <p className="text-slate-500 font-medium">Loading article...</p>
+      </div>
+    );
+  }
 
   if (!blog) return null;
 
@@ -90,19 +100,21 @@ export default function BlogDetailsPage() {
                <div className="text-slate-500 text-sm">
                  Tagged: <span className="text-slate-900 font-medium">{blog.category}</span>
                </div>
-               <div className="flex gap-2">
+               {/* <div className="flex gap-2">
                  <Button variant="outline" size="sm" className="text-slate-600">
                    <Share2 className="mr-2 h-4 w-4" /> Share
                  </Button>
-               </div>
+               </div> */}
              </div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-8">
+            
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 sticky top-24">
-              <h3 className="font-bold text-lg mb-4 text-slate-900">Latest Posts</h3>
-              <div className="space-y-4">
+              {/* <h3 className="font-bold text-lg mb-4 text-slate-900">Latest Posts</h3> */}
+              
+              {/* <div className="space-y-4">
                 {blogs.filter(b => b.id !== blog.id).slice(0, 3).map(related => (
                   <Link key={related.id} to={`/blogs/${related.id}`} className="block group">
                      <h4 className="font-medium text-slate-800 group-hover:text-primary transition-colors line-clamp-2 text-sm mb-1">
@@ -111,8 +123,10 @@ export default function BlogDetailsPage() {
                      <p className="text-xs text-slate-400">{related.date}</p>
                   </Link>
                 ))}
-              </div>
+              </div> */}
+              
             </div>
+            
           </div>
           
         </div>

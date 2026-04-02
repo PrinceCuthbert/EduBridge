@@ -7,6 +7,7 @@ import {
   deleteDoc,
   doc,
   setDoc,
+  addDoc,
   query,
   where,
   runTransaction,
@@ -22,11 +23,31 @@ import {
   updatePassword as firebaseUpdatePassword,
   reauthenticateWithCredential,
   EmailAuthProvider,
+  updateProfile as firebaseUpdateProfile,
 } from "firebase/auth";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-import { db, auth, firebaseConfig } from "../firebase/config";
+import { db, auth, firebaseConfig, storage } from "../firebase/config";
 
 // ── Authentication (Firebase Auth + Firestore profile) ────────────────────────
+
+/**
+ * Logs a standard user login event to the 'loginActivity' collection.
+ * This function tracks when users sign in, enabling the "Platform Visitors per Month" 
+ * metric in the Financial and Admin Reports dashboards. It records the userId and 
+ * the exact timestamp of the login event so we can aggregate logins over time.
+ * @param {string} uid - The Firebase Auth UID of the user logging in.
+ */
+const logLoginActivity = async (uid) => {
+  try {
+    await addDoc(collection(db, "loginActivity"), {
+      uid: uid,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("Failed to log login activity for visitor analytics:", error);
+  }
+};
 
 export const registerUser = async (userData) => {
   const desiredUsername = userData.username || userData.email.split("@")[0];
@@ -125,6 +146,9 @@ export const loginUser = async (identifier, password) => {
     throw new Error("Your account has been deactivated. Please contact support.");
   }
 
+  // Track the login event for analytic reports (e.g., visitors per month)
+  await logLoginActivity(uid);
+
   return { id: uid, ...profile };
 };
 
@@ -172,6 +196,9 @@ export const loginWithGoogle = async () => {
     };
 
     await setDoc(ref, profile);
+
+    // Track the login event for analytic reports
+    await logLoginActivity(uid);
     return { id: uid, ...profile };
   }
 
@@ -180,6 +207,9 @@ export const loginWithGoogle = async () => {
     await auth.signOut();
     throw new Error("Your account has been deactivated. Please contact support.");
   }
+
+  // Track the login event for analytic reports
+  await logLoginActivity(uid);
 
   return { id: uid, ...profile };
 };
@@ -311,4 +341,28 @@ export const updatePassword = async (id, currentPassword, newPassword) => {
 
   await firebaseUpdatePassword(currentUser, newPassword);
   return true;
+};
+
+export const uploadUserAvatar = async (uid, file) => {
+  if (!uid || !file) throw new Error("Missing user ID or file.");
+  
+  // 1. Upload to Firebase Storage
+  const fileExt = file.name.split('.').pop();
+  const filePath = `avatars/${uid}_${Date.now()}.${fileExt}`;
+  const storageRef = ref(storage, filePath);
+  
+  await uploadBytes(storageRef, file);
+  const downloadURL = await getDownloadURL(storageRef);
+
+  // 2. Update Firebase Auth Profile
+  const currentUser = auth.currentUser;
+  if (currentUser && currentUser.uid === uid) {
+    await firebaseUpdateProfile(currentUser, { photoURL: downloadURL });
+  }
+
+  // 3. Update Firestore Document
+  const userDocRef = doc(db, "users", uid);
+  await updateDoc(userDocRef, { avatar: downloadURL, updated_at: new Date().toISOString() });
+
+  return downloadURL;
 };

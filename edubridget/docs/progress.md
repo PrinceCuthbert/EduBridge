@@ -4,6 +4,35 @@
 
 ---
 
+## What Was Done — Thursday, 2 April 2026 (Session 19)
+
+### 1. Document Previewer (`react-pdf`)
+
+**Before:** Documents were opened via an inline `<iframe>` fallback with messy conditional rendering sprinkled across application review panels.
+**After:** Built a universal `<DocumentPreviewModal />` component wrapping `react-pdf`. 
+- Leverages Mozilla's `pdf.worker.min.mjs` hosted on unpkg for threaded, crash-free PDF rendering.
+- Converts `.docx` via `mammoth.js` just like before, but all bundled in one reusable UI.
+- Integrated `toProxyUrl` natively to bypass Firebase Storage CORS on the fly without complex backend triggers.
+- Replaced the inline implementations across `AdminApplicationReview.jsx`, `VisaCaseDetails.jsx`, and `AdminVisaCaseDetails.jsx`.
+
+### 2. Frontend Blog Migration (Live Firestore Data)
+
+**Before:** Public-facing `/blogs` and `/blogs/:id` loaded static fake JSON arrays (`MOCK_BLOGS`).
+**After:** Now connected to the live Firestore `blogs` bucket populated by the Admin CMS.
+- Setup `useBlogs.js` via TanStack Query with a `5 * 60 * 1000` stale time caching.
+- Filtered existing `/blogs` map to pull live data, mapping arrays directly into the existing pagination constraints.
+- Adjusted the `/blogs/:id` lookup logic to match Firestore string-based IDs.
+- Removed legacy mock data dependencies entirely.
+
+### 3. Profile Avatar Uploads
+
+**Before:** Avatars were hardcoded to external UI generators. 
+**After:** Full custom avatar image uploads wired into settings panels.
+- Users and Admins can now upload profile pictures up to `10MB`.
+- Built `uploadUserAvatar` in `userService.js` to send images to `Firebase Storage`, updating the Firestore user metadata and standard `auth.currentUser` node in parallel.
+
+---
+
 ## What Was Done — Friday, 27 March 2026 (Commit `f9fdbb7`)
 
 ### 1. `applicationService.js` — Full Firestore Migration
@@ -450,7 +479,7 @@ Edit and Delete were silently broken — the hook only exposed `createBranch` bu
 | **Programs**                        | `programService.js`         | ✅ **100% Firebase**         | Migrated March 30 — Firestore + React Query + matrix tuition fees       |
 | **Visa Cases**                      | `visaService.js`            | ✅ **100% Firebase**         | Migrated March 31 — Firestore CRUD + Firebase Storage + React Query     |
 | **Visa document uploads**           | `UploadCaseDocuments.jsx`   | ✅ **100% Firebase Storage** | Files in Storage, metadata in Firestore `documents` array               |
-| **Financial Reports**               | `financialService.js`       | ❌ **Mock data**             | Unblocked — `visaService` is live, financial migration is next          |
+| **Financial Reports**               | `financialService.js`       | ✅ **100% Firebase**         | Migrated April 1 — Firestore aggregation queries + React Query         |
 | **CMS (scholarships, posts, media)**| `cmsService.js`             | ✅ **100% Firebase**         | Migrated April 1 — Firestore CRUD, React Query, public pages connected  |
 
 ### Score Breakdown
@@ -463,10 +492,10 @@ Storage Downloads    ███████████████████�
 Branches             ████████████████████  100%  (Firestore + React Query)
 Programs             ████████████████████  100%  (DONE — completed March 30)
 Visa Cases           ████████████████████  100%  (DONE — Firestore + Storage, March 31)
-Financial            ░░░░░░░░░░░░░░░░░░░░    0%  (unblocked — next in queue)
+Financial            ████████████████████  100%  (DONE — Firestore + React Query, April 1)
 CMS Content          ████████████████████  100%  (DONE — Firestore + React Query, April 1)
 
-Overall              ██████████████████░░  ~92%
+Overall              ████████████████████ 100%
 ```
 
 ---
@@ -499,7 +528,7 @@ const arrayBuffer = await getBytes(ref(storage, getStoragePath(doc.url))); // do
 
 Full Firestore migration + document uploads to Firebase Storage. Both student and admin hooks rewritten with React Query. Fee management UI added. Storage proxy covers visa documents with no extra config.
 
-### Priority 6 — `financialService.js` → Firestore
+### ~~Priority 6 — `financialService.js` → Firestore~~ ✅ Done (April 1)
 
 Now unblocked. Financial data depends on real visa case data — with `visaService` live, the financial dashboard can pull real figures.
 
