@@ -58,10 +58,7 @@ const BranchesPage = () => {
     <div className="min-h-screen bg-slate-50">
       <main>
         {/* Hero */}
-        <section
-          className="py-16 md:py-20"
-          style={{ backgroundColor: "#1e3a8a" }}
-        >
+        <section className="py-16 md:py-20 bg-blue-900">
           <div className="container mx-auto px-4 md:px-8">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -85,7 +82,7 @@ const BranchesPage = () => {
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
             </div>
           ) : (
-            <div className="container mx-auto px-6">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 font-serif">
                   {t("branches_page.find_us.title")}
@@ -102,7 +99,7 @@ const BranchesPage = () => {
                     <button
                       key={branch.country}
                       onClick={() => setSelectedBranch(branch)}
-                      className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                      className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-xl font-medium transition-all ${
                         selectedBranch.country === branch.country
                           ? "bg-primary text-white shadow-md"
                           : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -128,7 +125,7 @@ const BranchesPage = () => {
                     <p className="text-slate-600 text-sm mb-3">
                       {selectedBranch.address}
                     </p>
-                    <div className="flex flex-wrap gap-4 text-sm text-slate-500">
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-slate-500">
                       <span className="flex items-center gap-1.5">
                         <Phone className="h-4 w-4 text-primary" />
                         {selectedBranch.phone}

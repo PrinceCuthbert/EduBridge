@@ -94,14 +94,18 @@ export default {
     container: {
       center: true,
       padding: {
-        DEFAULT: '1.25rem',
-        sm: '2rem',
-        lg: '4rem',
-        xl: '5rem',
-        '2xl': '6rem',
+        DEFAULT: '1rem',
+        sm: '1.25rem',
+        md: '1.5rem',
+        lg: '2rem',
+        xl: '4rem',
+        '2xl': '5rem',
       },
     },
     extend: {
+      screens: {
+        xs: '380px',
+      },
       // 1. TYPOGRAPHY: Keeping your fonts but tightening letter spacing for headings
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

@@ -125,7 +125,7 @@ function ContactPage() {
                  {t("contact.live_chat.available")}
                </p>
                <button 
-                 onClick={() => window.open('https://wa.me/250798697809', '_blank')}
+                 onClick={() => window.open('https://wa.me/250798697809', '_blank', 'noopener,noreferrer')}
                  className="mt-4 w-full py-3 bg-gradient-to-r from-[#1A237E] via-[#283593] to-[#1A237E] hover:from-[#283593] hover:to-[#1A237E] text-white font-bold rounded-lg transition-all shadow-md"
                >
                  {t("contact.live_chat.button")}
@@ -138,7 +138,7 @@ function ContactPage() {
       {/* Form and Offices Section */}
       <section className="py-16 bg-slate-50">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 max-w-7xl mx-auto">
             
             {/* Send Us a Message */}
             <div>
@@ -248,7 +248,7 @@ function ContactPage() {
                       </div>
                     </div>
                     
-                    <div className="pl-13 space-y-2">
+                    <div className="pl-[3.25rem] space-y-2">
                       <div className="flex items-center gap-2 text-sm">
                         <Phone size={16} className="text-slate-400" />
                         <span className="text-slate-600">{office.phone}</span>

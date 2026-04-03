@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/select";
 import { FileCheck, MapPin, CheckCircle, Phone, Mail } from "lucide-react";
 
-
 const VisaConsultationPage = () => {
   const { t } = useTranslation();
 
@@ -70,7 +69,6 @@ const VisaConsultationPage = () => {
     "Other",
   ];
 
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -90,21 +88,7 @@ const VisaConsultationPage = () => {
 
     // Simulate network delay
     setTimeout(() => {
-      // TODO: Send formData to backend API
-      // await consultationAPI.submit(formData);
-
-      if (import.meta.env.DEV) {
-        console.log("📝 Visa consultation form submitted:", {
-          service: formData.service,
-          destination: formData.destination,
-          consultationType: formData.consultationType,
-          // PII excluded from logs
-        });
-      }
-
-      toast.success(
-        "Thank you! We'll contact you within 24 hours to confirm your appointment.",
-      );
+      toast.success("Thank you! Login to request for consultation.");
       setFormData({
         name: "",
         email: "",

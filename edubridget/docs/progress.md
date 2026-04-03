@@ -1,6 +1,81 @@
 # EduBridge — Firebase Integration Progress Report
 
-> Last updated: 2026-04-01 (Session 18) | Branch: `frontendPhaseI`
+> Last updated: 2026-04-03 (Session 20) | Branch: `main`
+
+---
+
+## What Was Done — Friday, 3 April 2026 (Session 20)
+
+### 1. Codebase Cleanup — Dead Code & Mock Layer Removal
+
+With all services confirmed live on Firebase, the remaining mock/axios infrastructure was fully removed.
+
+**Deleted — legacy API layer:**
+- `src/api/services.js` — old axios API (no live callers)
+- `src/hooks/useApi.js` — hook wrapping the above
+- `src/utils/mockBackend.js` — localStorage fake backend
+
+**Deleted — dead admin pages:**
+- `Analytics.jsx` — axios TODO shell, never implemented
+- `Communications.jsx` — axios TODO shell, never implemented
+- `ScholarshipManager.jsx` — old mock-data version, superseded by `CMSScholarships.jsx`
+
+**Deleted — 9 mock data files:** `adminMockData`, `blogs`, `books`, `branches`, `fileRecords`, `mockFinancialData`, `mockMajors`, `mockUsers`, `universities`
+
+**Updated:**
+- `App.jsx` — removed `purgeStaleMockData()` migration helper
+- `AdminRoutes.jsx` — `/admin/scholarships` redirects to `/admin/cms/scholarships`
+- `mockVisaData.js` — dead MOCK_VISA_REQUESTS seed block removed; enum/config values retained
+
+---
+
+### 2. Digital Library — Wired to Mock Data
+
+**Before:** `DigitalLibraryPage.jsx` called `fetch(BASE_URL/library)` which pointed to a non-existent REST endpoint. The imported `MOCK_LIBRARY_RESOURCES` was unused.
+
+**After:** Page loads directly from `MOCK_LIBRARY_RESOURCES` on render. No async fetch, no spinner, no network dependency.
+
+- `MOCK_LIBRARY_RESOURCES` expanded from 4 → 8 entries, each with a real `link` to a free online resource (OpenStax, NCBI Bookshelf, IPCC)
+- Both Preview and Download buttons open `resource.link` in a new tab
+- Search filters inline against the mock array
+
+---
+
+### 3. Security Fixes
+
+| File | Fix |
+| ---- | --- |
+| `BlogDetailsPage.jsx` | `dangerouslySetInnerHTML` now runs through `DOMPurify.sanitize()` — added `dompurify` dependency |
+| `SignInPage.jsx` | Demo credential fill (`fillDemo`) gated behind `import.meta.env.DEV` — cannot be called in production |
+| `contactPage.jsx` | WhatsApp `window.open` now passes `noopener,noreferrer` as the third argument |
+
+---
+
+### 4. Nav & Footer Cleanup
+
+- `menuConfig.js` — "Academics" nav dropdown commented out (all three items were `/coming-soon` routes)
+- `translation.json` — removed `academics` nav keys; removed "High School & Online" and "Master's Programs" from footer links; reformatted testimonials block
+- `footer.jsx` — added `Array.isArray` guards before every `.map()` call on translation data (prevents crash if i18n returns a non-array fallback)
+
+---
+
+### 5. Partners Section — Corrected to Korean Universities
+
+**Before:** `partneringUni.js` listed Harvard, Oxford, Cambridge, Yale, UC Berkeley, Georgia Tech — none of which are actual EduBridge partners.
+
+**After:** Replaced with the real Korean partner roster: Seoul National University, KAIST, Yonsei, Korea University, POSTECH, Sungkyunkwan, Hanyang, Ewha Womans University.
+
+- `Partners.jsx` subtitle copy updated to match
+
+---
+
+### 6. Responsive Fixes
+
+| File | Fix |
+| ---- | --- |
+| `BranchesPage.jsx` | Hero inline style → `bg-blue-900` Tailwind class; responsive padding, button sizes, contact info flex direction |
+| `StudyAbroadPage.jsx` | Scroll nav buttons hidden on mobile (`hidden sm:flex`); inline style → `bg-blue-900` |
+| `WhyChoose.jsx` | React key changed from `f.title` to `f.key` (avoids duplicate-key warning) |
 
 ---
 

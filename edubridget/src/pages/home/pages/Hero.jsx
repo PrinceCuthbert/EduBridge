@@ -34,10 +34,7 @@ const Hero = () => {
 
   return (
     <>
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden min-h-[90vh] flex items-center "
-
-
-
+      <section className="relative pt-24 pb-14 sm:pt-32 sm:pb-20 lg:pt-48 lg:pb-32 overflow-hidden min-h-[min(100dvh,920px)] sm:min-h-[85vh] flex items-center"
       >
         {/* Video Background */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
@@ -64,13 +61,13 @@ const Hero = () => {
         </div>
 
         {/* Decorative blur elements */}
-        <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[600px] h-[600px] bg-accent/10 rounded-full blur-3xl opacity-40 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-3xl opacity-40 pointer-events-none" />
+        <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[min(100vw,280px)] h-[min(100vw,280px)] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] bg-accent/10 rounded-full blur-3xl opacity-40 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[min(100vw,240px)] h-[min(100vw,240px)] sm:w-[320px] sm:h-[320px] lg:w-[500px] lg:h-[500px] bg-secondary/10 rounded-full blur-3xl opacity-40 pointer-events-none" />
 
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Content side */}
-            <div className="flex-1 text-center lg:text-left">
+            <div className="flex-1 min-w-0 text-center lg:text-left">
               {/* Live Badge with improved styling */}
               {/* <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white backdrop-blur-md rounded-full text-sm font-semibold mb-6 border border-white/20">
                 <span className="relative flex h-3 w-3">
@@ -82,7 +79,7 @@ const Hero = () => {
               </div> */}
 
               {/* Heading with updated micro-copy */}
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 font-serif">
+              <h1 className="text-[1.65rem] xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.15] sm:leading-tight mb-5 sm:mb-6 font-serif">
                 {t('home_page.hero.title_prefix')}{" "}
                 <span className="block mt-2 bg-gradient-to-r from-accent via-accent-light to-secondary bg-clip-text text-transparent">
                   {t('home_page.hero.title_suffix')}
@@ -90,15 +87,15 @@ const Hero = () => {
               </h1>
 
               {/* Subheading with regional context */}
-              <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-white/90 mb-8 sm:mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
                 {t('home_page.hero.subtitle')}
               </p>
 
               {/* CTAs with amber primary button */}
-              <div className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start">
-                <Link to="/signin">
+              <div className="flex flex-col xs:flex-row flex-wrap items-stretch xs:items-center gap-3 sm:gap-5 justify-center lg:justify-start max-w-md mx-auto lg:max-w-none lg:mx-0">
+                <Link to="/signin" className="w-full xs:w-auto min-h-[48px] flex">
                   {/* Previously: rounded-2xl — that class was what gave this button its heavily curved/pill shape */}
-                  <button className="w-full sm:w-auto px-6 py-3 bg-accent hover:bg-accent-light text-slate-900 rounded font-bold shadow-glow-amber hover:shadow-glow-amber hover:scale-105 active:scale-95 transition-all text-base">
+                  <button className="w-full sm:w-auto min-h-[48px] px-6 py-3 inline-flex items-center justify-center bg-accent hover:bg-accent-light text-slate-900 rounded font-bold shadow-glow-amber hover:shadow-glow-amber hover:scale-105 active:scale-95 transition-all text-base">
                     {t('home_page.hero.cta_primary')}
                     <ArrowRight className="inline-block ml-2 h-5 w-5" />
                   </button>
@@ -106,8 +103,9 @@ const Hero = () => {
 
                 {/* Previously: rounded-2xl — that class was what gave this button its heavily curved/pill shape */}
                 <button
+                  type="button"
                   onClick={() => setIsVideoOpen(true)}
-                  className="w-full sm:w-auto px-6 py-3 flex items-center justify-center gap-3 text-white font-semibold hover:bg-white/10 border-2 border-white/30 rounded backdrop-blur-sm transition-all group text-base">
+                  className="w-full xs:w-auto min-h-[48px] px-6 py-3 flex items-center justify-center gap-3 text-white font-semibold hover:bg-white/10 border-2 border-white/30 rounded backdrop-blur-sm transition-all group text-base">
                   <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 group-hover:scale-110 transition-all">
                     <Play size={16} className="fill-white ml-0.5" />
                   </div>
@@ -116,7 +114,7 @@ const Hero = () => {
               </div>
 
               {/* Student avatars with organic shapes */}
-              <div className="mt-12 flex items-center gap-6 justify-center lg:justify-start">
+              <div className="mt-8 sm:mt-12 flex flex-wrap items-center gap-4 sm:gap-6 justify-center lg:justify-start">
                 <div className="flex -space-x-3">
                   {[1, 2, 3, 4].map((i) => (
                     <div
@@ -145,9 +143,7 @@ const Hero = () => {
             </div>
 
             {/* Image side with glassmorphic card */}
-            <div className="flex-1 relative w-full max-w-2xl "
-
-
+            <div className="flex-1 relative w-full max-w-2xl min-w-0 mt-4 lg:mt-0"
             >
               <div className="relative z-10 group">
                 {/* Glow effect */}
@@ -191,9 +187,9 @@ const Hero = () => {
                 </div> */}
 
                 {/* Success rate badge */}
-                <div className="absolute -bottom-8 -left-8 bg-gradient-to-br from-accent to-accent-light p-6 rounded-2xl shadow-lift hover:scale-105 transition-transform cursor-default">
-                  <p className="text-3xl font-bold text-slate-900 mb-1">98%</p>
-                  <p className="text-sm text-slate-700 font-semibold">
+                <div className="absolute -bottom-2 -left-1 sm:-bottom-6 sm:-left-6 lg:-bottom-8 lg:-left-8 bg-gradient-to-br from-accent to-accent-light p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-lift hover:scale-105 transition-transform cursor-default max-w-[calc(100vw-2rem)]">
+                  <p className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1">98%</p>
+                  <p className="text-xs sm:text-sm text-slate-700 font-semibold">
                     {t('home_page.hero.success_rate')}
                   </p>
                 </div>
@@ -206,7 +202,7 @@ const Hero = () => {
       {/* Video Modal */}
       {isVideoOpen && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 pb-safe animate-in fade-in duration-200"
           onClick={() => setIsVideoOpen(false)}>
           <div
             className="relative w-full max-w-5xl aspect-video bg-black rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"

@@ -5,6 +5,7 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import mammoth from 'mammoth';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 
 // Set up the generic worker for PDF.js to decode in the background natively.
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -180,7 +181,7 @@ export default function DocumentPreviewModal({ isOpen, onClose, document }) {
             <div className="w-full h-auto min-h-full flex items-start justify-center max-w-4xl mx-auto">
               <div
                 className="prose prose-slate max-w-none w-full bg-white rounded-lg shadow-xl border border-slate-200/60 p-8 lg:p-12 mb-8"
-                dangerouslySetInnerHTML={{ __html: docxHtml || '<p>Unable to read document.</p>' }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(docxHtml || '<p>Unable to read document.</p>') }}
               />
             </div>
           )}

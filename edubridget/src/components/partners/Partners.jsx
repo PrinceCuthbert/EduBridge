@@ -9,8 +9,8 @@ const Partners = () => {
           Our University Partners
         </h2>
         <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
-          We collaborate with leading Korean universities to provide world-class
-          education opportunities
+          We collaborate with Korea's top universities — SKY, KAIST, POSTECH and
+          more — to open doors for the next generation
         </p>
       </div>
 

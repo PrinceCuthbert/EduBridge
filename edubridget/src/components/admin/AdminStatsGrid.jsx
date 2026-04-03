@@ -3,7 +3,7 @@ import React from "react";
 export default function AdminStatsGrid({ stats }) {
   return (
     // CHANGED: gap-8 -> gap-6
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
@@ -12,7 +12,7 @@ export default function AdminStatsGrid({ stats }) {
             // CHANGED: rounded-[2rem] -> rounded-xl
             // CHANGED: p-8 -> p-6
             // CHANGED: Shadow and border styles to be cleaner/lighter
-            className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden"
+            className="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden"
           >
             <div className="flex items-start justify-between mb-4">
               {/* CHANGED: w-14 h-14 -> w-10 h-10 (Standard Icon Box) */}
