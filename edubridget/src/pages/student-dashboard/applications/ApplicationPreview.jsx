@@ -2,6 +2,7 @@
 // Student read-only view of a single application
 
 import React, { useState } from "react";
+import DOMPurify from 'dompurify';
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -518,7 +519,7 @@ export default function ApplicationPreview() {
             <div className="overflow-y-auto p-6">
               <div
                 className="prose prose-slate max-w-none text-sm"
-                dangerouslySetInnerHTML={{ __html: filePreview.html }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(filePreview.html) }}
               />
             </div>
           )}

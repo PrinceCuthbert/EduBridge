@@ -18,8 +18,6 @@ import {
   shortMonthFromKey,
 } from "../utils/financialUtils";
 
-const delay = (ms = 300) => new Promise((r) => setTimeout(r, ms));
-
 /**
  * Compute the KPI stats cards:
  *   - Total Visa Revenue (sum of all paid consultation fees)
@@ -28,7 +26,6 @@ const delay = (ms = 300) => new Promise((r) => setTimeout(r, ms));
  *   - Pending Fees count (feeStatus = "Unpaid" but fee is set)
  */
 export const getFinancialStats = async () => {
-  await delay();
   const visaRequests = await getVisaRequests();
 
   // Cases that have a fee set
@@ -59,7 +56,6 @@ export const getFinancialStats = async () => {
  * Computes from live visa requests where fee is Paid.
  */
 export const getRevenueByMonth = async () => {
-  await delay(150);
   const visaRequests = await getVisaRequests();
   const paidCases = visaRequests.filter(
     (r) => r.feeStatus === "Paid" && r.consultationFee && r.submissionDate
@@ -81,7 +77,6 @@ export const getRevenueByMonth = async () => {
  * Groups visa requests by submission month and status.
  */
 export const getApplicationsByMonth = async () => {
-  await delay(150);
   const applications = await getApplications();
   const withDates = applications.filter((r) => r.submissionDate);
 
@@ -104,7 +99,6 @@ export const getApplicationsByMonth = async () => {
  * Fetches actual login activity from Firestore and aggregates by month.
  */
 export const getVisitorsByMonth = async () => {
-  await delay(100);
   const snap = await getDocs(collection(db, "loginActivity"));
   const logs = snap.docs.map((doc) => doc.data());
 

@@ -374,7 +374,7 @@ export default function DashboardLayout() {
         </header>
 
         {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 xs:p-4 sm:p-6 bg-[#F8FAFC] pb-safe">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 md:p-6 bg-[#F8FAFC] pb-safe">
           <div className="max-w-6xl mx-auto h-full">
             <Outlet />
           </div>

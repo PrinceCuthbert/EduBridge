@@ -2709,3 +2709,195 @@ Fix is — add your Netlify domain to Firebase Console → Authentication → Se
 - `src/services/applicationService.js` — full rewrite
 - `src/pages/student-dashboard/applications/ApplicationSubmitForm.jsx` — file upload handler
 - `src/data/mockData.js` — seed data no longer needed once Firestore is live
+- `src/data/mockData.js` — seed data no longer needed once Firestore is live
+
+## Session — April 3, 2026
+
+### Codebase Cleanup: Dead Code & Mock Layer Removal
+
+**Commit:** `03b88ae` — "I have refactored the codebase and reduced unused codes"
+
+With all services now on Firebase (completed by April 1), the mock/axios infrastructure was fully orphaned. This session removed everything that had no live callers.
+
+---
+
+### Files Deleted
+
+**Legacy API / mock infrastructure:**
+
+| File | Reason |
+| ---- | ------ |
+| `src/api/services.js` | Old axios-based API layer — never wired to a real backend, all callers gone |
+| `src/hooks/useApi.js` | Hook wrapping the old axios services — no consumers |
+| `src/utils/mockBackend.js` | localStorage fake backend — replaced entirely by Firestore |
+
+**Dead admin pages:**
+
+| File | Reason |
+| ---- | ------ |
+| `src/pages/admin-dashboard/analytics/Analytics.jsx` | Had `// TODO: axios` placeholder, feature never implemented |
+| `src/pages/admin-dashboard/communications/Communications.jsx` | Same — axios TODO shell with no real logic |
+| `src/pages/admin-dashboard/scholarships/ScholarshipManager.jsx` | Old mock-data version; superseded by `CMSScholarships.jsx` (Firestore) |
+
+**Mock data files (9 deleted):**
+
+- `src/data/adminMockData.js`
+- `src/data/blogs.js`
+- `src/data/books.js`
+- `src/data/branches.js`
+- `src/data/fileRecords.js`
+- `src/data/mockFinancialData.js`
+- `src/data/mockMajors.js`
+- `src/data/mockUsers.js`
+- `src/data/universities.js`
+
+---
+
+### Code Removed from Existing Files
+
+**`src/App.jsx`** — Removed the `purgeStaleMockData()` call block. This was a migration helper that cleared old localStorage keys on load. With the migration complete and all consumers off localStorage, it served no purpose.
+
+**`src/routes/AdminRoutes.jsx`** — `/admin/scholarships` now redirects to `/admin/cms/scholarships`. The old route pointed to the deleted `ScholarshipManager.jsx`.
+
+---
+
+### Components Updated
+
+Several components that previously imported from deleted files were updated to use live Firebase data or have their dead import paths removed:
+
+- `AdminStatsGrid.jsx`, `AdminTable.jsx`, `AdminOverview.jsx`
+- `DocumentPreviewModal.jsx`, `DashboardLayout.jsx`
+- `SignInPage.jsx`, `BlogDetailsPage.jsx`, `BranchesPage.jsx`, `contactPage.jsx`
+- `ApplicationPreview.jsx`, `StudyAbroadPage.jsx`, `VisaConsultationPage.jsx`
+- `financialService.js` — dead mock references cleaned up
+- `mockVisaData.js` — trimmed; enum/config values retained (VISA_TYPES, VISA_COUNTRIES, etc.)
+- `main.jsx` — import cleanup
+
+---
+
+### State After This Session
+
+The mock backend layer is fully gone. The only remaining `src/data/` files are legitimate config/enum files that aren't Firestore candidates:
+
+| File | What it holds | Should migrate? |
+| ---- | ------------- | --------------- |
+| `mockVisaData.js` | VISA_TYPES, VISA_COUNTRIES, MEETING_TYPES, status configs | No — these are enums |
+| `mockData.js` | DESTINATIONS, MOCK_LIBRARY_RESOURCES, MOCK_PROGRAMS | Eventually |
+| `mockPublishersRoles.js` | MOCK_ROLES, MOCK_PUBLISHERS, MOCK_POLL_QUESTIONS | Eventually |
+| `applicationTimelines.js` | `getApplicationTimeline()` | Eventually |
+| `faqData.js` | Static FAQ content | Low priority |
+| `partneringUni.js` | University partner logos/links | Low priority |
+
+
+---
+
+## Session — April 3, 2026 (continued)
+
+### Digital Library, Security Fixes, Responsive Polish & Partner Corrections
+
+The second batch of changes from the same refactor session, discovered after the initial dead-code pass.
+
+---
+
+### Digital Library — Mock Data Wired
+
+`DigitalLibraryPage.jsx` was calling `fetch(http://localhost:3000/api/library)` — a REST endpoint that never existed. The `MOCK_LIBRARY_RESOURCES` import was in the file but unused.
+
+**Fix:**
+- Removed the `useEffect` + `fetch` + `loading` state entirely
+- `resources` is now derived inline from `MOCK_LIBRARY_RESOURCES`, filtered by `searchQuery`
+- `MOCK_LIBRARY_RESOURCES` in `mockData.js` expanded from 4 → 8 entries
+- Added a real `link` field to every entry pointing to a free online version of the resource:
+
+| # | Title | Source |
+|---|-------|--------|
+| 1 | Principles of Management | OpenStax |
+| 2 | Calculus Volume 1 | OpenStax |
+| 3 | Molecular Biology of the Cell | NCBI Bookshelf |
+| 4 | Climate Change 2022 AR6 WG2 | IPCC |
+| 5 | University Physics Volume 1 | OpenStax |
+| 6 | Introduction to Sociology 3e | OpenStax |
+| 7 | Chemistry: Atoms First 2e | OpenStax |
+| 8 | Concepts of Biology | OpenStax |
+
+Both Preview and Download buttons now call `window.open(resource.link, '_blank')` directly.
+
+---
+
+### Security Fixes
+
+**1 — `BlogDetailsPage.jsx` — XSS via `dangerouslySetInnerHTML`**
+
+Blog `content` from Firestore was rendered directly with `dangerouslySetInnerHTML` — if any CMS user stored a `<script>` tag in a post body it would execute in every reader's browser.
+
+**Fix:** Wrapped the value through `DOMPurify.sanitize()` before passing to React. Added `dompurify` + `@types/dompurify` as dependencies.
+
+```jsx
+dangerouslySetInnerHTML={{
+  __html: DOMPurify.sanitize(blog.content || `<p>${blog.excerpt}</p>`),
+}}
+```
+
+**2 — `SignInPage.jsx` — Demo credentials exposed in production**
+
+`fillDemo('admin')` and `fillDemo('student')` pre-filled hardcoded test credentials into the sign-in form. Nothing prevented this from running in production builds.
+
+**Fix:** Added an early return when not in DEV mode:
+```js
+const fillDemo = (role) => {
+  if (!import.meta.env.DEV) return;
+  // ...
+};
+```
+
+**3 — `contactPage.jsx` — `window.open` without rel guard**
+
+The WhatsApp button opened a new tab without `noopener,noreferrer`, which allows the opened page to access `window.opener` and potentially redirect the parent tab.
+
+**Fix:** Added the third argument: `window.open(url, '_blank', 'noopener,noreferrer')`.
+
+---
+
+### Nav & Footer Cleanup
+
+**`menuConfig.js`** — The "Academics" dropdown was commented out. All three items (`/coming-soon?filter=...`) had been pointing to a coming-soon page for months. Removed from the nav rather than continuing to show dead links.
+
+**`translation.json`** — Removed the `academics` nav key block and the two corresponding footer links ("High School & Online", "Master's Programs"). These were tied to the now-removed Academics dropdown.
+
+**`footer.jsx`** — i18next's `t(..., { returnObjects: true })` can return a string instead of an array when a key is missing or the namespace hasn't loaded yet. Calling `.map()` on a string crashes with `t.map is not a function`.
+
+**Fix:** Added `Array.isArray` guards on all three footer list variables:
+```js
+const explore = Array.isArray(exploreData) ? exploreData : [];
+const academics = Array.isArray(academicsData) ? academicsData : [];
+const socialLinks = Array.isArray(socialLinksData) ? socialLinksData : [];
+```
+
+---
+
+### Partners Section — Corrected University List
+
+`partneringUni.js` listed Harvard, Oxford, Cambridge, Yale, UC Berkeley, and Georgia Tech. None of these are actual EduBridge partners.
+
+**Fix:** Replaced the entire list with the real Korean university partner roster:
+Seoul National University, KAIST, Yonsei, Korea University, POSTECH, Sungkyunkwan University, Hanyang University, Ewha Womans University.
+
+All logo URLs updated to correct Wikipedia SVG emblem paths. `Partners.jsx` subtitle copy updated accordingly.
+
+---
+
+### Responsive Fixes
+
+**`BranchesPage.jsx`:**
+- Hero `style={{ backgroundColor: "#1e3a8a" }}` → `className="bg-blue-900"` (consistent with Tailwind)
+- Container padding: `px-6` → `px-4 sm:px-6 lg:px-8`
+- Country tab buttons: added `text-sm sm:text-base` and `px-3 sm:px-4 py-1.5 sm:py-2`
+- Contact info row: `flex-wrap gap-4` → `flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4` (stacks on mobile)
+
+**`StudyAbroadPage.jsx`:**
+- Left/right scroll buttons: `flex` → `hidden sm:flex` (invisible on mobile where scroll is touch-native)
+- Hero inline style → `bg-blue-900`
+
+**`WhyChoose.jsx`:**
+- React list key changed from `f.title` → `f.key`. `f.title` comes from a translated string and can collide across locales; `f.key` is a stable identifier.
+

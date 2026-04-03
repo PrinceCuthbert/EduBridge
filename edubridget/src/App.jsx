@@ -29,31 +29,6 @@ const ScrollToTop = () => {
   return null;
 };
 
-// ── Storage migration ─────────────────────────────────────────
-// Bumping this version clears stale mock data from any visitor's
-// browser on their next load. Only runs in production.
-// DEV keeps its seed data untouched.
-const STORAGE_VERSION = "v2";
-const VERSION_KEY = "edubridge_storage_version";
-
-// Mock data keys that should be empty in production.
-// Users key is intentionally excluded — demo accounts must survive.
-const MOCK_ONLY_KEYS = [
-  "edubridge_visa_requests",
-  "edubridge_applications",
-  "edubridge_programs",
-];
-
-// This to clean the browser of any mock data that might conflict with the current version of the app. And for any user or device.
-function purgeStaleMockData() {
-  if (import.meta.env.DEV) return; // never touch dev storage
-  if (localStorage.getItem(VERSION_KEY) === STORAGE_VERSION) return; // already migrated
-  MOCK_ONLY_KEYS.forEach((key) => localStorage.removeItem(key));
-  localStorage.setItem(VERSION_KEY, STORAGE_VERSION);
-}
-
-// Run once — before React renders anything.
-purgeStaleMockData();
 
 function App() {
   usePageLanguage();

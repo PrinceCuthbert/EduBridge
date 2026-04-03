@@ -24,9 +24,13 @@ const Footer = () => {
   const { t } = useTranslation();
 
   // Get dynamic data from JSON
-  const explore = t("footer.explore", { returnObjects: true });
-  const academics = t("footer.academics", { returnObjects: true });
-  const socialLinks = t("footer.social_links", { returnObjects: true });
+  const exploreData = t("footer.explore", { returnObjects: true });
+  const academicsData = t("footer.academics", { returnObjects: true });
+  const socialLinksData = t("footer.social_links", { returnObjects: true });
+
+  const explore = Array.isArray(exploreData) ? exploreData : [];
+  const academics = Array.isArray(academicsData) ? academicsData : [];
+  const socialLinks = Array.isArray(socialLinksData) ? socialLinksData : [];
 
   return (
     <footer className="bg-slate-900 text-slate-300 pt-12 pb-8 sm:pt-16 md:pt-20 sm:pb-10">
@@ -48,8 +52,7 @@ const Footer = () => {
               {t("footer.brand.description")}
             </p>
             <div className="flex items-center gap-4">
-              {socialLinks &&
-                socialLinks.map((social, i) => {
+              {socialLinks.map((social, i) => {
                   const Icon = iconMap[social.iconKey] || Facebook;
                   return (
                     <a
@@ -74,8 +77,7 @@ const Footer = () => {
                 {t("footer.explore_title")}
               </h3>
               <ul className="space-y-3">
-                {explore &&
-                  explore.map((link, index) => (
+                {explore.map((link, index) => (
                     <li key={index}>
                       <Link
                         to={link.path}
@@ -94,8 +96,7 @@ const Footer = () => {
                 {t("footer.academics_title")}
               </h3>
               <ul className="space-y-3">
-                {academics &&
-                  academics.map((link, index) => (
+                {academics.map((link, index) => (
                     <li key={index}>
                       <Link
                         to={link.path}
