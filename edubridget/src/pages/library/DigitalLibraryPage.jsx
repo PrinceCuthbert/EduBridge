@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,32 +8,16 @@ import { toast } from 'sonner';
 import { MOCK_LIBRARY_RESOURCES } from '@/data/mockData';
 import { useTranslation } from "react-i18next";
 
-import { BASE_URL } from '@/config/api';
-
 export default function DigitalLibraryPage() {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [resources, setResources] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchResources = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`${BASE_URL}/library`);
-        if (!res.ok) throw new Error("Failed to load library resources");
-        const data = await res.json();
-        setResources(data);
-      } catch (error) {
-        console.error("Error loading library:", error);
-        toast.error("Failed to load library resources");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchResources();
-  }, []);
+  const resources = searchQuery
+    ? MOCK_LIBRARY_RESOURCES.filter((r) =>
+        r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.category.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : MOCK_LIBRARY_RESOURCES;
 
   const categories = [
     { name: t('library_page.categories.ebooks'), count: 2500, icon: <BookOpen className="h-6 w-6" /> },
@@ -90,15 +74,9 @@ export default function DigitalLibraryPage() {
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold mb-8 text-slate-900">{t('library_page.featured_title')}</h2>
-          {loading ? (
-             <div className="flex justify-center p-12">
-               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-               <span className="sr-only">{t('library_page.loading')}</span>
-             </div>
-          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {resources.map((resource, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow border-slate-200">
+            {resources.map((resource) => (
+              <Card key={resource.id} className="hover:shadow-lg transition-shadow border-slate-200">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <Badge variant="secondary" className="bg-secondary/10 text-secondary hover:bg-secondary/20 font-medium border-0">{resource.type}</Badge>
@@ -110,34 +88,18 @@ export default function DigitalLibraryPage() {
                     <p>{t('library_page.details', { year: resource.year, pages: resource.pages })}</p>
                   </div>
                   <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="flex-1"
-                      onClick={() => {
-                        if (resource.link) window.open(resource.link, '_blank');
-                        else if (resource.fileUrl) window.open(resource.fileUrl, '_blank');
-                        else toast.info('Preview not available');
-                      }}
+                      onClick={() => window.open(resource.link, '_blank')}
                     >
                       <Eye className="h-4 w-4 mr-1" /> {t('library_page.preview')}
                     </Button>
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       className="flex-1 bg-primary hover:bg-primary-dark"
-                      onClick={() => {
-                         if (resource.link) window.open(resource.link, '_blank');
-                         else if (resource.fileUrl) {
-                            const link = document.createElement('a');
-                            link.href = resource.fileUrl;
-                            link.download = resource.title;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                         } else {
-                            toast.info('Download not available');
-                         }
-                      }}
+                      onClick={() => window.open(resource.link, '_blank')}
                     >
                       <Download className="h-4 w-4 mr-1" /> {t('library_page.download')}
                     </Button>
@@ -146,7 +108,6 @@ export default function DigitalLibraryPage() {
               </Card>
             ))}
           </div>
-          )}
         </div>
       </section>
     </div>

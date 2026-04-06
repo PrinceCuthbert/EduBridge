@@ -59,6 +59,8 @@ export function useApplications({ userId = null, trackerId = null } = {}) {
       queryClient.invalidateQueries({
         queryKey: ["applications", "user", userId],
       });
+    // Invalidate financial analytics derived from Applications
+    queryClient.invalidateQueries({ queryKey: ["applicationsByMonth"] });
   };
 
   // ── Mutations ───────────────────────────────────────────────────────────────

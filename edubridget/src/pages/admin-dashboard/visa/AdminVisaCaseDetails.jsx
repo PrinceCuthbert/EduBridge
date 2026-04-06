@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { getCountryFlag } from "@/data/mockVisaData";
 import { getVisaRequestById } from "@/services/visaService";
 import VisaStatusBadge from "@/components/visa/VisaStatusBadge";
+import DocumentPreviewModal from "@/components/shared/DocumentPreviewModal";
 
 // ── Proxy URL helper ───────────────────────────────────────
 function toProxyUrl(downloadUrl) {
@@ -85,6 +86,7 @@ export default function AdminVisaCaseDetails() {
   const [caseData, setCaseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [previewDoc, setPreviewDoc] = useState(null);
   const documentsPerPage = 6;
 
   useEffect(() => {
@@ -109,9 +111,9 @@ export default function AdminVisaCaseDetails() {
     fetchCase();
   }, [id, navigate]);
 
-  // Preview: open file through the storage proxy in a new tab.
+  // Preview: open file in Universal Modal.
   const handlePreview = (doc) => {
-    window.open(toProxyUrl(doc.url), "_blank", "noopener,noreferrer");
+    setPreviewDoc(doc);
   };
 
   // Download: fetch blob via proxy → force local save.
@@ -468,6 +470,12 @@ export default function AdminVisaCaseDetails() {
           </>
         )}
       </div>
+
+      <DocumentPreviewModal 
+        isOpen={!!previewDoc} 
+        document={previewDoc} 
+        onClose={() => setPreviewDoc(null)} 
+      />
     </div>
   );
 }

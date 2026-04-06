@@ -78,9 +78,9 @@ export default function AdminOverview() {
           {/* Stat Cards populated directly from the hook */}
           <AdminStatsGrid stats={stats} />
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Quick Actions (Static Navigation) */}
-            <div className="xl:col-span-1 flex flex-col gap-5">
+            <div className="lg:col-span-1 flex flex-col gap-5">
               <div className="px-1">
                 <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">
                   Quick Actions
@@ -120,7 +120,7 @@ export default function AdminOverview() {
             </div>
 
             {/* Recent Updates (Dynamic Data) */}
-            <div className="xl:col-span-2 space-y-8">
+            <div className="lg:col-span-2 space-y-8">
               <section className="space-y-4">
                 <div className="flex items-center justify-between px-1">
                   <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">

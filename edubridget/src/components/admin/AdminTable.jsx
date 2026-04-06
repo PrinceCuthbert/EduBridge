@@ -40,7 +40,7 @@ export default function AdminTable({
               {columns.map((col, index) => (
                 <th
                   key={index}
-                  className={`px-6 py-3 whitespace-nowrap ${col.className || ""}`}
+                  className={`px-3 sm:px-6 py-2 sm:py-3 whitespace-nowrap ${col.className || ""}`}
                 >
                   {col.header}
                 </th>
@@ -70,7 +70,7 @@ export default function AdminTable({
                     // CHANGED: px-10 py-7 -> px-6 py-4 (Standard density)
                     <td
                       key={colIndex}
-                      className={`px-6 py-4 ${col.className || ""}`}
+                      className={`px-3 sm:px-6 py-3 sm:py-4 ${col.className || ""}`}
                     >
                       {col.render(item)}
                     </td>
@@ -104,8 +104,8 @@ export default function AdminTable({
 
       {/* Pagination Controls */}
       {data.length > 0 && (
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-          <div className="text-sm text-slate-600">
+        <div className="px-3 sm:px-6 py-3 sm:py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center gap-3 sm:justify-between">
+          <div className="text-xs sm:text-sm text-slate-600">
             Showing <span className="font-semibold">{startIndex + 1}</span> to{" "}
             <span className="font-semibold">
               {Math.min(startIndex + itemsPerPage, data.length)}

@@ -170,8 +170,6 @@
     ],
     "academics_title": "Academics & Services",
     "academics": [
-      { "name": "High School & Online", "path": "/coursesPage" },
-      { "name": "Master's Programs", "path": "/coursesPage?filter=university" },
       { "name": "Study Abroad", "path": "/study-abroad" },
       { "name": "Visa Consultation", "path": "/visa-consultation" },
       { "name": "Digital Library", "path": "/library" },
@@ -431,11 +429,7 @@
       "sign_in_link": "Sign in"
     }
   },
-  "academics": {
-    "high_school": "High School Curriculum",
-    "masters": "Master's Programs",
-    "online": "Online Learning"
-  },
+
   "global": {
     "study_abroad": "Study Abroad",
     "visa": "Visa & Consultation"
@@ -661,11 +655,31 @@
       "title": "What Our Learners Say",
       "subtitle": "Hear from students and educators across Africa who have benefited from TM EduBridge.",
       "reviews": {
-        "jane_m":   { "name": "Jane M.",      "location": "Kenya",    "text": "TM EduBridge transformed my learning experience. I passed my national exams with flying colors!" },
-        "samuel_o": { "name": "Samuel O.",     "location": "Nigeria",  "text": "As a working professional, the flexible learning options helped me earn a certification in my own time." },
-        "amina_b":  { "name": "Ms. Amina B.", "location": "Tanzania", "text": "As an educator, I've found their resources aligned with our curriculum and easy to implement." },
-        "david_k":  { "name": "David K.",     "location": "Uganda",   "text": "The visa guidance was exceptional. EduBridge made my dream of studying abroad a reality." },
-        "grace_n":  { "name": "Grace N.",     "location": "Rwanda",   "text": "From application to arrival, every step was handled with care. I'm now studying in Seoul!" }
+        "jane_m": {
+          "name": "Jane M.",
+          "location": "Kenya",
+          "text": "TM EduBridge transformed my learning experience. I passed my national exams with flying colors!"
+        },
+        "samuel_o": {
+          "name": "Samuel O.",
+          "location": "Nigeria",
+          "text": "As a working professional, the flexible learning options helped me earn a certification in my own time."
+        },
+        "amina_b": {
+          "name": "Ms. Amina B.",
+          "location": "Tanzania",
+          "text": "As an educator, I've found their resources aligned with our curriculum and easy to implement."
+        },
+        "david_k": {
+          "name": "David K.",
+          "location": "Uganda",
+          "text": "The visa guidance was exceptional. EduBridge made my dream of studying abroad a reality."
+        },
+        "grace_n": {
+          "name": "Grace N.",
+          "location": "Rwanda",
+          "text": "From application to arrival, every step was handled with care. I'm now studying in Seoul!"
+        }
       }
     }
   },

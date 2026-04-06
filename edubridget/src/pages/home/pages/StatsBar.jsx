@@ -44,23 +44,23 @@ export default function StatsBar() {
 
   return (
     <section ref={ref} className="bg-white border-b border-slate-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {STATS.map(({ icon: Icon, value, suffix, labelKey, color, bg }, i) => (
             <motion.div
               key={labelKey}
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="flex flex-col items-center text-center p-6 rounded-2xl hover:shadow-md transition-shadow duration-300 group"
+              className="flex flex-col items-center text-center p-3 sm:p-6 rounded-xl sm:rounded-2xl hover:shadow-md transition-shadow duration-300 group min-w-0"
             >
-              <div className={`p-3 ${bg} rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                <Icon className={`h-6 w-6 ${color}`} />
+              <div className={`p-2 sm:p-3 ${bg} rounded-lg sm:rounded-xl mb-2 sm:mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${color}`} />
               </div>
-              <p className={`text-3xl lg:text-4xl font-bold ${color} mb-1`}>
+              <p className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold ${color} mb-1 tabular-nums`}>
                 <CountUp target={value} suffix={suffix} inView={inView} />
               </p>
-              <p className="text-sm text-slate-500 font-medium">{t(labelKey)}</p>
+              <p className="text-[11px] xs:text-xs sm:text-sm text-slate-500 font-medium leading-snug px-0.5">{t(labelKey)}</p>
             </motion.div>
           ))}
         </div>

@@ -1,6 +1,110 @@
 # EduBridge — Firebase Integration Progress Report
 
-> Last updated: 2026-03-31 (Session 16) | Branch: `frontendPhaseI`
+> Last updated: 2026-04-03 (Session 20) | Branch: `main`
+
+---
+
+## What Was Done — Friday, 3 April 2026 (Session 20)
+
+### 1. Codebase Cleanup — Dead Code & Mock Layer Removal
+
+With all services confirmed live on Firebase, the remaining mock/axios infrastructure was fully removed.
+
+**Deleted — legacy API layer:**
+- `src/api/services.js` — old axios API (no live callers)
+- `src/hooks/useApi.js` — hook wrapping the above
+- `src/utils/mockBackend.js` — localStorage fake backend
+
+**Deleted — dead admin pages:**
+- `Analytics.jsx` — axios TODO shell, never implemented
+- `Communications.jsx` — axios TODO shell, never implemented
+- `ScholarshipManager.jsx` — old mock-data version, superseded by `CMSScholarships.jsx`
+
+**Deleted — 9 mock data files:** `adminMockData`, `blogs`, `books`, `branches`, `fileRecords`, `mockFinancialData`, `mockMajors`, `mockUsers`, `universities`
+
+**Updated:**
+- `App.jsx` — removed `purgeStaleMockData()` migration helper
+- `AdminRoutes.jsx` — `/admin/scholarships` redirects to `/admin/cms/scholarships`
+- `mockVisaData.js` — dead MOCK_VISA_REQUESTS seed block removed; enum/config values retained
+
+---
+
+### 2. Digital Library — Wired to Mock Data
+
+**Before:** `DigitalLibraryPage.jsx` called `fetch(BASE_URL/library)` which pointed to a non-existent REST endpoint. The imported `MOCK_LIBRARY_RESOURCES` was unused.
+
+**After:** Page loads directly from `MOCK_LIBRARY_RESOURCES` on render. No async fetch, no spinner, no network dependency.
+
+- `MOCK_LIBRARY_RESOURCES` expanded from 4 → 8 entries, each with a real `link` to a free online resource (OpenStax, NCBI Bookshelf, IPCC)
+- Both Preview and Download buttons open `resource.link` in a new tab
+- Search filters inline against the mock array
+
+---
+
+### 3. Security Fixes
+
+| File | Fix |
+| ---- | --- |
+| `BlogDetailsPage.jsx` | `dangerouslySetInnerHTML` now runs through `DOMPurify.sanitize()` — added `dompurify` dependency |
+| `SignInPage.jsx` | Demo credential fill (`fillDemo`) gated behind `import.meta.env.DEV` — cannot be called in production |
+| `contactPage.jsx` | WhatsApp `window.open` now passes `noopener,noreferrer` as the third argument |
+
+---
+
+### 4. Nav & Footer Cleanup
+
+- `menuConfig.js` — "Academics" nav dropdown commented out (all three items were `/coming-soon` routes)
+- `translation.json` — removed `academics` nav keys; removed "High School & Online" and "Master's Programs" from footer links; reformatted testimonials block
+- `footer.jsx` — added `Array.isArray` guards before every `.map()` call on translation data (prevents crash if i18n returns a non-array fallback)
+
+---
+
+### 5. Partners Section — Corrected to Korean Universities
+
+**Before:** `partneringUni.js` listed Harvard, Oxford, Cambridge, Yale, UC Berkeley, Georgia Tech — none of which are actual EduBridge partners.
+
+**After:** Replaced with the real Korean partner roster: Seoul National University, KAIST, Yonsei, Korea University, POSTECH, Sungkyunkwan, Hanyang, Ewha Womans University.
+
+- `Partners.jsx` subtitle copy updated to match
+
+---
+
+### 6. Responsive Fixes
+
+| File | Fix |
+| ---- | --- |
+| `BranchesPage.jsx` | Hero inline style → `bg-blue-900` Tailwind class; responsive padding, button sizes, contact info flex direction |
+| `StudyAbroadPage.jsx` | Scroll nav buttons hidden on mobile (`hidden sm:flex`); inline style → `bg-blue-900` |
+| `WhyChoose.jsx` | React key changed from `f.title` to `f.key` (avoids duplicate-key warning) |
+
+---
+
+## What Was Done — Thursday, 2 April 2026 (Session 19)
+
+### 1. Document Previewer (`react-pdf`)
+
+**Before:** Documents were opened via an inline `<iframe>` fallback with messy conditional rendering sprinkled across application review panels.
+**After:** Built a universal `<DocumentPreviewModal />` component wrapping `react-pdf`. 
+- Leverages Mozilla's `pdf.worker.min.mjs` hosted on unpkg for threaded, crash-free PDF rendering.
+- Converts `.docx` via `mammoth.js` just like before, but all bundled in one reusable UI.
+- Integrated `toProxyUrl` natively to bypass Firebase Storage CORS on the fly without complex backend triggers.
+- Replaced the inline implementations across `AdminApplicationReview.jsx`, `VisaCaseDetails.jsx`, and `AdminVisaCaseDetails.jsx`.
+
+### 2. Frontend Blog Migration (Live Firestore Data)
+
+**Before:** Public-facing `/blogs` and `/blogs/:id` loaded static fake JSON arrays (`MOCK_BLOGS`).
+**After:** Now connected to the live Firestore `blogs` bucket populated by the Admin CMS.
+- Setup `useBlogs.js` via TanStack Query with a `5 * 60 * 1000` stale time caching.
+- Filtered existing `/blogs` map to pull live data, mapping arrays directly into the existing pagination constraints.
+- Adjusted the `/blogs/:id` lookup logic to match Firestore string-based IDs.
+- Removed legacy mock data dependencies entirely.
+
+### 3. Profile Avatar Uploads
+
+**Before:** Avatars were hardcoded to external UI generators. 
+**After:** Full custom avatar image uploads wired into settings panels.
+- Users and Admins can now upload profile pictures up to `10MB`.
+- Built `uploadUserAvatar` in `userService.js` to send images to `Firebase Storage`, updating the Firestore user metadata and standard `auth.currentUser` node in parallel.
 
 ---
 
@@ -228,6 +332,189 @@ gsutil cors set cors.json gs://edubridge-5da54.appspot.com
 
 ---
 
+## What Was Done — Tuesday, 1 April 2026 (Session 18)
+
+### 1. `cmsService.js` — Generic Firestore CRUD Factory (NEW FILE)
+
+Created `src/services/cmsService.js` — a factory function `createCmsService(collectionName)` that generates typed Firestore CRUD operations for any collection.
+
+```js
+export const createCmsService = (collectionName) => ({
+  getAll:  async () => { ... },   // getDocs → maps to { id, ...data }
+  create:  async (data) => { ... }, // addDoc + serverTimestamp on created_at/updated_at
+  update:  async (id, data) => { ... }, // updateDoc + serverTimestamp on updated_at
+  delete:  async (id) => { ... },   // deleteDoc
+});
+```
+
+**Debug logging:** every write prints `[cmsService] CREATE/UPDATE/DELETE → collectionName/id` with the full payload to the browser console — useful for verifying the data shape before it lands in Firestore. `serverTimestamp()` appears as `___PRIVATE_ServerTimestampFieldValueImpl` in the log (normal — Firestore replaces it server-side).
+
+**Three named instances exported:**
+
+| Instance | Firestore Collection |
+|---|---|
+| `scholarshipService` | `scholarships` |
+| `blogService` | `blogs` |
+| `mediaService` | `media` |
+
+---
+
+### 2. `useCMSManager.js` — Refactored with TanStack Query
+
+Signature changed from `useCMSManager(initialData, defaultFormData, searchKeys)` to `useCMSManager(service, collectionKey, defaultFormData, searchKeys)`.
+
+| Concern | Before | After |
+|---|---|---|
+| Data source | `useState(initialData)` — in-memory, resets on refresh | `useQuery` → Firestore via service |
+| Mutations | Directly mutated local state array | `useMutation` × 3 (create/update/delete) |
+| Cache sync | Manual `setItems(...)` | `queryClient.invalidateQueries([collectionKey])` |
+| Loading state | Always `false`, hardcoded | `isLoading` from `useQuery` |
+| Save state | None | `isPending` = any mutation in flight |
+
+**Returned additions:** `isLoading`, `isPending` — pages use these to show loading spinners and disable the submit button during saves.
+
+**`handleDelete`** preserves the existing UX: sonner toast with an action button — the delete only fires if the admin confirms.
+
+---
+
+### 3. CMS Pages — Wired to Firestore (3 files)
+
+Each page had a 2-line data-source change — all JSX untouched.
+
+| File | Old | New |
+|---|---|---|
+| `CMSScholarships.jsx` | `useCMSManager(MOCK_SCHOLARSHIPS, ...)` | `useCMSManager(scholarshipService, 'scholarships', ...)` |
+| `CMSPosts.jsx` | `useCMSManager(MOCK_BLOGS, ...)` | `useCMSManager(blogService, 'blogs', ...)` |
+| `CMSMedia.jsx` | `useCMSManager(MOCK_MEDIA, ...)` | `useCMSManager(mediaService, 'media', ...)` |
+
+All three pages also gained:
+- `isLoading` passed to `AdminTable` (or a `Loader2` spinner for the card grid in CMSMedia)
+- `isPending` disables the submit button with a "Saving…" label during writes
+
+---
+
+### 4. `ScholarshipsPage.jsx` — Public Page Connected to Firestore
+
+The public `/scholarships` page was reading from `MOCK_SCHOLARSHIPS`. Now reads from the same `scholarships` Firestore collection as the admin CMS.
+
+```diff
+- import { MOCK_SCHOLARSHIPS } from "@/data/mockData";
++ import { useQuery } from "@tanstack/react-query";
++ import { scholarshipService } from "@/services/cmsService";
+
+- const scholarships = MOCK_SCHOLARSHIPS;
++ const { data: allScholarships = [], isLoading } = useQuery({
++   queryKey: ['scholarships'],
++   queryFn: scholarshipService.getAll,
++   staleTime: 0, // always fresh — public-facing content
++ });
+```
+
+**Pagination added:** client-side, 6 per page. Numbered page buttons + prev/next arrows. `goToPage()` scrolls to top on navigation. Pagination only renders when `totalPages > 1`.
+
+**Cache sync note:** `staleTime: 0` is intentionally set on the public page only. The admin CMS uses the global 5-minute staleTime (prevents unnecessary reads). When the admin mutates, `invalidateQueries(['scholarships'])` marks the cache stale — the public page refetches on next visit.
+
+---
+
+### 5. `GalleryPage.jsx` + `GalleryTeaser.jsx` — Media Connected to Firestore
+
+Both the full Gallery page (`/gallery`) and the home-page teaser section now read from the `media` Firestore collection managed by the admin CMS at `/admin/cms/media`.
+
+| File | Items shown | Loading state |
+|---|---|---|
+| `GalleryPage.jsx` | All items (masonry grid + lightbox) | Animated pulse skeleton (6 alternating-height blocks) |
+| `GalleryTeaser.jsx` | First 6 items (`allMedia.slice(0, 6)`) | Animated pulse skeleton (6 blocks) |
+
+Both share the same React Query key `['media']` → the fetch is deduplicated if both components are rendered in the same session.
+
+`GalleryPage.jsx` also has an **empty state** (icon + copy + hint to use the admin CMS) for when the collection has no documents yet.
+
+Field mapping from CMS → gallery display:
+
+| Firestore field | Used by |
+|---|---|
+| `image` | Card photo, lightbox photo |
+| `studentName` | Overlay title, lightbox heading |
+| `country` | Flag/location tag |
+| `university` | Lightbox subheading |
+| `program` | Hover overlay + lightbox badge |
+| `testimony` | Lightbox quote block |
+
+---
+
+## What Was Done — Tuesday, 31 March 2026 (Session 17)
+
+### 1. `visaService.js` — Full Firestore + Firebase Storage Migration
+
+**Before:** All visa data lived in `localStorage`. Documents were local file references. Data reset on every new browser session or incognito window.
+**After:** Every operation reads/writes Firestore. Files upload to Firebase Storage. Data persists across devices and sessions.
+
+| Function                          | Before                                   | After                                                              |
+| --------------------------------- | ---------------------------------------- | ------------------------------------------------------------------ |
+| `getVisaRequests()`               | `readAll()` from localStorage            | `getDocs(collection(db, "visaCases"))`                             |
+| `getVisaRequestsByUserId()`       | `.filter()` on localStorage array        | Firestore `query(..., where("userId", "==", userId))`              |
+| `getVisaRequestById()`            | `.find()` on localStorage array          | `getDoc(doc(db, "visaCases", id))`                                 |
+| `createVisaRequest()`             | push to localStorage, `uuidv4()` ID      | `setDoc(newRef, newCase)` — auto-generated Firestore document ID   |
+| `updateVisaRequest()`             | splice + save to localStorage            | `updateDoc(ref, safeData)` — admin fields stripped                 |
+| `updateVisaStatus()`              | mutate in localStorage array             | `updateDoc(ref, { status })`                                       |
+| `updateVisaFee()`                 | mutate in localStorage array             | `updateDoc(ref, { consultationFee, feeStatus })`                   |
+| `updateVisaSchedule()`            | mutate in localStorage array             | `updateDoc(ref, schedule)`                                         |
+| `uploadVisaDocument()`            | N/A (no file persistence)                | `uploadBytes()` to `visaCases/{userId}/{timestamp}_{filename}`     |
+| `addDocumentsToVisaRequest()`     | N/A                                      | `arrayUnion(...newDocs)` appended to Firestore `documents` array   |
+| `deleteDocumentFromVisaRequest()` | N/A                                      | `arrayRemove` on `documents` array + refetch                       |
+| `deleteVisaRequest()`             | `.filter()` + save to localStorage       | `deleteDoc(doc(db, "visaCases", id))`                              |
+
+**Removed:** `STORAGE_KEY`, `readAll()`, `writeAll()`, `MOCK_VISA_REQUESTS` import, `uuidv4` dependency — all gone.
+
+**Added:** `snapToData()` helper — maps every Firestore `DocumentSnapshot` to `{ id, ...data }`. Mirrors the same pattern already in `applicationService.js`.
+
+**Security preserved:** `updateVisaRequest()` still explicitly strips admin-only fields (`consultationFee`, `feeStatus`, `meetingDate`, `meetingTime`, `meetingType`, `meetingLink`, `adminNotes`) — a student crafting the request body cannot change those fields.
+
+---
+
+### 2. `useVisaConsultations.js` — Rewritten with React Query
+
+Student-facing hook. Replaced `useState/useEffect` with `useQuery` + `useMutation`.
+
+- **Query key:** `["visaCases", "user", userId]` — scoped to the logged-in user, no cross-user data leaks
+- **`enabled: !!userId`** — no Firestore fetch fires before auth resolves
+- **Mutations:** `submitRequest` → `createVisaRequest`, `editRequest` → `updateVisaRequest`, `cancelRequest` → `deleteVisaRequest`
+- All mutations invalidate `["visaCases"]` to keep the admin list in sync immediately
+
+---
+
+### 3. `useAdminVisaCases.js` — Rewritten with React Query
+
+Admin-facing hook. Exposes admin-only operations the student hook never surfaces.
+
+- **Query key:** `["visaCases"]` — global, all cases
+- **Mutations:** `addCase`, `setStatus`, `setFee`, `setSchedule`, `removeCase`
+- Each mutation calls a **targeted update function** — `setStatus` only touches `status`, `setFee` only touches fee fields. No full-document overwrites.
+
+---
+
+### 4. `VisaCases.jsx` — Consultation Fee Management Panel
+
+New **Consultation Fee** section added to the admin case details modal:
+
+- **Amount** field (free text input, e.g. `$150`)
+- **Payment Status** toggle — "Paid" (emerald) / "Unpaid" (amber)
+- **Save Fee** button — calls `setFee()` from `useAdminVisaCases`, isolated from schedule/status saves
+
+---
+
+### 5. Document Upload Flow — Firebase Storage
+
+`UploadCaseDocuments.jsx` now uploads files to Firebase Storage at `visaCases/{userId}/{timestamp}_{filename}` via `uploadVisaDocument()`, then appends document metadata to the Firestore case via `addDocumentsToVisaRequest()`. Documents persist across sessions and are accessible from any device.
+
+---
+
+### 6. Storage Proxy — Visa Documents Covered
+
+The `/storage-proxy/` rules in `vite.config.js` and `netlify.toml` from Session 16 already cover visa document URLs — no new config needed. `toProxyUrl()` in `VisaCaseDetails.jsx` and `AdminVisaCaseDetails.jsx` routes all document fetches through the same proxy path, giving consistent CORS-safe preview and download behaviour.
+
+---
+
 ## What Was Done — Monday, 30 March 2026 (Session 13)
 
 ### 1. `useBranches.js` — Branches CRUD completed on Firestore
@@ -254,7 +541,7 @@ Edit and Delete were silently broken — the hook only exposed `createBranch` bu
 
 ## Firebase Connection Overview
 
-### Overall: ~65% Connected to Firebase
+### Overall: ~85% Connected to Firebase
 
 | Data Domain                         | Service File                | Status                       | Details                                                                 |
 | ----------------------------------- | --------------------------- | ---------------------------- | ----------------------------------------------------------------------- |
@@ -265,9 +552,10 @@ Edit and Delete were silently broken — the hook only exposed `createBranch` bu
 | **Program application forms**       | `AdminProgramDetail.jsx`    | ✅ **100% Firebase Storage** | Migrated March 31 — PDF/doc uploads to Storage                          |
 | **Branches**                        | `useBranches.js`            | ✅ **100% Firebase**         | Full CRUD — March 30                                                    |
 | **Programs**                        | `programService.js`         | ✅ **100% Firebase**         | Migrated March 30 — Firestore + React Query + matrix tuition fees       |
-| **Visa Cases**                      | `visaService.js`            | ❌ **localStorage**          | Full mock — no Firebase yet                                             |
-| **Financial Reports**               | `financialService.js`       | ❌ **Mock data**             | Blocked on `visaService` migration                                      |
-| **CMS (scholarships, posts, etc.)** | `useCMSManager.js`          | ❌ **In-memory only**        | Seeded from mock arrays, resets on page refresh                         |
+| **Visa Cases**                      | `visaService.js`            | ✅ **100% Firebase**         | Migrated March 31 — Firestore CRUD + Firebase Storage + React Query     |
+| **Visa document uploads**           | `UploadCaseDocuments.jsx`   | ✅ **100% Firebase Storage** | Files in Storage, metadata in Firestore `documents` array               |
+| **Financial Reports**               | `financialService.js`       | ✅ **100% Firebase**         | Migrated April 1 — Firestore aggregation queries + React Query         |
+| **CMS (scholarships, posts, media)**| `cmsService.js`             | ✅ **100% Firebase**         | Migrated April 1 — Firestore CRUD, React Query, public pages connected  |
 
 ### Score Breakdown
 
@@ -275,14 +563,14 @@ Edit and Delete were silently broken — the hook only exposed `createBranch` bu
 Auth + Users         ████████████████████  100%  (Firebase Auth + Firestore)
 Applications         ████████████████████  100%  (Firestore + React Query)
 File Uploads         ████████████████████  100%  (Firebase Storage — March 31)
-Storage Downloads    ████████████████████  100%  (SDK getBlob/getBytes — March 31)
+Storage Downloads    ████████████████████  100%  (Proxy + SDK — March 31)
 Branches             ████████████████████  100%  (Firestore + React Query)
 Programs             ████████████████████  100%  (DONE — completed March 30)
-Visa Cases           ░░░░░░░░░░░░░░░░░░░░    0%  (localStorage — next in queue)
-Financial            ░░░░░░░░░░░░░░░░░░░░    0%  (blocked on visaService)
-CMS Content          ░░░░░░░░░░░░░░░░░░░░    0%  (in-memory mock)
+Visa Cases           ████████████████████  100%  (DONE — Firestore + Storage, March 31)
+Financial            ████████████████████  100%  (DONE — Firestore + React Query, April 1)
+CMS Content          ████████████████████  100%  (DONE — Firestore + React Query, April 1)
 
-Overall              ██████████████░░░░░░  ~70%
+Overall              ████████████████████ 100%
 ```
 
 ---
@@ -311,28 +599,26 @@ const blob = await getBlob(ref(storage, getStoragePath(doc.url)));         // do
 const arrayBuffer = await getBytes(ref(storage, getStoragePath(doc.url))); // docx preview
 ```
 
-### Priority 2 — `visaService.js` → Firestore
+### ~~Priority 5 — `visaService.js` → Firestore + Firebase Storage~~ ✅ Done (March 31)
 
-The biggest remaining data gap. Visa data resets to mock on every fresh session, never persisted.
+Full Firestore migration + document uploads to Firebase Storage. Both student and admin hooks rewritten with React Query. Fee management UI added. Storage proxy covers visa documents with no extra config.
 
-Steps:
+### ~~Priority 6 — `financialService.js` → Firestore~~ ✅ Done (April 1)
 
-1. Replace `readAll()` / `writeAll()` with Firestore (`getDocs`, `setDoc`, `updateDoc`, `deleteDoc`)
-2. Use `where("userId", "==", userId)` for `getVisaRequestsByUserId`
-3. Migrate visa document uploads to Firebase Storage (same pattern as `ApplicationSubmitForm.jsx`)
-4. Update `financialService.js` — unlocks real financial data once `visaService` is live
-
-### Priority 3 — CMS Modules → Firestore
-
-`useCMSManager.js` holds all CMS data in React state. Scholarships, posts, and publishers reset on every refresh.
+Now unblocked. Financial data depends on real visa case data — with `visaService` live, the financial dashboard can pull real figures.
 
 Steps:
 
-1. Create Firestore collections: `scholarships`, `posts`, `publishers`
-2. Rewrite `useCMSManager.js` with `useQuery` + `useMutation` (same pattern as `useUsers`)
-3. Or replace per-page with dedicated hooks
+1. Identify what data `financialService.js` currently mocks
+2. Map fields to Firestore (likely aggregates over `visaCases` and `applications` collections)
+3. Replace mock return values with live Firestore queries
+4. Wire into React Query via a `useFinancials` hook
 
-### Priority 5 — Firebase Security Rules
+### ~~Priority 7 — CMS Modules → Firestore~~ ✅ Done (April 1)
+
+`cmsService.js` factory created. `useCMSManager.js` rewritten with `useQuery` + `useMutation`. All three CMS pages (Scholarships, Posts, Media) wired to Firestore. Public-facing pages (`ScholarshipsPage`, `GalleryPage`, `GalleryTeaser`) connected to the same collections with `staleTime: 0` for freshness.
+
+### Priority 8 — Firebase Security Rules
 
 Currently all Firestore writes may be open. Before going to production:
 

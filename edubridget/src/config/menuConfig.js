@@ -40,29 +40,29 @@ export const menuConfig = [
       { labelKey: "about.partners", path: "/partners", icon: Users },
     ],
   },
-  {
-    id: "academics",
-    labelKey: "nav.academics",
-    icon: GraduationCap,
-    type: "dropdown",
-    items: [
-      {
-        labelKey: "academics.high_school",
-        path: "/coming-soon?filter=High School Curriculum",
-        icon: BookOpen,
-      },
-      {
-        labelKey: "academics.masters",
-        path: "/coming-soon?filter=Master's Programs",
-        icon: Award,
-      },
-      {
-        labelKey: "academics.online",
-        path: "/coming-soon?filter=Online Learning",
-        icon: Globe,
-      },
-    ],
-  },
+  // {
+  //   id: "academics",
+  //   labelKey: "nav.academics",
+  //   icon: GraduationCap,
+  //   type: "dropdown",
+  //   items: [
+  //     {
+  //       labelKey: "academics.high_school",
+  //       path: "/coming-soon?filter=High School Curriculum",
+  //       icon: BookOpen,
+  //     },
+  //     {
+  //       labelKey: "academics.masters",
+  //       path: "/coming-soon?filter=Master's Programs",
+  //       icon: Award,
+  //     },
+  //     {
+  //       labelKey: "academics.online",
+  //       path: "/coming-soon?filter=Online Learning",
+  //       icon: Globe,
+  //     },
+  //   ],
+  // },
   {
     id: "global",
     labelKey: "nav.global",

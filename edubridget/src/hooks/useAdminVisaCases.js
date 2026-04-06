@@ -37,7 +37,12 @@ export const useAdminVisaCases = () => {
 
   const error = queryError ? "Failed to load cases." : null;
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey });
+    // Invalidate financial analytics derived from Visa Cases
+    queryClient.invalidateQueries({ queryKey: ["financialStats"] });
+    queryClient.invalidateQueries({ queryKey: ["revenueByMonth"] });
+  };
 
   // ── Admin creates a case manually ─────────────────────────
   const addCaseMutation = useMutation({

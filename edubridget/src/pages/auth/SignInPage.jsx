@@ -83,6 +83,7 @@ function SignInPage() {
   };
 
   const fillDemo = (role) => {
+    if (!import.meta.env.DEV) return;
     if (role === "admin") {
       setFormData({
         ...formData,

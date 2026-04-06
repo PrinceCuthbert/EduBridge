@@ -8,15 +8,15 @@ export default function
   
   PublicLayout() {
   return (
-    <>
-      <Suspense fallback={<div className="h-16 bg-white shadow-sm" />}>
+    <div className="flex min-h-screen min-h-[100dvh] flex-col w-full max-w-[100vw]">
+      <Suspense fallback={<div className="h-16 bg-white shadow-sm shrink-0" />}>
         <Header />
       </Suspense>
-      <main className="flex-grow">
+      <main className="flex-1 min-w-0 w-full">
         <Outlet />
       </main>
       <Footer />
       <WhatsAppButton />
-    </>
+    </div>
   );
 }

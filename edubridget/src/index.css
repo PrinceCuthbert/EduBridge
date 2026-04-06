@@ -181,11 +181,14 @@
     line-height: 1.5;
   }
 
-  /* Buttons */
-  button {
+  /* Buttons — snappier taps on touch devices */
+  button,
+  [type="button"],
+  [type="submit"] {
     font-size: 1rem;
     font-weight: 600;
     line-height: 1.5;
+    touch-action: manipulation;
   }
 
   /* 
@@ -198,6 +201,24 @@
 }
 
 @layer utilities {
+  /* Safe areas: notched phones & home indicators */
+  .pb-safe {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .px-safe {
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+  }
+  .inset-safe-bottom {
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+  .inset-safe-right {
+    right: max(0.75rem, env(safe-area-inset-right));
+  }
+
   /* Hide scrollbar for Chrome, Safari and Opera */
   .scrollbar-hide::-webkit-scrollbar {
     display: none;

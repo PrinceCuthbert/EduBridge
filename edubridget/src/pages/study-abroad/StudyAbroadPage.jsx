@@ -70,13 +70,13 @@ const UniversitySection = React.memo(
           {/* Scroll Buttons */}
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-lg border border-slate-100 text-slate-400 hover:text-primary hover:border-primary transition-all opacity-0 group-hover/section:opacity-100 disabled:opacity-0"
+            className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 w-8 h-8 items-center justify-center bg-white rounded-full shadow-lg border border-slate-100 text-slate-400 hover:text-primary hover:border-primary transition-all opacity-0 group-hover/section:opacity-100 disabled:opacity-0"
             aria-label="Scroll left">
             <ChevronLeft size={16} />
           </button>
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-lg border border-slate-100 text-slate-400 hover:text-primary hover:border-primary transition-all opacity-0 group-hover/section:opacity-100"
+            className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 w-8 h-8 items-center justify-center bg-white rounded-full shadow-lg border border-slate-100 text-slate-400 hover:text-primary hover:border-primary transition-all opacity-0 group-hover/section:opacity-100"
             aria-label="Scroll right">
             <ChevronRight size={16} />
           </button>
@@ -135,7 +135,7 @@ export default function StudyAbroadPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="text-white py-16" style={{ backgroundColor: "#1e3a8a" }}>
+      <div className="text-white py-16 bg-blue-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-white">
             {t("study_abroad_page.hero_title")}

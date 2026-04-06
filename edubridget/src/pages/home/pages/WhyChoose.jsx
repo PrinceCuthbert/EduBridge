@@ -46,7 +46,7 @@ export default function WhyChoose() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f, i) => (
             <motion.div
-              key={f.title}
+              key={f.key}
               custom={i}
               variants={cardVariants}
               initial="hidden"

@@ -37,8 +37,8 @@ const Navigation = () => {
 
   return (
     <nav className="bg-white/80 backdrop-blur-md border-b border-white/30 shadow-soft sticky top-0 z-[60]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+      <div className="max-w-7xl mx-auto px-safe sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center min-h-14 sm:min-h-16 h-14 sm:h-16">
           {/* Logo */}
           <div className="flex items-center">
             <Logo />
@@ -60,10 +60,11 @@ const Navigation = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="lg:hidden flex items-center">
+          <div className="lg:hidden flex items-center -mr-1">
             <button
+              type="button"
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-700 hover:text-primary"
+              className="text-gray-700 hover:text-primary min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg hover:bg-slate-100/80 active:bg-slate-100"
               aria-label="Toggle menu"
               aria-expanded={isOpen}
             >
@@ -93,10 +94,10 @@ const Navigation = () => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed right-0 top-0 h-screen w-[85%] max-w-sm bg-white shadow-2xl z-[110] lg:hidden flex flex-col"
+              className="fixed right-0 top-0 h-[100dvh] max-h-[100dvh] w-[min(100%,20rem)] sm:w-[85%] sm:max-w-sm bg-white shadow-2xl z-[110] lg:hidden flex flex-col pt-safe"
             >
               {/* Header */}
-              <div className="p-6 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-20">
+              <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-20 shrink-0">
                 <Logo mobile onClick={closeMenu} />
                 <button 
                   onClick={closeMenu} 
@@ -123,7 +124,7 @@ const Navigation = () => {
               </div>
 
               {/* Footer */}
-              <div className="p-6 border-t border-slate-100 bg-slate-50/50 space-y-3 sticky bottom-0">
+              <div className="p-4 sm:p-6 border-t border-slate-100 bg-slate-50/50 space-y-3 sticky bottom-0 pb-safe">
                 <div className="px-2 mb-3">
                   <LanguageSwitcher isMobile={true} />
                 </div>
