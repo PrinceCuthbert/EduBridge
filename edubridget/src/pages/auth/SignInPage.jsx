@@ -272,7 +272,7 @@ function SignInPage() {
               </div>
 
               {/* Demo Accounts */}
-              <div className="mt-6 pt-6 border-t border-slate-100">
+              {/* <div className="mt-6 pt-6 border-t border-slate-100">
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 text-center">
                   Demo Credentials
                 </p>
@@ -298,7 +298,7 @@ function SignInPage() {
                     </span>
                   </button>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
