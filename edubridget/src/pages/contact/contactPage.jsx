@@ -41,7 +41,7 @@ function ContactPage() {
           >
             <div className="flex items-center justify-center gap-3 mb-4">
               <span className="text-yellow-500 text-2xl">◆</span>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white" style={{ fontFamily: "'Inter', sans-serif" }}>
                 {t('contact.hero_title')}
               </h1>
               <span className="text-yellow-500 text-2xl">◆</span>
@@ -57,7 +57,7 @@ function ContactPage() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3" style={{ fontFamily: "'Inter', sans-serif" }}>
               {t("contact.help_title")}
             </h2>
             <p className="text-slate-600 max-w-2xl mx-auto">
@@ -142,7 +142,7 @@ function ContactPage() {
             
             {/* Send Us a Message */}
             <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>
+              <h2 className="text-3xl font-bold text-slate-900 mb-6" style={{ fontFamily: "'Inter', sans-serif" }}>
                 {t("contact.form_title")}
               </h2>
               
@@ -231,7 +231,7 @@ function ContactPage() {
 
             {/* Visit Our Offices */}
             <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-6" style={{ fontFamily: "'Playfair Display', serif" }}>
+              <h2 className="text-3xl font-bold text-slate-900 mb-6" style={{ fontFamily: "'Inter', sans-serif" }}>
                 {t("contact.offices.title")}
               </h2>
 

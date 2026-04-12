@@ -24,7 +24,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <ErrorBoundary>
         <App />
       </ErrorBoundary>
-      <ReactQueryDevtools initialIsOpen={true} />
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </React.StrictMode>,
 );
