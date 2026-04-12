@@ -29,7 +29,7 @@ const SocialLink = ({ href, bgClass, label, children }) => (
   <a
     href={href}
     aria-label={label}
-    className={`w-10 h-10 rounded-full text-white flex items-center justify-center transition-all text-sm font-bold hover:scale-110 hover:shadow-lg ${bgClass}`}>
+    className={`w-10 h-10 rounded-full text-slate-300 flex items-center justify-center transition-all duration-300 hover:text-white hover:scale-110 ${bgClass}`}>
     {children}
   </a>
 );
@@ -62,8 +62,8 @@ function AboutUsPage() {
             transition={{ duration: 0.6 }}
             className="font-bold leading-tight mb-4 text-white"
             style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: "clamp(2rem, 5vw, 4.5rem)",
+              fontFamily: "'Inter', sans-serif",
+              fontSize: "clamp(1.5rem, 3vw, 3rem)",
             }}>
             {t("about.hero_title")}
           </motion.h1>
@@ -91,7 +91,7 @@ function AboutUsPage() {
             className="text-center mb-10 md:mb-12">
             <h2
               className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1A237E] mb-3"
-              style={{ fontFamily: "'Playfair Display', serif" }}>
+              style={{ fontFamily: "'Inter', sans-serif" }}>
               {t("about.founder_title")}
             </h2>
             <p
@@ -128,7 +128,7 @@ function AboutUsPage() {
                 <div className="text-center">
                   <h3
                     className="text-2xl md:text-3xl font-bold text-[#1A237E] mb-2"
-                    style={{ fontFamily: "'Playfair Display', serif" }}>
+                    style={{ fontFamily: "'Inter', sans-serif" }}>
                     {t("about.founder_name")}
                   </h3>
                   <p
@@ -141,7 +141,7 @@ function AboutUsPage() {
                   <div className="flex gap-3 justify-center mt-4">
                     <SocialLink
                       href="#"
-                      bgClass="bg-blue-600 hover:bg-blue-700"
+                      bgClass="bg-primary hover:bg-primary-light"
                       label="Facebook">
                       <svg
                         className="w-4 h-4"
@@ -152,7 +152,7 @@ function AboutUsPage() {
                     </SocialLink>
                     <SocialLink
                       href="#"
-                      bgClass="bg-sky-500 hover:bg-sky-600"
+                      bgClass="bg-primary hover:bg-primary-light"
                       label="Twitter">
                       <svg
                         className="w-4 h-4"
@@ -163,18 +163,20 @@ function AboutUsPage() {
                     </SocialLink>
                     <SocialLink
                       href="#"
-                      bgClass="bg-gradient-to-br from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600"
+                      bgClass="bg-primary hover:bg-primary-light"
                       label="Instagram">
                       <svg
                         className="w-4 h-4"
                         fill="currentColor"
                         viewBox="0 0 24 24">
                         <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z" />
+                        <path d="M12 5.838c-3.403 0-6.162 2.759-6.162 6.162S8.597 18.162 12 18.162s6.162-2.759 6.162-6.162S15.403 5.838 12 5.838zm0 10.162c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z" />
+                        <circle cx="18.406" cy="5.594" r="1.44" />
                       </svg>
                     </SocialLink>
                     <SocialLink
                       href="#"
-                      bgClass="bg-blue-700 hover:bg-blue-800"
+                      bgClass="bg-primary hover:bg-primary-light"
                       label="LinkedIn">
                       <svg
                         className="w-4 h-4"
@@ -223,7 +225,7 @@ function AboutUsPage() {
                   </p>
                   <p
                     className="font-bold text-lg md:text-xl mt-1"
-                    style={{ fontFamily: "'Playfair Display', serif" }}>
+                    style={{ fontFamily: "'Inter', sans-serif" }}>
                     {t("about.founder_name")}
                   </p>
                   <p className="text-yellow-600 font-semibold uppercase tracking-wide text-sm">
@@ -250,7 +252,7 @@ function AboutUsPage() {
             className="text-center mb-10 md:mb-12">
             <h2
               className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1A237E] mb-3"
-              style={{ fontFamily: "'Playfair Display', serif" }}>
+              style={{ fontFamily: "'Inter', sans-serif" }}>
               {t("about.values_title")}
             </h2>
             <p
@@ -310,7 +312,7 @@ function AboutUsPage() {
                   </div>
                   <h3
                     className="text-xl md:text-2xl font-bold text-[#1A237E] mb-3 group-hover:text-yellow-600 transition-colors duration-300"
-                    style={{ fontFamily: "'Playfair Display', serif" }}>
+                    style={{ fontFamily: "'Inter', sans-serif" }}>
                     {value.title}
                   </h3>
                   <p
@@ -339,7 +341,7 @@ function AboutUsPage() {
             className="text-center mb-10 md:mb-12">
             <h2
               className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#1A237E] mb-3"
-              style={{ fontFamily: "'Playfair Display', serif" }}>
+              style={{ fontFamily: "'Inter', sans-serif" }}>
               {t("about.journey_title")}
             </h2>
             <p
@@ -381,7 +383,7 @@ function AboutUsPage() {
             className="text-center mb-10 md:mb-12">
             <h2
               className="text-2xl md:text-3xl font-bold text-[#1A237E] mb-3"
-              style={{ fontFamily: "'Playfair Display', serif" }}>
+              style={{ fontFamily: "'Inter', sans-serif" }}>
               {t("about.team_title")}
             </h2>
             <p
@@ -412,7 +414,7 @@ const TeamMemberCard = ({ member }) => (
       />
     </div>
     <h3 className="mt-4 font-bold text-xl text-[#1A237E]">{member.name}</h3>
-    <p className="text-yellow-600 uppercase text-xs font-bold tracking-wider">
+    <p className="text-yellow-600 uppercase text-sm font-bold tracking-wider">
       {member.role}
     </p>
     <p className="text-slate-600 text-sm mt-2 text-center max-w-[200px]">

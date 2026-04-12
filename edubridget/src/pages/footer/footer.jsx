@@ -33,7 +33,7 @@ const Footer = () => {
   const socialLinks = Array.isArray(socialLinksData) ? socialLinksData : [];
 
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-12 pb-8 sm:pt-16 md:pt-20 sm:pb-10">
+    <footer className="font-sans bg-slate-900 text-slate-300 pt-12 pb-8 sm:pt-16 md:pt-20 sm:pb-10">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-16">
           {/* Branding Section */}

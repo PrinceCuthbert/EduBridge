@@ -79,7 +79,7 @@ const Hero = () => {
               </div> */}
 
               {/* Heading with updated micro-copy */}
-              <h1 className="text-[1.65rem] xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.15] sm:leading-tight mb-5 sm:mb-6 font-serif">
+              <h1 className="text-[1.65rem] xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.15] sm:leading-tight mb-5 sm:mb-6 font-sans">
                 {t('home_page.hero.title_prefix')}{" "}
                 <span className="block mt-2 bg-gradient-to-r from-accent via-accent-light to-secondary bg-clip-text text-transparent">
                   {t('home_page.hero.title_suffix')}
