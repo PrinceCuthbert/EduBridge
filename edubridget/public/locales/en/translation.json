@@ -162,7 +162,7 @@
     "explore_title": "Explore",
     "explore": [
       { "name": "Company", "path": "/" },
-      { "name": "About Us", "path": "/aboutuspage" },
+      { "name": "About Us", "path": "/aboutus" },
       { "name": "Our Branches", "path": "/branches" },
       { "name": "Partners", "path": "/partners" },
       { "name": "Gallery", "path": "/gallery" },

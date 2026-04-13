@@ -9,6 +9,7 @@ import {
   MapPin,
   X,
   Eye,
+  ChevronDown
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -244,66 +245,49 @@ export default function UniversityPrograms({ isReadOnly = false }) {
         searchPlaceholder="Search universities..."
         secondaryActions={
           <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
-            {/* Status Filter */}
-            <select
-              value={filters.status}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, status: e.target.value }))
-              }
-              className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-slate-300 transition-colors cursor-pointer">
+           {[
+        { key: 'status', label: 'All Status', optName: 'status' },
+        { key: 'visaType', label: 'All Visas', optName: 'visaType' },
+        { key: 'country', label: 'All Countries', optName: 'country' }
+         ].map((filter) => (
+         <div key={filter.key} className="relative group flex-shrink-0">
+          <select
+             value={filters[filter.key]}
+                    onChange={(e) =>
+                setFilters((prev) => ({ ...prev, [filter.key]: e.target.value }))
+                }
+                className="appearance-none pl-3 pr-9 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 hover:border-slate-300 transition-all cursor-pointer min-w-[120px]"
+                >
               {filterOptions
-                .find((f) => f.name === "status")
-                .options.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt === "All" ? "All Status" : opt}
-                  </option>
-                ))}
-            </select>
+                  .find((f) => f.name === filter.optName)
+                        .options.map((opt) => (
+                     <option key={opt} value={opt} className="py-2">
+                        {opt === "All" ? filter.label : opt}
+                     </option>
+                    ))}
+                 </select>
+      
+                 {/* Custom Chevron Icon */}
+               <ChevronDown 
+                   size={14} 
+                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-slate-600 transition-colors" 
+               />
+            </div>
+          ))}
 
-            {/* Visa Type Filter */}
-            <select
-              value={filters.visaType}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, visaType: e.target.value }))
-              }
-              className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-slate-300 transition-colors cursor-pointer">
-              {filterOptions
-                .find((f) => f.name === "visaType")
-                .options.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt === "All" ? "All Visas" : opt}
-                  </option>
-                ))}
-            </select>
-
-            {/* Country Filter */}
-            <select
-              value={filters.country}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, country: e.target.value }))
-              }
-              className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-slate-300 transition-colors cursor-pointer">
-              {filterOptions
-                .find((f) => f.name === "country")
-                .options.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt === "All" ? "All Countries" : opt}
-                  </option>
-                ))}
-            </select>
-
-            {/* Clear Filters Button */}
-            {(filters.status !== "All" ||
-              filters.visaType !== "All" ||
-              filters.country !== "All") && (
-              <button
-                onClick={clearFilters}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-                title="Clear Filters">
-                <X size={18} />
-              </button>
-            )}
-          </div>
+  {/* Clear Filters Button */}
+  {(filters.status !== "All" ||
+    filters.visaType !== "All" ||
+    filters.country !== "All") && (
+    <button
+      onClick={clearFilters}
+      className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all flex-shrink-0"
+      title="Clear Filters"
+    >
+      <X size={18} />
+    </button>
+  )}
+</div>
         }
       />
 

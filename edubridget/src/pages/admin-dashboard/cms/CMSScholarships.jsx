@@ -146,11 +146,10 @@ export default function CMSScholarships() {
           >
             Cancel
           </button>
-  
            <button 
          type="submit" 
          disabled={isPending} 
-         className="f lex items-center justify-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed min-w-[140px]"
+         className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed min-w-[140px]"
         >
           {isPending ? (
             <>
