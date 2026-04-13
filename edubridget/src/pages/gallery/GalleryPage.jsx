@@ -153,45 +153,13 @@ export default function GalleryPage() {
                   {/* EduBridge Watermark */}
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                     <div className="flex items-center gap-3">
-                      {/* Logo SVG */}
-                      <div className="w-10 h-10 flex-shrink-0">
-                        <svg viewBox="0 0 48 48" className="w-full h-full">
-                          <path
-                            d="M 8 40 Q 24 8, 40 40"
-                            fill="none"
-                            stroke="url(#lightboxGradient1)"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                          />
-                          <path
-                            d="M 12 38 Q 24 14, 36 38"
-                            fill="none"
-                            stroke="url(#lightboxGradient2)"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            opacity="0.6"
-                          />
-                          <defs>
-                            <linearGradient
-                              id="lightboxGradient1"
-                              x1="0%"
-                              y1="0%"
-                              x2="100%"
-                              y2="0%">
-                              <stop offset="0%" stopColor="#60a5fa" />
-                              <stop offset="100%" stopColor="#93c5fd" />
-                            </linearGradient>
-                            <linearGradient
-                              id="lightboxGradient2"
-                              x1="0%"
-                              y1="0%"
-                              x2="100%"
-                              y2="0%">
-                              <stop offset="0%" stopColor="#93c5fd" />
-                              <stop offset="100%" stopColor="#bfdbfe" />
-                            </linearGradient>
-                          </defs>
-                        </svg>
+                      {/* Logo Image */}
+                      <div className="w-10 h-10 flex-shrink-0 rounded-full overflow-hidden bg-white/10 p-0.5">
+                        <img 
+                          src="/tmlogo.jpg" 
+                          alt="EduBridge Logo" 
+                          className="w-full h-full object-cover rounded-full"
+                        />
                       </div>
                       <div>
                         <p className="text-white font-bold text-lg">

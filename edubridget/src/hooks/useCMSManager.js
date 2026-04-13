@@ -116,11 +116,24 @@ export function useCMSManager(service, collectionKey, defaultFormData, searchKey
           .filter(Boolean);
       }
 
-      if (editingItem) {
-        await updateMutation.mutateAsync({ id: editingItem.id, data: processedData });
-      } else {
-        await createMutation.mutateAsync(processedData);
-      }
+      // if (editingItem) {
+      //   await updateMutation.mutateAsync({ id: editingItem.id, data: processedData });
+      // } else {
+      //   await createMutation.mutateAsync(processedData);
+      // }
+      // Define the operation
+    const savePromise = editingItem 
+      ? updateMutation.mutateAsync({ id: editingItem.id, data: processedData })
+      : createMutation.mutateAsync(processedData);
+
+    // Trigger the loading toast with a spinner
+    toast.promise(savePromise, {
+      loading: 'Saving changes...',
+      success: 'Changes saved successfully!',
+      error: 'Failed to save changes.',
+      position: 'top-center', // Centers it at the top
+    });
+      return savePromise;
     },
     [formData, editingItem, updateMutation, createMutation]
   );

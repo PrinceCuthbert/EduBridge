@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useRef, useMemo } from "react";
+import React, { useRef, useMemo,useState } from "react";
 // import { Card, CardContent } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
@@ -149,8 +149,19 @@ export default function StudyAbroadPage() {
       {/* Available Universities Section */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* 3. Map over the dynamic groups to render sections automatically */}
-          {Object.entries(programsByVisa).length === 0 && !loading ? (
+          {/* Show skeleton loaders while data is being fetched */}
+          {loading ? (
+            [1, 2].map((i) => (
+              <UniversitySection
+                key={i}
+                title=""
+                visaType=""
+                subtitle=""
+                universities={[]}
+                loading={true}
+              />
+            ))
+          ) : Object.entries(programsByVisa).length === 0 ? (
             <div className="text-center py-12 text-slate-500">
               {t("study_abroad_page.universities.no_programs")}
             </div>
@@ -168,7 +179,7 @@ export default function StudyAbroadPage() {
                         : `Available Universities offering ${visa} programs`
                   }
                   universities={unis}
-                  loading={loading}
+                  loading={false}
                 />
                 {index < array.length - 1 && (
                   <div className="w-full h-px bg-slate-100 my-8"></div>

@@ -13,7 +13,9 @@ import {
   Image as ImageIcon,
   Upload,
   FileText,
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 import {
   usePrograms,
   useProgram,
@@ -74,35 +76,42 @@ export default function AdminProgramDetail() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let applicationFileUrl = formData.applicationFile;
+    const saveOperation = async () => {
+      let applicationFileUrl = formData.applicationFile;
 
-    // If the admin picked a new File (not already a URL string), upload it first
-    if (formData.applicationFile instanceof File) {
-      const fileRef = ref(
-        storage,
-        `programs/application-forms/${Date.now()}_${formData.applicationFile.name}`,
-      );
-      const snapshot = await uploadBytes(fileRef, formData.applicationFile, {
-        contentDisposition: `attachment; filename="${formData.applicationFile.name}"`,
-      });
-      applicationFileUrl = await getDownloadURL(snapshot.ref);
-    }
+      // If the admin picked a new File (not already a URL string), upload it first
+      if (formData.applicationFile instanceof File) {
+        const fileRef = ref(
+          storage,
+          `programs/application-forms/${Date.now()}_${formData.applicationFile.name}`,
+        );
+        const snapshot = await uploadBytes(fileRef, formData.applicationFile, {
+          contentDisposition: `attachment; filename="${formData.applicationFile.name}"`,
+        });
+        applicationFileUrl = await getDownloadURL(snapshot.ref);
+      }
 
-    const sanitizedData = {
-      ...formData,
-      visaType: formData.visaType.trim().toUpperCase(),
-      applicationFile: applicationFileUrl ?? null,
+      const sanitizedData = {
+        ...formData,
+        visaType: formData.visaType.trim().toUpperCase(),
+        applicationFile: applicationFileUrl ?? null,
+      };
+
+      if (isNew) {
+        const created = await addProgram(sanitizedData);
+        if (created) navigate("/admin/programs");
+      } else {
+        const ok = await updateProgram(String(id), sanitizedData);
+        if (ok) navigate("/admin/programs");
+      }
     };
 
-    console.log("Submitting Program Payload:", sanitizedData);
-
-    if (isNew) {
-      const created = await addProgram(sanitizedData);
-      if (created) navigate("/admin/programs");
-    } else {
-      const ok = await updateProgram(String(id), sanitizedData);
-      if (ok) navigate("/admin/programs");
-    }
+    toast.promise(saveOperation(), {
+      loading: 'Saving changes...',
+      success: isNew ? 'Program created successfully!' : 'Changes saved successfully!',
+      error: 'Failed to save program.',
+      position: 'top-center',
+    });
   };
 
   if (fetchLoading && !isNew) {
@@ -137,13 +146,18 @@ export default function AdminProgramDetail() {
         <button
           onClick={handleSubmit}
           disabled={saveLoading}
-          className="flex items-center justify-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-lg font-medium text-sm hover:bg-slate-800 transition-all shadow-sm active:scale-95 disabled:opacity-70 disabled:pointer-events-none">
+          className="flex items-center justify-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-lg font-medium text-sm hover:bg-slate-800 transition-all shadow-sm active:scale-95 disabled:opacity-70 disabled:pointer-events-none min-w-[160px]">
           {saveLoading ? (
-            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Saving...</span>
+            </>
           ) : (
-            <Save size={16} />
+            <>
+              <Save size={16} />
+              <span>{isNew ? "Create Program" : "Save Changes"}</span>
+            </>
           )}
-          <span>{isNew ? "Create Program" : "Save Changes"}</span>
         </button>
       </div>
 

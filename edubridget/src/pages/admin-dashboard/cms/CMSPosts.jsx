@@ -1,4 +1,4 @@
-import { Plus, Edit, Trash2, FileText, Calendar, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, FileText, Calendar, Image as ImageIcon, Loader2 } from 'lucide-react';
 import Modal from '../../../components/Modal';
 import { blogService } from '../../../services/cmsService';
 import AdminPageHeader from "../../../components/admin/AdminPageHeader";
@@ -171,7 +171,21 @@ export default function CMSPosts() {
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
             <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">Cancel</button>
-            <button type="submit" disabled={isPending} className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">{isPending ? 'Saving…' : editingItem ? 'Update Post' : 'Publish Post'}</button>
+            <button 
+              type="submit" 
+              disabled={isPending} 
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed min-w-[140px]">
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : editingItem ? (
+                'Update Post'
+              ) : (
+                'Publish Post'
+              )}
+            </button>
           </div>
         </form>
       </Modal>

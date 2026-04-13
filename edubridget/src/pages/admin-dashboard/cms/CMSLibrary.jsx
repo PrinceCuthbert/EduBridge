@@ -6,6 +6,7 @@ import {
   Link,
   CheckCircle,
   FileText,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { uploadFile } from "../../../services/fileService";
@@ -30,6 +31,7 @@ export default function CMSLibrary() {
     handleEdit,
     handleDelete,
     handleSubmit,
+    isPending,
   } = useCMSManager(
     MOCK_LIBRARY_RESOURCES,
     {
@@ -317,8 +319,18 @@ export default function CMSLibrary() {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm">
-              {editingItem ? "Update Resource" : "Add Resource"}
+              disabled={isPending}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed min-w-[140px]">
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : editingItem ? (
+                "Update Resource"
+              ) : (
+                "Add Resource"
+              )}
             </button>
           </div>
         </form>
