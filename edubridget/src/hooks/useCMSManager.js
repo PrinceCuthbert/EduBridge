@@ -31,12 +31,7 @@ export function useCMSManager(service, collectionKey, defaultFormData, searchKey
     mutationFn: service.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [collectionKey] });
-      toast.success('Created successfully');
       setIsModalOpen(false);
-    },
-    onError: (err) => {
-      console.error('[useCMSManager] create failed:', err);
-      toast.error('Failed to create item');
     },
   });
 
@@ -44,12 +39,7 @@ export function useCMSManager(service, collectionKey, defaultFormData, searchKey
     mutationFn: ({ id, data }) => service.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [collectionKey] });
-      toast.success('Updated successfully');
       setIsModalOpen(false);
-    },
-    onError: (err) => {
-      console.error('[useCMSManager] update failed:', err);
-      toast.error('Failed to update item');
     },
   });
 
@@ -116,11 +106,18 @@ export function useCMSManager(service, collectionKey, defaultFormData, searchKey
           .filter(Boolean);
       }
 
-      if (editingItem) {
-        await updateMutation.mutateAsync({ id: editingItem.id, data: processedData });
-      } else {
-        await createMutation.mutateAsync(processedData);
-      }
+      const savePromise = editingItem
+        ? updateMutation.mutateAsync({ id: editingItem.id, data: processedData })
+        : createMutation.mutateAsync(processedData);
+
+      toast.promise(savePromise, {
+        loading: 'Saving changes...',
+        success: 'Changes saved successfully!',
+        error: 'Failed to save changes.',
+        position: 'top-center',
+      });
+
+      return savePromise;
     },
     [formData, editingItem, updateMutation, createMutation]
   );

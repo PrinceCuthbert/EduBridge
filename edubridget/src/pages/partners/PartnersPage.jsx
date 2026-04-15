@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 import {
   BookOpen,
   Building2,
@@ -10,11 +10,8 @@ import {
 } from "lucide-react";
 
 import OptimizedImage from "@/components/OptimizedImage";
-import { BASE_URL } from "@/config/api";
-import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-
-import Partners from "../../components/partners/Partners";
+import { universityPartners } from "../../data/partneringUni";
 
 // Custom Slider Component
 const UniversitySlider = ({ items, title }) => {
@@ -68,9 +65,14 @@ const UniversitySlider = ({ items, title }) => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 className="min-w-[200px] flex-1">
-                <div className="flex flex-col items-center group/item cursor-pointer">
+                <a
+                  href={uni.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center group/item cursor-pointer no-underline"
+                  title={`Visit ${uni.enName}`}>
                   <div className="relative w-32 h-32 mb-4 flex items-center justify-center">
-                    <div className="w-24 h-24 bg-slate-50 p-2 rounded-full">
+                    <div className="w-24 h-24 bg-slate-50 p-2 rounded-full ring-2 ring-transparent group-hover/item:ring-primary/30 transition-all duration-300">
                       <OptimizedImage
                         src={uni.logo}
                         alt={uni.name}
@@ -87,11 +89,11 @@ const UniversitySlider = ({ items, title }) => {
                   </div>
 
                   <div className="text-center space-y-1">
-                    <h3 className="font-bold text-slate-800 text-sm">
-                      {uni.name}
-                    </h3>
-                    <p className="text-xs text-slate-500 font-medium">
+                    <h3 className="font-bold text-slate-800 text-sm group-hover/item:text-primary transition-colors">
                       {uni.enName}
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium group-hover/item:text-primary/70 transition-colors">
+                      {uni.name}
                     </p>
 
                     {uni.badge && (
@@ -103,7 +105,7 @@ const UniversitySlider = ({ items, title }) => {
                       </span>
                     )}
                   </div>
-                </div>
+                </a>
               </motion.div>
             ))}
           </motion.div>
@@ -123,30 +125,9 @@ const UniversitySlider = ({ items, title }) => {
 
 export default function PartnersPage() {
   const { t } = useTranslation();
-  const [partners, setPartners] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchPartners = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`${BASE_URL}/partners`);
-        if (!res.ok) throw new Error("Failed to load partners");
-        const data = await res.json();
-        setPartners(data);
-      } catch (error) {
-        console.error("Error loading partners:", error);
-        toast.error("Failed to load partners");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPartners();
-  }, []);
-
-  const d2Universities = partners.filter((p) => p.type === "D-2");
-  const d4Universities = partners.filter((p) => p.type === "D-4-1");
+  const d2Universities = universityPartners.filter((p) => p.type === "D-2");
+  const d4Universities = universityPartners.filter((p) => p.type === "D-4-1");
 
   return (
     <div className="min-h-screen bg-white">
@@ -195,24 +176,16 @@ export default function PartnersPage() {
       {/* Sliders Section */}
       <section className="pb-20">
         <div className="max-w-7xl mx-auto px-6">
-          {loading ? (
-            <div className="flex justify-center p-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
-          ) : (
-            <>
-              <UniversitySlider
-                items={d2Universities}
-                title={t("partners_page.sliders.d2_title")}
-              />
-              <UniversitySlider
-                items={d4Universities}
-                title={t("partners_page.sliders.d4_title")}
-              />
-
-              {/* <Partners /> */}
-            </>
-          )}
+          <>
+            <UniversitySlider
+              items={d2Universities}
+              title={t("partners_page.sliders.d2_title")}
+            />
+            <UniversitySlider
+              items={d4Universities}
+              title={t("partners_page.sliders.d4_title")}
+            />
+          </>
         </div>
       </section>
     </div>

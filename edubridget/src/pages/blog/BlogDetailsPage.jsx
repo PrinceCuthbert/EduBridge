@@ -89,7 +89,7 @@ export default function BlogDetailsPage() {
 
       {/* Content Section */}
       <article className="container mx-auto px-4 md:px-6 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-12">
+        <div className="max-w-4xl mx-auto">
           {/* Main Article Content */}
           <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm border border-slate-200">
             {/* Render HTML content safely - in a real app, sanitize this! */}
@@ -114,29 +114,6 @@ export default function BlogDetailsPage() {
                   {blog.category}
                 </span>
               </div>
-              {/* <div className="flex gap-2">
-                 <Button variant="outline" size="sm" className="text-slate-600">
-                   <Share2 className="mr-2 h-4 w-4" /> Share
-                 </Button>
-               </div> */}
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-8">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 sticky top-24">
-              {/* <h3 className="font-bold text-lg mb-4 text-slate-900">Latest Posts</h3> */}
-
-              {/* <div className="space-y-4">
-                {blogs.filter(b => b.id !== blog.id).slice(0, 3).map(related => (
-                  <Link key={related.id} to={`/blogs/${related.id}`} className="block group">
-                     <h4 className="font-medium text-slate-800 group-hover:text-primary transition-colors line-clamp-2 text-sm mb-1">
-                       {related.title}
-                     </h4>
-                     <p className="text-xs text-slate-400">{related.date}</p>
-                  </Link>
-                ))}
-              </div> */}
             </div>
           </div>
         </div>

@@ -67,7 +67,7 @@ export const createApplication = async (data) => {
       },
       { stage: "Under Review", completed: false, date: null },
       { stage: "Decision", completed: false, date: null },
-      { stage: "Enrolled", completed: false, date: null },
+      { stage: "Admitted", completed: false, date: null },
     ],
     documents: data.documents || [],
     fee: {

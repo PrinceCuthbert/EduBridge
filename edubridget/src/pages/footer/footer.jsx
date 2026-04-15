@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 // Map string keys from JSON to actual components
+
 const iconMap = {
   facebook: Facebook,
   twitter: Twitter,
@@ -33,7 +34,7 @@ const Footer = () => {
   const socialLinks = Array.isArray(socialLinksData) ? socialLinksData : [];
 
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-12 pb-8 sm:pt-16 md:pt-20 sm:pb-10">
+    <footer className="font-sans bg-slate-900 text-slate-300 pt-12 pb-8 sm:pt-16 md:pt-20 sm:pb-10">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-16">
           {/* Branding Section */}
@@ -53,19 +54,19 @@ const Footer = () => {
             </p>
             <div className="flex items-center gap-4">
               {socialLinks.map((social, i) => {
-                  const Icon = iconMap[social.iconKey] || Facebook;
-                  return (
-                    <a
-                      key={i}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={social.label}
-                      className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300">
-                      <Icon size={20} />
-                    </a>
-                  );
-                })}
+                const Icon = iconMap[social.iconKey] || Facebook;
+                return (
+                  <a
+                    key={i}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300">
+                    <Icon size={20} />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -78,15 +79,15 @@ const Footer = () => {
               </h3>
               <ul className="space-y-3">
                 {explore.map((link, index) => (
-                    <li key={index}>
-                      <Link
-                        to={link.path}
-                        className="hover:text-primary transition-colors duration-300 flex items-center gap-2 group text-sm">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-primary transition-colors" />
-                        {link.name}
-                      </Link>
-                    </li>
-                  ))}
+                  <li key={index}>
+                    <Link
+                      to={link.path}
+                      className="hover:text-primary transition-colors duration-300 flex items-center gap-2 group text-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-primary transition-colors" />
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -97,15 +98,15 @@ const Footer = () => {
               </h3>
               <ul className="space-y-3">
                 {academics.map((link, index) => (
-                    <li key={index}>
-                      <Link
-                        to={link.path}
-                        className="hover:text-primary transition-colors duration-300 flex items-center gap-2 group text-sm">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-primary transition-colors" />
-                        {link.name}
-                      </Link>
-                    </li>
-                  ))}
+                  <li key={index}>
+                    <Link
+                      to={link.path}
+                      className="hover:text-primary transition-colors duration-300 flex items-center gap-2 group text-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-primary transition-colors" />
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
