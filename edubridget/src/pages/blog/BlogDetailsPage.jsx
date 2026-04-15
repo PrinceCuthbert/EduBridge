@@ -61,7 +61,8 @@ export default function BlogDetailsPage() {
             <Link to="/blogs">
               <Button
                 variant="ghost"
-                className="text-white/80 hover:text-white hover:bg-white/10 mb-6 pl-0">
+                className="text-white/80 hover:text-white hover:bg-white/10 mb-6 pl-0"
+              >
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to Blog
               </Button>
             </Link>
